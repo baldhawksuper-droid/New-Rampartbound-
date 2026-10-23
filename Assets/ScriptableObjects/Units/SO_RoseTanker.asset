@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec4cd8a608a747d784eed65ed5d9d0a8, type: 3}
+  m_Name: SO_RoseTanker
+  unitType: 1
+  tier: 1
+  heroName: Rose Tanker
+  title: Ksatria Rambut Pink
+  description: Pelindung benteng dengan perisai mawar dan palu godam. Menahan gempuran monster dan memberikan efek stun.
+  baseDamage: 22
+  attackRate: 0.9
+  attackRange: 1
+  maxHealth: 200
+  criticalChance: 0.05
+  defensePercent: 0.3
+  unitIcon: {fileID: 21300000, guid: 0d4d359f9d734bb1ad8399ca48b92233, type: 3}
+  unitPrefab: {fileID: 0}
+  themeColor: {r: 0.95, g: 0.4, b: 0.65, a: 1}
+  tier0GemSprite: {fileID: 21300000, guid: 6b42cff82a15461495b251581e33f044, type: 3}
+  tier1Sprite: {fileID: 21300000, guid: 0d4d359f9d734bb1ad8399ca48b92233, type: 3}
+  tier2Sprite: {fileID: 21300000, guid: 1a69f121ca4a49758e6062b99ef69ccd, type: 3}
+  tier3Sprite: {fileID: 21300000, guid: 43090c84e6c34b9780db50205c24b168, type: 3}
+  preparationTokenSprite: {fileID: 21300000, guid: b56e0a0427ec4799b17dafeef32bbe09, type: 3}
+  preparationTokenTier2Sprite: {fileID: 21300000, guid: 5ba4fc4e6cb6a8d525c2dd4b014f950e, type: 3}
+  preparationTokenTier3Sprite: {fileID: 21300000, guid: 80d628c7be4659643490a5d86963a438, type: 3}
+  skillName: Earthshaker
+  skillDescription: Hentakan palu ke tanah yang memicu gempa, memberikan stun area dan memantulkan damage musuh.
+  skillCooldown: 6

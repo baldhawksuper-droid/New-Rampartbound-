@@ -1,0 +1,44 @@
+{
+  "cards": [
+    {
+      "id": "card_atk_speed",
+      "title": "Swift Strike",
+      "description": "+20% Attack Speed untuk seluruh hero di papan",
+      "rarity": "Common",
+      "statType": "AttackSpeed",
+      "multiplier": 1.20
+    },
+    {
+      "id": "card_atk_damage",
+      "title": "Raw Power",
+      "description": "+25% Attack Damage untuk seluruh hero",
+      "rarity": "Common",
+      "statType": "Damage",
+      "multiplier": 1.25
+    },
+    {
+      "id": "card_wall_repair",
+      "title": "Rampart Reinforce",
+      "description": "Pulihkan +35 HP Benteng secara instan",
+      "rarity": "Rare",
+      "statType": "HealBase",
+      "multiplier": 35.0
+    },
+    {
+      "id": "card_crit_chance",
+      "title": "Deadly Precision",
+      "description": "+15% Peluang Critical Hit (2x Damage)",
+      "rarity": "Rare",
+      "statType": "CritChance",
+      "multiplier": 0.15
+    },
+    {
+      "id": "card_mana_regen",
+      "title": "Mana Surge",
+      "description": "+50% Mana dari setiap monster yang dikalahkan",
+      "rarity": "Epic",
+      "statType": "ManaBonus",
+      "multiplier": 1.50
+    }
+  ]
+}

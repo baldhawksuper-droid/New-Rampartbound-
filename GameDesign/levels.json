@@ -1,0 +1,199 @@
+{
+  "levels": [
+    {
+      "levelNumber": 1,
+      "title": "Awal Petualangan",
+      "gridWidth": 5,
+      "gridHeight": 5,
+      "movesLimit": 15,
+      "targetTier": 3,
+      "targetCount": 1,
+      "description": "Gabungkan Pebble (Tier 1) untuk membuat Green Jade (Tier 3)!",
+      "initialSpawns": [
+        { "x": 1, "y": 2, "tier": 1 },
+        { "x": 2, "y": 2, "tier": 1 },
+        { "x": 3, "y": 2, "tier": 2 },
+        { "x": 2, "y": 3, "tier": 2 }
+      ],
+      "blockedSlots": []
+    },
+    {
+      "levelNumber": 2,
+      "title": "Mengenal Lapis Lazuli",
+      "gridWidth": 5,
+      "gridHeight": 5,
+      "movesLimit": 18,
+      "targetTier": 4,
+      "targetCount": 1,
+      "description": "Capai Lapis Lazuli (Tier 4) sebelum kehabisan langkah.",
+      "initialSpawns": [
+        { "x": 0, "y": 2, "tier": 1 },
+        { "x": 1, "y": 2, "tier": 1 },
+        { "x": 2, "y": 2, "tier": 2 },
+        { "x": 3, "y": 2, "tier": 2 },
+        { "x": 4, "y": 2, "tier": 3 }
+      ],
+      "blockedSlots": []
+    },
+    {
+      "levelNumber": 3,
+      "title": "Pecahkan Batu Pertama",
+      "gridWidth": 5,
+      "gridHeight": 5,
+      "movesLimit": 20,
+      "targetTier": 4,
+      "targetCount": 1,
+      "description": "Perhatikan petak yang terblokir! Fokus pada area tengah.",
+      "initialSpawns": [
+        { "x": 2, "y": 1, "tier": 2 },
+        { "x": 2, "y": 3, "tier": 2 },
+        { "x": 1, "y": 2, "tier": 1 },
+        { "x": 3, "y": 2, "tier": 1 }
+      ],
+      "blockedSlots": [
+        { "x": 0, "y": 0 },
+        { "x": 4, "y": 0 },
+        { "x": 0, "y": 4 },
+        { "x": 4, "y": 4 }
+      ]
+    },
+    {
+      "levelNumber": 4,
+      "title": "Kilau Amethyst",
+      "gridWidth": 5,
+      "gridHeight": 5,
+      "movesLimit": 25,
+      "targetTier": 5,
+      "targetCount": 1,
+      "description": "Gabungkan hingga menghasilkan Amethyst ungu berkilau (Tier 5).",
+      "initialSpawns": [
+        { "x": 1, "y": 1, "tier": 2 },
+        { "x": 3, "y": 1, "tier": 2 },
+        { "x": 1, "y": 3, "tier": 3 },
+        { "x": 3, "y": 3, "tier": 3 }
+      ],
+      "blockedSlots": [
+        { "x": 2, "y": 2 }
+      ]
+    },
+    {
+      "levelNumber": 5,
+      "title": "Dua Permata Giok",
+      "gridWidth": 5,
+      "gridHeight": 5,
+      "movesLimit": 22,
+      "targetTier": 3,
+      "targetCount": 2,
+      "description": "Kumpulkan 2 buah Green Jade (Tier 3) sekaligus!",
+      "initialSpawns": [
+        { "x": 0, "y": 1, "tier": 1 },
+        { "x": 1, "y": 1, "tier": 1 },
+        { "x": 3, "y": 1, "tier": 1 },
+        { "x": 4, "y": 1, "tier": 1 }
+      ],
+      "blockedSlots": []
+    },
+    {
+      "levelNumber": 6,
+      "title": "Lembah Sempit",
+      "gridWidth": 5,
+      "gridHeight": 5,
+      "movesLimit": 28,
+      "targetTier": 5,
+      "targetCount": 1,
+      "description": "Banyak petak tertutup. Manfaatkan jalur tengah dengan cermat.",
+      "initialSpawns": [
+        { "x": 2, "y": 0, "tier": 1 },
+        { "x": 2, "y": 1, "tier": 2 },
+        { "x": 2, "y": 3, "tier": 2 },
+        { "x": 2, "y": 4, "tier": 3 }
+      ],
+      "blockedSlots": [
+        { "x": 0, "y": 1 },
+        { "x": 0, "y": 2 },
+        { "x": 0, "y": 3 },
+        { "x": 4, "y": 1 },
+        { "x": 4, "y": 2 },
+        { "x": 4, "y": 3 }
+      ]
+    },
+    {
+      "levelNumber": 7,
+      "title": "Topaz Emas",
+      "gridWidth": 5,
+      "gridHeight": 5,
+      "movesLimit": 32,
+      "targetTier": 6,
+      "targetCount": 1,
+      "description": "Ciptakan Topaz emas yang langka (Tier 6). Butuh perencanaan langkah!",
+      "initialSpawns": [
+        { "x": 1, "y": 2, "tier": 3 },
+        { "x": 3, "y": 2, "tier": 3 },
+        { "x": 2, "y": 1, "tier": 4 }
+      ],
+      "blockedSlots": [
+        { "x": 1, "y": 1 },
+        { "x": 3, "y": 3 }
+      ]
+    },
+    {
+      "levelNumber": 8,
+      "title": "Ganda Amethyst",
+      "gridWidth": 5,
+      "gridHeight": 5,
+      "movesLimit": 30,
+      "targetTier": 5,
+      "targetCount": 2,
+      "description": "Target: 2 buah Amethyst (Tier 5). Jangan biarkan papan penuh!",
+      "initialSpawns": [
+        { "x": 2, "y": 2, "tier": 4 },
+        { "x": 1, "y": 2, "tier": 3 },
+        { "x": 3, "y": 2, "tier": 3 }
+      ],
+      "blockedSlots": []
+    },
+    {
+      "levelNumber": 9,
+      "title": "Tantangan Delima",
+      "gridWidth": 5,
+      "gridHeight": 5,
+      "movesLimit": 35,
+      "targetTier": 7,
+      "targetCount": 1,
+      "description": "Capai Ruby Merah (Tier 7)! Ini adalah batu permata kelas tinggi.",
+      "initialSpawns": [
+        { "x": 0, "y": 2, "tier": 4 },
+        { "x": 4, "y": 2, "tier": 4 },
+        { "x": 2, "y": 0, "tier": 3 },
+        { "x": 2, "y": 4, "tier": 3 }
+      ],
+      "blockedSlots": [
+        { "x": 2, "y": 1 },
+        { "x": 2, "y": 3 }
+      ]
+    },
+    {
+      "levelNumber": 10,
+      "title": "Mahkota Sang Kolektor",
+      "gridWidth": 5,
+      "gridHeight": 5,
+      "movesLimit": 40,
+      "targetTier": 8,
+      "targetCount": 1,
+      "description": "Level Boss! Satukan seluruh kristal untuk melahirkan Sapphire Royal (Tier 8).",
+      "initialSpawns": [
+        { "x": 1, "y": 1, "tier": 5 },
+        { "x": 3, "y": 3, "tier": 5 },
+        { "x": 2, "y": 2, "tier": 4 }
+      ],
+      "blockedSlots": [
+        { "x": 0, "y": 0 },
+        { "x": 4, "y": 0 },
+        { "x": 0, "y": 4 },
+        { "x": 4, "y": 4 },
+        { "x": 2, "y": 0 },
+        { "x": 2, "y": 4 }
+      ]
+    }
+  ]
+}

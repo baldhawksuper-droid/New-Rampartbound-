@@ -1,0 +1,35 @@
+{
+  "energyConfig": {
+    "maxEnergy": 30,
+    "costPerBattle": 5,
+    "regenMinutesPerPoint": 8
+  },
+  "chapters": [
+    {
+      "chapterId": 1,
+      "chapterName": "Hutan Zamrud (Emerald Forest)",
+      "themeColor": "#2E7D32",
+      "environmentBg": "BattleField.jpg",
+      "stages": [
+        { "stageId": "1-1", "title": "Serbuan Kristal Zamrud", "totalWaves": 3, "firstClearGold": 150, "firstClearGems": 10, "energyCost": 5 },
+        { "stageId": "1-2", "title": "Sayap Bayangan Kehampaan", "totalWaves": 4, "firstClearGold": 200, "firstClearGems": 15, "energyCost": 5 },
+        { "stageId": "1-3", "title": "Penyusup Kumbang Rawa", "totalWaves": 5, "firstClearGold": 300, "firstClearGems": 20, "energyCost": 5 },
+        { "stageId": "1-4", "title": "Bara Magma Obsidian", "totalWaves": 5, "firstClearGold": 400, "firstClearGems": 25, "energyCost": 5 },
+        { "stageId": "1-5", "title": "Kebangkitan Malakor Sang Tirani", "totalWaves": 6, "firstClearGold": 800, "firstClearGems": 50, "energyCost": 5, "isBossStage": true }
+      ]
+    },
+    {
+      "chapterId": 2,
+      "chapterName": "Benteng Obsidian (Obsidian Citadel)",
+      "themeColor": "#4A148C",
+      "environmentBg": "BattleField.jpg",
+      "stages": [
+        { "stageId": "2-1", "title": "Pintu Gerbang Kawah", "totalWaves": 4, "firstClearGold": 350, "firstClearGems": 20, "energyCost": 5 },
+        { "stageId": "2-2", "title": "Aura Kehampaan Ungu", "totalWaves": 5, "firstClearGold": 450, "firstClearGems": 25, "energyCost": 5 },
+        { "stageId": "2-3", "title": "Barisan Ksatria Magma", "totalWaves": 5, "firstClearGold": 600, "firstClearGems": 30, "energyCost": 5 },
+        { "stageId": "2-4", "title": "Badai Gempa Kehampaan", "totalWaves": 6, "firstClearGold": 750, "firstClearGems": 35, "energyCost": 5 },
+        { "stageId": "2-5", "title": "Puncak Pertempuran Malakor", "totalWaves": 7, "firstClearGold": 1500, "firstClearGems": 100, "energyCost": 5, "isBossStage": true }
+      ]
+    }
+  ]
+}

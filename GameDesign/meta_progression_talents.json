@@ -1,0 +1,59 @@
+{
+  "talents": [
+    {
+      "id": "talent_fortress_hp",
+      "name": "Batu Pertahanan",
+      "description": "Menambah HP dasar Benteng sebesar +15 per level",
+      "maxLevel": 10,
+      "baseCost": 100,
+      "costMultiplier": 1.5,
+      "statType": "BaseHp",
+      "incrementValue": 15.0,
+      "iconName": "icon_shield"
+    },
+    {
+      "id": "talent_start_mana",
+      "name": "Mata Air Mana",
+      "description": "Mulai pertempuran dengan tambahan +20 Mana",
+      "maxLevel": 10,
+      "baseCost": 150,
+      "costMultiplier": 1.6,
+      "statType": "StartingMana",
+      "incrementValue": 20.0,
+      "iconName": "icon_mana"
+    },
+    {
+      "id": "talent_hero_dmg",
+      "name": "Pedang Ketajaman",
+      "description": "Meningkatkan daya rusak (Damage) seluruh Hero sebesar +5%",
+      "maxLevel": 10,
+      "baseCost": 200,
+      "costMultiplier": 1.7,
+      "statType": "GlobalDamagePercent",
+      "incrementValue": 0.05,
+      "iconName": "icon_sword"
+    },
+    {
+      "id": "talent_atk_speed",
+      "name": "Kecepatan Angin",
+      "description": "Meningkatkan kecepatan serang seluruh Hero sebesar +4%",
+      "maxLevel": 10,
+      "baseCost": 250,
+      "costMultiplier": 1.8,
+      "statType": "GlobalAtkSpeedPercent",
+      "incrementValue": 0.04,
+      "iconName": "icon_wing"
+    },
+    {
+      "id": "talent_gold_bonus",
+      "name": "Pundi Emas",
+      "description": "Mendapatkan tambahan +10% Koin Emas dari setiap monster",
+      "maxLevel": 10,
+      "baseCost": 180,
+      "costMultiplier": 1.5,
+      "statType": "GoldBonusPercent",
+      "incrementValue": 0.10,
+      "iconName": "icon_coin"
+    }
+  ]
+}

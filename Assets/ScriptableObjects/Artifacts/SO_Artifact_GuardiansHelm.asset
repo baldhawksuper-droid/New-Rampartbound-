@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a8b9c0d1e2f3456789abcdef0123456, type: 3}
+  m_Name: SO_Artifact_GuardiansHelm
+  artifactId: guardians_helm
+  artifactName: Guardian's Sacred Helm
+  setType: 0
+  pieceSlot: 0
+  artifactIcon: {fileID: 0}
+  description: Helm suci penjaga Citadel, memperkokoh ketahanan benteng pertahanan.
+  bonusHealth: 60
+  bonusAttack: 6
+  bonusCritChance: 0.01
+  combatPower: 160

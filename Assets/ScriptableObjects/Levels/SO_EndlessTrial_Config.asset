@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f8e32da910444558e8a11bc32911005, type: 3}
+  m_Name: SO_EndlessTrial_Config
+  modeTitle: Endless Abyssal Trial
+  modeDescription: Hadapi gelombang monster tanpa henti dari jurang terdalam Citadel.
+    Bertahanlah selama mungkin untuk meraih peringkat tertinggi dan peti harta mingguan!
+  healthGrowthRate: 0.14
+  damageGrowthRate: 0.08
+  speedGrowthRate: 0.015
+  maxSpeedMultiplier: 1.4
+  baseMonsterCount: 8
+  maxMonsterCount: 28
+  baseSpawnInterval: 1.1
+  restTimeBetweenFloors: 3.5
+  bossEncounterInterval: 5
+  milestones:
+  - floorMilestone: 5
+    goldReward: 400
+    gemsReward: 25
+    forgeDustReward: 30
+    refineStoneReward: 1
+    rewardDescription: Peti Perunggu Abyssal (Lantai 5)
+  - floorMilestone: 10
+    goldReward: 800
+    gemsReward: 50
+    forgeDustReward: 60
+    refineStoneReward: 2
+    rewardDescription: Peti Perak Abyssal (Lantai 10)
+  - floorMilestone: 15
+    goldReward: 1400
+    gemsReward: 80
+    forgeDustReward: 100
+    refineStoneReward: 3
+    rewardDescription: Peti Emas Abyssal (Lantai 15)
+  - floorMilestone: 20
+    goldReward: 2200
+    gemsReward: 120
+    forgeDustReward: 150
+    refineStoneReward: 5
+    rewardDescription: Peti Berlian Abyssal (Lantai 20)
+  - floorMilestone: 25
+    goldReward: 3200
+    gemsReward: 180
+    forgeDustReward: 220
+    refineStoneReward: 8
+    rewardDescription: Peti Abyssal Kuno (Lantai 25)
+  - floorMilestone: 30
+    goldReward: 5000
+    gemsReward: 300
+    forgeDustReward: 350
+    refineStoneReward: 12
+    rewardDescription: Peti Mahkota Abyssal (Lantai 30)

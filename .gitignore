@@ -1,0 +1,102 @@
+# =========================================================================
+# Unity .gitignore for Rampartbound / Project G
+# =========================================================================
+
+# Unity Temporary & Generated Folders
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+.utmp/
+
+# Sub-project specific Unity folders (Rampartbound)
+Rampartbound/[Ll]ibrary/
+Rampartbound/[Tt]emp/
+Rampartbound/[Oo]bj/
+Rampartbound/[Bb]uild/
+Rampartbound/[Bb]uilds/
+Rampartbound/[Ll]ogs/
+Rampartbound/[Uu]ser[Ss]ettings/
+Rampartbound/[Mm]emoryCaptures/
+Rampartbound/[Rr]ecordings/
+Rampartbound/.utmp/
+
+# AI Assistant & Tooling Internal Folders
+.gemini/
+.claude/
+.idea/
+.vscode/
+.vs/
+.gradle/
+
+# Log Files & Crash Dumps
+*.log
+mono_crash.*
+sysinfo.txt
+crashlytics-build.properties
+
+# Visual Studio & IDE generated files
+ExportedObj/
+.consulo/
+*.csproj
+*.unityproj
+*.sln
+*.slnx
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.DotSettings.user
+
+# Unity3D generated meta files for temp objects
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+
+# Blender backup files
+*.blend1
+*.blend1.meta
+
+# Builds & Packages
+*.apk
+!Builds/Android/*.apk
+*.aab
+*.unitypackage
+*.unitypackage.meta
+*.app
+
+# TestRunner generated files
+InitTestScene*.unity*
+
+# Addressables default ignores
+/ServerData
+[Aa]ssets/StreamingAssets/aa*
+[Aa]ssets/AddressableAssetsData/link.xml*
+[Aa]ssets/Addressables_Temp*
+[Aa]ssets/AddressableAssetsData/*/*.bin*
+
+# UI Toolkit auto generated files
+UIElementsSchema/
+[Aa]ssets/[Ss]ceneDependencyCache*
+
+# OS specific files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Secrets & Bot Configs
+.env
+.env*
+scripts/telegram_config.json
+
