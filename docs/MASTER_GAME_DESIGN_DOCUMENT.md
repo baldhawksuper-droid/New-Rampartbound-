@@ -1,3 +1,7 @@
+# LEGACY MASTER GDD — Historical Reference
+
+> **Status:** Superseded for current product direction by [`CURRENT_PRODUCT_DESIGN.md`](CURRENT_PRODUCT_DESIGN.md). This document contains legacy concepts and may not describe current implementation. Verify code/data before treating a feature statement as implemented.
+
 # MASTER GAME DESIGN DOCUMENT (MASTER GDD) & TECHNICAL SPECIFICATION
 **Project Name:** Fantasy Citadel Defense  
 **Genre:** Stylized Chibi Fantasy Defense RPG (Puzzle Merge & Strategy Defense)  

@@ -1,7 +1,10 @@
-# TIM PENGEMBANGAN & ALUR KERJA PROYEK (TEAM PROJECT WORKFLOW)
-**Proyek:** Fantasy Citadel Defense  
+# Rampartbound — Project Workflow & QA
+
+> **Status:** Historical sprint ledger / working reference. The approved current product direction is in [`CURRENT_PRODUCT_DESIGN.md`](CURRENT_PRODUCT_DESIGN.md); verified facts and remaining audit work are in [`PROJECT_STATUS.md`](PROJECT_STATUS.md). Sprint claims below are not independently verified by this document.
+
+**Proyek:** Rampartbound: Merge Defense (judul kerja)
 **Versi:** 1.0.0  
-**Lead Project Manager:** BaldHawk  
+**AI Project Lead:** Hermes Agent (planning, implementation support, and review when explicitly requested). **Game Owner / final decision-maker:** User. Role labels below describe workstreams, not staffed people or agents unless they have actually been assigned.
 **Acuan Desain:** [MASTER_GAME_DESIGN_DOCUMENT.md](MASTER_GAME_DESIGN_DOCUMENT.md)  
 
 ---
@@ -13,7 +16,7 @@ Untuk mempercepat iterasi dan menjaga kualitas teknis, proyek diorganisasi menja
 ```
                             ┌─────────────────────────────────┐
                             │      LEAD PROJECT MANAGER       │
-                            │           (BaldHawk)            │
+                            │        (Hermes Agent)           │
                             │   Visi, Orkestrasi, Integrasi   │
                             └────────────────┬────────────────┘
                                              │
@@ -60,12 +63,12 @@ Untuk mempercepat iterasi dan menjaga kualitas teknis, proyek diorganisasi menja
 
 | Sprint | Nama Sprint | Fokus Utama & Output | Status |
 | :---: | :--- | :--- | :---: |
-| **Sprint 1** | **Fondasi Grid, Placeholder & Data Model** | Hierarki Unity, Placeholder PNG sprites lengkap + `.meta`, `UnitDataSO`, `LevelConfigSO`, `GridManager`, `TileCell`, `UnitController`, `EconomyManager`, `GameManager`. | **Selesai (100%)** |
-| **Sprint 2** | **Summon Engine & Merge Controller (Mobile/Tablet)** | `HeroSummoner`, formula gems dinamis, Drag-and-Drop Merge mobile (touch offset jari, highlight hijau/biru/merah), pergantian sprite Tier 1-3, `GridMatch3Solver`, `MobileTouchManager`, `HeroMergeController`, `SummonButtonUI`. | **Selesai (100%)** |
-| **Sprint 3** | **Monster AI, Pathway & Combat Targeting** | `MonsterController`, `MonsterPathManager`, `WaveSpawner`, `CastleBarricade`, targeting real-time hero, serangan proyektil sihir AoE, data monster & wave ScriptableObjects. | **Selesai (100%)** |
-| **Sprint 4** | **Spesialisasi Skill Tier 2 & Tier 3** | Skill unik: Dual Slash & Blade Tempest Cedric, Shield Slam & Earthshaker Rose, Mystic Burst & Meteor Rabbit Mage. Visual feedback fusi, shockwaves, floating text (`SkillVfxManager`), dan synthesized audio (`AudioManager`). | **Selesai (100%)** |
-| **Sprint 5** | **Battle HUD, Metagame Link & Balancing** | UI HUD tempur (`UIBattleView`, `DragDropHandler`), speed toggle (1x/2x), pause overlay, popup Victory & Defeat, sinkronisasi data CP Lobby (`CitadelLobbyManager`, `LobbyDataModel`), formula matematis tier scaling. | **Selesai (100%)** |
-| **Sprint 6** | **Hero Upgrade, Equipment & Stage World Map** | Upgrade level hero pakai Gold (`HeroLobbyProfile`), slot equipment (`HeroEquipment`), scaling stat arena battle (`UnitController`), controller UI upgrade (`UIHeroUpgradeView`), data 10 stage Chapter 1 (`StageDataSO`), master progress manager (`StageManager`), sistem rating bintang 1-3 & reward first-clear, serta peta dunia (`UIStageMapView`). | **Selesai (100%)** |
+| **Sprint 1** | **Fondasi Grid, Placeholder & Data Model** | Hierarki Unity, Placeholder PNG sprites lengkap + `.meta`, `UnitDataSO`, `LevelConfigSO`, `GridManager`, `TileCell`, `UnitController`, `EconomyManager`, `GameManager`. | **Perlu bukti verifikasi** |
+| **Sprint 2** | **Summon Engine & Merge Controller (Mobile/Tablet)** | `HeroSummoner`, formula gems dinamis, Drag-and-Drop Merge mobile (touch offset jari, highlight hijau/biru/merah), pergantian sprite Tier 1-3, `GridMatch3Solver`, `MobileTouchManager`, `HeroMergeController`, `SummonButtonUI`. | **Perlu bukti verifikasi** |
+| **Sprint 3** | **Monster AI, Pathway & Combat Targeting** | `MonsterController`, `MonsterPathManager`, `WaveSpawner`, `CastleBarricade`, targeting real-time hero, serangan proyektil sihir AoE, data monster & wave ScriptableObjects. | **Perlu bukti verifikasi** |
+| **Sprint 4** | **Spesialisasi Skill Tier 2 & Tier 3** | Skill unik: Dual Slash & Blade Tempest Cedric, Shield Slam & Earthshaker Rose, Mystic Burst & Meteor Rabbit Mage. Visual feedback fusi, shockwaves, floating text (`SkillVfxManager`), dan synthesized audio (`AudioManager`). | **Perlu bukti verifikasi** |
+| **Sprint 5** | **Battle HUD, Metagame Link & Balancing** | UI HUD tempur (`UIBattleView`, `DragDropHandler`), speed toggle (1x/2x), pause overlay, popup Victory & Defeat, sinkronisasi data CP Lobby (`CitadelLobbyManager`, `LobbyDataModel`), formula matematis tier scaling. | **Perlu bukti verifikasi** |
+| **Sprint 6** | **Hero Upgrade, Equipment & Stage World Map** | Upgrade level hero pakai Gold (`HeroLobbyProfile`), slot equipment (`HeroEquipment`), scaling stat arena battle (`UnitController`), controller UI upgrade (`UIHeroUpgradeView`), data 10 stage Chapter 1 (`StageDataSO`), master progress manager (`StageManager`), sistem rating bintang 1-3 & reward first-clear, serta peta dunia (`UIStageMapView`). | **Perlu bukti verifikasi** |
 
 ---
 
@@ -153,7 +156,7 @@ Untuk mempercepat iterasi dan menjaga kualitas teknis, proyek diorganisasi menja
 
 ### Definition of Done Sprint 9 (Penentuan Nama Game Original & Konsolidasi 1 Folder Unity Mandiri):
 1. **Brainstorming & Penentuan Nama Game Original:**
-   * Diskusi kolaboratif 4 divisi spesialis (Asset, Gameplay, Economy, QA/ASO) untuk memilih judul game orisinal, berdampak tinggi, berdaya saing komersial, dan 100% bebas hak cipta / belum pernah dipakai di pasar game.
+   * Judul kerja saat ini: **Rampartbound: Merge Defense**. Jangan mengklaim clearance merek dagang/hak cipta atau keunikan global sebelum pencarian terdokumentasi dan review hukum yang sesuai.
    * Menentukan filosofi lore, kesesuaian ASO (App Store Optimization), dan identitas brand game.
 2. **Konsolidasi 1 Folder Mandiri Unity (Ready-to-Run):**
    * Mengelompokkan seluruh aset, skrip (48 skrip C#), audio, prefab, animasi, dan ScriptableObjects ke dalam 1 folder proyek mandiri berlabel nama game.

@@ -1,3 +1,7 @@
+# LEGACY GDD — Core Gameplay Mechanics
+
+> **Status:** Historical reference; current product direction is in [`CURRENT_PRODUCT_DESIGN.md`](CURRENT_PRODUCT_DESIGN.md). Verify all details against current code and owner decisions before implementation.
+
 # GAME DESIGN DOCUMENT (GDD) & ARCHITECTURE
 **Project:** Fantasy Defense RPG  
 **Module:** Core Battle Gameplay, Parameters, Trio Heroes & Unity C# Architecture  

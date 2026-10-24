@@ -1,14 +1,36 @@
 # Rampartbound: Merge Defense — Unity Project & Drop-In Asset Guide
 
 Selamat datang di repositori resmi **Rampartbound: Merge Defense**!
-Folder ini adalah **Dedicated Unity Project 1 Folder Penuh** yang mandiri, bersih, dan siap dijalankan (*ready-to-run*) di Unity Hub / Unity Editor.
+Folder ini berisi project Unity mandiri. Kelengkapan folder belum membuktikan bahwa project berhasil dikompilasi atau diuji; lakukan validasi di Unity Editor sebelum menyatakan build siap.
+
+Panduan mulai cepat ini melengkapi [`README_UNITY_SETUP.md`](README_UNITY_SETUP.md). Spesifikasi desain aktif ada di [`docs/CURRENT_PRODUCT_DESIGN.md`](docs/CURRENT_PRODUCT_DESIGN.md); dokumen GDD lama ditandai sebagai referensi historis.
+
+## Mulai cepat
+
+1. Buka `<project-root>` di Unity Hub (folder yang berisi `Assets`, `Packages`, dan `ProjectSettings`).
+2. Gunakan versi Editor yang tercatat di `ProjectSettings/ProjectVersion.txt`.
+3. Buka `Assets/Scenes/RampartboundMainScene.unity` dan tekan **Play**.
+4. Untuk build, gunakan menu `Rampartbound > Build` yang didefinisikan di `Assets/Scripts/Editor/RampartboundBuildPipeline.cs`; output path/nama hasil build mengikuti nilai aktual pipeline. Build belum dianggap teruji sampai berhasil dibuat dan dijalankan.
+
+## Dokumen utama
+
+- [`docs/CURRENT_PRODUCT_DESIGN.md`](docs/CURRENT_PRODUCT_DESIGN.md) — arah produk dan desain aktif.
+- [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md) — status terverifikasi, keterbatasan, dan Sprint 49.
+- [`README_UNITY_SETUP.md`](README_UNITY_SETUP.md) — setup proyek.
+- `docs/MASTER_GAME_DESIGN_DOCUMENT.md`, `docs/GDD_CORE_GAMEPLAY_MECHANICS.md`, dan `docs/GDD_LOBBY_CONCEPT.md` — referensi historis sampai direkonsiliasi.
 
 ---
+
+---
+
+## Status proyek dan dokumen acuan
+
+Arah desain aktif tersedia di [`docs/CURRENT_PRODUCT_DESIGN.md`](docs/CURRENT_PRODUCT_DESIGN.md); status implementasi, bukti verifikasi, dan batas yang belum diuji ada di [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md). Panduan ini tidak menyatakan semua fitur atau build telah diuji.
 
 ## 📁 Struktur Direktori Proyek
 
 ```text
-D:\PROJECT GAMES\NewProjectGames\Rampartbound\
+<project-root>\
 ├── Assets\
 │   ├── Animations\           (Animasi squash-and-stretch & procedural visual juice)
 │   ├── Art\Sprites\          (Pixel art Cedric, Rose, Rabbit, Wind Ranger, Monsters, Grid, UI)
@@ -23,7 +45,7 @@ D:\PROJECT GAMES\NewProjectGames\Rampartbound\
 │   │   ├── Talents\          (SO_Talent_CitadelAegis, SO_Talent_EconomicProsperity, dll)
 │   │   ├── Units\            (SO_Cedric, SO_RoseTanker, SO_RabbitMage, SO_WindRanger)
 │   │   └── Waves\            (SO_Wave_1, SO_Wave_2, SO_Wave_3)
-│   └── Scripts\              (75 Skrip C# modular terkalibrasi tanpa compiler error)
+│   └── Scripts\              (jumlah script dan status kompilasi perlu diperbarui dari hasil verifikasi terbaru)
 │       ├── Combat\           (CedricUnit, RoseTankerUnit, RabbitMageUnit, WindRangerUnit, EliteMonsterAffix, AutoMergeAssistant, BossMonsterController, dll)
 │       ├── Core\             (GameManager, GridManager, TileCell, MobileCamera, Economy, Audio, DevicePerformance, Weather)
 │       ├── Metagame\         (CitadelLobbyManager, ArtifactManager, StageManager, CitadelSummonManager, QuestManager, EndlessTrialManager, RelicForgeManager, CitadelTalentManager, GuildManager, BattlePassManager, CitadelStoreManager)
@@ -48,7 +70,7 @@ Fitur arsitektur ini dirancang khusus agar komandan dapat **langsung menumpuk/me
 > 1. Gunakan **nama file PNG yang sama persis** dengan yang sudah terdaftar di tabel manifest.
 > 2. **JANGAN PERNAH menghapus file pendamping berakhiran `.meta`** (misalnya `Cedric_T1.png.meta`).
 > 
-> *Mengapa?* Unity menyimpan nomor identitas rahasia (**GUID**) di dalam file `.meta`. Selama file `.meta` tidak terhapus, Unity akan langsung memperbarui tampilan grafis di arena permainan secara instan dengan referensi data ScriptableObject 100% utuh tanpa pernah putus (*zero missing references*)!
+> *Mengapa?* Unity menyimpan nomor identitas rahasia (**GUID**) di dalam file `.meta`. Selama file `.meta` tidak terhapus, Unity akan langsung memperbarui tampilan grafis di arena permainan secara instan dengan referensi data ScriptableObject tetap terhubung selama GUID `.meta` yang lama dipertahankan; verifikasi referensi di Unity setelah mengganti aset!
 
 ---
 
@@ -132,7 +154,7 @@ Merakit ulang seluruh hierarki arena secara otomatis dari nol ke dalam scene `As
 ### 3. `Rampartbound` ➡️ `Build`
 Menu ekspor otomatis 1-klik untuk distribusi, staging, dan rilis Google Play Store:
 * **`1-Click Build Windows Standalone (64-bit)`:** Mengompilasi binary PC desktop langsung ke `Builds/Windows/Rampartbound.exe`.
-* **`1-Click Build Android Sideload APK (Testing)`:** Mengompilasi paket instalasi Android siap instal langsung ke `Builds/Android/Rampartbound_v1.2.0_debug.apk`.
+* **`1-Click Build Android Sideload APK (Testing)`:** Mengompilasi paket instalasi Android siap instal langsung ke `Builds/Android/Builds/Android/Rampartbound_v1.2.14_release.apk`.
 * **`1-Click Build Google Play App Bundle (.aab - Release)`:** Mengompilasi paket resmi Google Play App Bundle (.aab) dengan arsitektur IL2CPP 64-bit ARM64 + ARMv7, Target SDK 34+, dan Play Asset/Feature delivery.
 * **`Google Play Release Readiness Audit`:** Memeriksa kesiapan paket, App ID, Target API 34+, dan 64-bit compliance sebelum proses submission ke Google Play Console.
 * **`Configure Project Settings (Portrait & Mobile)`:** Otomatis mengunci orientasi layar ke Portrait, package ID `com.rampartbound.mergedefense`, dan konfigurasi grafis mobile.
@@ -162,8 +184,8 @@ Proyek ini dilengkapi pipeline otomatis untuk memproduksi APK langsung melalui G
 1. Buka aplikasi **Unity Hub**.
 2. Klik tombol **Add** (atau *Add project from disk*).
 3. Arahkan dan pilih folder:  
-   👉 `D:\PROJECT GAMES\Rampartbound`
-4. Pilih versi Editor: **Unity 6 (`6000.6.5f1` / `6000.6.6f1`)** atau Unity 2022.3 LTS+.
+   👉 `<project-root>` (folder yang berisi `Assets`, `Packages`, dan `ProjectSettings`)
+4. Gunakan versi Editor yang tercatat di `ProjectSettings/ProjectVersion.txt` (`6000.6.5f1`); kompatibilitas versi lain belum diverifikasi.
 5. Klik nama proyek untuk masuk ke **Unity Editor**.
 6. Buka scene: `Assets/Scenes/RampartboundMainScene.unity`.
 7. Tekan tombol **Play (▶️)** di Unity Editor untuk langsung menikmati game!
@@ -175,9 +197,9 @@ Proyek ini dilengkapi pipeline otomatis untuk memproduksi APK langsung melalui G
 
 Bagi Komandan yang ingin langsung mencoba game di perangkat Android tanpa perlu build ulang atau upload ke pihak ketiga:
 * File APK siap sideload sudah tersedia langsung di dalam repositori Git:  
-  👉 **[`Builds/Android/Rampartbound_v1.2.0_debug.apk`](Builds/Android/Rampartbound_v1.2.0_debug.apk)** (Ukuran: ~29.17 MB)
+  👉 **[`Builds/Android/Builds/Android/Rampartbound_v1.2.14_release.apk`](Builds/Android/Builds/Android/Rampartbound_v1.2.14_release.apk)** (artifact versi 1.2.14; versi kode saat ini 1.2.17, belum diverifikasi sebagai build terkini)
 * **Cara Pemasangan di Ponsel / Tablet Android:**
-  1. Unduh file `Rampartbound_v1.2.0_debug.apk` langsung dari repositori GitHub.
+  1. Unduh file `Rampartbound_v1.2.14_release.apk` langsung dari repositori GitHub.
   2. Salin ke ponsel atau kirim via chat.
   3. Buka file `.apk` di ponsel Anda dan pilih **Install** (izinkan *Install from unknown sources* jika diminta).
   4. Buka dan nikmati permainan pertahanan benteng secara langsung!

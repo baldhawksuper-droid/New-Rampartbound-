@@ -1,3 +1,7 @@
+# LEGACY GDD — Lobby & Hero System
+
+> **Status:** Historical concept; current product direction is in [`CURRENT_PRODUCT_DESIGN.md`](CURRENT_PRODUCT_DESIGN.md). Verify details against current UI and owner decisions before implementation.
+
 # GAME DESIGN DOCUMENT (GDD) - LOBBY & HERO SYSTEM
 **Project:** Fantasy Heroes RPG  
 **Module:** Main Lobby UI & Trio Character Formation  
