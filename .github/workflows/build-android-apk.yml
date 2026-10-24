@@ -21,15 +21,21 @@ jobs:
         with:
           lfs: true
 
-      - name: Cache Unity Library
-        uses: actions/cache@v4
-        with:
-          path: Library
-          key: Library-${{ runner.os }}-${{ env.UNITY_VERSION }}-${{ hashFiles('Packages/packages-lock.json', 'Assets/**', 'ProjectSettings/**') }}
-          restore-keys: |
-            Library-${{ runner.os }}-${{ env.UNITY_VERSION }}-
+      # Unity's Android builder image is very large. Free space on this ephemeral
+      # GitHub-hosted runner before Docker pulls the image; project files are untouched.
+      - name: Free runner disk space
+        shell: bash
+        run: |
+          set -euxo pipefail
+          df -h /
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
+            /usr/local/share/powershell /usr/local/share/chromium \
+            /usr/local/.ghcup /usr/lib/jvm
+          docker system prune --all --force --volumes || true
+          df -h /
 
       - name: Build Android APK
+        timeout-minutes: 90
         uses: game-ci/unity-builder@v4
         env:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
@@ -39,8 +45,7 @@ jobs:
           targetPlatform: Android
           unityVersion: ${{ env.UNITY_VERSION }}
           buildMethod: ${{ env.BUILD_METHOD }}
-          customParameters: -quit
-          allowDirtyBuild: true
+          allowDirtyBuild: false
 
       - name: Verify APK exists
         shell: bash
