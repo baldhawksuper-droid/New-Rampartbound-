@@ -49,6 +49,17 @@ Initial observations from `Gameplay.jpeg`:
 
 These are visual-audit findings and recommendations, not approved asset changes. Audit actual runtime screens (lobby, battle, map, panels, overlays) across portrait aspect ratios before a broad visual overhaul.
 
+## Static source and asset review (not runtime verification)
+
+Inspection of `RampartboundSceneSetup.cs`, `UICitadelLobbyView`, and selected project-owned art suggests:
+
+- The project has a hybrid art treatment: compact/angular hero sprites and blocky backdrop forms sit beside a painterly, gradient-rich title illustration. Describe this as a mixed/retro-inspired fantasy style for now; the assets do not establish a consistent strict pixel-art direction.
+- The generated lobby source gives four hero cards similar layout prominence. The three approved starters should be the main roster; Wind Ranger should be clearly presented as a distinct locked/featured summon unlock. This remains a design requirement, not a claim about the rendered screen or actual ownership logic.
+- The source assigns different rarity frames to the starter heroes (Cedric/Rose Rare, Rabbit Mage Epic) and Wind Ranger Legendary while displaying comparable level/star text. Explain the progression/rarity meaning or standardize it so card treatments do not suggest unsupported starting advantages.
+- The generated lobby uses many flat tinted buttons and emoji/text next to detailed fantasy frames/art. Define a consistent control treatment and verify emoji/font legibility across target devices.
+
+These are recommendations from selected source and asset inspection only. They do not verify layout, binding, state, legibility, or input behavior at runtime. Prioritize a cohesive art/UI pass after the owner approves the intended visual direction.
+
 ## First-session experience
 
 1. Explain the defense goal and castle health.

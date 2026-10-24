@@ -52,7 +52,7 @@ Deliver a readable mobile hybrid merge/puzzle defense campaign. Levels deliberat
 - Updated the project role descriptions to identify Hermes Agent as AI project lead and the user as product owner; reduced some absolute QA/sprint claims.
 - Inspected `Gameplay.jpeg`: colorful tokens are distinguishable, but board/background separation and cell boundaries are weak; the image shows no objective, mode/phase, moves/economy, next-wave context, or castle-health indicator; the fence, cropped side structures, and large blue/gold object compete with the grid. These are image-only findings, not proof of runtime UI state.
 - `Pixel Art.jpeg` appears to be a third-party/ad-feed composition with platform overlays, and is not verified as Rampartbound-owned art or in-game UI. Do not use it as evidence of the game's art direction. Establish a consistent original pixel-art direction from project-owned assets instead.
-- Unity runtime behavior, other screens, portrait aspect ratios, device-scale readability, and actual use of the referenced sprites remain unverified.
+- Unity Editor/Play Mode/build cannot be run on the current computer because Unity is not installed and cannot be installed there (owner-reported). Therefore no runtime, responsive-layout, device-scale, or build verification is claimed. Static source/art review is possible; an externally rendered screenshot/video or a Unity-capable CI/other computer can supplement but not fully replace interaction/device testing.
 
 **Bounded work completed so far (not full design audit):**
 

@@ -41,7 +41,7 @@ Struktur dan daftar fitur di bawah merangkum file yang ada atau catatan historis
 │   ├── Audio\                (Synthesized BGM Lobby, BGM Battle, SFX procedural)
 │   ├── Prefabs\              (Prefab Grid, Proyektil, Partikel VFX)
 │   ├── Scenes\
-│   │   └── RampartboundMainScene.unity  (Scene arena utama siap Play)
+│   │   └── RampartboundMainScene.unity  (scene terdaftar di Build Settings; belum diuji Play Mode)
 │   ├── ScriptableObjects\
 │   │   ├── Artifacts\        (12 SO Artefak: Guardian's Vow, Berserker's Fury, Sorcerer's Surge)
 │   │   ├── Levels\           (SO_Level1_Config.asset, SO_EndlessTrial_Config.asset)
@@ -163,23 +163,20 @@ Menu ekspor otomatis 1-klik untuk distribusi, staging, dan rilis Google Play Sto
 * **`Google Play Release Readiness Audit`:** Memeriksa kesiapan paket, App ID, Target API 34+, dan 64-bit compliance sebelum proses submission ke Google Play Console.
 * **`Configure Project Settings (Portrait & Mobile)`:** Otomatis mengunci orientasi layar ke Portrait, package ID `com.rampartbound.mergedefense`, dan konfigurasi grafis mobile.
 
-### 4. 🤖 Otomatisasi Build APK via Git & GitHub Actions (CI/CD)
-Proyek ini dilengkapi pipeline otomatis untuk memproduksi APK langsung melalui Git / GitHub Actions:
-* **Workflow File:** `.github/workflows/build-android-apk.yml`
-* **Cara Eksekusi via GitHub Web:**
-  1. Buka repositori: https://github.com/baldhawksuper-droid/New-Rampartbound-
-  2. Buka tab **Actions**.
-  3. Pilih workflow **"Build Android APK & Release"**.
-  4. Klik **Run workflow**, pilih tipe build (`apk` atau `aab`), lalu klik tombol hijau **Run workflow**.
-  5. Setelah selesai, file APK siap di-download di bagian **Artifacts**!
-* **Cara Eksekusi via Terminal / Git CLI:**
-  ```bash
-  # Memicu build cloud langsung dari terminal:
-  gh workflow run build-android-apk.yml -f buildType=apk
+### 4. Build lokal melalui Unity Editor
 
-  # Atau jalankan script batch otomatis di folder scripts:
-  .\scripts\build_android_apk.bat
-  ```
+Build lokal tersedia melalui menu yang dideklarasikan di `Assets/Scripts/Editor/RampartboundBuildPipeline.cs`:
+
+- `Rampartbound > Build > 1-Click Build Windows Standalone (64-bit)` — target `Builds/Windows/Rampartbound.exe`.
+- `Rampartbound > Build > 1-Click Build Android Sideload APK (Testing)` — target `Builds/Android/Rampartbound_debug.apk`.
+- `Rampartbound > Build > 1-Click Build Google Play App Bundle (.aab - Release)` — target `Builds/Android/Rampartbound_v1.2.17_b137_release.aab`.
+- `Rampartbound > Build > Google Play Release Readiness Audit` — menghasilkan laporan pemeriksaan, bukan bukti submission atau persetujuan toko.
+
+Nama dan lokasi tersebut adalah target dari kode pipeline, bukan bukti bahwa build sudah berhasil dibuat. Checkout ini tidak memuat `.github/workflows/build-android-apk.yml`, jadi instruksi CI lama dihapus. Script helper di `scripts/` mengarah ke repo/workflow berbeda dan belum tervalidasi untuk checkout ini.
+
+#### Uji Play Mode
+
+`Assets/Scenes/RampartboundMainScene.unity` tercatat di Build Settings, tetapi belum terbukti bisa berjalan di Unity Editor. Buka proyek dengan versi Editor yang tercatat di `ProjectSettings/ProjectVersion.txt`, jalankan scene, lalu verifikasi UI dan Console sebelum menyebutnya siap dimainkan.
 
 ---
 
@@ -192,17 +189,12 @@ Proyek ini dilengkapi pipeline otomatis untuk memproduksi APK langsung melalui G
 4. Gunakan versi Editor yang tercatat di `ProjectSettings/ProjectVersion.txt` (`6000.6.5f1`); kompatibilitas versi lain belum diverifikasi.
 5. Klik nama proyek untuk masuk ke **Unity Editor**.
 6. Buka scene: `Assets/Scenes/RampartboundMainScene.unity`.
-7. Tekan tombol **Play (▶️)** di Unity Editor untuk langsung menikmati game!
-8. Untuk mengekspor installer APK ponsel, Google Play App Bundle (.aab), atau file EXE Windows, cukup pilih menu **`Rampartbound` ➡️ `Build`**!
+7. Untuk menguji Play Mode, tekan **Play (▶️)** dan periksa Unity Console serta alur scene; hasilnya belum diverifikasi di Sprint 49.
+8. Target build lokal tersedia melalui menu **`Rampartbound` ➡️ `Build`**; nama menu lengkap dan target output dijelaskan di bagian berikut.
 
 ---
 
-## 📱 Uji Coba & Unduh Langsung Paket APK (Direct Git Access)
+## Verifikasi yang belum dilakukan
 
-## Build Android
-
-Pipeline menargetkan `Builds/Android/Rampartbound_debug.apk`. Folder repositori juga berisi APK lama dengan nama/versi berbeda; saya belum membangun, memasang, atau menguji paket APK pada perangkat dalam Sprint 49. Jangan menganggap artefak lama sebagai build terkini atau rekomendasi rilis.
-
-Untuk menghasilkan paket terbaru, gunakan menu `Rampartbound > Build > 1-Click Build Android Sideload APK (Testing)` di Unity Editor yang cocok dengan versi proyek.
-
+Unity Editor tidak tersedia di komputer saat ini. Scene terdaftar di Build Settings, tetapi belum diuji di Play Mode. Output build yang disebut di atas adalah target yang dideklarasikan pipeline, bukan hasil build yang sudah diverifikasi.
 
