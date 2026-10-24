@@ -172,7 +172,7 @@ Build lokal tersedia melalui menu yang dideklarasikan di `Assets/Scripts/Editor/
 - `Rampartbound > Build > 1-Click Build Google Play App Bundle (.aab - Release)` — target `Builds/Android/Rampartbound_v1.2.17_b137_release.aab`.
 - `Rampartbound > Build > Google Play Release Readiness Audit` — menghasilkan laporan pemeriksaan, bukan bukti submission atau persetujuan toko.
 
-Nama dan lokasi tersebut adalah target dari kode pipeline, bukan bukti bahwa build sudah berhasil dibuat. Checkout ini tidak memuat `.github/workflows/build-android-apk.yml`, jadi instruksi CI lama dihapus. Script helper di `scripts/` mengarah ke repo/workflow berbeda dan belum tervalidasi untuk checkout ini.
+Nama dan lokasi tersebut adalah target dari kode pipeline, bukan bukti bahwa build sudah berhasil dibuat. Workflow manual tersedia di `.github/workflows/build-android-apk.yml`; setelah perubahan ini masuk ke `main`, jalankan melalui tab **Actions → Build Android APK → Run workflow**. Hasilnya diunggah sebagai artifact bernama `Rampartbound-Android-APK`. Script helper lama di `scripts/` masih mengarah ke repo/workflow berbeda dan belum tervalidasi untuk checkout ini.
 
 #### Uji Play Mode
 

@@ -1,0 +1,55 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  UNITY_VERSION: 6000.6.5f1
+  BUILD_METHOD: Rampartbound.Editor.RampartboundBuildPipeline.BuildAndroidAPK
+  BUILD_OUTPUT: Builds/Android/Rampartbound_debug.apk
+
+jobs:
+  build-apk:
+    name: Build APK (Unity 6000.6.5f1)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Cache Unity Library
+        uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-${{ runner.os }}-${{ env.UNITY_VERSION }}-${{ hashFiles('Packages/packages-lock.json', 'Assets/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-${{ runner.os }}-${{ env.UNITY_VERSION }}-
+
+      - name: Build Android APK
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          targetPlatform: Android
+          unityVersion: ${{ env.UNITY_VERSION }}
+          buildMethod: ${{ env.BUILD_METHOD }}
+          customParameters: -quit
+          allowDirtyBuild: true
+
+      - name: Verify APK exists
+        shell: bash
+        run: test -s "${BUILD_OUTPUT}"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Rampartbound-Android-APK
+          path: ${{ env.BUILD_OUTPUT }}
+          if-no-files-found: error
+          retention-days: 14
