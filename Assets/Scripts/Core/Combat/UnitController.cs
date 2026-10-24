@@ -183,6 +183,11 @@ namespace FantasyDefense.Combat
         {
             if (!ActiveUnits.Contains(this))
                 ActiveUnits.Add(this);
+
+            if (transform.localScale.sqrMagnitude < 0.001f)
+            {
+                UpdateVisualAppearance();
+            }
         }
 
         protected virtual void OnDisable()
@@ -392,6 +397,7 @@ namespace FantasyDefense.Combat
                         {
                             gem.CurrentCell.SetOccupant(gem);
                             gem.gameObject.SetActive(true);
+                            gem.UpdateVisualAppearance();
                             if (gem.gameObject.activeInHierarchy)
                             {
                                 gem.StartCoroutine(gem.AnimateGemRestoreRoutine());
@@ -423,7 +429,8 @@ namespace FantasyDefense.Combat
             Vector3 targetScaleVec = Vector3.one * targetScale;
 
             transform.localScale = Vector3.zero;
-            Color targetColor = unitData != null ? unitData.themeColor : Color.white;
+            // Kembalikan warna murni Color.white agar artwork permata T0 asli tampil tajam, cerah dan tidak terdistorsi tint
+            Color targetColor = Color.white;
             spriteRenderer.color = new Color(targetColor.r, targetColor.g, targetColor.b, 0f);
 
             float duration = 0.35f;
@@ -996,12 +1003,14 @@ namespace FantasyDefense.Combat
                 AudioManager.Instance.PlaySound(SoundType.ButtonClick);
             }
 
+            // PENTING: Kunci petak tujuan jari pemain (cellB) sebagai pusat fusi interaksi pemain!
+            // Jangan memicu event unit sekunder (otherUnit) yang berpotensi menimpa lastInteractionCell.
             OnUnitMoved?.Invoke(this, cellB);
-            OnUnitMoved?.Invoke(otherUnit, cellA);
 
-            // Cek apakah swap ini memicu Match-3 (kunci petak cellB sebagai target swap)
+            // Cek apakah swap ini memicu Match-3 (kunci petak cellB dan this sebagai target swap mutlak)
             if (GridMatch3Solver.Instance != null)
             {
+                GridMatch3Solver.Instance.SetPlayerInteraction(this, cellB);
                 GridMatch3Solver.Instance.CheckAndResolveMatches(cellB);
             }
         }
@@ -1214,19 +1223,43 @@ namespace FantasyDefense.Combat
             MonsterController bestTarget = null;
             float maxRange = GetAttackRange();
             float closestDist = maxRange;
-
             Vector3 myPos = transform.position;
+
+            // Prioritas Taktis Pertahanan (Point 1 - Focus-Fire Defender Priority):
+            // Cari monster yang sedang aktif mendobrak gerbang benteng di garis batas
+            MonsterController barricadeThreat = null;
+            float closestThreatDist = maxRange;
+
             for (int i = 0; i < monsters.Count; i++)
             {
                 var monster = monsters[i];
                 if (monster == null || monster.IsDead) continue;
 
                 float dist = Vector3.Distance(myPos, monster.transform.position);
-                if (dist <= closestDist)
+                if (dist <= maxRange)
                 {
-                    closestDist = dist;
-                    bestTarget = monster;
+                    // Prioritas Tertinggi: Monster yang sedang mendobrak gerbang benteng
+                    if (monster.IsAttackingBarricade)
+                    {
+                        if (dist <= closestThreatDist)
+                        {
+                            closestThreatDist = dist;
+                            barricadeThreat = monster;
+                        }
+                    }
+
+                    if (dist <= closestDist)
+                    {
+                        closestDist = dist;
+                        bestTarget = monster;
+                    }
                 }
+            }
+
+            // Utamakan musuh yang mengancam gerbang jika ada dalam jangkauan
+            if (barricadeThreat != null)
+            {
+                return barricadeThreat;
             }
 
             return bestTarget;
@@ -1432,6 +1465,34 @@ namespace FantasyDefense.Combat
         protected void NotifySkillTriggered(string skillName)
         {
             OnUnitSkillTriggered?.Invoke(this, skillName);
+        }
+
+        #endregion
+
+        #region Hero Defender Battle Emotes (Point 3)
+
+        /// <summary>
+        /// Memicu balon emote reaksi hero ketika benteng diserang musuh (Point 3 - Hero Defender Battle Emotes).
+        /// </summary>
+        public void TriggerDefenderEmote()
+        {
+            if (unitData == null || !gameObject.activeInHierarchy) return;
+
+            string emoteText = UnitType switch
+            {
+                UnitType.Cedric => FantasyDefense.Localization.CitadelLocalizationManager.Text("🛡️ TAHAN GERBANG!", "🛡️ HOLD THE GATE!"),
+                UnitType.RoseTanker => FantasyDefense.Localization.CitadelLocalizationManager.Text("🌸 LINDUNGI BENTENG!", "🌸 DEFEND THE CITADEL!"),
+                UnitType.RabbitMage => FantasyDefense.Localization.CitadelLocalizationManager.Text("✨ MUNDUR KALIAN!", "✨ BEGONE FOOLS!"),
+                UnitType.WindRanger => FantasyDefense.Localization.CitadelLocalizationManager.Text("🏹 FOKUS PANAH KE GERBANG!", "🏹 TARGET THE SIEGE!"),
+                _ => FantasyDefense.Localization.CitadelLocalizationManager.Text("⚔️ BERTAHAN!", "⚔️ DEFEND!")
+            };
+
+            Color theme = unitData != null ? unitData.themeColor : new Color(1f, 0.85f, 0.3f);
+
+            if (SkillVfxManager.Instance != null)
+            {
+                SkillVfxManager.Instance.SpawnDefenderBattleEmote(transform.position + Vector3.up * 0.95f, emoteText, theme);
+            }
         }
 
         #endregion

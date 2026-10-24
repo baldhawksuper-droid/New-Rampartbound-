@@ -145,9 +145,27 @@ namespace FantasyDefense.GridSystem
         /// </summary>
         public void SetVisualVisible(bool visible)
         {
+            SetVisualAlpha(visible ? 1f : 0f);
+        }
+
+        /// <summary>
+        /// Mengatur transparansi (alpha) visual petak dan status collider.
+        /// Saat mode tempur hero (alpha = 0), collider dinonaktifkan agar raycast bebas hambatan.
+        /// Saat fase persiapan (alpha = 1), collider diaktifkan kembali untuk interaksi sentuh pemain.
+        /// </summary>
+        public void SetVisualAlpha(float alpha)
+        {
             if (spriteRenderer != null)
             {
-                spriteRenderer.enabled = visible;
+                Color c = spriteRenderer.color;
+                c.a = alpha;
+                spriteRenderer.color = c;
+                spriteRenderer.enabled = alpha > 0.005f;
+            }
+
+            if (boxCollider != null)
+            {
+                boxCollider.enabled = alpha > 0.1f;
             }
         }
 
@@ -283,27 +301,35 @@ namespace FantasyDefense.GridSystem
 
             int size = 128;
             Texture2D tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
-            Color baseColor = new Color(0.85f, 0.82f, 0.76f, 1f); // Cobblestone light
-            Color borderColor = new Color(0.35f, 0.38f, 0.44f, 1f); // Stone frame border
-            Color innerShadow = new Color(0.70f, 0.68f, 0.62f, 1f);
+            // Standar Ashlar Fantasy Masonry: Ubin batu bertingkat lembut dengan mortar halus
+            Color mortarColor = new Color(0.18f, 0.20f, 0.25f, 0.90f);
+            Color baseColorTop = new Color(0.78f, 0.77f, 0.74f, 1f);
+            Color baseColorBottom = new Color(0.62f, 0.60f, 0.58f, 1f);
+            Color highlightBevel = new Color(0.92f, 0.90f, 0.86f, 1f);
+            Color shadowBevel = new Color(0.40f, 0.38f, 0.36f, 1f);
 
-            int borderWidth = 4;
+            int margin = 5;
             Color[] colors = new Color[size * size];
             for (int y = 0; y < size; y++)
             {
+                float v = (float)y / size;
                 for (int x = 0; x < size; x++)
                 {
-                    if (x < borderWidth || x >= size - borderWidth || y < borderWidth || y >= size - borderWidth)
+                    if (x < margin || x >= size - margin || y < margin || y >= size - margin)
                     {
-                        colors[y * size + x] = borderColor;
+                        colors[y * size + x] = mortarColor;
                     }
-                    else if (x < borderWidth + 3 || y < borderWidth + 3)
+                    else if (y >= size - margin - 3 || x < margin + 3)
                     {
-                        colors[y * size + x] = innerShadow;
+                        colors[y * size + x] = highlightBevel;
+                    }
+                    else if (y < margin + 3 || x >= size - margin - 3)
+                    {
+                        colors[y * size + x] = shadowBevel;
                     }
                     else
                     {
-                        colors[y * size + x] = baseColor;
+                        colors[y * size + x] = Color.Lerp(baseColorBottom, baseColorTop, v);
                     }
                 }
             }

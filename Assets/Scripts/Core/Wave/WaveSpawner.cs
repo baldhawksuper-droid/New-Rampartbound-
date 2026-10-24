@@ -314,22 +314,20 @@ namespace FantasyDefense.Wave
         {
             if (isWaveCompleting || isSpawningWave) return;
 
-            // Watchdog Guard: Menjamin wave tidak pernah macet saat seluruh musuh tereliminasi
+            // Watchdog Guard: Menjamin wave tidak pernah macet saat seluruh musuh tereliminasi di arena
             if (GameManager.Instance != null && GameManager.Instance.CurrentState == BattleState.WaveActive)
             {
-                if (monstersRemainingInWave <= 0)
+                int livingMonsters = 0;
+                for (int i = 0; i < MonsterController.ActiveMonsters.Count; i++)
                 {
-                    int livingMonsters = 0;
-                    for (int i = 0; i < MonsterController.ActiveMonsters.Count; i++)
-                    {
-                        var m = MonsterController.ActiveMonsters[i];
-                        if (m != null && m.IsAlive && m.CurrentHealth > 0) livingMonsters++;
-                    }
+                    var m = MonsterController.ActiveMonsters[i];
+                    if (m != null && m.IsAlive && m.CurrentHealth > 0) livingMonsters++;
+                }
 
-                    if (livingMonsters == 0)
-                    {
-                        CheckWaveProgress();
-                    }
+                if (livingMonsters == 0)
+                {
+                    monstersRemainingInWave = 0;
+                    CheckWaveProgress();
                 }
             }
         }

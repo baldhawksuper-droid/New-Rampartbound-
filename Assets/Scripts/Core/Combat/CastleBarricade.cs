@@ -24,6 +24,12 @@ namespace FantasyDefense.Combat
         [SerializeField] private Color normalColor = Color.white;
         [SerializeField] private Color hitColor = new Color(1f, 0.3f, 0.3f, 1f);
 
+        [Header("Cracked Barricade Multi-Tier Visuals (Point 2)")]
+        [SerializeField] private SpriteRenderer crackOverlayRenderer;
+        private static Sprite crackStage1Sprite; // HP <= 75%
+        private static Sprite crackStage2Sprite; // HP <= 50%
+        private static Sprite crackStage3Sprite; // HP <= 25%
+
         public int CurrentHealth => currentHealth;
         public int MaxHealth => maxHealth;
         public float HealthPercent => (float)currentHealth / Mathf.Max(1, maxHealth);
@@ -61,6 +67,8 @@ namespace FantasyDefense.Combat
             }
 
             currentHealth = maxHealth;
+            EnsureCrackOverlay();
+            UpdateDamageVisuals();
         }
 
         private void Start()
@@ -100,15 +108,46 @@ namespace FantasyDefense.Combat
         {
             maxHealth = startingHealth;
             currentHealth = startingHealth;
+            EnsureCrackOverlay();
+            UpdateDamageVisuals();
             OnCastleHealthChanged?.Invoke(currentHealth, maxHealth);
         }
 
+        [Header("Damage Pacing & DPS Protection (Point 6)")]
+        private float lastDamageTime = -1f;
+        private int recentDamageAccumulator = 0;
+        private const float DAMAGE_WINDOW = 0.18f;
+        private const int MAX_DAMAGE_PER_BURST = 16;
+
         /// <summary>
         /// Menerima damage saat monster berhasil mencapai garis batas benteng.
+        /// Dilengkapi proteksi pacing DPS agar barikade tidak lenyap seketika dalam 1 detik saat rombongan tiba bersamaan.
         /// </summary>
         public void TakeDamage(int damage)
         {
             if (currentHealth <= 0) return;
+
+            // Pacing DPS Guardrail: Batasi lonjakan damage serentak dalam rentang 0.18 detik
+            if (Time.time - lastDamageTime < DAMAGE_WINDOW)
+            {
+                if (recentDamageAccumulator >= MAX_DAMAGE_PER_BURST)
+                {
+                    // Throttle damage berlebih agar pemain memiliki jeda reaksi
+                    damage = Mathf.Min(damage, 2);
+                }
+                else
+                {
+                    damage = Mathf.Min(damage, MAX_DAMAGE_PER_BURST - recentDamageAccumulator);
+                }
+                recentDamageAccumulator += damage;
+            }
+            else
+            {
+                lastDamageTime = Time.time;
+                recentDamageAccumulator = damage;
+            }
+
+            if (damage <= 0) return;
 
             // Integrasi Aegis Barrier: Guardian's Vow 4-Piece (Kebal 4 detik) (Sprint 13)
             if (ArtifactManager.Instance != null && ArtifactManager.Instance.IsAegisBarrierActive)
@@ -151,6 +190,16 @@ namespace FantasyDefense.Combat
             {
                 SkillVfxManager.Instance.SpawnFloatingCombatNumber(transform.position + Vector3.up * 0.8f, $"-{damage}", new Color(1f, 0.25f, 0.25f), 1.25f, true);
                 SkillVfxManager.Instance.SpawnProceduralParticleBurst(transform.position + Vector3.up * 0.3f, new Color(1f, 0.45f, 0.2f), new Color(0.9f, 0.15f, 0.15f), 12, 3.5f);
+
+                // Efek Visual Retakan Gerbang & Cipratan Debu Batu Halus (Point 2 - Siege FX)
+                Vector3 dustPos = transform.position + new Vector3(UnityEngine.Random.Range(-0.85f, 0.85f), 0.25f, 0f);
+                SkillVfxManager.Instance.SpawnProceduralParticleBurst(
+                    dustPos,
+                    new Color(0.85f, 0.80f, 0.70f), // Debu batu kapur halus
+                    new Color(0.48f, 0.42f, 0.35f), // Serpihan batu & arang
+                    14,
+                    2.8f
+                );
             }
 
             // Cek aktivasi darurat Aegis Barrier jika HP turun di bawah 30%
@@ -174,6 +223,9 @@ namespace FantasyDefense.Combat
 
             StartCoroutine(FlashHitEffect());
 
+            // Pemicu Reaksi Emotif Pahlawan Terdekat (Point 3 - Hero Defender Battle Emotes)
+            TriggerNearestHeroDefenderEmote();
+
             if (currentHealth <= 0)
             {
                 Debug.LogWarning("[CastleBarricade] Benteng Runtuh! Pertahanan jebol!");
@@ -194,15 +246,16 @@ namespace FantasyDefense.Combat
             currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
             OnCastleHealthChanged?.Invoke(currentHealth, maxHealth);
 
+            // Efek Angka Pemulihan Hijau Melayang
             if (SkillVfxManager.Instance != null)
             {
-                SkillVfxManager.Instance.SpawnProceduralParticleBurst(transform.position + Vector3.up * 0.3f, new Color(0.2f, 1f, 0.4f), new Color(0.1f, 0.8f, 0.3f), 8, 2.5f);
+                SkillVfxManager.Instance.SpawnFloatingCombatNumber(transform.position + Vector3.up * 0.9f, $"+{amount}", new Color(0.28f, 0.95f, 0.45f), 1.25f, false);
             }
 
-            if (spriteRenderer != null)
-            {
-                spriteRenderer.color = GetDamageStateColor();
-            }
+            // Kilatan Pendaran Hijau Keemasan Menyapu Pagar Benteng (Point 2 - Barricade Repair Gleam)
+            PlayRepairGleamEffect();
+
+            UpdateDamageVisuals();
         }
 
         private Color GetDamageStateColor()
@@ -220,8 +273,268 @@ namespace FantasyDefense.Combat
             {
                 spriteRenderer.color = hitColor;
                 yield return new WaitForSeconds(0.12f);
-                spriteRenderer.color = GetDamageStateColor();
+                UpdateDamageVisuals();
             }
         }
+
+        #region Cracked Barricade Multi-Tier Visual System (Point 2)
+
+        private void EnsureCrackOverlay()
+        {
+            if (crackOverlayRenderer != null) return;
+
+            Transform existing = transform.Find("CrackOverlay");
+            if (existing != null)
+            {
+                crackOverlayRenderer = existing.GetComponent<SpriteRenderer>();
+            }
+
+            if (crackOverlayRenderer == null)
+            {
+                GameObject overlayObj = new GameObject("CrackOverlay");
+                overlayObj.transform.SetParent(transform, false);
+                overlayObj.transform.localPosition = Vector3.zero;
+                overlayObj.transform.localScale = Vector3.one;
+
+                crackOverlayRenderer = overlayObj.AddComponent<SpriteRenderer>();
+                crackOverlayRenderer.sortingLayerName = spriteRenderer != null ? spriteRenderer.sortingLayerName : "Board";
+                crackOverlayRenderer.sortingOrder = (spriteRenderer != null ? spriteRenderer.sortingOrder : 5) + 1;
+            }
+        }
+
+        public void UpdateDamageVisuals()
+        {
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.color = GetDamageStateColor();
+            }
+
+            if (crackOverlayRenderer == null)
+            {
+                EnsureCrackOverlay();
+            }
+
+            if (crackOverlayRenderer == null) return;
+
+            float pct = HealthPercent;
+            if (pct <= 0.25f)
+            {
+                crackOverlayRenderer.gameObject.SetActive(true);
+                crackOverlayRenderer.sprite = GetOrCreateCrackSprite(3);
+                crackOverlayRenderer.color = new Color(1f, 0.35f, 0.25f, 0.95f); // Retakan parah kritis membara
+            }
+            else if (pct <= 0.50f)
+            {
+                crackOverlayRenderer.gameObject.SetActive(true);
+                crackOverlayRenderer.sprite = GetOrCreateCrackSprite(2);
+                crackOverlayRenderer.color = new Color(0.92f, 0.85f, 0.75f, 0.90f); // Retakan struktural menengah
+            }
+            else if (pct <= 0.75f)
+            {
+                crackOverlayRenderer.gameObject.SetActive(true);
+                crackOverlayRenderer.sprite = GetOrCreateCrackSprite(1);
+                crackOverlayRenderer.color = new Color(0.85f, 0.85f, 0.85f, 0.75f); // Retakan halus awal
+            }
+            else
+            {
+                crackOverlayRenderer.gameObject.SetActive(false);
+            }
+        }
+
+        private static Sprite GetOrCreateCrackSprite(int stage)
+        {
+            if (stage == 1 && crackStage1Sprite != null) return crackStage1Sprite;
+            if (stage == 2 && crackStage2Sprite != null) return crackStage2Sprite;
+            if (stage == 3 && crackStage3Sprite != null) return crackStage3Sprite;
+
+            int w = 128;
+            int h = 48;
+            Texture2D tex = new Texture2D(w, h, TextureFormat.RGBA32, false);
+            Color[] pixels = new Color[w * h];
+            for (int i = 0; i < pixels.Length; i++) pixels[i] = Color.clear;
+
+            Color crackDark = new Color(0.12f, 0.10f, 0.08f, 0.90f);
+            Color crackRed = new Color(0.88f, 0.22f, 0.12f, 0.85f);
+
+            // Seed deterministic agar bentuk retakan stabil dan rapi
+            var rng = new System.Random(stage * 1337);
+
+            int crackCount = stage switch
+            {
+                1 => 3,
+                2 => 6,
+                _ => 10
+            };
+
+            for (int c = 0; c < crackCount; c++)
+            {
+                int startX = rng.Next(8, w - 8);
+                int startY = rng.Next(0, 10);
+                int endX = Mathf.Clamp(startX + rng.Next(-25, 25), 4, w - 4);
+                int endY = rng.Next(h - 15, h);
+
+                int steps = Mathf.Max(Mathf.Abs(endX - startX), Mathf.Abs(endY - startY));
+                float curX = startX;
+                float curY = startY;
+                float dx = (endX - startX) / (float)steps;
+                float dy = (endY - startY) / (float)steps;
+
+                for (int s = 0; s <= steps; s++)
+                {
+                    int px = Mathf.Clamp(Mathf.RoundToInt(curX + (float)(rng.NextDouble() * 2.0 - 1.0)), 0, w - 1);
+                    int py = Mathf.Clamp(Mathf.RoundToInt(curY), 0, h - 1);
+
+                    pixels[py * w + px] = stage == 3 && rng.Next(0, 3) == 0 ? crackRed : crackDark;
+
+                    // Buat retakan lebih tebal pada stage 2 dan 3
+                    if (stage >= 2 && px + 1 < w)
+                    {
+                        pixels[py * w + (px + 1)] = crackDark;
+                    }
+                    if (stage == 3 && py + 1 < h)
+                    {
+                        pixels[(py + 1) * w + px] = crackDark;
+                    }
+
+                    curX += dx;
+                    curY += dy;
+                }
+            }
+
+            tex.SetPixels(pixels);
+            tex.Apply();
+
+            Sprite sprite = Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 0.5f), 64f);
+            if (stage == 1) crackStage1Sprite = sprite;
+            else if (stage == 2) crackStage2Sprite = sprite;
+            else crackStage3Sprite = sprite;
+
+            return sprite;
+        }
+
+        #region Barricade Repair Gleam & Hero Emote Systems (Points 2 & 3)
+
+        private float nextHeroEmoteTime = 0f;
+
+        private void TriggerNearestHeroDefenderEmote()
+        {
+            if (Time.time < nextHeroEmoteTime) return;
+            nextHeroEmoteTime = Time.time + 6.5f;
+
+            // Cari pahlawan aktif terdekat dari gerbang benteng
+            UnitController[] allUnits = UnityEngine.Object.FindObjectsByType<UnitController>(FindObjectsSortMode.None);
+            if (allUnits == null || allUnits.Length == 0) return;
+
+            UnitController closestHero = null;
+            float closestDist = float.MaxValue;
+            Vector3 gatePos = transform.position;
+
+            for (int i = 0; i < allUnits.Length; i++)
+            {
+                var unit = allUnits[i];
+                if (unit == null || !unit.gameObject.activeInHierarchy) continue;
+
+                float dist = Vector3.Distance(gatePos, unit.transform.position);
+                if (dist < closestDist)
+                {
+                    closestDist = dist;
+                    closestHero = unit;
+                }
+            }
+
+            if (closestHero != null)
+            {
+                closestHero.TriggerDefenderEmote();
+            }
+        }
+
+        private void PlayRepairGleamEffect()
+        {
+            StartCoroutine(RepairGleamRoutine());
+
+            if (Audio.AudioManager.Instance != null)
+            {
+                Audio.AudioManager.Instance.PlaySound(Audio.SoundType.BarricadeRepair, 1.05f);
+            }
+        }
+
+        private IEnumerator RepairGleamRoutine()
+        {
+            GameObject gleamObj = new GameObject("BarricadeRepairGleam");
+            gleamObj.transform.SetParent(transform, false);
+            gleamObj.transform.localPosition = new Vector3(-1.8f, 0.25f, 0f);
+
+            SpriteRenderer gleamRenderer = gleamObj.AddComponent<SpriteRenderer>();
+            gleamRenderer.sprite = GetOrCreateGleamSprite();
+            gleamRenderer.color = new Color(0.35f, 1f, 0.60f, 0.85f);
+            gleamRenderer.sortingLayerName = "UI";
+            gleamRenderer.sortingOrder = 360;
+            gleamObj.transform.localScale = new Vector3(0.6f, 0.45f, 1f);
+
+            float duration = 0.55f;
+            float elapsed = 0f;
+            float startX = -1.8f;
+            float endX = 1.8f;
+
+            int sparkleStep = 0;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / duration;
+
+                float curX = Mathf.Lerp(startX, endX, t);
+                gleamObj.transform.localPosition = new Vector3(curX, 0.25f, 0f);
+
+                Color gleamColor = Color.Lerp(new Color(0.25f, 1f, 0.55f, 0.9f), new Color(1f, 0.92f, 0.35f, 0.9f), t);
+                gleamRenderer.color = gleamColor;
+
+                if (t >= 0.25f * (sparkleStep + 1) && sparkleStep < 3)
+                {
+                    sparkleStep++;
+                    if (SkillVfxManager.Instance != null)
+                    {
+                        Vector3 burstPos = transform.position + new Vector3(curX, 0.3f, 0f);
+                        SkillVfxManager.Instance.SpawnProceduralParticleBurst(burstPos, new Color(0.35f, 1f, 0.55f), new Color(1f, 0.92f, 0.35f), 8, 2.2f);
+                    }
+                }
+
+                yield return null;
+            }
+
+            Destroy(gleamObj);
+        }
+
+        private static Sprite cachedGleamSprite;
+        private static Sprite GetOrCreateGleamSprite()
+        {
+            if (cachedGleamSprite != null) return cachedGleamSprite;
+
+            int w = 64;
+            int h = 32;
+            Texture2D tex = new Texture2D(w, h, TextureFormat.RGBA32, false);
+            Color[] pixels = new Color[w * h];
+
+            for (int y = 0; y < h; y++)
+            {
+                float ny = (y - (h - 1) * 0.5f) / ((h - 1) * 0.5f);
+                for (int x = 0; x < w; x++)
+                {
+                    float nx = (x - (w - 1) * 0.5f) / ((w - 1) * 0.5f);
+                    float d = Mathf.Clamp01(1f - Mathf.Sqrt(nx * nx + ny * ny));
+                    float alpha = d * d;
+                    pixels[y * w + x] = new Color(1f, 1f, 1f, alpha);
+                }
+            }
+
+            tex.SetPixels(pixels);
+            tex.Apply();
+            cachedGleamSprite = Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 0.5f), 32f);
+            return cachedGleamSprite;
+        }
+
+        #endregion
+
+        #endregion
     }
 }

@@ -70,17 +70,27 @@ namespace FantasyDefense.Core
 
         /// <summary>
         /// Memicu efek getaran kamera (Screen Shake) untuk hantaman boss, merge Tier 3, atau damage benteng.
+        /// Mendukung rotasi mikro (Z-angle twist) untuk benturan berskala besar.
         /// </summary>
-        public void TriggerScreenShake(float duration = 0.22f, float magnitude = 0.16f)
+        public void TriggerScreenShake(float duration = 0.22f, float magnitude = 0.16f, float rotationalAngle = 0f)
         {
             if (shakeCoroutine != null)
             {
                 StopCoroutine(shakeCoroutine);
             }
-            shakeCoroutine = StartCoroutine(DoScreenShake(duration, magnitude));
+            shakeCoroutine = StartCoroutine(DoScreenShake(duration, magnitude, rotationalAngle));
         }
 
-        private System.Collections.IEnumerator DoScreenShake(float duration, float magnitude)
+        /// <summary>
+        /// Memicu guncangan kamera khusus hantaman Boss Monster (Point 4 - Boss Impact Screen-Shake Twist).
+        /// Memberikan hentakan berat dengan rotasi mikro sudut Z (0.5 - 0.7 derajat) yang dramatis.
+        /// </summary>
+        public void TriggerBossScreenShake(float duration = 0.38f, float magnitude = 0.30f, float maxAngle = 0.65f)
+        {
+            TriggerScreenShake(duration, magnitude, maxAngle);
+        }
+
+        private System.Collections.IEnumerator DoScreenShake(float duration, float magnitude, float rotationalAngle = 0f)
         {
             float elapsed = 0f;
             Vector3 basePos = originalCameraPosition;
@@ -92,11 +102,19 @@ namespace FantasyDefense.Core
                 float offsetY = Random.Range(-1f, 1f) * magnitude * damping;
 
                 transform.position = new Vector3(basePos.x + offsetX, basePos.y + offsetY, basePos.z);
+
+                if (rotationalAngle > 0.01f)
+                {
+                    float angleOffset = Random.Range(-1f, 1f) * rotationalAngle * damping;
+                    transform.rotation = Quaternion.Euler(0f, 0f, angleOffset);
+                }
+
                 elapsed += Time.unscaledDeltaTime;
                 yield return null;
             }
 
             transform.position = basePos;
+            transform.rotation = Quaternion.identity;
             shakeCoroutine = null;
         }
 

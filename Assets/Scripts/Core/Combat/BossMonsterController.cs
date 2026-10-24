@@ -192,10 +192,10 @@ namespace FantasyDefense.Combat
                 FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Heavy);
             }
 
-            // Efek guncangan kamera dan partikel tanah
+            // Efek guncangan kamera khusus Boss Ground Smash dengan mikro-rotasi (Point 4 - Boss Impact Screen-Shake Twist)
             if (MobileCameraAdapter.Instance != null)
             {
-                MobileCameraAdapter.Instance.TriggerScreenShake(0.35f, 0.28f);
+                MobileCameraAdapter.Instance.TriggerBossScreenShake(0.40f, 0.32f, 0.70f);
             }
 
             if (SkillVfxManager.Instance != null)

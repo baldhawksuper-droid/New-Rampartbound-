@@ -170,7 +170,7 @@ namespace Rampartbound.Editor
             // Mengisi ruang kosong di bawah benteng hingga ke dasar layar mobile
             var apronObj = new GameObject("Citadel_Foundation_Apron");
             apronObj.transform.SetParent(barricadeObj.transform);
-            apronObj.transform.localPosition = new Vector3(0f, -1.8f, 0.05f);
+            apronObj.transform.localPosition = new Vector3(0f, -1.85f, 0.05f);
             var apronSr = apronObj.AddComponent<SpriteRenderer>();
             apronSr.sortingLayerName = "Board";
             apronSr.sortingOrder = 4;
@@ -181,13 +181,13 @@ namespace Rampartbound.Editor
                 apronSr.sprite = rampartWallSprite;
                 apronSr.drawMode = SpriteDrawMode.Sliced;
                 apronSr.size = new Vector2(7.0f, 3.2f);
-                apronSr.color = new Color(0.75f, 0.8f, 0.88f, 1f);
+                apronSr.color = new Color(0.85f, 0.88f, 0.92f, 1f);
             }
 
             // Menara Pertahanan Kiri: Meriam Pelontar Roket Benteng (Bastion Cannon Turret)
             var cannonObj = new GameObject("Turret_Left_Cannon");
             cannonObj.transform.SetParent(barricadeObj.transform);
-            cannonObj.transform.localPosition = new Vector3(-2.70f, 0.35f, 0);
+            cannonObj.transform.localPosition = new Vector3(-2.15f, 0.28f, 0);
             var cannonSr = cannonObj.AddComponent<SpriteRenderer>();
             var cannonSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Combat/bastion_cannon_left.png");
             if (cannonSprite == null) cannonSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Combat/cannon_turret.png");
@@ -201,7 +201,7 @@ namespace Rampartbound.Editor
             // Menara Pertahanan Kanan: Pemanah & Balista Sniper Benteng (Bastion Ballista / Archer Turret)
             var archerObj = new GameObject("Turret_Right_Archer");
             archerObj.transform.SetParent(barricadeObj.transform);
-            archerObj.transform.localPosition = new Vector3(2.70f, 0.35f, 0);
+            archerObj.transform.localPosition = new Vector3(2.15f, 0.28f, 0);
             var archerSr = archerObj.AddComponent<SpriteRenderer>();
             var archerSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Combat/ballista_turret.png");
             if (archerSprite != null) archerSr.sprite = archerSprite;
@@ -214,15 +214,15 @@ namespace Rampartbound.Editor
             // Relik Inti Benteng Kerajaan (Citadel Arcane Core Relic)
             var coreObj = new GameObject("Citadel_Core_Relic");
             coreObj.transform.SetParent(barricadeObj.transform);
-            coreObj.transform.localPosition = new Vector3(0f, -0.4f, 0);
+            coreObj.transform.localPosition = new Vector3(0f, -0.65f, 0);
             var coreSr = coreObj.AddComponent<SpriteRenderer>();
             var coreSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Combat/arcane_rune_cube.png");
             if (coreSprite != null)
             {
                 coreSr.sprite = coreSprite;
                 coreSr.sortingLayerName = "Board";
-                coreSr.sortingOrder = 12;
-                coreObj.transform.localScale = Vector3.one * 0.75f;
+                coreSr.sortingOrder = 9;
+                coreObj.transform.localScale = Vector3.one * 0.48f;
             }
 
             // Waypoints Lintasan Monster Adaptif (MonsterPathManager)
@@ -894,11 +894,13 @@ namespace Rampartbound.Editor
                 pauseImg.color = Color.white;
             }
             var pauseTitle = CreateText(pausePanel.transform, "Title", "PERMAINAN DIHENTIKAN", 36, FontStyle.Bold, TextAnchor.MiddleCenter, Color.white, defaultFont);
-            PositionUI(pauseTitle.gameObject, 0.05f, 0.75f, 0.95f, 0.92f);
-            var pauseResumeBtn = CreateButton(pausePanel.transform, "ResumeButton", "LANJUTKAN (RESUME)", new Color(0.2f, 0.65f, 0.35f), Color.white, 28, defaultFont);
-            PositionUI(pauseResumeBtn, 0.12f, 0.45f, 0.88f, 0.65f);
-            var pauseSurrenderBtn = CreateButton(pausePanel.transform, "SurrenderButton", "MENYERAH & KEMBALI KE CITADEL", new Color(0.65f, 0.25f, 0.25f), Color.white, 24, defaultFont);
-            PositionUI(pauseSurrenderBtn, 0.12f, 0.2f, 0.88f, 0.4f);
+            PositionUI(pauseTitle.gameObject, 0.05f, 0.78f, 0.95f, 0.93f);
+            var pauseResumeBtn = CreateButton(pausePanel.transform, "ResumeButton", "LANJUTKAN (RESUME)", new Color(0.2f, 0.65f, 0.35f), Color.white, 26, defaultFont);
+            PositionUI(pauseResumeBtn, 0.12f, 0.58f, 0.88f, 0.73f);
+            var pauseVibBtn = CreateButton(pausePanel.transform, "VibrationButton", "📳 GETARAN: AKTIF", new Color(0.20f, 0.40f, 0.60f), Color.white, 22, defaultFont);
+            PositionUI(pauseVibBtn, 0.12f, 0.38f, 0.88f, 0.53f);
+            var pauseSurrenderBtn = CreateButton(pausePanel.transform, "SurrenderButton", "MENYERAH & KEMBALI KE CITADEL", new Color(0.65f, 0.25f, 0.25f), Color.white, 22, defaultFont);
+            PositionUI(pauseSurrenderBtn, 0.12f, 0.18f, 0.88f, 0.33f);
             pausePanel.SetActive(false);
 
             // Bind UIBattleView
@@ -918,6 +920,10 @@ namespace Rampartbound.Editor
             battleSO.FindProperty("defeatRetryButton").objectReferenceValue = defRetryBtn.GetComponent<Button>();
             battleSO.FindProperty("defeatReturnButton").objectReferenceValue = defReturnBtn.GetComponent<Button>();
             battleSO.FindProperty("pausePanel").objectReferenceValue = pausePanel;
+            var pauseVibBtnProp = battleSO.FindProperty("pauseVibrationButton");
+            if (pauseVibBtnProp != null) pauseVibBtnProp.objectReferenceValue = pauseVibBtn.GetComponent<Button>();
+            var pauseVibTxtProp = battleSO.FindProperty("pauseVibrationText");
+            if (pauseVibTxtProp != null) pauseVibTxtProp.objectReferenceValue = pauseVibBtn.GetComponentInChildren<Text>();
             battleSO.FindProperty("puzzlePreparationPanel").objectReferenceValue = puzzlePanel;
             battleSO.FindProperty("movesRemainingText").objectReferenceValue = movesTxt;
             var threatProp = battleSO.FindProperty("upcomingThreatText");

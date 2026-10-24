@@ -139,6 +139,20 @@ namespace FantasyDefense.Mobile
             OnHapticsToggled?.Invoke(isHapticsEnabled);
         }
 
+        public void ToggleHaptics()
+        {
+            ToggleHaptics(!isHapticsEnabled);
+            if (isHapticsEnabled)
+            {
+                TriggerHaptic(HapticFeedbackType.Light);
+            }
+        }
+
+        public void SetHapticsEnabled(bool isEnabled)
+        {
+            ToggleHaptics(isEnabled);
+        }
+
         #endregion
 
         #region Haptic Feedback Engine

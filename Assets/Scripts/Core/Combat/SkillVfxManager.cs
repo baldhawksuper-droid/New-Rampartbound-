@@ -502,6 +502,146 @@ namespace FantasyDefense.Combat
             }
         }
 
+        #region Hero Defender Battle Emotes (Point 3)
+
+        private static Sprite cachedEmoteBubbleSprite;
+        private static Sprite GetOrCreateEmoteBubbleSprite()
+        {
+            if (cachedEmoteBubbleSprite != null) return cachedEmoteBubbleSprite;
+
+            int w = 64;
+            int h = 32;
+            Texture2D tex = new Texture2D(w, h, TextureFormat.RGBA32, false);
+            Color[] pixels = new Color[w * h];
+            float r = 12f;
+
+            for (int y = 0; y < h; y++)
+            {
+                for (int x = 0; x < w; x++)
+                {
+                    float dx = Mathf.Max(0f, Mathf.Abs(x - (w - 1) * 0.5f) - ((w - 1) * 0.5f - r));
+                    float dy = Mathf.Max(0f, Mathf.Abs(y - (h - 1) * 0.5f) - ((h - 1) * 0.5f - r));
+                    float dist = Mathf.Sqrt(dx * dx + dy * dy);
+
+                    if (dist <= r)
+                    {
+                        float alpha = Mathf.Clamp01(r - dist + 0.5f);
+                        pixels[y * w + x] = new Color(1f, 1f, 1f, alpha);
+                    }
+                    else
+                    {
+                        pixels[y * w + x] = Color.clear;
+                    }
+                }
+            }
+
+            tex.SetPixels(pixels);
+            tex.Apply();
+            cachedEmoteBubbleSprite = Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 0.5f), 32f);
+            return cachedEmoteBubbleSprite;
+        }
+
+        /// <summary>
+        /// Menampilkan balon reaksi pertahanan (Hero Defender Battle Emotes - Point 3) di atas pahlawan saat gerbang diserang.
+        /// </summary>
+        public void SpawnDefenderBattleEmote(Vector3 worldPos, string emoteText, Color themeColor)
+        {
+            if (!enableFloatingText) return;
+
+            GameObject emoteObj = new GameObject($"DefenderEmote_{emoteText}");
+            emoteObj.transform.position = worldPos;
+
+            // Background bubble pill
+            GameObject bgObj = new GameObject("BubbleBg");
+            bgObj.transform.SetParent(emoteObj.transform, false);
+            SpriteRenderer bgRenderer = bgObj.AddComponent<SpriteRenderer>();
+            bgRenderer.sprite = GetOrCreateEmoteBubbleSprite();
+            bgRenderer.color = new Color(0.08f, 0.10f, 0.16f, 0.94f);
+            bgRenderer.sortingLayerName = "UI";
+            bgRenderer.sortingOrder = 505;
+
+            // Border glow
+            GameObject borderObj = new GameObject("BubbleBorder");
+            borderObj.transform.SetParent(emoteObj.transform, false);
+            SpriteRenderer borderRenderer = borderObj.AddComponent<SpriteRenderer>();
+            borderRenderer.sprite = GetOrCreateEmoteBubbleSprite();
+            borderRenderer.color = new Color(themeColor.r, themeColor.g, themeColor.b, 0.85f);
+            borderRenderer.sortingLayerName = "UI";
+            borderRenderer.sortingOrder = 504;
+
+            // Text
+            GameObject textObj = new GameObject("BubbleText");
+            textObj.transform.SetParent(emoteObj.transform, false);
+            TextMesh tm = textObj.AddComponent<TextMesh>();
+            tm.text = emoteText;
+            tm.fontSize = 24;
+            tm.fontStyle = FontStyle.Bold;
+            tm.characterSize = 0.072f;
+            tm.anchor = TextAnchor.MiddleCenter;
+            tm.alignment = TextAlignment.Center;
+            tm.color = Color.white;
+
+            MeshRenderer mr = textObj.GetComponent<MeshRenderer>();
+            if (mr != null)
+            {
+                mr.sortingLayerName = "UI";
+                mr.sortingOrder = 506;
+            }
+
+            float width = Mathf.Clamp(0.7f + emoteText.Length * 0.065f, 1.1f, 2.6f);
+            bgObj.transform.localScale = new Vector3(width, 0.42f, 1f);
+            borderObj.transform.localScale = new Vector3(width * 1.05f, 0.48f, 1f);
+
+            StartCoroutine(DefenderEmoteRoutine(emoteObj, bgRenderer, borderRenderer, tm));
+        }
+
+        private IEnumerator DefenderEmoteRoutine(GameObject obj, SpriteRenderer bg, SpriteRenderer border, TextMesh text)
+        {
+            float duration = 1.6f;
+            float elapsed = 0f;
+            Vector3 startPos = obj.transform.position;
+            Vector3 startScale = Vector3.zero;
+            obj.transform.localScale = startScale;
+
+            // 1. Pop-in bounce
+            float popDuration = 0.18f;
+            while (elapsed < popDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / popDuration;
+                float s = Mathf.Sin(t * Mathf.PI * 0.75f) * 1.2f;
+                obj.transform.localScale = Vector3.one * s;
+                yield return null;
+            }
+            obj.transform.localScale = Vector3.one;
+
+            // 2. Float & fade out
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / duration;
+
+                obj.transform.position = startPos + Vector3.up * (0.35f * t);
+
+                if (t > 0.70f)
+                {
+                    float fade = 1f - ((t - 0.70f) / 0.30f);
+                    if (bg != null) bg.color = new Color(bg.color.r, bg.color.g, bg.color.b, 0.94f * fade);
+                    if (border != null) border.color = new Color(border.color.r, border.color.g, border.color.b, 0.85f * fade);
+                    if (text != null) text.color = new Color(text.color.r, text.color.g, text.color.b, fade);
+                }
+
+                yield return null;
+            }
+
+            if (obj != null)
+            {
+                Destroy(obj);
+            }
+        }
+
+        #endregion
+
         #endregion
     }
 }

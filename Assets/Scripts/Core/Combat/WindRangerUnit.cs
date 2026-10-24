@@ -105,18 +105,21 @@ namespace FantasyDefense.Combat
                 var sr = projObj.AddComponent<SpriteRenderer>();
                 sr.sortingOrder = 24;
 
-                Sprite arrowSprite = null;
+                Sprite arrowSprite = Resources.Load<Sprite>("Sprites/Combat/Projectile_Wind_Arrow");
 #if UNITY_EDITOR
-                arrowSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Combat/Projectile_Wind_Arrow.png");
+                if (arrowSprite == null)
+                {
+                    arrowSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Combat/Projectile_Wind_Arrow.png");
+                }
 #endif
                 if (arrowSprite != null)
                 {
                     sr.sprite = arrowSprite;
                     sr.color = currentTier == UnitTier.Tier3 ? new Color(0.8f, 1f, 0.9f) : Color.white;
                 }
-                else if (unitData != null && unitData.unitIcon != null)
+                else
                 {
-                    sr.sprite = unitData.unitIcon;
+                    sr.sprite = GetOrCreateProceduralArrowSprite();
                     sr.color = currentTier == UnitTier.Tier3 ? new Color(0.3f, 1f, 0.6f) : new Color(0.1f, 0.85f, 0.45f);
                 }
 
@@ -246,6 +249,39 @@ namespace FantasyDefense.Combat
                     }
                 }
             }
+        }
+
+        private static Sprite cachedArrowSprite;
+        private static Sprite GetOrCreateProceduralArrowSprite()
+        {
+            if (cachedArrowSprite != null) return cachedArrowSprite;
+            int w = 32, h = 16;
+            Texture2D tex = new Texture2D(w, h, TextureFormat.RGBA32, false);
+            Color[] pixels = new Color[w * h];
+
+            for (int y = 0; y < h; y++)
+            {
+                for (int x = 0; x < w; x++)
+                {
+                    // Arrow shape: shaft + arrowhead
+                    bool isShaft = (y >= 6 && y <= 9 && x >= 4 && x <= 22);
+                    bool isHead = (x >= 20 && Mathf.Abs(y - 7.5f) <= (w - 1 - x) * 0.8f);
+                    bool isFletching = (x <= 6 && Mathf.Abs(y - 7.5f) <= (6 - x) * 0.7f);
+
+                    if (isHead || isShaft || isFletching)
+                    {
+                        pixels[y * w + x] = Color.white;
+                    }
+                    else
+                    {
+                        pixels[y * w + x] = Color.clear;
+                    }
+                }
+            }
+            tex.SetPixels(pixels);
+            tex.Apply();
+            cachedArrowSprite = Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 0.5f), 100f);
+            return cachedArrowSprite;
         }
     }
 }

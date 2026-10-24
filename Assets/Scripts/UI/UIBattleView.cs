@@ -44,6 +44,8 @@ namespace FantasyDefense.UI
         [SerializeField] private Text speedToggleText;
         [SerializeField] private Button pauseButton;
         [SerializeField] private GameObject pausePanel;
+        [SerializeField] private Button pauseVibrationButton;
+        [SerializeField] private Text pauseVibrationText;
 
         [Header("Dynamic Battle Mode HUD (Sprint 8)")]
         [SerializeField] private GameObject modeBadgeContainer;
@@ -125,6 +127,7 @@ namespace FantasyDefense.UI
             GameManager.OnInterWavePreparationStarted += HandleInterWavePreparationStarted;
             WaveSpawner.OnWaveMonsterProgressChanged += HandleWaveMonsterProgressChanged;
             FantasyDefense.GridSystem.GridMatch3Solver.OnCascadeCombo += HandleCascadeCombo;
+            FantasyDefense.Mobile.DevicePerformanceManager.OnHapticsToggled += HandleHapticsToggled;
         }
 
         private void OnDisable()
@@ -150,6 +153,7 @@ namespace FantasyDefense.UI
             GameManager.OnInterWavePreparationStarted -= HandleInterWavePreparationStarted;
             WaveSpawner.OnWaveMonsterProgressChanged -= HandleWaveMonsterProgressChanged;
             FantasyDefense.GridSystem.GridMatch3Solver.OnCascadeCombo -= HandleCascadeCombo;
+            FantasyDefense.Mobile.DevicePerformanceManager.OnHapticsToggled -= HandleHapticsToggled;
             StopLowHpDangerAlert();
         }
 
@@ -161,6 +165,7 @@ namespace FantasyDefense.UI
             }
             UpdateMonsterCountDisplay();
             UpdateAutoMergeDisplay(AutoMergeAssistant.Instance != null && AutoMergeAssistant.Instance.IsAutoMergeEnabled);
+            UpdateVibrationButtonDisplay();
 
             if (startDefenseNowButton != null)
             {
@@ -309,6 +314,8 @@ namespace FantasyDefense.UI
                 {
                     surrenderBtn.onClick.AddListener(OnReturnToCitadelClicked);
                 }
+
+                InitializePauseVibrationButton();
             }
         }
 
@@ -824,12 +831,13 @@ namespace FantasyDefense.UI
 
         #endregion
 
-        #region Barricade Danger Alert & Vignette (Sprint 43)
+        #region Low HP Danger Alert & Vignette (Point 1 - Citadel Danger Pulse)
 
         [Header("Critical Barricade HP Danger Alert (Sprint 43)")]
         [SerializeField] private Image dangerVignetteImage;
         private Coroutine dangerVignetteCoroutine = null;
         private bool isDangerAlertActive = false;
+        private static Sprite cachedVignetteSprite;
 
         private void EnsureDangerVignette()
         {
@@ -846,8 +854,38 @@ namespace FantasyDefense.UI
             rt.offsetMax = Vector2.zero;
 
             dangerVignetteImage = vigObj.GetComponent<Image>();
-            dangerVignetteImage.color = new Color(0.85f, 0.1f, 0.1f, 0f);
+            dangerVignetteImage.sprite = GetOrCreateVignetteSprite();
+            dangerVignetteImage.color = new Color(0.85f, 0.08f, 0.08f, 0f);
             dangerVignetteImage.raycastTarget = false;
+        }
+
+        private static Sprite GetOrCreateVignetteSprite()
+        {
+            if (cachedVignetteSprite != null) return cachedVignetteSprite;
+
+            int w = 128;
+            int h = 128;
+            Texture2D tex = new Texture2D(w, h, TextureFormat.RGBA32, false);
+            Color[] pixels = new Color[w * h];
+
+            for (int y = 0; y < h; y++)
+            {
+                float ny = (y - (h - 1) * 0.5f) / ((h - 1) * 0.5f);
+                for (int x = 0; x < w; x++)
+                {
+                    float nx = (x - (w - 1) * 0.5f) / ((w - 1) * 0.5f);
+                    float dist = Mathf.Sqrt(nx * nx + ny * ny);
+                    // Lingkar tengah transparan, tepi layar berdenyut merah tua
+                    float alpha = Mathf.Clamp01((dist - 0.40f) / 0.60f);
+                    alpha = alpha * alpha; // Quad falloff halus
+                    pixels[y * w + x] = new Color(1f, 1f, 1f, alpha);
+                }
+            }
+
+            tex.SetPixels(pixels);
+            tex.Apply();
+            cachedVignetteSprite = Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 0.5f), 100f);
+            return cachedVignetteSprite;
         }
 
         private void TriggerLowHpDangerAlert()
@@ -859,7 +897,7 @@ namespace FantasyDefense.UI
             if (dangerVignetteCoroutine != null) StopCoroutine(dangerVignetteCoroutine);
             dangerVignetteCoroutine = StartCoroutine(PulsingVignetteRoutine());
 
-            FantasyDefense.Mobile.DevicePerformanceManager.Instance?.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Medium);
+            FantasyDefense.Mobile.DevicePerformanceManager.Instance?.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Warning);
         }
 
         private void StopLowHpDangerAlert()
@@ -889,8 +927,8 @@ namespace FantasyDefense.UI
         {
             while (isDangerAlertActive && dangerVignetteImage != null)
             {
-                float pulse = (Mathf.Sin(Time.time * 4.2f) + 1f) * 0.5f;
-                float alpha = Mathf.Lerp(0.04f, 0.20f, pulse);
+                float pulse = (Mathf.Sin(Time.unscaledTime * 4.5f) + 1f) * 0.5f;
+                float alpha = Mathf.Lerp(0.08f, 0.32f, pulse);
                 dangerVignetteImage.color = new Color(0.85f, 0.08f, 0.08f, alpha);
                 yield return null;
             }
@@ -914,6 +952,101 @@ namespace FantasyDefense.UI
             Color finalC = dangerVignetteImage.color;
             finalC.a = 0f;
             dangerVignetteImage.color = finalC;
+        }
+
+        #endregion
+
+        #region In-Battle Vibration Control (Enable/Disable Vibration)
+
+        private void InitializePauseVibrationButton()
+        {
+            if (pausePanel == null) return;
+
+            if (pauseVibrationButton == null)
+            {
+                Transform vibTransform = pausePanel.transform.Find("VibrationButton");
+                if (vibTransform != null)
+                {
+                    pauseVibrationButton = vibTransform.GetComponent<Button>();
+                    pauseVibrationText = vibTransform.GetComponentInChildren<Text>();
+                }
+                else
+                {
+                    Transform resumeTransform = pausePanel.transform.Find("ResumeButton");
+                    Transform surrenderTransform = pausePanel.transform.Find("SurrenderButton");
+
+                    if (resumeTransform != null && surrenderTransform != null)
+                    {
+                        GameObject vibObj = Instantiate(resumeTransform.gameObject, pausePanel.transform);
+                        vibObj.name = "VibrationButton";
+                        pauseVibrationButton = vibObj.GetComponent<Button>();
+                        pauseVibrationText = vibObj.GetComponentInChildren<Text>();
+
+                        RectTransform rtResume = resumeTransform.GetComponent<RectTransform>();
+                        RectTransform rtSurrender = surrenderTransform.GetComponent<RectTransform>();
+                        RectTransform rtVib = vibObj.GetComponent<RectTransform>();
+
+                        if (rtResume != null && rtSurrender != null && rtVib != null)
+                        {
+                            rtResume.anchorMin = new Vector2(0.12f, 0.60f);
+                            rtResume.anchorMax = new Vector2(0.88f, 0.75f);
+
+                            rtVib.anchorMin = new Vector2(0.12f, 0.39f);
+                            rtVib.anchorMax = new Vector2(0.88f, 0.54f);
+
+                            rtSurrender.anchorMin = new Vector2(0.12f, 0.18f);
+                            rtSurrender.anchorMax = new Vector2(0.88f, 0.33f);
+                        }
+
+                        Image vibImg = vibObj.GetComponent<Image>();
+                        if (vibImg != null)
+                        {
+                            vibImg.color = new Color(0.20f, 0.35f, 0.52f, 1f);
+                        }
+                    }
+                }
+            }
+
+            if (pauseVibrationButton != null)
+            {
+                pauseVibrationButton.onClick.RemoveAllListeners();
+                pauseVibrationButton.onClick.AddListener(OnPauseVibrationToggleClicked);
+                UpdateVibrationButtonDisplay();
+            }
+        }
+
+        private void OnPauseVibrationToggleClicked()
+        {
+            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null)
+            {
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.ToggleHaptics();
+            }
+            UpdateVibrationButtonDisplay();
+
+            if (Audio.AudioManager.Instance != null)
+            {
+                Audio.AudioManager.Instance.PlaySound(Audio.SoundType.ButtonClick);
+            }
+        }
+
+        private void HandleHapticsToggled(bool isEnabled)
+        {
+            UpdateVibrationButtonDisplay();
+        }
+
+        private void UpdateVibrationButtonDisplay()
+        {
+            if (pauseVibrationText == null) return;
+
+            bool isHaptic = FantasyDefense.Mobile.DevicePerformanceManager.Instance == null ||
+                            FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled;
+
+            string txt = isHaptic ?
+                CitadelLocalizationManager.Text("📳 GETARAN: AKTIF", "📳 VIBRATION: ON") :
+                CitadelLocalizationManager.Text("📴 GETARAN: NONAKTIF", "📴 VIBRATION: OFF");
+
+            pauseVibrationText.text = txt;
+            pauseVibrationText.color = isHaptic ? new Color(0.35f, 1f, 0.55f) : new Color(0.85f, 0.85f, 0.85f);
         }
 
         #endregion
@@ -953,6 +1086,10 @@ namespace FantasyDefense.UI
             if (pausePanel != null)
             {
                 pausePanel.SetActive(isPaused);
+                if (isPaused)
+                {
+                    UpdateVibrationButtonDisplay();
+                }
             }
 
             if (Audio.AudioManager.Instance != null)

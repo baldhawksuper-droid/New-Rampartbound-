@@ -54,6 +54,8 @@ namespace FantasyDefense.GridSystem
             }
         }
 
+        private Coroutine gridFadeCoroutine;
+
         private void OnEnable()
         {
             FantasyDefense.Core.GameManager.OnBattleStateChanged += HandleBattleStateChanged;
@@ -66,27 +68,72 @@ namespace FantasyDefense.GridSystem
 
         private void HandleBattleStateChanged(FantasyDefense.Core.BattleState state)
         {
-            // Sesuai Instruksi Komandan:
-            // Saat mode perang hero aktif, seluruh kotak kecil (petak) dan kotak besar (board)
-            // disembunyikan agar pandangan medan perang bersih dan hero tampak leluasa bertarung di alam terbuka.
+            // Sesuai Instruksi Komandan (Poin 2):
+            // a. Transisi Fade-Out lembut (alpha turun dari 1 ke 0 dalam 0.35 detik) bersamaan dengan transformasi hero.
+            // b. Kotak kecil 100% transparan, frame papan besar disisakan bayangan tipis (alpha 10-15%).
+            // c. Ketika gelombang selesai dan kembali ke fase taktis (Inter-Wave Preparation), kotak di-fade-in kembali.
             if (state == FantasyDefense.Core.BattleState.WaveActive)
             {
-                SetGridVisualVisibility(false);
+                FadeGridVisual(true, 0.35f);
             }
             else if (state == FantasyDefense.Core.BattleState.Preparation)
             {
-                SetGridVisualVisibility(true);
+                FadeGridVisual(false, 0.35f);
             }
         }
 
         /// <summary>
-        /// Mengatur visibilitas visual kotak petak dan bingkai papan grid.
+        /// Memicu transisi fade-out / fade-in lembut pada petak dan bingkai papan grid.
         /// </summary>
-        public void SetGridVisualVisibility(bool visible)
+        public void FadeGridVisual(bool toCombat, float duration = 0.35f)
+        {
+            if (gridFadeCoroutine != null)
+            {
+                StopCoroutine(gridFadeCoroutine);
+            }
+            if (gameObject.activeInHierarchy)
+            {
+                gridFadeCoroutine = StartCoroutine(FadeGridVisualRoutine(toCombat, duration));
+            }
+            else
+            {
+                ApplyGridAlphaDirect(toCombat ? 0f : 1f, toCombat ? 0.0f : 0.95f);
+            }
+        }
+
+        private System.Collections.IEnumerator FadeGridVisualRoutine(bool toCombat, float duration)
+        {
+            float startCellAlpha = toCombat ? 1f : 0f;
+            float targetCellAlpha = toCombat ? 0f : 1f;
+
+            float startBoardAlpha = toCombat ? 0.95f : 0.0f;
+            float targetBoardAlpha = toCombat ? 0.0f : 0.95f;
+
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+
+                float currentCellAlpha = Mathf.Lerp(startCellAlpha, targetCellAlpha, t);
+                float currentBoardAlpha = Mathf.Lerp(startBoardAlpha, targetBoardAlpha, t);
+
+                ApplyGridAlphaDirect(currentCellAlpha, currentBoardAlpha);
+                yield return null;
+            }
+
+            ApplyGridAlphaDirect(targetCellAlpha, targetBoardAlpha);
+            gridFadeCoroutine = null;
+        }
+
+        private void ApplyGridAlphaDirect(float cellAlpha, float boardAlpha)
         {
             if (boardRenderer != null)
             {
-                boardRenderer.enabled = visible;
+                boardRenderer.enabled = boardAlpha > 0.005f;
+                Color bCol = boardRenderer.color;
+                bCol.a = boardAlpha;
+                boardRenderer.color = bCol;
             }
 
             if (gridMatrix != null)
@@ -98,11 +145,19 @@ namespace FantasyDefense.GridSystem
                         TileCell cell = gridMatrix[x, y];
                         if (cell != null)
                         {
-                            cell.SetVisualVisible(visible);
+                            cell.SetVisualAlpha(cellAlpha);
                         }
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Mengatur visibilitas visual kotak petak dan bingkai papan grid (backward compatibility).
+        /// </summary>
+        public void SetGridVisualVisibility(bool visible)
+        {
+            FadeGridVisual(!visible, 0.35f);
         }
 
         private void Start()

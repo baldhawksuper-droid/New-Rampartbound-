@@ -22,8 +22,8 @@ namespace Rampartbound.Editor
         public const string COMPANY_NAME = "BaldHawk Studios";
         public const string PRODUCT_NAME = "Rampartbound: Merge Defense";
         public const string PACKAGE_IDENTIFIER = "com.rampartbound.mergedefense";
-        public const string APP_VERSION = "1.2.13";
-        public const int BUNDLE_VERSION_CODE = 133;
+        public const string APP_VERSION = "1.2.17";
+        public const int BUNDLE_VERSION_CODE = 137;
         public const string DEFAULT_SCENE_PATH = "Assets/Scenes/RampartboundMainScene.unity";
 
         private const string WINDOWS_BUILD_DIR = "Builds/Windows";

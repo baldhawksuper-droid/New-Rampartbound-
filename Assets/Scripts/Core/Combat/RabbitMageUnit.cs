@@ -71,18 +71,21 @@ namespace FantasyDefense.Combat
                 var sr = projObj.AddComponent<SpriteRenderer>();
                 sr.sortingOrder = 25;
 
-                Sprite orbSprite = null;
+                Sprite orbSprite = Resources.Load<Sprite>("Sprites/Combat/Projectile_Magic_Orb");
 #if UNITY_EDITOR
-                orbSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Combat/Projectile_Magic_Orb.png");
+                if (orbSprite == null)
+                {
+                    orbSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Combat/Projectile_Magic_Orb.png");
+                }
 #endif
                 if (orbSprite != null)
                 {
                     sr.sprite = orbSprite;
                     sr.color = currentTier == UnitTier.Tier3 ? new Color(1f, 0.75f, 1f) : Color.white;
                 }
-                else if (unitData != null && unitData.unitIcon != null)
+                else
                 {
-                    sr.sprite = unitData.unitIcon;
+                    sr.sprite = GetOrCreateProceduralOrbSprite();
                     sr.color = currentTier == UnitTier.Tier3 ? new Color(0.9f, 0.4f, 1f) : new Color(0.2f, 0.8f, 1f);
                 }
 
@@ -106,6 +109,38 @@ namespace FantasyDefense.Combat
                 critical: false,
                 meteor: isMeteor
             );
+        }
+
+        private static Sprite cachedOrbSprite;
+        private static Sprite GetOrCreateProceduralOrbSprite()
+        {
+            if (cachedOrbSprite != null) return cachedOrbSprite;
+            int size = 32;
+            Texture2D tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+            Color[] pixels = new Color[size * size];
+            float radius = size * 0.45f;
+            Vector2 center = new Vector2(size * 0.5f, size * 0.5f);
+
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    float dist = Vector2.Distance(new Vector2(x, y), center);
+                    if (dist <= radius)
+                    {
+                        float alpha = Mathf.Clamp01(1f - (dist / radius));
+                        pixels[y * size + x] = new Color(1f, 1f, 1f, alpha * alpha);
+                    }
+                    else
+                    {
+                        pixels[y * size + x] = Color.clear;
+                    }
+                }
+            }
+            tex.SetPixels(pixels);
+            tex.Apply();
+            cachedOrbSprite = Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 100f);
+            return cachedOrbSprite;
         }
     }
 }

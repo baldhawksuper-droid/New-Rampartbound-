@@ -27,7 +27,7 @@ namespace FantasyDefense.GridSystem
         [SerializeField] private int match3BonusGems = 20;
 
         [Tooltip("Jeda waktu sebelum eksekusi fusi agar pemain melihat deretan match-3 sesaat")]
-        [SerializeField] private float mergeDelay = 0.35f;
+        [SerializeField] private float mergeDelay = 0.12f;
 
         [Header("Merge Rules & Multi-Unit Reward")]
         [Tooltip("Jumlah unit Tx+1 yang dihasilkan saat Match-5 (5 Kembar). Nilai 3 = 3 unit Tx+1.")]
@@ -40,6 +40,18 @@ namespace FantasyDefense.GridSystem
 
         private bool isResolving = false;
         public bool IsResolving => isResolving;
+
+        private UnitController explicitPlayerUnit;
+
+        /// <summary>
+        /// Mengunci unit dan petak yang secara eksplisit digerakkan oleh jari pemain
+        /// sebagai episentrum evolusi Tx+1 (Point 4).
+        /// </summary>
+        public void SetPlayerInteraction(UnitController unit, TileCell cell)
+        {
+            explicitPlayerUnit = unit;
+            lastInteractionCell = cell;
+        }
 
         public static event Action<List<UnitController>, UnitController, UnitTier> OnMatch3Resolved; // (absorbedUnits, upgradedUnit, newTier)
 
@@ -159,29 +171,79 @@ namespace FantasyDefense.GridSystem
                 yield break;
             }
 
-            // Selesaikan cluster fusi pertama yang terdeteksi
-            bool foundAnyMatch = false;
-            foreach (var cluster in clusters)
+            // Temukan seluruh cluster mandiri/independen yang tidak saling tumpang tindih
+            var independentClusters = GetIndependentClusters(clusters);
+            if (independentClusters.Count == 0)
             {
-                if (cluster == null || cluster.promotedUnit == null) continue;
-
-                currentChain++;
-                currentCombo = currentChain;
-                yield return new WaitForSeconds(mergeDelay);
-                yield return StartCoroutine(ExecuteMatchClusterRoutine(cluster, currentChain));
-                foundAnyMatch = true;
-                break; // Selesaikan 1 kelompok fusi terlebih dahulu sebelum cascade
+                yield break;
             }
 
-            // Jika ada fusi yang terjadi, berikan jeda bernapas agar evolusi unit terlihat jelas sebelum cascade
-            if (foundAnyMatch)
+            currentChain++;
+            currentCombo = currentChain;
+            yield return new WaitForSeconds(mergeDelay);
+
+            // Eksekusi fusi seluruh kelompok independen secara BERSAMAAN / SERENTAK (Simultaneous - Poin 4)
+            int runningCount = independentClusters.Count;
+            foreach (var cluster in independentClusters)
             {
-                yield return new WaitForSeconds(0.20f);
-                yield return StartCoroutine(CascadeAndRefillFromBelowCoroutine());
-                yield return new WaitForSeconds(0.18f);
-                // Pemindaian berulang untuk rantai kombo lanjutan
-                yield return StartCoroutine(ScanAndResolveChainRoutine(currentChain));
+                StartCoroutine(ExecuteTrackedMatchCluster(cluster, currentChain, () => runningCount--));
             }
+
+            while (runningCount > 0)
+            {
+                yield return null;
+            }
+
+            // Setelah seluruh fusi selesai serentak, lakukan cascade dan refill terpadu tanpa jeda canggung
+            yield return new WaitForSeconds(0.12f);
+            yield return StartCoroutine(CascadeAndRefillFromBelowCoroutine());
+            yield return new WaitForSeconds(0.10f);
+
+            // Pemindaian berulang untuk rantai kombo lanjutan
+            yield return StartCoroutine(ScanAndResolveChainRoutine(currentChain));
+        }
+
+        private IEnumerator ExecuteTrackedMatchCluster(MatchCluster cluster, int comboChain, System.Action onComplete)
+        {
+            yield return StartCoroutine(ExecuteMatchClusterRoutine(cluster, comboChain));
+            onComplete?.Invoke();
+        }
+
+        /// <summary>
+        /// Memisahkan kelompok fusi yang independen (tidak berbagi petak atau unit yang sama)
+        /// agar dapat dieksekusi secara simultan/paralel dalam satu frame (Poin 4).
+        /// </summary>
+        private List<MatchCluster> GetIndependentClusters(List<MatchCluster> allClusters)
+        {
+            List<MatchCluster> independent = new List<MatchCluster>();
+            HashSet<TileCell> usedCells = new HashSet<TileCell>();
+            HashSet<UnitController> usedUnits = new HashSet<UnitController>();
+
+            foreach (var c in allClusters)
+            {
+                if (c == null || c.promotedUnit == null || c.allUnits.Count < 3) continue;
+
+                bool overlaps = false;
+                foreach (var cell in c.cells)
+                {
+                    if (usedCells.Contains(cell)) { overlaps = true; break; }
+                }
+                if (!overlaps)
+                {
+                    foreach (var unit in c.allUnits)
+                    {
+                        if (usedUnits.Contains(unit)) { overlaps = true; break; }
+                    }
+                }
+
+                if (!overlaps)
+                {
+                    independent.Add(c);
+                    foreach (var cell in c.cells) usedCells.Add(cell);
+                    foreach (var unit in c.allUnits) usedUnits.Add(unit);
+                }
+            }
+            return independent;
         }
 
         /// <summary>
@@ -631,7 +693,11 @@ namespace FantasyDefense.GridSystem
 
                 // Evaluasi unit yang disentuh/dipindahkan pemain secara langsung (Kotak yang sebenarnya)
                 UnitController playerInteractedUnit = null;
-                if (lastInteractionCell != null && lastInteractionCell.CurrentUnit != null && cluster.allUnits.Contains(lastInteractionCell.CurrentUnit))
+                if (explicitPlayerUnit != null && cluster.allUnits.Contains(explicitPlayerUnit))
+                {
+                    playerInteractedUnit = explicitPlayerUnit;
+                }
+                else if (lastInteractionCell != null && lastInteractionCell.CurrentUnit != null && cluster.allUnits.Contains(lastInteractionCell.CurrentUnit))
                 {
                     playerInteractedUnit = lastInteractionCell.CurrentUnit;
                 }
@@ -653,9 +719,33 @@ namespace FantasyDefense.GridSystem
                 {
                     cluster.promotedUnits.Add(intersectionCell.CurrentUnit);
                 }
+                else if (isPureVertical)
+                {
+                    // STANDAR FUSI VERTIKAL (Poin 5):
+                    // Pada deretan murni vertikal, target evolusi SELALU berada di baris teratas (Y tertinggi, barisan depan menghadap musuh)!
+                    // Ini mencegah bidak jatuh ke baris bawah saat fusi, serta mencegah bidak diseret naik kembali oleh cascade.
+                    var sortedByY = new List<UnitController>(cluster.allUnits);
+                    sortedByY.Sort((a, b) => (a.CurrentCell != null && b.CurrentCell != null) ? a.CurrentCell.Y.CompareTo(b.CurrentCell.Y) : 0);
+
+                    if (cluster.allUnits.Count >= 5)
+                    {
+                        cluster.promotedUnits.Add(sortedByY[sortedByY.Count - 1]);
+                        cluster.promotedUnits.Add(sortedByY[sortedByY.Count - 2]);
+                        cluster.promotedUnits.Add(sortedByY[sortedByY.Count - 3]);
+                    }
+                    else if (cluster.allUnits.Count == 4)
+                    {
+                        cluster.promotedUnits.Add(sortedByY[sortedByY.Count - 1]);
+                        cluster.promotedUnits.Add(sortedByY[sortedByY.Count - 2]);
+                    }
+                    else
+                    {
+                        cluster.promotedUnits.Add(sortedByY[sortedByY.Count - 1]);
+                    }
+                }
                 else if (playerInteractedUnit != null)
                 {
-                    // PRIORITAS UTAMA (Point 1): Petak interaksi jari pemain ("Tx+1 udh benar sesuai jari").
+                    // PRIORITAS UTAMA FUSI HORIZONTAL: Petak interaksi jari pemain ("Tx+1 udh benar sesuai jari").
                     // Bidak yang digeser/disentuh pemain langsung berevolusi menjadi Tx+1 tepat di posisi jari pemain.
                     cluster.promotedUnits.Add(playerInteractedUnit);
 
@@ -677,29 +767,6 @@ namespace FantasyDefense.GridSystem
                         {
                             cluster.promotedUnits.Add(cluster.allUnits[partnerIdx]);
                         }
-                    }
-                }
-                else if (isPureVertical)
-                {
-                    // Fusi otomatis berantai tanpa sentuhan jari langsung (Cascade Chain Reaction):
-                    // Promosikan unit paling atas (Y tertinggi) menghadap musuh
-                    var sortedByY = new List<UnitController>(cluster.allUnits);
-                    sortedByY.Sort((a, b) => (a.CurrentCell != null && b.CurrentCell != null) ? a.CurrentCell.Y.CompareTo(b.CurrentCell.Y) : 0);
-
-                    if (cluster.allUnits.Count >= 5)
-                    {
-                        cluster.promotedUnits.Add(sortedByY[sortedByY.Count - 1]);
-                        cluster.promotedUnits.Add(sortedByY[sortedByY.Count - 2]);
-                        cluster.promotedUnits.Add(sortedByY[sortedByY.Count - 3]);
-                    }
-                    else if (cluster.allUnits.Count == 4)
-                    {
-                        cluster.promotedUnits.Add(sortedByY[sortedByY.Count - 1]);
-                        cluster.promotedUnits.Add(sortedByY[sortedByY.Count - 2]);
-                    }
-                    else
-                    {
-                        cluster.promotedUnits.Add(sortedByY[sortedByY.Count - 1]);
                     }
                 }
                 else if (cluster.allUnits.Count >= 5)
@@ -742,6 +809,7 @@ namespace FantasyDefense.GridSystem
         {
             if (cluster == null || cluster.promotedUnit == null || cluster.allUnits.Count < 3) yield break;
 
+            explicitPlayerUnit = null;
             UnitController promotedUnit = cluster.promotedUnit;
             // Standar Game Swap & Merge: Fusi berbentuk L / T / + (Cross) adalah fusi 5-unit istimewa yang melompatkan 2 Tier (T0 -> T2 atau T1 -> T3)!
             int tierBoost = cluster.isIntersection ? 2 : 1;

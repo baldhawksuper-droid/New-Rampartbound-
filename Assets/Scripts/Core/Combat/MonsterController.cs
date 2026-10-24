@@ -64,6 +64,12 @@ namespace FantasyDefense.Combat
         [SerializeField] protected float barricadeAttackInterval = 1.2f;
         protected float barricadeAttackTimer = 0f;
 
+        [Header("Siege Mini HP Bar (Point 3)")]
+        [SerializeField] protected GameObject miniHpBarRoot;
+        [SerializeField] protected SpriteRenderer miniHpBarFillRenderer;
+        [SerializeField] protected SpriteRenderer miniHpBarBgRenderer;
+        protected static Sprite cachedMiniHpBarSprite;
+
         protected Vector3[] waypoints;
         protected int currentWaypointIndex = 0;
         protected bool isDead = false;
@@ -78,6 +84,7 @@ namespace FantasyDefense.Combat
         public bool IsStunned => isStunned;
         public bool IsBurned => isBurned;
         public float DefenseDebuff => defenseDebuff;
+        public bool IsAttackingBarricade => isAttackingBarricade;
 
         public static event Action<MonsterController> OnMonsterSpawned;
         public static event Action<MonsterController> OnMonsterKilled;
@@ -414,14 +421,35 @@ namespace FantasyDefense.Combat
         {
             if (isDead || isAttackingBarricade) return;
 
-            // Sesuai Instruksi Komandan (Poin 4):
-            // Monster yang mencapai gerbang TIDAK LANGSUNG MENGHILANG!
-            // Monster berhenti di depan gerbang dan terus menyerang benteng berkala hingga dieliminasi oleh hero/turret!
+            // Sesuai Instruksi Komandan (Poin 1 & 6):
+            // Monster yang mencapai gerbang TETAP HIDUP dan terus mendobrak benteng hingga gugur dalam pertempuran!
+            // Stagger timer serangan awal (0.35s - 1.0s) agar pukulan rombongan monster terdistribusi secara ritmis (DPS)
             isAttackingBarricade = true;
-            barricadeAttackTimer = 0.2f;
+            barricadeAttackTimer = UnityEngine.Random.Range(0.35f, 1.0f);
 
-            int damage = monsterData != null ? monsterData.castleDamage : 10;
+            // Tampilkan Mini HP Bar di atas kepala monster pengepung (Point 3)
+            EnsureMiniHpBar();
+            UpdateMiniHpBar();
+
+            int damage = GetCalculatedBarricadeDamage();
             OnMonsterReachedBarricade?.Invoke(this, damage);
+        }
+
+        protected virtual int GetCalculatedBarricadeDamage()
+        {
+            if (monsterData == null) return 5;
+            int baseDmg = monsterData.castleDamage;
+
+            // Kalibrasi Pacing DPS Benteng (Point 6):
+            // Creep: 2-4 damage per pukulan (gesit tapi ringan)
+            // Brute: 6-9 damage per pukulan (berat berlapis baja)
+            // Boss: Sesuai data boss (15-25 damage hantaman destruktif)
+            return monsterData.monsterType switch
+            {
+                MonsterType.Creep => Mathf.Clamp(baseDmg, 2, 4),
+                MonsterType.Brute => Mathf.Clamp(baseDmg, 6, 9),
+                _ => baseDmg
+            };
         }
 
         protected virtual void AttackBarricade()
@@ -433,16 +461,25 @@ namespace FantasyDefense.Combat
             {
                 barricadeAttackTimer = barricadeAttackInterval;
 
-                int damage = monsterData != null ? monsterData.castleDamage : 10;
+                int damage = GetCalculatedBarricadeDamage();
                 CastleBarricade.Instance.TakeDamage(damage);
 
-                // Mainkan animasi menerjang ke arah gerbang benteng
+                // Mainkan animasi menerjang dan hentakan debu ke gerbang benteng (Point 5)
                 StartCoroutine(AttackBarricadeLungeRoutine());
 
-                // Mainkan SFX benturan ke benteng
+                // Mainkan SFX benturan ke benteng bervariasi sesuai jenis monster & haptic ponsel (Point 4)
                 if (FantasyDefense.Audio.AudioManager.Instance != null)
                 {
-                    FantasyDefense.Audio.AudioManager.Instance.PlaySound(FantasyDefense.Audio.SoundType.CastleHit);
+                    FantasyDefense.Audio.AudioManager.Instance.PlayCastleHit(monsterData != null ? monsterData.monsterType : MonsterType.Creep);
+                }
+
+                // Guncangan mikro-rotasi dramatis jika Boss menyerang barikade (Point 4 - Boss Impact Screen-Shake Twist)
+                if (monsterData != null && monsterData.monsterType == MonsterType.Boss)
+                {
+                    if (FantasyDefense.Core.MobileCameraAdapter.Instance != null)
+                    {
+                        FantasyDefense.Core.MobileCameraAdapter.Instance.TriggerBossScreenShake(0.38f, 0.30f, 0.65f);
+                    }
                 }
             }
 
@@ -460,6 +497,18 @@ namespace FantasyDefense.Combat
                 t += Time.deltaTime;
                 transform.position = Vector3.Lerp(startPos, lungeTarget, t / 0.10f);
                 yield return null;
+            }
+
+            // Hentakan Debu & Pukulan saat menghantam gerbang benteng (Divisi Art & Visual - Point 5)
+            if (SkillVfxManager.Instance != null)
+            {
+                SkillVfxManager.Instance.SpawnProceduralParticleBurst(
+                    transform.position + Vector3.down * 0.22f,
+                    new Color(0.85f, 0.78f, 0.65f), // Dust tan
+                    new Color(0.55f, 0.50f, 0.42f), // Ash stone
+                    8,
+                    2.0f
+                );
             }
 
             t = 0f;
@@ -495,6 +544,8 @@ namespace FantasyDefense.Combat
             currentHealth -= finalDamage;
             StartCoroutine(FlashDamageColor(isCrit ? Color.yellow : Color.red));
 
+            UpdateMiniHpBar();
+
             OnMonsterDamaged?.Invoke(this, finalDamage, isCrit);
 
             if (currentHealth <= 0)
@@ -508,6 +559,11 @@ namespace FantasyDefense.Combat
             if (isDead) return;
             isDead = true;
             isAttackingBarricade = false;
+
+            if (miniHpBarRoot != null)
+            {
+                Destroy(miniHpBarRoot);
+            }
 
             // Segera hapus dari daftar monster aktif agar sinkronisasi jumlah musuh akurat seketika
             ActiveMonsters.Remove(this);
@@ -688,5 +744,90 @@ namespace FantasyDefense.Combat
             cachedProceduralMonsterSprites[type] = sprite;
             return sprite;
         }
+
+        #region Siege Mini HP Bar System (Point 3)
+
+        protected static Sprite GetOrCreateMiniHpBarSprite()
+        {
+            if (cachedMiniHpBarSprite != null) return cachedMiniHpBarSprite;
+            Texture2D tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+            Color[] colors = new Color[] { Color.white, Color.white, Color.white, Color.white };
+            tex.SetPixels(colors);
+            tex.Apply();
+            cachedMiniHpBarSprite = Sprite.Create(tex, new Rect(0, 0, 2, 2), new Vector2(0.5f, 0.5f), 100f);
+            return cachedMiniHpBarSprite;
+        }
+
+        protected virtual void EnsureMiniHpBar()
+        {
+            if (miniHpBarRoot != null)
+            {
+                miniHpBarRoot.SetActive(true);
+                return;
+            }
+
+            miniHpBarRoot = new GameObject("MiniHpBar_Siege");
+            miniHpBarRoot.transform.SetParent(transform, false);
+
+            // Mengimbangi skala induk agar dimensi bar di layar tetap konsisten dan tajam di segala resolusi
+            float invScaleX = 1f / Mathf.Max(0.01f, baseScale.x);
+            float invScaleY = 1f / Mathf.Max(0.01f, baseScale.y);
+            miniHpBarRoot.transform.localScale = new Vector3(invScaleX, invScaleY, 1f);
+
+            // Posisi vertikal tepat melayang di atas puncak sprite monster
+            float headOffset = (spriteRenderer != null && spriteRenderer.sprite != null)
+                ? (spriteRenderer.sprite.bounds.extents.y * baseScale.y + 0.12f)
+                : 0.40f;
+            miniHpBarRoot.transform.localPosition = new Vector3(0f, headOffset * invScaleY, 0f);
+
+            // Background Bingkai Mini Bar (Hitam arang kontras tinggi dengan alpha halus)
+            GameObject bgObj = new GameObject("HpBar_Bg");
+            bgObj.transform.SetParent(miniHpBarRoot.transform, false);
+            miniHpBarBgRenderer = bgObj.AddComponent<SpriteRenderer>();
+            miniHpBarBgRenderer.sprite = GetOrCreateMiniHpBarSprite();
+            miniHpBarBgRenderer.color = new Color(0.10f, 0.10f, 0.12f, 0.90f);
+            miniHpBarBgRenderer.sortingLayerName = "UI";
+            miniHpBarBgRenderer.sortingOrder = 350;
+            bgObj.transform.localScale = new Vector3(0.52f, 0.08f, 1f);
+
+            // Foreground Fill Bar
+            GameObject fillObj = new GameObject("HpBar_Fill");
+            fillObj.transform.SetParent(miniHpBarRoot.transform, false);
+            miniHpBarFillRenderer = fillObj.AddComponent<SpriteRenderer>();
+            miniHpBarFillRenderer.sprite = GetOrCreateMiniHpBarSprite();
+            miniHpBarFillRenderer.color = new Color(0.28f, 0.92f, 0.42f, 1f); // Emerald Green
+            miniHpBarFillRenderer.sortingLayerName = "UI";
+            miniHpBarFillRenderer.sortingOrder = 351;
+            fillObj.transform.localScale = new Vector3(0.48f, 0.055f, 1f);
+        }
+
+        protected virtual void UpdateMiniHpBar()
+        {
+            if (!isAttackingBarricade || miniHpBarRoot == null || miniHpBarFillRenderer == null) return;
+
+            float pct = Mathf.Clamp01(HealthPercent);
+            float fullWidth = 0.48f;
+            float currentWidth = fullWidth * pct;
+
+            miniHpBarFillRenderer.transform.localScale = new Vector3(currentWidth, 0.055f, 1f);
+            // Geser anchor ke kiri agar bar memendek ke arah kiri secara alami
+            miniHpBarFillRenderer.transform.localPosition = new Vector3(-((fullWidth - currentWidth) * 0.5f), 0f, 0f);
+
+            // Pewarnaan dinamis adaptif (Hijau Sehat -> Amber Kuning -> Merah Kritis)
+            if (pct > 0.50f)
+            {
+                miniHpBarFillRenderer.color = new Color(0.28f, 0.92f, 0.42f, 1f);
+            }
+            else if (pct > 0.25f)
+            {
+                miniHpBarFillRenderer.color = new Color(0.98f, 0.78f, 0.15f, 1f);
+            }
+            else
+            {
+                miniHpBarFillRenderer.color = new Color(0.95f, 0.22f, 0.22f, 1f);
+            }
+        }
+
+        #endregion
     }
 }

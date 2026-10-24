@@ -20,6 +20,9 @@ namespace FantasyDefense.Audio
         SummonHero,
         HeroSummon = SummonHero,
         CastleHit,
+        CastleHitCreep,
+        CastleHitBrute,
+        CastleHitBoss,
         VictoryFanfare,
         DefeatChime,
         ButtonClick,
@@ -32,7 +35,8 @@ namespace FantasyDefense.Audio
         CannonFire,
         BallistaShoot = ArrowShot,
         Surrender = DefeatChime,
-        WaveIncoming
+        WaveIncoming,
+        BarricadeRepair
     }
 
     public enum AudioSfxType
@@ -228,6 +232,44 @@ namespace FantasyDefense.Audio
                 default:
                     PlaySound(SoundType.MysticBurst);
                     break;
+            }
+        }
+
+        /// <summary>
+        /// Memainkan variasi SFX hantaman gerbang benteng dan getaran haptic ponsel sesuai jenis monster pengepung (Point 4).
+        /// Creep: gesit tajam (cakar), Brute: dentuman godam berat, Boss: gempa menggelegar.
+        /// </summary>
+        public void PlayCastleHit(MonsterType monsterType)
+        {
+            SoundType sound = monsterType switch
+            {
+                MonsterType.Creep => SoundType.CastleHitCreep,
+                MonsterType.Brute => SoundType.CastleHitBrute,
+                MonsterType.Boss => SoundType.CastleHitBoss,
+                _ => SoundType.CastleHit
+            };
+
+            float pitch = monsterType switch
+            {
+                MonsterType.Creep => Random.Range(0.95f, 1.15f),
+                MonsterType.Brute => Random.Range(0.85f, 1.0f),
+                MonsterType.Boss => Random.Range(0.75f, 0.90f),
+                _ => 1.0f
+            };
+
+            PlaySound(sound, pitch);
+
+            // Memicu haptic feedback ponsel yang proporsional dengan bobot musuh
+            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null)
+            {
+                var hapticType = monsterType switch
+                {
+                    MonsterType.Creep => FantasyDefense.Mobile.HapticFeedbackType.Light,
+                    MonsterType.Brute => FantasyDefense.Mobile.HapticFeedbackType.Medium,
+                    MonsterType.Boss => FantasyDefense.Mobile.HapticFeedbackType.Heavy,
+                    _ => FantasyDefense.Mobile.HapticFeedbackType.Light
+                };
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(hapticType);
             }
         }
 
@@ -462,6 +504,9 @@ namespace FantasyDefense.Audio
             proceduralClipCache[SoundType.MergeSuccess] = CreateArpeggioClip("MergeSuccess", new float[] { 523.25f, 659.25f, 783.99f, 1046.50f }, 0.06f);
             proceduralClipCache[SoundType.SummonHero] = CreateToneClip("SummonHero", 0.18f, 440f, 660f);
             proceduralClipCache[SoundType.CastleHit] = CreateToneClip("CastleHit", 0.25f, 120f, 50f);
+            proceduralClipCache[SoundType.CastleHitCreep] = CreateToneClip("CastleHitCreep", 0.12f, 220f, 130f); // Pukulan gesit cakar goblin
+            proceduralClipCache[SoundType.CastleHitBrute] = CreateToneClip("CastleHitBrute", 0.30f, 110f, 40f); // Dentuman berat godam orc
+            proceduralClipCache[SoundType.CastleHitBoss] = CreateToneClip("CastleHitBoss", 0.48f, 75f, 25f); // Gempa subwoofer destruktif boss
 
             proceduralClipCache[SoundType.VictoryFanfare] = CreateArpeggioClip("VictoryFanfare", new float[] { 440f, 554.37f, 659.25f, 880f, 1108.7f }, 0.12f);
             proceduralClipCache[SoundType.DefeatChime] = CreateArpeggioClip("DefeatChime", new float[] { 659.25f, 587.33f, 523.25f, 392f }, 0.15f);
@@ -476,6 +521,7 @@ namespace FantasyDefense.Audio
             proceduralClipCache[SoundType.BossRoar] = CreateToneClip("BossRoar", 0.5f, 120f, 55f);
             proceduralClipCache[SoundType.CannonFire] = CreateToneClip("CannonFire", 0.32f, 180f, 40f);
             proceduralClipCache[SoundType.WaveIncoming] = CreateArpeggioClip("WaveIncoming", new float[] { 349.23f, 440f, 523.25f, 698.46f }, 0.09f);
+            proceduralClipCache[SoundType.BarricadeRepair] = CreateArpeggioClip("BarricadeRepair", new float[] { 523.25f, 659.25f, 783.99f, 1046.50f, 1318.5f }, 0.05f);
         }
 
         private AudioClip CreateToneClip(string name, float duration, float startFreq, float endFreq)

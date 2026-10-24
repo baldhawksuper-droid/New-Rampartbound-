@@ -121,6 +121,21 @@ namespace FantasyDefense.Combat
             Vector3 myPos = transform.position;
 
             var monsters = MonsterController.GetActiveMonstersSnapshot();
+
+            // 1. Prioritaskan monster yang sedang aktif mendobrak gerbang benteng (Point 1)
+            for (int i = 0; i < monsters.Count; i++)
+            {
+                var monster = monsters[i];
+                if (monster == null || monster.IsDead) continue;
+
+                float distToTurret = Vector2.Distance(myPos, monster.transform.position);
+                if (distToTurret <= attackRange && monster.IsAttackingBarricade)
+                {
+                    return monster; // Langsung tembak pembobol gerbang!
+                }
+            }
+
+            // 2. Fallback: prioritaskan monster dengan posisi Y paling rendah (paling mendekati benteng di bawah)
             for (int i = 0; i < monsters.Count; i++)
             {
                 var monster = monsters[i];
@@ -129,7 +144,6 @@ namespace FantasyDefense.Combat
                 float distToTurret = Vector2.Distance(myPos, monster.transform.position);
                 if (distToTurret <= attackRange)
                 {
-                    // Prioritaskan monster dengan posisi Y paling rendah (paling mendekati benteng di bawah)
                     float monsterY = monster.transform.position.y;
                     if (monsterY < closestDistanceToBarricade)
                     {
