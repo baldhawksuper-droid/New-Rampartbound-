@@ -22,6 +22,8 @@ The player summons units using the level's battle economy and makes deployment/m
 
 ### Hybrid campaign rule
 
+These are design requirements, not verified current UI or behavior:
+
 - Assign one primary mode per stage in stage data.
 - Communicate the mode before the player commits to a stage and in the battle HUD.
 - Teach each mode separately before introducing complexity.
@@ -32,20 +34,20 @@ The player summons units using the level's battle economy and makes deployment/m
 
 - **Starting trio:** Cedric (melee damage), Rose Tanker (frontline durability/control), Rabbit Mage (ranged area damage/control).
 - **Summon/gacha unlock:** Wind Ranger (long-range physical damage). Treat as an additional unlock, not a required tutorial hero or one of the starting three.
+- **Lobby presentation requirement:** Give the starting trio the primary roster space. Present Wind Ranger in a visibly distinct locked/featured summon treatment; do not show her as an equally owned starter card. This is a design requirement, not a verified current UI state.
 - Any other hero acquisition, probabilities, pity, duplicate conversion, pricing, and real-money purchase claims remain out of scope until separately approved and reviewed for platform/legal compliance.
 
 ## Visual direction and UX principles
 
-The available `Gameplay.jpeg` screenshot establishes a colorful, friendly fantasy-puzzle direction, but is only one gameplay view. It does not approve the complete art direction or prove runtime behavior.
+`Gameplay.jpeg` is a single image reference, not proof of runtime behavior or approval of the full art direction. The separate `Pixel Art.jpeg` appears to be a third-party/ad-feed image and is not verified as Rampartbound-owned art; do not use it as evidence of the game's style.
 
-Initial observations from that screenshot:
-- Retain colorful, friendly fantasy mood and distinct piece silhouettes.
-- Increase separation between the green board and grassy background; strengthen tile-state contrast while preserving readability for color-vision differences.
-- Reduce competing visual weight around the board. The fence-side structures and large blue/gold object below it need unmistakable gameplay meaning or less prominence.
-- Harmonize the soft background with the detailed, strongly shaded board pieces and foreground props.
-- Keep the grid the primary focal area; show only essential objective, phase, move/economy, wave, and castle-health information at readable sizes.
+Initial observations from `Gameplay.jpeg`:
+- The colorful tokens have distinguishable silhouettes, but the green board blends into the field and cell boundaries/states are subtle; increase board and tile-state contrast using visual cues beyond color alone.
+- The screenshot does not show an objective, mode/phase, remaining moves/economy, upcoming wave, or castle health; verify if these are intentionally omitted/cropped, then make the battle HUD readable and clear.
+- Fence, cropped side structures, and the large blue/gold object below the board compete with the grid; label their function through clear gameplay feedback or reduce their prominence.
+- Define consistent original rules for palette, outlines, shading, and detail density using project-owned assets; do not infer the lobby style from `Pixel Art.jpeg`.
 
-These are review findings, not approved asset changes. Complete an audit of lobby, battle, stage map, feature panels, overlays, and multiple portrait aspect ratios before proposing a broad visual overhaul.
+These are visual-audit findings and recommendations, not approved asset changes. Audit actual runtime screens (lobby, battle, map, panels, overlays) across portrait aspect ratios before a broad visual overhaul.
 
 ## First-session experience
 

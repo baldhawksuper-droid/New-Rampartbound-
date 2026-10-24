@@ -16,7 +16,7 @@ This document is the concise index for current, verified project facts. If older
 - Hero ScriptableObject assets exist for Cedric, Rose Tanker, Rabbit Mage, and Wind Ranger under `Assets/ScriptableObjects/Units/`.
 - Hero sprite files exist under `Assets/Art/Sprites/Heroes/`.
 - `LevelConfigSO` defaults its battle mode to `PuzzlePreparation`.
-- `StageManager` assigns `PuzzlePreparation` to several configured stages and `RealTimeDeploy` to others. The current intended player-facing mode strategy is not yet stated consistently in design docs.
+- `StageManager` assigns `PuzzlePreparation` to several configured stages and `RealTimeDeploy` to others. The current canonical brief sets hybrid modes by level; historical GDDs conflict and stage-specific assignments have not been fully audited.
 - `RampartboundBuildPipeline.cs` declares app version `1.2.17` and Android bundle version code `137`.
 - The `Builds/` tree contains artifacts named `Rampartbound_v1.2.14_release.apk`, `Rampartbound_v1.2.3_debug.apk`, and `Rampartbound_debug.apk`. Artifact names alone do not establish build success, installability, or current release status.
 - The working tree was already dirty before this documentation update: `AGENTS.md` and `docs/TEAM_PROJECT_WORKFLOW.md` had edits replacing BaldHawk with Hermes Agent.
@@ -50,18 +50,24 @@ Deliver a readable mobile hybrid merge/puzzle defense campaign. Levels deliberat
 - Added this status/source-of-truth page with confirmed direction, directly verified project facts, limitations, and unresolved platform/monetization decisions.
 - Updated README and setup guide to remove old machine-specific path examples, use the recorded Unity Editor version, and avoid absolute claims of readiness or missing-reference guarantees.
 - Updated the project role descriptions to identify Hermes Agent as AI project lead and the user as product owner; reduced some absolute QA/sprint claims.
-- Inspected `Gameplay.jpeg`: bright casual palette and distinct icons, but weak board/background separation, dense 6x6 symbols, inconsistent softness/detail between background and foreground, crowded lower battlefield props, and unclear function of the large blue-gold object.
-- Inspected `Pixel Art.jpeg`: detailed pixel-art village/lobby concept with appealing medieval mood, but potentially inconsistent pixel/detail scale, dense decoration, and no clear gameplay/interactive hierarchy in the provided image. The image also contains social-video overlays. Determine whether it is the intended lobby style and align it with the battle art direction.
-- These are image-based observations only, not an in-Unity UI audit or approval of final art.
+- Inspected `Gameplay.jpeg`: colorful tokens are distinguishable, but board/background separation and cell boundaries are weak; the image shows no objective, mode/phase, moves/economy, next-wave context, or castle-health indicator; the fence, cropped side structures, and large blue/gold object compete with the grid. These are image-only findings, not proof of runtime UI state.
+- `Pixel Art.jpeg` appears to be a third-party/ad-feed composition with platform overlays, and is not verified as Rampartbound-owned art or in-game UI. Do not use it as evidence of the game's art direction. Establish a consistent original pixel-art direction from project-owned assets instead.
+- Unity runtime behavior, other screens, portrait aspect ratios, device-scale readability, and actual use of the referenced sprites remain unverified.
 
-**Still required to finish Sprint 49:**
-1. Complete a full visual inventory/audit of lobby, battle, stage map, modal screens, typography, icon style, safe area, and phone aspect-ratio screenshots. `Gameplay.jpeg` and `Pixel Art.jpeg` are only first-pass concept/image references.
-2. Refresh build steps against actual Unity menu commands and a tested artifact; pipeline version is 1.2.17 / code 137, while newest named APK found is v1.2.14; a current APK is not evidenced.
-3. Reconcile old Sprint history and feature claims with code/config/test evidence; the legacy documents remain reference-only until audited.
-4. Check internal links and remaining stale/version/path/role/mode/roster statements in all current docs.
-5. Run documentation checks, review diff, commit, push, and verify remote SHA.
+**Bounded work completed so far (not full design audit):**
 
-**Definition of done:** one canonical approved product-design brief; portable setup instructions verified; visual/UX audit documented with findings and proposals; unverified claims marked; all critical current-doc conflicts fixed or explicitly tracked; `git diff --check` and link/stale-string audit pass; changes committed and pushed with remote SHA verified.
+- [x] Record approved product direction: per-level hybrid modes; starting trio Cedric/Rose/Rabbit Mage; Wind Ranger via gacha.
+- [x] Create canonical current product brief and project status page.
+- [x] Mark the older Master GDD, core gameplay GDD, and lobby concept as historical references.
+- [x] Update README/setup repo references to actual repository/build-pipeline facts and use portable project-root instructions.
+- [x] Record first-pass image observations. `Pixel Art.jpeg` is not verified as project-owned art and is excluded as evidence of this game's visual style.
+- [x] A local Markdown link check found no broken links; `git diff --check` passed on the preceding change set. Re-run after pending edits.
+- [ ] Review every visual surface in the running Unity project: lobby, stage map, battle HUD, modals, tutorials, typography, icons, safe areas, and multiple mobile aspect ratios. Current review is image-only.
+- [ ] Verify actual Unity menu/build paths and create/install/run a current build. Pipeline code says 1.2.17 / code 137; newest named APK found is 1.2.14. No current build is evidenced.
+- [ ] Reconcile remaining historical sprint statements against source, assets, serialized scene/config, and test evidence. Legacy labels mean “not authoritative”, not that every claim was independently audited.
+- [ ] Recheck docs after final edits, commit, push, and verify remote SHA.
+
+**Sprint 49 is in progress, not complete.** A documentation commit exists, but its existence does not validate gameplay, complete the visual audit, or mean Sprint 49 is done. Definition of done: current product brief and portable setup guidance; full visual/UX audit with proposals; remaining sprint claims verified or explicitly tracked; link/stale-string checks pass; and final changes committed/pushed with remote SHA confirmed.
 
 ## Remaining owner decisions (not blockers for current doc cleanup)
 

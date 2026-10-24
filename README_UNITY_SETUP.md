@@ -133,7 +133,7 @@ Merakit ulang seluruh hierarki arena secara otomatis dari nol ke dalam scene `As
 ### 3. `Rampartbound` ➡️ `Build`
 Menu ekspor otomatis 1-klik untuk distribusi, staging, dan rilis Google Play Store:
 * **`1-Click Build Windows Standalone (64-bit)`:** Mengompilasi binary PC desktop langsung ke `Builds/Windows/Rampartbound.exe`.
-* **`1-Click Build Android Sideload APK (Testing)`:** Mengompilasi paket instalasi Android siap instal langsung ke `Builds/Android/Builds/Android/Rampartbound_v1.2.14_release.apk`.
+* **`1-Click Build Android Sideload APK (Testing)`:** Menargetkan output `Builds/Android/Rampartbound_debug.apk` menurut kode build pipeline. File output terbaru belum dibangun/dijalankan dalam pemeriksaan ini.
 * **`1-Click Build Google Play App Bundle (.aab - Release)`:** Mengompilasi paket resmi Google Play App Bundle (.aab) dengan arsitektur IL2CPP 64-bit ARM64 + ARMv7, Target SDK 34+, dan Play Asset/Feature delivery.
 * **`Google Play Release Readiness Audit`:** Memeriksa kesiapan paket, App ID, Target API 34+, dan 64-bit compliance sebelum proses submission ke Google Play Console.
 * **`Configure Project Settings (Portrait & Mobile)`:** Otomatis mengunci orientasi layar ke Portrait, package ID `com.rampartbound.mergedefense`, dan konfigurasi grafis mobile.
@@ -142,7 +142,7 @@ Menu ekspor otomatis 1-klik untuk distribusi, staging, dan rilis Google Play Sto
 Proyek ini dilengkapi pipeline otomatis untuk memproduksi APK langsung melalui Git / GitHub Actions:
 * **Workflow File:** `.github/workflows/build-android-apk.yml`
 * **Cara Eksekusi via GitHub Web:**
-  1. Buka repositori: https://github.com/baldhawksuper-droid/Rampartbound-Unity
+  1. Buka repositori: https://github.com/baldhawksuper-droid/New-Rampartbound-
   2. Buka tab **Actions**.
   3. Pilih workflow **"Build Android APK & Release"**.
   4. Klik **Run workflow**, pilih tipe build (`apk` atau `aab`), lalu klik tombol hijau **Run workflow**.
@@ -172,15 +172,10 @@ Proyek ini dilengkapi pipeline otomatis untuk memproduksi APK langsung melalui G
 
 ---
 
-## 📱 Uji Coba & Unduh Langsung Paket APK (Direct Git Access)
+## Build Android
 
-Bagi Komandan yang ingin langsung mencoba game di perangkat Android tanpa perlu build ulang atau upload ke pihak ketiga:
-* File APK siap sideload sudah tersedia langsung di dalam repositori Git:  
-  👉 **[`Builds/Android/Builds/Android/Rampartbound_v1.2.14_release.apk`](Builds/Android/Builds/Android/Rampartbound_v1.2.14_release.apk)** (artifact versi 1.2.14; versi kode saat ini 1.2.17, belum diverifikasi sebagai build terkini)
-* **Cara Pemasangan di Ponsel / Tablet Android:**
-  1. Unduh file `Rampartbound_v1.2.14_release.apk` langsung dari repositori GitHub.
-  2. Salin ke ponsel atau kirim via chat.
-  3. Buka file `.apk` di ponsel Anda dan pilih **Install** (izinkan *Install from unknown sources* jika diminta).
-  4. Buka dan nikmati permainan pertahanan benteng secara langsung!
+Pipeline menargetkan output `Builds/Android/Rampartbound_debug.apk`. Folder repositori juga berisi APK lama dengan nama/versi berbeda; saya belum membangun, memasang, atau menguji paket APK pada perangkat dalam Sprint 49. Jangan menganggap artefak lama sebagai build terkini atau rekomendasi rilis.
+
+Untuk menghasilkan paket terbaru, gunakan menu `Rampartbound > Build > 1-Click Build Android Sideload APK (Testing)` di Unity Editor yang cocok dengan versi proyek.
 
 
