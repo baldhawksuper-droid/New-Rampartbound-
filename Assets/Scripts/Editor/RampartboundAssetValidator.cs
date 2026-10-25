@@ -73,6 +73,8 @@ namespace Rampartbound.Editor
             AuditHero("Rabbit Mage Tier 1", "Assets/Art/Sprites/Heroes/RabbitMage_T1.png", "Assets/ScriptableObjects/Units/SO_RabbitMage.asset", 1);
             AuditHero("Rabbit Mage Tier 2", "Assets/Art/Sprites/Heroes/RabbitMage_T2.png", "Assets/ScriptableObjects/Units/SO_RabbitMage.asset", 2);
             AuditHero("Rabbit Mage Tier 3", "Assets/Art/Sprites/Heroes/RabbitMage_T3.png", "Assets/ScriptableObjects/Units/SO_RabbitMage.asset", 3);
+            AuditHero("Rabbit Mage Tier 4", "Assets/Art/Sprites/Heroes/RabbitMage_T4.png", "Assets/ScriptableObjects/Units/SO_RabbitMage.asset", 4);
+            AuditHero("Rabbit Mage Tier 5", "Assets/Art/Sprites/Heroes/RabbitMage_T5.png", "Assets/ScriptableObjects/Units/SO_RabbitMage.asset", 5);
 
             AuditHero("Wind Ranger Tier 1", "Assets/Art/Sprites/Heroes/WindRanger_T1.png", "Assets/ScriptableObjects/Units/SO_WindRanger.asset", 1);
             AuditHero("Wind Ranger Tier 2", "Assets/Art/Sprites/Heroes/WindRanger_T2.png", "Assets/ScriptableObjects/Units/SO_WindRanger.asset", 2);
@@ -399,10 +401,27 @@ namespace Rampartbound.Editor
             var t1 = AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Art/Sprites/Heroes/{heroPrefix}_T1.png");
             var t2 = AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Art/Sprites/Heroes/{heroPrefix}_T2.png");
             var t3 = AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Art/Sprites/Heroes/{heroPrefix}_T3.png");
+            var t4 = AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Art/Sprites/Heroes/{heroPrefix}_T4.png");
+            var t5 = AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Art/Sprites/Heroes/{heroPrefix}_T5.png");
 
             if (t1 != null) { so.unitIcon = t1; so.tier1Sprite = t1; }
             if (t2 != null) so.tier2Sprite = t2;
             if (t3 != null) so.tier3Sprite = t3;
+            if (t4 != null) so.tier4Sprite = t4;
+            if (t5 != null) so.tier5Sprite = t5;
+
+            var tokPrefix = heroPrefix == "RabbitMage" ? "Rabbit" : (heroPrefix == "RoseTanker" ? "Rose" : (heroPrefix == "WindRanger" ? "Wind" : heroPrefix));
+            var tok1 = AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Art/Sprites/Grid/Token_Medallion_{tokPrefix}.png");
+            var tok2 = AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Art/Sprites/Grid/Token_Medallion_{tokPrefix}_T2.png");
+            var tok3 = AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Art/Sprites/Grid/Token_Medallion_{tokPrefix}_T3.png");
+            var tok4 = AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Art/Sprites/Grid/Token_Medallion_{tokPrefix}_T4.png");
+            var tok5 = AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Art/Sprites/Grid/Token_Medallion_{tokPrefix}_T5.png");
+
+            if (tok1 != null) so.preparationTokenSprite = tok1;
+            if (tok2 != null) so.preparationTokenTier2Sprite = tok2;
+            if (tok3 != null) so.preparationTokenTier3Sprite = tok3;
+            if (tok4 != null) so.preparationTokenTier4Sprite = tok4;
+            if (tok5 != null) so.preparationTokenTier5Sprite = tok5;
 
             EditorUtility.SetDirty(so);
         }
