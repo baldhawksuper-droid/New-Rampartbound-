@@ -198,7 +198,8 @@ namespace FantasyDefense.Combat
             float elapsed = 0f;
 
             // Orientasi serangan: Kemiringan hero condong ke arah monster yang diserang (ke atas & arah target)
-            float attackTilt = Mathf.Clamp(dir.x * 22f, -25f, 25f);
+            // Jika target di utara (monster lane Y > anchorPos.Y), terjang lurus ke atas dengan sedikit tilt horizontal
+            float attackTilt = Mathf.Clamp(-dir.x * 20f, -25f, 25f);
             Quaternion strikeRot = Quaternion.Euler(0f, 0f, attackTilt);
 
             // Fase 1: Menerjang maju menusuk ke arah monster

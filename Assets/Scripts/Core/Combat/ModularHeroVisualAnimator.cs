@@ -23,8 +23,11 @@ namespace FantasyDefense.Combat
         [SerializeField] private float headSecondaryDelay = 0.35f;
         [SerializeField] private float swordIdleSwayAngle = 3.5f;
         [SerializeField] private float shieldIdleSwayAngle = 2.0f;
-        [SerializeField] private float attackPullbackAngle = -35f;
-        [SerializeField] private float attackSlashAngle = 72f;
+        // Konfigurasi Sudut Ayunan & Tebasan (North-Oriented Combat Attack)
+        [Header("North Combat Attack Angles")]
+        [SerializeField] private float attackPullbackAngle = -25f; // Tarik ke belakang bawah sedikit
+        [SerializeField] private float attackSlashAngle = 85f;    // Tebasan lurus ke atas / utara (Northward thrust/slash)
+        [SerializeField] private Vector3 attackLungeOffset = new Vector3(0f, 0.15f, 0f); // Karakter menerjang ke atas (ke arah monster)
 
         private Vector3 headBasePos;
         private Vector3 torsoBasePos;
@@ -99,7 +102,8 @@ namespace FantasyDefense.Combat
             {
                 var slashObj = new GameObject("VFX_Slash");
                 slashObj.transform.SetParent(transform, false);
-                slashObj.transform.localPosition = new Vector3(0.22f, 0.15f, -0.06f);
+                // Tempatkan VFX Slash di bagian atas tubuh (North) tempat pedang menebas ke arah monster
+                slashObj.transform.localPosition = new Vector3(0.08f, 0.38f, -0.06f);
                 slashVfxSr = slashObj.AddComponent<SpriteRenderer>();
                 slashVfxSr.sprite = slashVfx;
                 slashVfxSr.sortingLayerName = "Gem";
@@ -407,14 +411,15 @@ namespace FantasyDefense.Combat
             float durPhase2 = 0.08f;
             elapsed = 0f;
 
-            // Nyalakan Slash VFX Arc
+            // Nyalakan Slash VFX Arc yang melengkung ke atas menyongsong monster di utara
             if (slashVfxSr != null)
             {
                 slashVfxSr.color = new Color(1f, 1f, 1f, 0.95f);
                 if (slashVfxBone != null)
                 {
-                    slashVfxBone.localRotation = Quaternion.Euler(0f, 0f, Random.Range(-15f, 25f));
-                    slashVfxBone.localScale = new Vector3(1.3f, 1.3f, 1f);
+                    // Rotasi -55 derajat memposisikan kepala busur api tebasan tepat di atas/utara (North upward strike)
+                    slashVfxBone.localRotation = Quaternion.Euler(0f, 0f, -55f + Random.Range(-10f, 10f));
+                    slashVfxBone.localScale = new Vector3(1.35f, 1.35f, 1f);
                 }
             }
 
@@ -424,7 +429,7 @@ namespace FantasyDefense.Combat
                 float t = Mathf.Clamp01(elapsed / durPhase2);
                 float easeOut = Mathf.Sin(t * Mathf.PI * 0.5f);
 
-                // Lengan mengayun ke depan secara agresif
+                // Lengan mengayun ke atas (Northward slash) secara agresif
                 if (swordArmBone != null)
                 {
                     Quaternion pullRot = swordArmBaseRot * Quaternion.Euler(0f, 0f, attackPullbackAngle);
@@ -432,9 +437,10 @@ namespace FantasyDefense.Combat
                     swordArmBone.localRotation = Quaternion.Slerp(pullRot, slashRot, easeOut);
                 }
 
-                // Tubuh sedikit menerjang ke depan
+                // Tubuh menerjang ke atas (ke arah monster di utara / Y positif)
                 if (torsoBone != null)
                 {
+                    torsoBone.localPosition = Vector3.Lerp(torsoBasePos, torsoBasePos + attackLungeOffset, easeOut);
                     torsoBone.localScale = Vector3.Lerp(new Vector3(1.12f, 0.88f, 1f), new Vector3(0.92f, 1.15f, 1f), easeOut);
                 }
 
@@ -477,7 +483,7 @@ namespace FantasyDefense.Combat
                 if (torsoBone != null)
                 {
                     torsoBone.localScale = Vector3.Lerp(new Vector3(0.92f, 1.15f, 1f), Vector3.one, t);
-                    torsoBone.localPosition = Vector3.Lerp(torsoBone.localPosition, torsoBasePos, t);
+                    torsoBone.localPosition = Vector3.Lerp(torsoBasePos + attackLungeOffset, torsoBasePos, t);
                 }
 
                 if (shieldArmBone != null)
