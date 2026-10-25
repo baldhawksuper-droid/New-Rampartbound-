@@ -147,6 +147,27 @@ namespace FantasyDefense.Combat
         }
 
         /// <summary>
+        /// Menyalakan atau mematikan seluruh rig potongan tubuh modular (misal saat mode token persiapan vs mode tempur).
+        /// </summary>
+        public void SetModularRigActive(bool active)
+        {
+            if (torsoBone != null) torsoBone.gameObject.SetActive(active);
+            if (headBone != null) headBone.gameObject.SetActive(active);
+            if (swordArmBone != null) swordArmBone.gameObject.SetActive(active);
+            if (shieldArmBone != null) shieldArmBone.gameObject.SetActive(active);
+            if (slashVfxBone != null) slashVfxBone.gameObject.SetActive(active);
+
+            if (!active)
+            {
+                StopAllModularRoutines();
+            }
+            else if (isModularConfigured)
+            {
+                StartModularIdle();
+            }
+        }
+
+        /// <summary>
         /// Menyelaraskan sorting order seluruh bagian tubuh modular agar selalu di atas tatakan dan bayangan.
         /// </summary>
         public void UpdateModularSortingOrder(int baseSortOrder)

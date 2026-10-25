@@ -597,9 +597,13 @@ namespace FantasyDefense.Combat
                 {
                     groundPlinthObj = new GameObject("HeroPlinth_3D");
                     groundPlinthObj.transform.SetParent(transform, false);
-                    groundPlinthObj.transform.localPosition = new Vector3(0f, -0.42f, 0.05f);
+                    groundPlinthObj.transform.localPosition = new Vector3(0f, -0.22f, 0.05f);
                     groundPlinthSr = groundPlinthObj.AddComponent<SpriteRenderer>();
                     groundPlinthSr.sortingLayerName = "Gem";
+                }
+                else
+                {
+                    groundPlinthObj.transform.localPosition = new Vector3(0f, -0.22f, 0.05f);
                 }
 
                 Sprite plinthSprite = Resources.Load<Sprite>($"Sprites/Combat/Plinth_Hero_Base_T{tierNum}")
@@ -648,12 +652,16 @@ namespace FantasyDefense.Combat
                 {
                     groundShadowObj = new GameObject("GroundShadow_2.5D");
                     groundShadowObj.transform.SetParent(transform, false);
-                    groundShadowObj.transform.localPosition = new Vector3(0f, -0.48f, 0.08f);
+                    groundShadowObj.transform.localPosition = new Vector3(0f, -0.28f, 0.08f);
                     groundShadowSr = groundShadowObj.AddComponent<SpriteRenderer>();
                     groundShadowSr.sprite = Resources.Load<Sprite>("Sprites/UI/Shadow_Ground_Oval");
                     groundShadowSr.sortingLayerName = "Gem";
                     groundShadowSr.color = new Color(0f, 0f, 0f, 0.42f);
                     groundShadowObj.transform.localScale = new Vector3(0.85f, 0.35f, 1f);
+                }
+                else
+                {
+                    groundShadowObj.transform.localPosition = new Vector3(0f, -0.28f, 0.08f);
                 }
 
                 if (groundShadowSr != null)
@@ -668,6 +676,10 @@ namespace FantasyDefense.Combat
                 if (groundShadowObj != null) groundShadowObj.SetActive(false);
             }
         }
+
+        [Header("Combat Presentation Scaling")]
+        [Tooltip("Rasio ukuran unit hero saat mode tempur (berdiri di atas tatakan plinth)")]
+        [SerializeField] protected float combatHeroScaleMultiplier = 0.72f;
 
         public virtual void UpdateVisualAppearance()
         {
@@ -697,13 +709,15 @@ namespace FantasyDefense.Combat
                 spriteRenderer.color = unitData.themeColor;
             }
 
-            // Rumus baku seragam untuk seluruh tier (T0, T1, T2, T3) dan mode token/hero:
-            // scale = (cellSize * fillRatio) / sprite.bounds.size.x (fillRatio = 0.75)
+            // Rumus baku seragam:
+            // Mode token/permata: mengisi cellW * fillRatio (0.75)
+            // Mode hero tempur: di-scale proporsional agar kaki pas menapak di tatakan plinth dan tidak menabrak petak lain
             float spriteW = (spriteRenderer.sprite != null && spriteRenderer.sprite.bounds.size.x > 0.001f)
                 ? spriteRenderer.sprite.bounds.size.x
                 : (spriteRenderer.sprite != null ? (spriteRenderer.sprite.rect.width / spriteRenderer.sprite.pixelsPerUnit) : 1f);
 
-            float targetScale = (cellW * fillRatio) / Mathf.Max(0.01f, spriteW);
+            float currentFill = (isPreparationToken || currentTier == UnitTier.Tier0) ? fillRatio : (fillRatio * combatHeroScaleMultiplier);
+            float targetScale = (cellW * currentFill) / Mathf.Max(0.01f, spriteW);
             transform.localScale = Vector3.one * targetScale;
 
             // Sorting Layer standar arsitektur: Gem (selalu di atas Cell dan Board)
@@ -733,13 +747,17 @@ namespace FantasyDefense.Combat
                         if (torso != null && head != null)
                         {
                             modularAnim.ConfigureModularSprites(torso, head, sword, shield, slash);
+                            modularAnim.SetModularRigActive(true);
                             // Sembunyikan single-sprite bawaan agar tidak dobel/tumpang tindih
                             spriteRenderer.color = new Color(1f, 1f, 1f, 0f);
                         }
                     }
                     else
                     {
-                        // Pulihkan visual normal saat mode token persiapan atau dragging
+                        // Sembunyikan rig modular tubuh saat mode token persiapan atau dragging
+                        modularAnim.SetModularRigActive(false);
+
+                        // Pulihkan visual normal (koin token medallion utuh) saat mode persiapan
                         if (spriteRenderer.color.a < 0.05f)
                         {
                             spriteRenderer.color = Color.white;
