@@ -20,7 +20,7 @@ namespace FantasyDefense.Combat
         [SerializeField] private bool hasShieldAbsorb = false;
 
         public float StunDuration => currentTier >= UnitTier.Tier3 ? stunDurationT3 : stunDurationT2;
-        public float ThornReflectPercent => currentTier == UnitTier.Tier3 ? thornReflectPercent : 0f;
+        public float ThornReflectPercent => currentTier >= UnitTier.Tier3 ? thornReflectPercent : 0f;
         public float EarthshakerRadius => earthshakerRadius;
         public bool HasShieldAbsorb => hasShieldAbsorb;
 
@@ -120,8 +120,8 @@ namespace FantasyDefense.Combat
 
         private void HandleBarricadeHitForThornReflect(MonsterController monster, int barricadeDamage)
         {
-            // Thorn Aegis aktif pada Tier 3: Pantulkan 20% damage serangan monster kembali ke mereka
-            if (currentTier == UnitTier.Tier3 && monster != null && !monster.IsDead)
+            // Thorn Aegis aktif pada Tier 3+: Pantulkan 20% damage serangan monster kembali ke mereka
+            if (currentTier >= UnitTier.Tier3 && monster != null && !monster.IsDead)
             {
                 float reflectedDamage = barricadeDamage * thornReflectPercent * 5f; // Scaling relevan untuk monster
                 monster.TakeDamage(reflectedDamage);

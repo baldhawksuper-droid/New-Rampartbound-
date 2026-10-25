@@ -16,7 +16,7 @@ namespace FantasyDefense.Combat
         [SerializeField] private float meteorSlowDuration = 3.0f; // 3 seconds slow & burn
 
         public float SplashRadius => currentTier >= UnitTier.Tier3 ? meteorRadius : (currentTier == UnitTier.Tier2 ? mysticBurstSplashRadius : 0f);
-        public float MeteorSlowPercent => currentTier == UnitTier.Tier3 ? meteorSlowPercent : 0f;
+        public float MeteorSlowPercent => currentTier >= UnitTier.Tier3 ? meteorSlowPercent : 0f;
         public float MeteorSlowDuration => meteorSlowDuration;
 
         [Header("Projectile Reference (Optional)")]
@@ -81,15 +81,15 @@ namespace FantasyDefense.Combat
                 if (orbSprite != null)
                 {
                     sr.sprite = orbSprite;
-                    sr.color = currentTier == UnitTier.Tier3 ? new Color(1f, 0.75f, 1f) : Color.white;
+                    sr.color = currentTier >= UnitTier.Tier3 ? new Color(1f, 0.75f, 1f) : Color.white;
                 }
                 else
                 {
                     sr.sprite = GetOrCreateProceduralOrbSprite();
-                    sr.color = currentTier == UnitTier.Tier3 ? new Color(0.9f, 0.4f, 1f) : new Color(0.2f, 0.8f, 1f);
+                    sr.color = currentTier >= UnitTier.Tier3 ? new Color(0.9f, 0.4f, 1f) : new Color(0.2f, 0.8f, 1f);
                 }
 
-                projObj.transform.localScale = Vector3.one * (currentTier == UnitTier.Tier3 ? 0.75f : 0.55f);
+                projObj.transform.localScale = Vector3.one * (currentTier >= UnitTier.Tier3 ? 0.75f : 0.55f);
             }
 
             var proj = projObj.GetComponent<Projectile>();

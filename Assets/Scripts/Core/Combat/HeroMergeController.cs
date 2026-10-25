@@ -142,7 +142,7 @@ namespace FantasyDefense.Combat
 
         private void SpawnMergeVfx(Vector3 worldPos, UnitTier tier)
         {
-            GameObject vfxPrefab = tier == UnitTier.Tier3 ? mergeTier3VfxPrefab : mergeTier2VfxPrefab;
+            GameObject vfxPrefab = tier >= UnitTier.Tier3 ? mergeTier3VfxPrefab : mergeTier2VfxPrefab;
             if (vfxPrefab != null)
             {
                 GameObject vfx = Instantiate(vfxPrefab, worldPos, Quaternion.identity);

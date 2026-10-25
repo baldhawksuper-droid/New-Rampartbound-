@@ -53,15 +53,15 @@ namespace FantasyDefense.Combat
             // 1. Tampilkan teks nama skill di atas pahlawan
             if (enableFloatingText)
             {
-                Color skillColor = unit.CurrentTier == UnitTier.Tier3 ? new Color(1f, 0.85f, 0.2f) : new Color(0.4f, 0.9f, 1f);
+                Color skillColor = unit.CurrentTier >= UnitTier.Tier3 ? new Color(1f, 0.85f, 0.2f) : new Color(0.4f, 0.9f, 1f);
                 SpawnFloatingText(pos + Vector3.up * 0.7f, skillName, skillColor, 1.2f);
             }
 
             // 2. Tampilkan efek cincin kejut (Shockwave) jika diaktifkan
             if (enableShockwaves)
             {
-                Color waveColor = unit.CurrentTier == UnitTier.Tier3 ? new Color(1f, 0.6f, 0.1f, 0.8f) : new Color(0.2f, 0.8f, 1f, 0.7f);
-                float radius = unit.CurrentTier == UnitTier.Tier3 ? 1.8f : 1.2f;
+                Color waveColor = unit.CurrentTier >= UnitTier.Tier3 ? new Color(1f, 0.6f, 0.1f, 0.8f) : new Color(0.2f, 0.8f, 1f, 0.7f);
+                float radius = unit.CurrentTier >= UnitTier.Tier3 ? 1.8f : 1.2f;
                 StartCoroutine(SpawnShockwaveRingRoutine(pos, radius, waveColor));
             }
 
@@ -373,34 +373,34 @@ namespace FantasyDefense.Combat
             {
                 case UnitType.Cedric:
                     // Tebasan Pedang Merah/Perak
-                    Color cedricMain = tier == UnitTier.Tier3 ? new Color(1f, 0.2f, 0.1f) : new Color(0.95f, 0.35f, 0.2f);
+                    Color cedricMain = tier >= UnitTier.Tier3 ? new Color(1f, 0.2f, 0.1f) : new Color(0.95f, 0.35f, 0.2f);
                     Color cedricSec = new Color(1f, 0.85f, 0.7f);
-                    int cedricCount = tier == UnitTier.Tier3 ? 24 : 14;
-                    SpawnProceduralParticleBurst(pos, cedricMain, cedricSec, cedricCount, tier == UnitTier.Tier3 ? 3.0f : 2.0f);
+                    int cedricCount = tier >= UnitTier.Tier3 ? 24 : 14;
+                    SpawnProceduralParticleBurst(pos, cedricMain, cedricSec, cedricCount, tier >= UnitTier.Tier3 ? 3.0f : 2.0f);
                     break;
 
                 case UnitType.RoseTanker:
                     // Hantaman Palu & Gempa Mawar (Rose Gold & Cokelat Tanah)
-                    Color roseMain = tier == UnitTier.Tier3 ? new Color(1f, 0.45f, 0.65f) : new Color(0.9f, 0.5f, 0.5f);
+                    Color roseMain = tier >= UnitTier.Tier3 ? new Color(1f, 0.45f, 0.65f) : new Color(0.9f, 0.5f, 0.5f);
                     Color roseSec = new Color(0.9f, 0.8f, 0.4f);
-                    int roseCount = tier == UnitTier.Tier3 ? 26 : 15;
-                    SpawnProceduralParticleBurst(pos, roseMain, roseSec, roseCount, tier == UnitTier.Tier3 ? 2.5f : 1.8f);
+                    int roseCount = tier >= UnitTier.Tier3 ? 26 : 15;
+                    SpawnProceduralParticleBurst(pos, roseMain, roseSec, roseCount, tier >= UnitTier.Tier3 ? 2.5f : 1.8f);
                     break;
 
                 case UnitType.RabbitMage:
                     // Komet Sihir & Arcane Embers (Toska Kristal & Oranye Nyala Api)
-                    Color rabbitMain = tier == UnitTier.Tier3 ? new Color(0.2f, 0.9f, 1f) : new Color(0.4f, 0.7f, 1f);
+                    Color rabbitMain = tier >= UnitTier.Tier3 ? new Color(0.2f, 0.9f, 1f) : new Color(0.4f, 0.7f, 1f);
                     Color rabbitSec = new Color(1f, 0.6f, 0.1f);
-                    int rabbitCount = tier == UnitTier.Tier3 ? 30 : 18;
-                    SpawnProceduralParticleBurst(pos, rabbitMain, rabbitSec, rabbitCount, tier == UnitTier.Tier3 ? 3.5f : 2.2f);
+                    int rabbitCount = tier >= UnitTier.Tier3 ? 30 : 18;
+                    SpawnProceduralParticleBurst(pos, rabbitMain, rabbitSec, rabbitCount, tier >= UnitTier.Tier3 ? 3.5f : 2.2f);
                     break;
 
                 case UnitType.WindRanger:
                     // Panah Angin Zamrud & Zephyr Whirlwind (Hijau Zamrud & Putih Angin)
-                    Color windMain = tier == UnitTier.Tier3 ? new Color(0.1f, 1f, 0.5f) : new Color(0.2f, 0.85f, 0.4f);
+                    Color windMain = tier >= UnitTier.Tier3 ? new Color(0.1f, 1f, 0.5f) : new Color(0.2f, 0.85f, 0.4f);
                     Color windSec = new Color(0.8f, 1f, 0.9f);
-                    int windCount = tier == UnitTier.Tier3 ? 32 : 16;
-                    SpawnProceduralParticleBurst(pos, windMain, windSec, windCount, tier == UnitTier.Tier3 ? 3.8f : 2.5f);
+                    int windCount = tier >= UnitTier.Tier3 ? 32 : 16;
+                    SpawnProceduralParticleBurst(pos, windMain, windSec, windCount, tier >= UnitTier.Tier3 ? 3.8f : 2.5f);
                     break;
             }
         }

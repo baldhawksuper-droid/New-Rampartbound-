@@ -115,12 +115,12 @@ namespace FantasyDefense.Combat
                 if (arrowSprite != null)
                 {
                     sr.sprite = arrowSprite;
-                    sr.color = currentTier == UnitTier.Tier3 ? new Color(0.8f, 1f, 0.9f) : Color.white;
+                    sr.color = currentTier >= UnitTier.Tier3 ? new Color(0.8f, 1f, 0.9f) : Color.white;
                 }
                 else
                 {
                     sr.sprite = GetOrCreateProceduralArrowSprite();
-                    sr.color = currentTier == UnitTier.Tier3 ? new Color(0.3f, 1f, 0.6f) : new Color(0.1f, 0.85f, 0.45f);
+                    sr.color = currentTier >= UnitTier.Tier3 ? new Color(0.3f, 1f, 0.6f) : new Color(0.1f, 0.85f, 0.45f);
                 }
 
                 projObj.transform.localScale = new Vector3(0.65f, 0.45f, 1f);
