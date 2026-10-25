@@ -216,6 +216,12 @@ namespace FantasyDefense.GridSystem
             // Variasi warna rarity border (Point 5)
             switch (currentUnit.CurrentTier)
             {
+                case UnitTier.Tier5:
+                    spriteRenderer.color = new Color(1f, 0.95f, 0.45f, 1f); // Celestial Divine Radiant
+                    break;
+                case UnitTier.Tier4:
+                    spriteRenderer.color = new Color(0.85f, 0.35f, 1f, 1f); // Mythic Amethyst Violet
+                    break;
                 case UnitTier.Tier3:
                     spriteRenderer.color = new Color(1f, 0.85f, 0.2f, 1f); // Radiant Gold
                     break;

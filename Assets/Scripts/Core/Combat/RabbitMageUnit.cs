@@ -35,7 +35,7 @@ namespace FantasyDefense.Combat
             {
                 NotifySkillTriggered("Mystic Burst");
             }
-            else if (currentTier == UnitTier.Tier3)
+            else if (currentTier >= UnitTier.Tier3)
             {
                 NotifySkillTriggered("Meteor Strike & Arcane Fire");
             }
@@ -45,7 +45,7 @@ namespace FantasyDefense.Combat
             {
                 if (currentTier >= UnitTier.Tier2)
                 {
-                    visualAnimator.PlaySkillCast("Arcane", currentTier == UnitTier.Tier3 ? new Color(0.85f, 0.3f, 1f) : new Color(0.2f, 0.75f, 1f));
+                    visualAnimator.PlaySkillCast("Arcane", currentTier >= UnitTier.Tier3 ? new Color(0.85f, 0.3f, 1f) : new Color(0.2f, 0.75f, 1f));
                 }
                 visualAnimator.PlayAttack(target.transform.position);
             }
@@ -98,7 +98,7 @@ namespace FantasyDefense.Combat
                 proj = projObj.AddComponent<Projectile>();
             }
 
-            bool isMeteor = currentTier == UnitTier.Tier3;
+            bool isMeteor = currentTier >= UnitTier.Tier3;
 
             proj.Initialize(
                 targetMonster: target,

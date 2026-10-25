@@ -72,9 +72,9 @@ namespace FantasyDefense.Combat
                     SpawnArrowProjectile(target, GetAttackDamage(), false, 0f, 0f);
                 }
             }
-            else if (currentTier == UnitTier.Tier3)
+            else if (currentTier >= UnitTier.Tier3)
             {
-                // T3: Tornado Barrage & Zephyr Whirlwind
+                // T3, T4, T5: Tornado Barrage & Zephyr Whirlwind
                 NotifySkillTriggered("Tornado Barrage & Zephyr Whirlwind");
                 ExecuteTornadoBarrage(target);
             }

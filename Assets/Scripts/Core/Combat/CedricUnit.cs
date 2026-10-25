@@ -67,9 +67,9 @@ namespace FantasyDefense.Combat
                 // T2: Dual Slash (Double strike rapid sequence)
                 StartCoroutine(ExecuteDualSlashRoutine(target));
             }
-            else if (currentTier == UnitTier.Tier3)
+            else if (currentTier >= UnitTier.Tier3)
             {
-                // T3: Blade Tempest & Heroic Surge
+                // T3, T4, T5: Blade Tempest & Heroic Surge
                 ExecuteBladeTempest(target);
             }
         }

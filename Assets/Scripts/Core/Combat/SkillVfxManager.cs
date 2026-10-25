@@ -78,23 +78,41 @@ namespace FantasyDefense.Combat
 
             Vector3 pos = target.transform.position;
 
-            // Flash cahaya fusi (Tier 2 = Emas, Tier 3 = Pelangi/Ungu Megah)
-            Color mergeColor = newTier == UnitTier.Tier3 ? new Color(1f, 0.2f, 0.9f, 0.9f) : new Color(1f, 0.9f, 0.2f, 0.8f);
-            StartCoroutine(SpawnShockwaveRingRoutine(pos, newTier == UnitTier.Tier3 ? 2.0f : 1.4f, mergeColor));
+            // Flash cahaya fusi (Tier 2 = Emas, Tier 3 = Pelangi/Ungu Megah, Tier 4 = Astral Violet, Tier 5 = Celestial Gold)
+            Color mergeColor = newTier switch
+            {
+                UnitTier.Tier5 => new Color(1f, 0.95f, 0.4f, 1f),
+                UnitTier.Tier4 => new Color(0.85f, 0.25f, 1f, 0.95f),
+                UnitTier.Tier3 => new Color(1f, 0.2f, 0.9f, 0.9f),
+                _ => new Color(1f, 0.9f, 0.2f, 0.8f)
+            };
+            float shockwaveRadius = newTier == UnitTier.Tier5 ? 3.0f : (newTier == UnitTier.Tier4 ? 2.5f : (newTier == UnitTier.Tier3 ? 2.0f : 1.4f));
+            StartCoroutine(SpawnShockwaveRingRoutine(pos, shockwaveRadius, mergeColor));
 
             if (enableParticleEffects)
             {
-                Color secondary = newTier == UnitTier.Tier3 ? new Color(1f, 0.85f, 0.2f) : Color.white;
-                SpawnProceduralParticleBurst(pos, mergeColor, secondary, newTier == UnitTier.Tier3 ? 28 : 16, 2.5f);
+                Color secondary = newTier == UnitTier.Tier5 ? new Color(1f, 1f, 0.9f) :
+                                  (newTier == UnitTier.Tier4 ? new Color(1f, 0.85f, 0.2f) :
+                                  (newTier == UnitTier.Tier3 ? new Color(1f, 0.85f, 0.2f) : Color.white));
+                int burstCount = newTier == UnitTier.Tier5 ? 42 : (newTier == UnitTier.Tier4 ? 34 : (newTier == UnitTier.Tier3 ? 28 : 16));
+                SpawnProceduralParticleBurst(pos, mergeColor, secondary, burstCount, newTier >= UnitTier.Tier4 ? 3.5f : 2.5f);
             }
 
-            string text = newTier == UnitTier.Tier3 ? "★ TIER 3 ULTIMATE! ★" : "TIER 2 EVOLVED!";
-            SpawnFloatingText(pos + Vector3.up * 0.85f, text, mergeColor, 1.35f);
-
-            // Memicu Screen Shake dramatis saat berhasil fusi Tier 3
-            if (newTier == UnitTier.Tier3 && MobileCameraAdapter.Instance != null)
+            string text = newTier switch
             {
-                MobileCameraAdapter.Instance.TriggerScreenShake(0.24f, 0.20f);
+                UnitTier.Tier5 => "👑 TIER 5 CELESTIAL SOVEREIGN! 👑",
+                UnitTier.Tier4 => "★ TIER 4 MYTHIC EVOLUTION! ★",
+                UnitTier.Tier3 => "★ TIER 3 ULTIMATE! ★",
+                _ => "TIER 2 EVOLVED!"
+            };
+            SpawnFloatingText(pos + Vector3.up * 0.85f, text, mergeColor, newTier >= UnitTier.Tier4 ? 1.6f : 1.35f);
+
+            // Memicu Screen Shake dramatis saat berhasil fusi Tier 3+
+            if (newTier >= UnitTier.Tier3 && MobileCameraAdapter.Instance != null)
+            {
+                float shakeDur = newTier == UnitTier.Tier5 ? 0.35f : (newTier == UnitTier.Tier4 ? 0.28f : 0.24f);
+                float shakeMag = newTier == UnitTier.Tier5 ? 0.30f : (newTier == UnitTier.Tier4 ? 0.24f : 0.20f);
+                MobileCameraAdapter.Instance.TriggerScreenShake(shakeDur, shakeMag);
             }
         }
 

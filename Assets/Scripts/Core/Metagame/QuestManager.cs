@@ -405,7 +405,7 @@ namespace FantasyDefense.Metagame
         private void HandleMergeSuccess(int combo, UnitTier tier)
         {
             ProgressQuest(QuestObjectiveType.MergeHeroes, 1);
-            if (tier == UnitTier.Tier3)
+            if (tier >= UnitTier.Tier3)
             {
                 ProgressQuest(QuestObjectiveType.CreateTier3, 1);
             }

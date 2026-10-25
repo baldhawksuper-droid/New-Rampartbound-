@@ -87,15 +87,17 @@ namespace FantasyDefense.Combat
                 tier2CreatedCount++;
             else if (newTier == UnitTier.Tier3)
                 tier3CreatedCount++;
+            else if (newTier >= UnitTier.Tier4)
+                tier3CreatedCount++; // counts as ultimate tier creation
 
             // 1. Mobile Haptic Vibration via DevicePerformanceManager
             TriggerMobileHaptic(newTier);
 
-            // 2. Camera Screen Shake (Point 6: subtle screen shake for Tier 2 and Tier 3)
+            // 2. Camera Screen Shake (Point 6: subtle screen shake for Tier 2 and Tier 3+)
             if (MobileCameraAdapter.Instance != null)
             {
-                float shakeDuration = newTier == UnitTier.Tier3 ? 0.24f : 0.14f;
-                float shakeMagnitude = newTier == UnitTier.Tier3 ? 0.20f : 0.10f;
+                float shakeDuration = newTier == UnitTier.Tier5 ? 0.35f : (newTier == UnitTier.Tier4 ? 0.28f : (newTier == UnitTier.Tier3 ? 0.24f : 0.14f));
+                float shakeMagnitude = newTier == UnitTier.Tier5 ? 0.30f : (newTier == UnitTier.Tier4 ? 0.24f : (newTier == UnitTier.Tier3 ? 0.20f : 0.10f));
                 MobileCameraAdapter.Instance.TriggerScreenShake(shakeDuration, shakeMagnitude);
             }
 
@@ -121,7 +123,7 @@ namespace FantasyDefense.Combat
 
             if (DevicePerformanceManager.Instance != null)
             {
-                DevicePerformanceManager.Instance.TriggerHaptic(tier == UnitTier.Tier3 ? HapticFeedbackType.Heavy : HapticFeedbackType.Success);
+                DevicePerformanceManager.Instance.TriggerHaptic(tier >= UnitTier.Tier3 ? HapticFeedbackType.Heavy : HapticFeedbackType.Success);
                 return;
             }
 

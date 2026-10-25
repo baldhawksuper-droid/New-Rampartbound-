@@ -427,7 +427,7 @@ namespace FantasyDefense.GridSystem
 
             UnitType type = centerCell.CurrentUnit.UnitType;
             UnitTier tier = centerCell.CurrentUnit.CurrentTier;
-            if (tier >= UnitTier.Tier3) return false; // Tier 3 tidak dapat difusi lebih lanjut
+            if (tier >= UnitTier.Tier5) return false; // Tier 5 tidak dapat difusi lebih lanjut
 
             int width = GridManager.Instance.GridWidth;
             int height = GridManager.Instance.GridHeight;
@@ -535,7 +535,7 @@ namespace FantasyDefense.GridSystem
                 while (startX < width)
                 {
                     TileCell startCell = GridManager.Instance.GetCell(startX, y);
-                    if (startCell == null || !startCell.IsOccupied || startCell.CurrentUnit == null || startCell.CurrentUnit.CurrentTier >= UnitTier.Tier3)
+                    if (startCell == null || !startCell.IsOccupied || startCell.CurrentUnit == null || startCell.CurrentUnit.CurrentTier >= UnitTier.Tier5)
                     {
                         startX++;
                         continue;
@@ -577,7 +577,7 @@ namespace FantasyDefense.GridSystem
                 while (startY < height)
                 {
                     TileCell startCell = GridManager.Instance.GetCell(x, startY);
-                    if (startCell == null || !startCell.IsOccupied || startCell.CurrentUnit == null || startCell.CurrentUnit.CurrentTier >= UnitTier.Tier3)
+                    if (startCell == null || !startCell.IsOccupied || startCell.CurrentUnit == null || startCell.CurrentUnit.CurrentTier >= UnitTier.Tier5)
                     {
                         startY++;
                         continue;
@@ -813,7 +813,7 @@ namespace FantasyDefense.GridSystem
             UnitController promotedUnit = cluster.promotedUnit;
             // Standar Game Swap & Merge: Fusi berbentuk L / T / + (Cross) adalah fusi 5-unit istimewa yang melompatkan 2 Tier (T0 -> T2 atau T1 -> T3)!
             int tierBoost = cluster.isIntersection ? 2 : 1;
-            UnitTier nextTier = (UnitTier)Mathf.Min(3, (int)promotedUnit.CurrentTier + tierBoost);
+            UnitTier nextTier = (UnitTier)Mathf.Min(5, (int)promotedUnit.CurrentTier + tierBoost);
             int matchCount = cluster.matchCount;
             Vector3 targetPos = promotedUnit.transform.position;
 
@@ -874,7 +874,7 @@ namespace FantasyDefense.GridSystem
                 if (promoted != null)
                 {
                     // Unit utama di pusat/sudut perpotongan mendapatkan promosi penuh (lompat 2 tier untuk L/+)
-                    UnitTier unitTargetTier = (i == 0) ? nextTier : (UnitTier)Mathf.Min(3, (int)promoted.CurrentTier + 1);
+                    UnitTier unitTargetTier = (i == 0) ? nextTier : (UnitTier)Mathf.Min(5, (int)promoted.CurrentTier + 1);
                     promoted.UpgradeTier(unitTargetTier);
                     if (promoted.CurrentCell != null)
                     {
@@ -893,7 +893,7 @@ namespace FantasyDefense.GridSystem
             // Haptic Feedback Tactile Pulse
             if (DevicePerformanceManager.Instance != null)
             {
-                var hapticType = (cluster.isIntersection || matchCount >= 5 || nextTier == UnitTier.Tier3)
+                var hapticType = (cluster.isIntersection || matchCount >= 5 || nextTier >= UnitTier.Tier3)
                     ? HapticFeedbackType.Heavy
                     : (matchCount == 4 || comboChain > 1 ? HapticFeedbackType.Success : HapticFeedbackType.Medium);
                 DevicePerformanceManager.Instance.TriggerHaptic(hapticType);
@@ -907,9 +907,11 @@ namespace FantasyDefense.GridSystem
 
                 if (cluster.isIntersection)
                 {
-                    comboText = nextTier == UnitTier.Tier3
-                        ? (comboChain > 1 ? $"👑 CROSS MERGE T3 x{comboChain}!" : "👑 GODLIKE CROSS MERGE T3!")
-                        : (comboChain > 1 ? $"🔥 SUPER L-MERGE T2 x{comboChain}!" : "🔥 SUPER L/T MERGE T2!");
+                    comboText = nextTier >= UnitTier.Tier4
+                        ? (comboChain > 1 ? $"👑 CELESTIAL CROSS MERGE T{(int)nextTier} x{comboChain}!" : $"👑 CELESTIAL CROSS MERGE T{(int)nextTier}!")
+                        : (nextTier == UnitTier.Tier3
+                            ? (comboChain > 1 ? $"👑 CROSS MERGE T3 x{comboChain}!" : "👑 GODLIKE CROSS MERGE T3!")
+                            : (comboChain > 1 ? $"🔥 SUPER L-MERGE T2 x{comboChain}!" : "🔥 SUPER L/T MERGE T2!"));
                     txtColor = new Color(1f, 0.45f, 0.1f);
                 }
                 else if (matchCount >= 5)
@@ -928,6 +930,16 @@ namespace FantasyDefense.GridSystem
                     {
                         comboText = comboChain > 1 ? $"⚡ HERO AWAKENED x{comboChain}!" : "HERO AWAKENED!";
                         txtColor = new Color(1f, 0.9f, 0.2f);
+                    }
+                    else if (nextTier == UnitTier.Tier5)
+                    {
+                        comboText = comboChain > 1 ? $"👑 TIER 5 CELESTIAL SOVEREIGN x{comboChain}!" : "👑 TIER 5 CELESTIAL SOVEREIGN!";
+                        txtColor = new Color(1f, 0.95f, 0.4f);
+                    }
+                    else if (nextTier == UnitTier.Tier4)
+                    {
+                        comboText = comboChain > 1 ? $"★ TIER 4 MYTHIC x{comboChain}!" : "★ TIER 4 MYTHIC!";
+                        txtColor = new Color(0.85f, 0.35f, 1f);
                     }
                     else
                     {

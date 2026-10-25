@@ -411,24 +411,24 @@ namespace FantasyDefense.Audio
             switch (unit.UnitType)
             {
                 case UnitType.Cedric:
-                    if (unit.CurrentTier == UnitTier.Tier3) PlaySound(SoundType.BladeTempest);
+                    if (unit.CurrentTier >= UnitTier.Tier3) PlaySound(SoundType.BladeTempest);
                     else if (unit.CurrentTier == UnitTier.Tier2) PlaySound(SoundType.DualSlash);
                     else PlaySound(SoundType.Slash);
                     break;
 
                 case UnitType.RoseTanker:
-                    if (unit.CurrentTier == UnitTier.Tier3) PlaySound(SoundType.Earthshaker);
+                    if (unit.CurrentTier >= UnitTier.Tier3) PlaySound(SoundType.Earthshaker);
                     else PlaySound(SoundType.ShieldSlam);
                     break;
 
                 case UnitType.RabbitMage:
-                    if (unit.CurrentTier == UnitTier.Tier3) PlaySound(SoundType.MeteorImpact);
+                    if (unit.CurrentTier >= UnitTier.Tier3) PlaySound(SoundType.MeteorImpact);
                     else if (unit.CurrentTier == UnitTier.Tier2) PlaySound(SoundType.MysticBurst);
                     else PlaySound(SoundType.MagicSpark);
                     break;
 
                 case UnitType.WindRanger:
-                    if (unit.CurrentTier == UnitTier.Tier3) PlaySound(SoundType.TornadoImpact);
+                    if (unit.CurrentTier >= UnitTier.Tier3) PlaySound(SoundType.TornadoImpact);
                     else if (unit.CurrentTier == UnitTier.Tier2) PlaySound(SoundType.PiercingGale);
                     else PlaySound(SoundType.ArrowShot);
                     break;
@@ -437,13 +437,13 @@ namespace FantasyDefense.Audio
 
         private void HandleUnitMerged(UnitController source, UnitController target, UnitTier newTier)
         {
-            float pitch = newTier == UnitTier.Tier3 ? 1.45f : 1.20f;
+            float pitch = newTier == UnitTier.Tier5 ? 1.70f : (newTier == UnitTier.Tier4 ? 1.55f : (newTier == UnitTier.Tier3 ? 1.45f : 1.20f));
             PlaySound(SoundType.MergeSuccess, pitch);
 
-            // Berikan fanfare perayaan jika berhasil menciptakan Hero Tier 3 Ultimate
-            if (newTier == UnitTier.Tier3)
+            // Berikan fanfare perayaan jika berhasil menciptakan Hero Tier 3+ (Ultimate / Mythic / Celestial)
+            if (newTier >= UnitTier.Tier3)
             {
-                PlaySound(SoundType.GachaLegendary, 1.1f);
+                PlaySound(SoundType.GachaLegendary, newTier == UnitTier.Tier5 ? 1.25f : 1.1f);
             }
         }
 

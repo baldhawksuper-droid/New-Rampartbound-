@@ -318,12 +318,19 @@ namespace FantasyDefense.Combat
         private IEnumerator MergeJumpRoutine(UnitTier newTier)
         {
             Vector3 anchorPos = GetAnchorPosition();
-            float jumpHeight = newTier == UnitTier.Tier3 ? 0.95f : 0.65f;
+            float jumpHeight = newTier == UnitTier.Tier5 ? 1.35f : (newTier == UnitTier.Tier4 ? 1.15f : (newTier == UnitTier.Tier3 ? 0.95f : 0.65f));
             float duration = 0.65f; // Diperlambat dari 0.42f agar fusi evolusi terlihat megah, realistis, dan memuaskan
             float elapsed = 0f;
 
             // Flash pendar fusi dramatis
-            Color glowColor = newTier == UnitTier.Tier3 ? new Color(1f, 0.92f, 0.45f) : (newTier == UnitTier.Tier2 ? new Color(0.6f, 0.95f, 1f) : new Color(0.9f, 1f, 0.9f));
+            Color glowColor = newTier switch
+            {
+                UnitTier.Tier5 => new Color(1f, 0.95f, 0.6f),  // Celestial Divine Gold
+                UnitTier.Tier4 => new Color(0.85f, 0.4f, 1f),  // Mythic Astral Violet
+                UnitTier.Tier3 => new Color(1f, 0.92f, 0.45f),
+                UnitTier.Tier2 => new Color(0.6f, 0.95f, 1f),
+                _ => new Color(0.9f, 1f, 0.9f)
+            };
             if (spriteRenderer != null)
                 spriteRenderer.color = glowColor;
 
@@ -443,7 +450,13 @@ namespace FantasyDefense.Combat
         {
             if (unit == unitController)
             {
-                Color aura = unit.CurrentTier == UnitTier.Tier3 ? new Color(1f, 0.85f, 0.2f) : new Color(0.4f, 0.9f, 1f);
+                Color aura = unit.CurrentTier switch
+                {
+                    UnitTier.Tier5 => new Color(1f, 0.95f, 0.6f),
+                    UnitTier.Tier4 => new Color(0.85f, 0.35f, 1f),
+                    UnitTier.Tier3 => new Color(1f, 0.85f, 0.2f),
+                    _ => new Color(0.4f, 0.9f, 1f)
+                };
                 PlaySkillCast(skillName, aura);
             }
         }

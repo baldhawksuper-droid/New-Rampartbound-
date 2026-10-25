@@ -68,9 +68,9 @@ namespace FantasyDefense.Combat
                     target.TakeDamage(damage);
                 }
             }
-            else if (currentTier == UnitTier.Tier3)
+            else if (currentTier >= UnitTier.Tier3)
             {
-                // Tier 3: Earthshaker Impact (AoE Stun 1.5s & Shockwave Damage)
+                // Tier 3, 4, 5: Earthshaker Impact (AoE Stun & Shockwave Damage)
                 NotifySkillTriggered("Earthshaker & Thorn Aegis");
                 ExecuteEarthshaker(target, damage);
             }

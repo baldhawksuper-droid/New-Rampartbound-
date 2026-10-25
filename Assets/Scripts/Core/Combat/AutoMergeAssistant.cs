@@ -108,8 +108,8 @@ namespace FantasyDefense.Combat
                     if (cell != null && cell.IsOccupied && cell.CurrentUnit != null)
                     {
                         UnitController unit = cell.CurrentUnit;
-                        // Hanya pertimbangkan unit di bawah Tier 3 dan tidak sedang di-drag oleh pemain
-                        if (unit.CurrentTier < UnitTier.Tier3 && !unit.IsDragging)
+                        // Hanya pertimbangkan unit di bawah Tier 5 dan tidak sedang di-drag oleh pemain
+                        if (unit.CurrentTier < UnitTier.Tier5 && !unit.IsDragging)
                         {
                             activeUnits.Add(unit);
                         }

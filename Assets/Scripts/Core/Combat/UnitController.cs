@@ -475,7 +475,13 @@ namespace FantasyDefense.Combat
             // Fase 1: Mengambang naik sedikit dengan pendaran aura persiapan (0.35 detik)
             float elapsed = 0f;
             float duration1 = 0.35f;
-            Color auraColor = currentTier == UnitTier.Tier3 ? new Color(1f, 0.9f, 0.3f, 1f) : new Color(0.5f, 0.95f, 1f, 1f);
+            Color auraColor = currentTier switch
+            {
+                UnitTier.Tier5 => new Color(1f, 0.95f, 0.6f, 1f),  // Celestial Gold
+                UnitTier.Tier4 => new Color(0.85f, 0.35f, 1f, 1f), // Mythic Astral Purple
+                UnitTier.Tier3 => new Color(1f, 0.9f, 0.3f, 1f),
+                _ => new Color(0.5f, 0.95f, 1f, 1f)
+            };
 
             while (elapsed < duration1)
             {
@@ -1027,11 +1033,11 @@ namespace FantasyDefense.Combat
             if (otherUnit == null) return false;
             if (otherUnit == this) return false;
 
-            // Merge mensyaratkan: Tipe hero sama, Tier sama, dan belum mencapai Tier 3 maksimal
+            // Merge mensyaratkan: Tipe hero sama, Tier sama, dan belum mencapai Tier 5 maksimal
             return (unitData != null && otherUnit.UnitData != null) &&
                    (unitData.unitType == otherUnit.UnitType) &&
                    (currentTier == otherUnit.CurrentTier) &&
-                   (currentTier < UnitTier.Tier3);
+                   (currentTier < UnitTier.Tier5);
         }
 
         /// <summary>
@@ -1062,7 +1068,8 @@ namespace FantasyDefense.Combat
             // Respon Haptic Vibration pada perangkat ponsel
             if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null)
             {
-                var hapticType = nextTier == UnitTier.Tier3 ? FantasyDefense.Mobile.HapticFeedbackType.Medium : FantasyDefense.Mobile.HapticFeedbackType.Light;
+                var hapticType = nextTier >= UnitTier.Tier4 ? FantasyDefense.Mobile.HapticFeedbackType.Heavy :
+                                 (nextTier == UnitTier.Tier3 ? FantasyDefense.Mobile.HapticFeedbackType.Medium : FantasyDefense.Mobile.HapticFeedbackType.Light);
                 FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(hapticType);
             }
 
@@ -1095,7 +1102,8 @@ namespace FantasyDefense.Combat
 
             if (DevicePerformanceManager.Instance != null)
             {
-                var haptic = nextTier == UnitTier.Tier3 ? HapticFeedbackType.Heavy : HapticFeedbackType.Medium;
+                var haptic = nextTier >= UnitTier.Tier4 ? HapticFeedbackType.Heavy :
+                             (nextTier == UnitTier.Tier3 ? HapticFeedbackType.Medium : HapticFeedbackType.Light);
                 DevicePerformanceManager.Instance.TriggerHaptic(haptic);
             }
         }

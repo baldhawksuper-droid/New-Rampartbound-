@@ -15,7 +15,9 @@ namespace FantasyDefense.Data
         Tier0 = 0,   // Batu Permata / T0 Gem (Fase Puzzle Preparation)
         Tier1 = 1,   // Pahlawan Tingkat 1 (Evolusi fusi 3 batu permata T0)
         Tier2 = 2,   // Pahlawan Tingkat 2 (Evolusi fusi 3 token T1)
-        Tier3 = 3    // Pahlawan Tingkat 3 (Evolusi fusi 3 token T2)
+        Tier3 = 3,   // Pahlawan Tingkat 3 (Evolusi fusi 3 token T2)
+        Tier4 = 4,   // Pahlawan Tingkat 4 Mythic (Evolusi fusi 3 token T3)
+        Tier5 = 5    // Pahlawan Tingkat 5 Celestial Sovereign (Evolusi fusi 3 token T4 - Puncak)
     }
 
     [CreateAssetMenu(fileName = "NewUnitData", menuName = "FantasyDefense/Unit Data", order = 1)]
@@ -63,12 +65,20 @@ namespace FantasyDefense.Data
         public Sprite tier2Sprite;
         [Tooltip("Sprite visual untuk Tier 3 (Aura / ultimate gear)")]
         public Sprite tier3Sprite;
+        [Tooltip("Sprite visual untuk Tier 4 (Mythic Gear / Cosmic Radiance)")]
+        public Sprite tier4Sprite;
+        [Tooltip("Sprite visual untuk Tier 5 (Celestial Sovereign / Puncak Ilahi)")]
+        public Sprite tier5Sprite;
         [Tooltip("Sprite medali token khusus Mode Persiapan (Puzzle Preparation) - Tier 1")]
         public Sprite preparationTokenSprite;
         [Tooltip("Sprite medali token khusus Mode Persiapan - Tier 2 (2 Bintang Emas)")]
         public Sprite preparationTokenTier2Sprite;
         [Tooltip("Sprite medali token khusus Mode Persiapan - Tier 3 (3 Bintang Emas)")]
         public Sprite preparationTokenTier3Sprite;
+        [Tooltip("Sprite medali token khusus Mode Persiapan - Tier 4 (4 Bintang Ungu/Emas)")]
+        public Sprite preparationTokenTier4Sprite;
+        [Tooltip("Sprite medali token khusus Mode Persiapan - Tier 5 (5 Bintang Mahkota Suci)")]
+        public Sprite preparationTokenTier5Sprite;
 
         private string GetShortHeroKey(UnitType type)
         {
@@ -82,7 +92,7 @@ namespace FantasyDefense.Data
         }
 
         /// <summary>
-        /// Mengembalikan sprite medali untuk mode persiapan berdasarkan tingkat tier (T0, T1, T2, T3).
+        /// Mengembalikan sprite medali untuk mode persiapan berdasarkan tingkat tier (T0, T1, T2, T3, T4, T5).
         /// </summary>
         public Sprite GetTokenSprite(UnitTier targetTier = UnitTier.Tier1)
         {
@@ -91,7 +101,23 @@ namespace FantasyDefense.Data
 
             string shortKey = GetShortHeroKey(unitType);
 
-            if (targetTier == UnitTier.Tier2)
+            if (targetTier == UnitTier.Tier5)
+            {
+                if (preparationTokenTier5Sprite != null) return preparationTokenTier5Sprite;
+                var t5 = Resources.Load<Sprite>($"Sprites/Grid/Token_Medallion_{unitType}_T5") ??
+                         Resources.Load<Sprite>($"Sprites/Grid/Token_Medallion_{shortKey}_T5");
+                if (t5 != null) return t5;
+                return tier5Sprite != null ? tier5Sprite : GetTokenSprite(UnitTier.Tier4);
+            }
+            else if (targetTier == UnitTier.Tier4)
+            {
+                if (preparationTokenTier4Sprite != null) return preparationTokenTier4Sprite;
+                var t4 = Resources.Load<Sprite>($"Sprites/Grid/Token_Medallion_{unitType}_T4") ??
+                         Resources.Load<Sprite>($"Sprites/Grid/Token_Medallion_{shortKey}_T4");
+                if (t4 != null) return t4;
+                return tier4Sprite != null ? tier4Sprite : GetTokenSprite(UnitTier.Tier3);
+            }
+            else if (targetTier == UnitTier.Tier2)
             {
                 if (preparationTokenTier2Sprite != null) return preparationTokenTier2Sprite;
                 var t2 = Resources.Load<Sprite>($"Sprites/Grid/Token_Medallion_{unitType}_T2") ??
@@ -129,20 +155,24 @@ namespace FantasyDefense.Data
                     return tier2Sprite != null ? tier2Sprite : (tier1Sprite != null ? tier1Sprite : unitIcon);
                 case UnitTier.Tier3:
                     return tier3Sprite != null ? tier3Sprite : (tier2Sprite != null ? tier2Sprite : unitIcon);
+                case UnitTier.Tier4:
+                    return tier4Sprite != null ? tier4Sprite : (tier3Sprite != null ? tier3Sprite : (tier2Sprite != null ? tier2Sprite : unitIcon));
+                case UnitTier.Tier5:
+                    return tier5Sprite != null ? tier5Sprite : (tier4Sprite != null ? tier4Sprite : (tier3Sprite != null ? tier3Sprite : (tier2Sprite != null ? tier2Sprite : unitIcon)));
                 default:
                     return unitIcon;
             }
         }
 
-        [Header("Special Skill (Tier 2 & Tier 3)")]
+        [Header("Special Skill (Tier 2 s/d Tier 5)")]
         public string skillName;
         [TextArea(2, 3)]
         public string skillDescription;
         public float skillCooldown = 5f;
 
         /// <summary>
-        /// Mengembalikan penggali stat berdasarkan tier (T0: 0x, T1: 1.0x, T2: 2.2x, T3: 4.8x)
-        /// Sesuai formula resmi di MASTER_GAME_DESIGN_DOCUMENT.md
+        /// Mengembalikan penggali stat berdasarkan tier (T0: 0x, T1: 1.0x, T2: 2.2x, T3: 4.8x, T4: 9.8x, T5: 20.0x)
+        /// Sesuai formula resmi evolusi Rampartbound
         /// </summary>
         public float GetTierMultiplier()
         {
@@ -157,6 +187,8 @@ namespace FantasyDefense.Data
                 case UnitTier.Tier1: return 1.0f;
                 case UnitTier.Tier2: return 2.2f;
                 case UnitTier.Tier3: return 4.8f;
+                case UnitTier.Tier4: return 9.8f;
+                case UnitTier.Tier5: return 20.0f;
                 default: return 1.0f;
             }
         }
