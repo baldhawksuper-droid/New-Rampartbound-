@@ -30,7 +30,7 @@ MonoBehaviour:
   tier2Sprite: {fileID: 21300000, guid: 5ca4bf4797004b96b75692af261d9529, type: 3}
   tier3Sprite: {fileID: 21300000, guid: a7288e550e9d44dda3e4f3dd2e486c58, type: 3}
   tier4Sprite: {fileID: 21300000, guid: 0aa3af261d98463f9f06e7ce1ea7dc0f, type: 3}
-  tier5Sprite: {fileID: 0}
+  tier5Sprite: {fileID: 21300000, guid: ee27ea900f884fb082280623cc57a14d, type: 3}
   preparationTokenSprite: {fileID: 21300000, guid: e05773f134174b359dc7d16ee82795e4, type: 3}
   preparationTokenTier2Sprite: {fileID: 21300000, guid: a94ddb78d2bcd7ee300e292072574b11, type: 3}
   preparationTokenTier3Sprite: {fileID: 21300000, guid: c68468bf3b10eee2e861f14d8d9f12b1, type: 3}
