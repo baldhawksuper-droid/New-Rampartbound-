@@ -695,7 +695,16 @@ namespace FantasyDefense.Combat
             }
             else
             {
-                targetSprite = unitData.GetSpriteForTier(currentTier);
+                // Prioritas sprite tempur menghadap ke atas / North jika tersedia
+                if (unitData.unitType == UnitType.Cedric && currentTier == UnitTier.Tier1)
+                {
+                    targetSprite = Resources.Load<Sprite>("Sprites/Heroes/Cedric_T1_Combat_North")
+                                ?? unitData.GetSpriteForTier(currentTier);
+                }
+                else
+                {
+                    targetSprite = unitData.GetSpriteForTier(currentTier);
+                }
             }
 
             if (targetSprite != null)
@@ -734,13 +743,22 @@ namespace FantasyDefense.Combat
                     if (!isPreparationToken && currentTier > UnitTier.Tier0 && unitData != null && unitData.unitType == UnitType.Cedric)
                     {
                         int tNum = Mathf.Clamp((int)currentTier, 1, 5);
-                        Sprite torso = Resources.Load<Sprite>($"Sprites/Heroes/Modular/Cedric_T{tNum}_Torso")
+                        // Prioritas: Sprite Modular Combat North (menghadap utara / musuh yang datang dari atas layar)
+                        Sprite torso = Resources.Load<Sprite>($"Sprites/Heroes/Modular/Cedric_T{tNum}_Torso_North")
+                                    ?? Resources.Load<Sprite>("Sprites/Heroes/Modular/Cedric_T1_Torso_North")
+                                    ?? Resources.Load<Sprite>($"Sprites/Heroes/Modular/Cedric_T{tNum}_Torso")
                                     ?? Resources.Load<Sprite>("Sprites/Heroes/Modular/Cedric_T1_Torso");
-                        Sprite head = Resources.Load<Sprite>($"Sprites/Heroes/Modular/Cedric_T{tNum}_Head")
+                        Sprite head = Resources.Load<Sprite>($"Sprites/Heroes/Modular/Cedric_T{tNum}_Head_North")
+                                   ?? Resources.Load<Sprite>("Sprites/Heroes/Modular/Cedric_T1_Head_North")
+                                   ?? Resources.Load<Sprite>($"Sprites/Heroes/Modular/Cedric_T{tNum}_Head")
                                    ?? Resources.Load<Sprite>("Sprites/Heroes/Modular/Cedric_T1_Head");
-                        Sprite sword = Resources.Load<Sprite>($"Sprites/Heroes/Modular/Cedric_T{tNum}_Arm_Sword")
+                        Sprite sword = Resources.Load<Sprite>($"Sprites/Heroes/Modular/Cedric_T{tNum}_Arm_Sword_North")
+                                    ?? Resources.Load<Sprite>("Sprites/Heroes/Modular/Cedric_T1_Arm_Sword_North")
+                                    ?? Resources.Load<Sprite>($"Sprites/Heroes/Modular/Cedric_T{tNum}_Arm_Sword")
                                     ?? Resources.Load<Sprite>("Sprites/Heroes/Modular/Cedric_T1_Arm_Sword");
-                        Sprite shield = Resources.Load<Sprite>($"Sprites/Heroes/Modular/Cedric_T{tNum}_Arm_Shield")
+                        Sprite shield = Resources.Load<Sprite>($"Sprites/Heroes/Modular/Cedric_T{tNum}_Arm_Shield_North")
+                                     ?? Resources.Load<Sprite>("Sprites/Heroes/Modular/Cedric_T1_Arm_Shield_North")
+                                     ?? Resources.Load<Sprite>($"Sprites/Heroes/Modular/Cedric_T{tNum}_Arm_Shield")
                                      ?? Resources.Load<Sprite>("Sprites/Heroes/Modular/Cedric_T1_Arm_Shield");
                         Sprite slash = Resources.Load<Sprite>("Sprites/VFX/VFX_Slash_Arc");
 
