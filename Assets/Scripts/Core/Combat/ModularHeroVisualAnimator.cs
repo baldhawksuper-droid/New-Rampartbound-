@@ -156,6 +156,21 @@ namespace FantasyDefense.Combat
         }
 
         /// <summary>
+        /// Override PlayAttack dari HeroVisualAnimator agar memicu animasi tebasan modular secara otomatis.
+        /// </summary>
+        public override void PlayAttack(Vector3 targetWorldPos)
+        {
+            if (isModularConfigured)
+            {
+                PlayModularAttack(targetWorldPos, null);
+            }
+            else
+            {
+                base.PlayAttack(targetWorldPos);
+            }
+        }
+
+        /// <summary>
         /// Memicu animasi tebasan pedang modular nyata (Bukan sekadar menggeser stiker utuh).
         /// </summary>
         public void PlayModularAttack(Vector3 targetWorldPos, System.Action onSlashImpact = null)

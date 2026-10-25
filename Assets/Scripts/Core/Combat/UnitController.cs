@@ -220,9 +220,11 @@ namespace FantasyDefense.Combat
             if (spriteRenderer == null)
                 spriteRenderer = GetComponent<SpriteRenderer>();
 
-            visualAnimator = GetComponent<HeroVisualAnimator>();
+            visualAnimator = GetComponent<ModularHeroVisualAnimator>();
             if (visualAnimator == null)
-                visualAnimator = gameObject.AddComponent<HeroVisualAnimator>();
+                visualAnimator = GetComponent<HeroVisualAnimator>();
+            if (visualAnimator == null)
+                visualAnimator = gameObject.AddComponent<ModularHeroVisualAnimator>();
 
             mainCamera = Camera.main;
         }
