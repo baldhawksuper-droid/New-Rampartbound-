@@ -35,7 +35,7 @@ MonoBehaviour:
   preparationTokenTier2Sprite: {fileID: 21300000, guid: a94ddb78d2bcd7ee300e292072574b11, type: 3}
   preparationTokenTier3Sprite: {fileID: 21300000, guid: c68468bf3b10eee2e861f14d8d9f12b1, type: 3}
   preparationTokenTier4Sprite: {fileID: 21300000, guid: 24df1293e7e64312a6e33fad41b1fd29, type: 3}
-  preparationTokenTier5Sprite: {fileID: 0}
+  preparationTokenTier5Sprite: {fileID: 21300000, guid: 7aaa9bd3d0b44e9aad9174813712bdc9, type: 3}
   skillName: Blade Tempest
   skillDescription: Tebasan pedang berputar yang melibas seluruh monster di sekitarnya.
   skillCooldown: 5
