@@ -34,6 +34,12 @@ namespace FantasyDefense.UI
         [SerializeField] private Image enterCitadelButtonImage;
         [SerializeField] private Text enterCitadelButtonText;
 
+        [Header("Title Screen Dual Heroes (Pippin & Cedric)")]
+        [SerializeField] private Image pippinHeroImage;
+        [SerializeField] private Image cedricHeroImage;
+        [SerializeField] private RectTransform pippinHeroRt;
+        [SerializeField] private RectTransform cedricHeroRt;
+
         [Header("Interactive Hand Cursor")]
         [SerializeField] private RectTransform handCursorRt;
         [SerializeField] private Image handCursorImage;
@@ -198,16 +204,16 @@ namespace FantasyDefense.UI
             {
                 enterCitadelButtonText.text = FantasyDefense.Localization.CitadelLocalizationManager.Get(
                     "TITLE_ENTER_CITADEL",
-                    "🏰 MASUK KE CITADEL",
-                    "🏰 ENTER CITADEL"
+                    "🏰 TAP TO START",
+                    "🏰 TAP TO START"
                 );
             }
             if (pulsingHintText != null)
             {
                 pulsingHintText.text = FantasyDefense.Localization.CitadelLocalizationManager.Get(
                     "TITLE_HINT_TAP",
-                    "Ketuk Layar untuk Memulai",
-                    "Tap Screen to Start"
+                    "Ketuk Layar untuk Memulai Pertahanan",
+                    "Tap Screen to Start Defense"
                 );
             }
             if (versionText != null)
@@ -230,6 +236,31 @@ namespace FantasyDefense.UI
 
             // 2. Interactive Hand Cursor Draggable Logic
             UpdateHandCursorInteraction();
+
+            // 3. Dual Heroes Gentle Breathing Idle Animation on Title Screen
+            UpdateDualHeroesIdleAnimation();
+        }
+
+        private void UpdateDualHeroesIdleAnimation()
+        {
+            float idleTime = Time.unscaledTime;
+            if (pippinHeroRt != null)
+            {
+                // Pippin gentle floating breathing
+                float pippinOffsetY = Mathf.Sin(idleTime * 2.2f) * 6f;
+                float pippinScaleY = 1f + (Mathf.Sin(idleTime * 2.2f) * 0.02f);
+                pippinHeroRt.anchoredPosition = new Vector2(pippinHeroRt.anchoredPosition.x, -20f + pippinOffsetY);
+                pippinHeroRt.localScale = new Vector3(1f, pippinScaleY, 1f);
+            }
+
+            if (cedricHeroRt != null)
+            {
+                // Cedric grounded rhythmic breathing with slight phase delay
+                float cedricOffsetY = Mathf.Sin((idleTime * 2.0f) + 0.8f) * 5f;
+                float cedricScaleY = 1f + (Mathf.Sin((idleTime * 2.0f) + 0.8f) * 0.02f);
+                cedricHeroRt.anchoredPosition = new Vector2(cedricHeroRt.anchoredPosition.x, -20f + cedricOffsetY);
+                cedricHeroRt.localScale = new Vector3(1f, cedricScaleY, 1f);
+            }
         }
 
         private void UpdateHandCursorInteraction()

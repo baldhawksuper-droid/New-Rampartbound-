@@ -435,19 +435,92 @@ namespace Rampartbound.Editor
             subRect.offsetMax = Vector2.zero;
 
             // Start Button: 3D Button Timbul Tanpa Frame Kosong & Anti-Teks Bertumpuk
-            var startBtnObj = CreateButton(titlePanelObj.transform, "EnterCitadelButton", "🏰 MASUK KE CITADEL", new Color(0.95f, 0.72f, 0.16f), new Color(0.12f, 0.08f, 0.02f), 32, defaultFont);
+            var startBtnObj = CreateButton(titlePanelObj.transform, "EnterCitadelButton", "🏰 TAP TO START", new Color(0.98f, 0.78f, 0.18f), new Color(0.12f, 0.08f, 0.02f), 34, defaultFont);
             var startBtnRect = startBtnObj.GetComponent<RectTransform>();
-            startBtnRect.anchorMin = new Vector2(0.12f, 0.26f);
-            startBtnRect.anchorMax = new Vector2(0.88f, 0.36f);
+            startBtnRect.anchorMin = new Vector2(0.15f, 0.12f);
+            startBtnRect.anchorMax = new Vector2(0.85f, 0.22f);
             startBtnRect.offsetMin = Vector2.zero;
             startBtnRect.offsetMax = Vector2.zero;
+            if (_titleBtnTap != null)
+            {
+                var btnImg = startBtnObj.GetComponent<Image>();
+                btnImg.sprite = _titleBtnTap;
+                btnImg.type = Image.Type.Sliced;
+            }
 
-            var pulseTxt = CreateText(titlePanelObj.transform, "PulsingHintText", "Ketuk Layar untuk Memulai", 26, FontStyle.Italic, TextAnchor.MiddleCenter, new Color(1f, 1f, 1f, 0.8f), defaultFont);
+            var pulseTxt = CreateText(titlePanelObj.transform, "PulsingHintText", "Ketuk Layar untuk Memulai Pertahanan", 24, FontStyle.Italic, TextAnchor.MiddleCenter, new Color(1f, 1f, 1f, 0.85f), defaultFont);
             var pulseRect = pulseTxt.GetComponent<RectTransform>();
-            pulseRect.anchorMin = new Vector2(0.1f, 0.20f);
-            pulseRect.anchorMax = new Vector2(0.9f, 0.25f);
+            pulseRect.anchorMin = new Vector2(0.1f, 0.06f);
+            pulseRect.anchorMax = new Vector2(0.9f, 0.11f);
             pulseRect.offsetMin = Vector2.zero;
             pulseRect.offsetMax = Vector2.zero;
+
+            // Dual Heroes Title Screen (Pippin di kiri, Cedric di kanan menyambut berdua)
+            // A. Pippin Container & Plinth
+            var pippinGroup = new GameObject("Title_Hero_Pippin_Group", typeof(RectTransform));
+            pippinGroup.transform.SetParent(titlePanelObj.transform, false);
+            var pippinGroupRt = pippinGroup.GetComponent<RectTransform>();
+            pippinGroupRt.anchorMin = new Vector2(0.04f, 0.23f);
+            pippinGroupRt.anchorMax = new Vector2(0.48f, 0.60f);
+            pippinGroupRt.offsetMin = Vector2.zero;
+            pippinGroupRt.offsetMax = Vector2.zero;
+
+            // Pippin Plinth Base
+            var pippinPlinthObj = new GameObject("Pippin_Plinth_Base", typeof(RectTransform), typeof(Image));
+            pippinPlinthObj.transform.SetParent(pippinGroup.transform, false);
+            var pippinPlinthRt = pippinPlinthObj.GetComponent<RectTransform>();
+            pippinPlinthRt.anchorMin = new Vector2(0.08f, 0f);
+            pippinPlinthRt.anchorMax = new Vector2(0.92f, 0.26f);
+            pippinPlinthRt.offsetMin = Vector2.zero;
+            pippinPlinthRt.offsetMax = Vector2.zero;
+            var pippinPlinthImg = pippinPlinthObj.GetComponent<Image>();
+            if (_plinthT1 != null) { pippinPlinthImg.sprite = _plinthT1; pippinPlinthImg.preserveAspect = true; }
+            pippinPlinthImg.raycastTarget = false;
+
+            // Pippin Sprite
+            var pippinSpriteObj = new GameObject("Pippin_Sprite_Img", typeof(RectTransform), typeof(Image));
+            pippinSpriteObj.transform.SetParent(pippinGroup.transform, false);
+            var pippinSpriteRt = pippinSpriteObj.GetComponent<RectTransform>();
+            pippinSpriteRt.anchorMin = new Vector2(0.05f, 0.12f);
+            pippinSpriteRt.anchorMax = new Vector2(0.95f, 1f);
+            pippinSpriteRt.offsetMin = Vector2.zero;
+            pippinSpriteRt.offsetMax = Vector2.zero;
+            var pippinImg = pippinSpriteObj.GetComponent<Image>();
+            if (_heroRabbitSprite != null) { pippinImg.sprite = _heroRabbitSprite; pippinImg.preserveAspect = true; }
+            pippinImg.raycastTarget = false;
+
+            // B. Cedric Container & Plinth
+            var cedricGroup = new GameObject("Title_Hero_Cedric_Group", typeof(RectTransform));
+            cedricGroup.transform.SetParent(titlePanelObj.transform, false);
+            var cedricGroupRt = cedricGroup.GetComponent<RectTransform>();
+            cedricGroupRt.anchorMin = new Vector2(0.52f, 0.23f);
+            cedricGroupRt.anchorMax = new Vector2(0.96f, 0.60f);
+            cedricGroupRt.offsetMin = Vector2.zero;
+            cedricGroupRt.offsetMax = Vector2.zero;
+
+            // Cedric Plinth Base
+            var cedricPlinthObj = new GameObject("Cedric_Plinth_Base", typeof(RectTransform), typeof(Image));
+            cedricPlinthObj.transform.SetParent(cedricGroup.transform, false);
+            var cedricPlinthRt = cedricPlinthObj.GetComponent<RectTransform>();
+            cedricPlinthRt.anchorMin = new Vector2(0.08f, 0f);
+            cedricPlinthRt.anchorMax = new Vector2(0.92f, 0.26f);
+            cedricPlinthRt.offsetMin = Vector2.zero;
+            cedricPlinthRt.offsetMax = Vector2.zero;
+            var cedricPlinthImg = cedricPlinthObj.GetComponent<Image>();
+            if (_plinthT1 != null) { cedricPlinthImg.sprite = _plinthT1; cedricPlinthImg.preserveAspect = true; }
+            cedricPlinthImg.raycastTarget = false;
+
+            // Cedric Sprite
+            var cedricSpriteObj = new GameObject("Cedric_Sprite_Img", typeof(RectTransform), typeof(Image));
+            cedricSpriteObj.transform.SetParent(cedricGroup.transform, false);
+            var cedricSpriteRt = cedricSpriteObj.GetComponent<RectTransform>();
+            cedricSpriteRt.anchorMin = new Vector2(0.05f, 0.12f);
+            cedricSpriteRt.anchorMax = new Vector2(0.95f, 1f);
+            cedricSpriteRt.offsetMin = Vector2.zero;
+            cedricSpriteRt.offsetMax = Vector2.zero;
+            var cedricImg = cedricSpriteObj.GetComponent<Image>();
+            if (_heroCedricSprite != null) { cedricImg.sprite = _heroCedricSprite; cedricImg.preserveAspect = true; }
+            cedricImg.raycastTarget = false;
 
             // Layer Kursor Tangan Interaktif (Draggable & Idle Tapping)
             var handObj = new GameObject("Interactive_Hand_Cursor", typeof(RectTransform), typeof(Image));
@@ -487,6 +560,10 @@ namespace Rampartbound.Editor
             titleSO.FindProperty("handCursorRt").objectReferenceValue = handRt;
             titleSO.FindProperty("handCursorImage").objectReferenceValue = handImg;
             if (_handCursor != null) titleSO.FindProperty("handCursorSprite").objectReferenceValue = _handCursor;
+            titleSO.FindProperty("pippinHeroImage").objectReferenceValue = pippinImg;
+            titleSO.FindProperty("cedricHeroImage").objectReferenceValue = cedricImg;
+            titleSO.FindProperty("pippinHeroRt").objectReferenceValue = pippinSpriteRt;
+            titleSO.FindProperty("cedricHeroRt").objectReferenceValue = cedricSpriteRt;
             titleSO.ApplyModifiedProperties();
 
             // ==========================================
@@ -1982,6 +2059,8 @@ namespace Rampartbound.Editor
         private static Sprite _titleBackdrop;
         private static Sprite _titleBtnTap;
         private static Sprite _handCursor;
+        private static Sprite _shadowOval;
+        private static Sprite _plinthT1;
         private static Sprite _lobbyBackdrop;
         private static Sprite _keyVisualBanner;
         private static Sprite _heroCedricSprite;
@@ -2017,6 +2096,8 @@ namespace Rampartbound.Editor
             if (_titleBackdrop == null) _titleBackdrop = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Title_Screen_Backdrop.png") ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Rampartbound_KeyVisual_Banner.jpg");
             if (_titleBtnTap == null) _titleBtnTap = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Title_Btn_Tap_To_Start.png");
             if (_handCursor == null) _handCursor = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Hand_Cursor.png");
+            if (_shadowOval == null) _shadowOval = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Shadow_Ground_Oval.png");
+            if (_plinthT1 == null) _plinthT1 = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Combat/Plinth_Hero_Base_T1.png");
             if (_lobbyBackdrop == null) _lobbyBackdrop = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Citadel_Lobby_Backdrop.png") ?? _titleBackdrop;
             if (_keyVisualBanner == null) _keyVisualBanner = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Rampartbound_KeyVisual_Banner.jpg");
             if (_heroCedricSprite == null) _heroCedricSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Heroes/Cedric_T1.png");
