@@ -570,6 +570,11 @@ namespace FantasyDefense.Combat
                     groundShadowSr.sortingLayerName = "Gem";
                     groundShadowSr.sortingOrder = sortOrder - 2;
                 }
+
+                if (visualAnimator is ModularHeroVisualAnimator modularAnim)
+                {
+                    modularAnim.UpdateModularSortingOrder(sortOrder);
+                }
             }
         }
 
@@ -708,6 +713,39 @@ namespace FantasyDefense.Combat
             if (visualAnimator != null)
             {
                 visualAnimator.SetBaseScale(transform.localScale);
+
+                // Modular 2.5D Rigging (Kepala Chibi, Dada/Jubah, Lengan Pedang, Lengan Perisai, dan Slash VFX)
+                if (visualAnimator is ModularHeroVisualAnimator modularAnim)
+                {
+                    if (!isPreparationToken && currentTier > UnitTier.Tier0 && unitData != null && unitData.unitType == UnitType.Cedric)
+                    {
+                        int tNum = Mathf.Clamp((int)currentTier, 1, 5);
+                        Sprite torso = Resources.Load<Sprite>($"Sprites/Heroes/Modular/Cedric_T{tNum}_Torso")
+                                    ?? Resources.Load<Sprite>("Sprites/Heroes/Modular/Cedric_T1_Torso");
+                        Sprite head = Resources.Load<Sprite>($"Sprites/Heroes/Modular/Cedric_T{tNum}_Head")
+                                   ?? Resources.Load<Sprite>("Sprites/Heroes/Modular/Cedric_T1_Head");
+                        Sprite sword = Resources.Load<Sprite>($"Sprites/Heroes/Modular/Cedric_T{tNum}_Arm_Sword")
+                                    ?? Resources.Load<Sprite>("Sprites/Heroes/Modular/Cedric_T1_Arm_Sword");
+                        Sprite shield = Resources.Load<Sprite>($"Sprites/Heroes/Modular/Cedric_T{tNum}_Arm_Shield")
+                                     ?? Resources.Load<Sprite>("Sprites/Heroes/Modular/Cedric_T1_Arm_Shield");
+                        Sprite slash = Resources.Load<Sprite>("Sprites/VFX/VFX_Slash_Arc");
+
+                        if (torso != null && head != null)
+                        {
+                            modularAnim.ConfigureModularSprites(torso, head, sword, shield, slash);
+                            // Sembunyikan single-sprite bawaan agar tidak dobel/tumpang tindih
+                            spriteRenderer.color = new Color(1f, 1f, 1f, 0f);
+                        }
+                    }
+                    else
+                    {
+                        // Pulihkan visual normal saat mode token persiapan atau dragging
+                        if (spriteRenderer.color.a < 0.05f)
+                        {
+                            spriteRenderer.color = Color.white;
+                        }
+                    }
+                }
             }
 
             UpdateDepthSorting();

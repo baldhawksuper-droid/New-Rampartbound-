@@ -146,6 +146,38 @@ namespace FantasyDefense.Combat
             }
         }
 
+        /// <summary>
+        /// Menyelaraskan sorting order seluruh bagian tubuh modular agar selalu di atas tatakan dan bayangan.
+        /// </summary>
+        public void UpdateModularSortingOrder(int baseSortOrder)
+        {
+            if (torsoBone != null)
+            {
+                var sr = torsoBone.GetComponent<SpriteRenderer>();
+                if (sr != null) { sr.sortingLayerName = "Gem"; sr.sortingOrder = baseSortOrder; }
+            }
+            if (shieldArmBone != null)
+            {
+                var sr = shieldArmBone.GetComponent<SpriteRenderer>();
+                if (sr != null) { sr.sortingLayerName = "Gem"; sr.sortingOrder = baseSortOrder + 1; }
+            }
+            if (headBone != null)
+            {
+                var sr = headBone.GetComponent<SpriteRenderer>();
+                if (sr != null) { sr.sortingLayerName = "Gem"; sr.sortingOrder = baseSortOrder + 2; }
+            }
+            if (swordArmBone != null)
+            {
+                var sr = swordArmBone.GetComponent<SpriteRenderer>();
+                if (sr != null) { sr.sortingLayerName = "Gem"; sr.sortingOrder = baseSortOrder + 3; }
+            }
+            if (slashVfxSr != null)
+            {
+                slashVfxSr.sortingLayerName = "Gem";
+                slashVfxSr.sortingOrder = baseSortOrder + 5;
+            }
+        }
+
         private void OnEnable()
         {
             if (isModularConfigured)
