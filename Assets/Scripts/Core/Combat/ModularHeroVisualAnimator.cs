@@ -43,8 +43,74 @@ namespace FantasyDefense.Combat
         }
 
         /// <summary>
-        /// Secara otomatis mencari atau menyusun hirarki modular jika aset bagian tubuh tersedia.
+        /// Secara otomatis merakit objek-objek bagian tubuh modular (Bones/Layers) jika belum ada di GameObject.
         /// </summary>
+        public void ConfigureModularSprites(Sprite torso, Sprite head, Sprite swordArm, Sprite shieldArm, Sprite slashVfx)
+        {
+            if (torso != null && torsoBone == null)
+            {
+                var torsoObj = new GameObject("Torso");
+                torsoObj.transform.SetParent(transform, false);
+                torsoObj.transform.localPosition = new Vector3(0f, 0f, 0f);
+                var sr = torsoObj.AddComponent<SpriteRenderer>();
+                sr.sprite = torso;
+                sr.sortingLayerName = "Gem";
+                sr.sortingOrder = 30;
+                torsoBone = torsoObj.transform;
+            }
+
+            if (head != null && headBone == null)
+            {
+                var headObj = new GameObject("Head");
+                headObj.transform.SetParent(transform, false);
+                headObj.transform.localPosition = new Vector3(0f, 0f, -0.02f);
+                var sr = headObj.AddComponent<SpriteRenderer>();
+                sr.sprite = head;
+                sr.sortingLayerName = "Gem";
+                sr.sortingOrder = 32;
+                headBone = headObj.transform;
+            }
+
+            if (swordArm != null && swordArmBone == null)
+            {
+                var swordObj = new GameObject("Arm_Sword");
+                swordObj.transform.SetParent(transform, false);
+                swordObj.transform.localPosition = new Vector3(0.18f, 0.05f, -0.04f);
+                var sr = swordObj.AddComponent<SpriteRenderer>();
+                sr.sprite = swordArm;
+                sr.sortingLayerName = "Gem";
+                sr.sortingOrder = 34;
+                swordArmBone = swordObj.transform;
+            }
+
+            if (shieldArm != null && shieldArmBone == null)
+            {
+                var shieldObj = new GameObject("Arm_Shield");
+                shieldObj.transform.SetParent(transform, false);
+                shieldObj.transform.localPosition = new Vector3(-0.20f, -0.02f, -0.03f);
+                var sr = shieldObj.AddComponent<SpriteRenderer>();
+                sr.sprite = shieldArm;
+                sr.sortingLayerName = "Gem";
+                sr.sortingOrder = 33;
+                shieldArmBone = shieldObj.transform;
+            }
+
+            if (slashVfx != null && slashVfxBone == null)
+            {
+                var slashObj = new GameObject("VFX_Slash");
+                slashObj.transform.SetParent(transform, false);
+                slashObj.transform.localPosition = new Vector3(0.22f, 0.15f, -0.06f);
+                slashVfxSr = slashObj.AddComponent<SpriteRenderer>();
+                slashVfxSr.sprite = slashVfx;
+                slashVfxSr.sortingLayerName = "Gem";
+                slashVfxSr.sortingOrder = 36;
+                slashVfxSr.color = new Color(1f, 1f, 1f, 0f);
+                slashVfxBone = slashObj.transform;
+            }
+
+            SetupModularHierarchyIfNeeded();
+        }
+
         public void SetupModularHierarchyIfNeeded()
         {
             if (torsoBone == null) torsoBone = transform.Find("Torso");
