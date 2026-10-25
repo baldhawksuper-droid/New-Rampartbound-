@@ -110,7 +110,7 @@ namespace FantasyDefense.Combat
 
         #region Idle Animation
 
-        public void StartIdleAnimation()
+        public virtual void StartIdleAnimation()
         {
             currentState = AnimationState.Idle;
             if (activeAnimRoutine != null) StopCoroutine(activeAnimRoutine);
@@ -167,7 +167,7 @@ namespace FantasyDefense.Combat
         /// <summary>
         /// Memicu animasi serang (lunge forward menusuk ke target lalu kembali membal secara elastis).
         /// </summary>
-        public void PlayAttack(Vector3 targetWorldPos)
+        public virtual void PlayAttack(Vector3 targetWorldPos)
         {
             if (unitController != null && unitController.IsDragging) return;
 
@@ -377,7 +377,7 @@ namespace FantasyDefense.Combat
 
         #region Hit Recoil
 
-        public void PlayHitRecoil()
+        public virtual void PlayHitRecoil()
         {
             if (currentState == AnimationState.MergeCelebration || currentState == AnimationState.SkillCast) return;
             StartCoroutine(HitRecoilRoutine());

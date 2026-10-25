@@ -197,6 +197,18 @@ namespace FantasyDefense.Combat
             if (modularAttackRoutine != null) { StopCoroutine(modularAttackRoutine); modularAttackRoutine = null; }
         }
 
+        public override void StartIdleAnimation()
+        {
+            if (isModularConfigured)
+            {
+                StartModularIdle();
+            }
+            else
+            {
+                base.StartIdleAnimation();
+            }
+        }
+
         public void StartModularIdle()
         {
             if (!isModularConfigured) return;
@@ -268,9 +280,68 @@ namespace FantasyDefense.Combat
             }
         }
 
+        public override void PlayHitRecoil()
+        {
+            if (isModularConfigured)
+            {
+                StartCoroutine(ModularHitRecoilRoutine());
+            }
+            else
+            {
+                base.PlayHitRecoil();
+            }
+        }
+
+        private IEnumerator ModularHitRecoilRoutine()
+        {
+            float dur = 0.12f;
+            float elapsed = 0f;
+            Vector3 pushOffset = new Vector3(-0.06f, -0.04f, 0f);
+
+            while (elapsed < dur)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / dur);
+                float recoil = Mathf.Sin(t * Mathf.PI);
+
+                if (torsoBone != null)
+                {
+                    torsoBone.localPosition = torsoBasePos + pushOffset * recoil;
+                    torsoBone.localRotation = Quaternion.Euler(0f, 0f, -4f * recoil);
+                }
+                if (shieldArmBone != null)
+                {
+                    shieldArmBone.localRotation = shieldArmBaseRot * Quaternion.Euler(0f, 0f, 18f * recoil);
+                }
+                yield return null;
+            }
+
+            if (torsoBone != null)
+            {
+                torsoBone.localPosition = torsoBasePos;
+                torsoBone.localRotation = Quaternion.identity;
+            }
+            if (shieldArmBone != null)
+            {
+                shieldArmBone.localRotation = shieldArmBaseRot;
+            }
+        }
+
         /// <summary>
         /// Memicu animasi tebasan pedang modular nyata (Bukan sekadar menggeser stiker utuh).
         /// </summary>
+        public override void PlayAttack(Vector3 targetWorldPos)
+        {
+            if (isModularConfigured)
+            {
+                PlayModularAttack(targetWorldPos, null);
+            }
+            else
+            {
+                base.PlayAttack(targetWorldPos);
+            }
+        }
+
         public void PlayModularAttack(Vector3 targetWorldPos, System.Action onSlashImpact = null)
         {
             if (!isModularConfigured)
