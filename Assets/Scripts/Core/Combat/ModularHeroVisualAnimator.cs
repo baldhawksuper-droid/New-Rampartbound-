@@ -330,18 +330,6 @@ namespace FantasyDefense.Combat
         /// <summary>
         /// Memicu animasi tebasan pedang modular nyata (Bukan sekadar menggeser stiker utuh).
         /// </summary>
-        public override void PlayAttack(Vector3 targetWorldPos)
-        {
-            if (isModularConfigured)
-            {
-                PlayModularAttack(targetWorldPos, null);
-            }
-            else
-            {
-                base.PlayAttack(targetWorldPos);
-            }
-        }
-
         public void PlayModularAttack(Vector3 targetWorldPos, System.Action onSlashImpact = null)
         {
             if (!isModularConfigured)
