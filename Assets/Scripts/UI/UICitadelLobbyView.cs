@@ -152,6 +152,7 @@ namespace FantasyDefense.UI
             CitadelLobbyManager.OnCitadelLevelChanged += HandleLevelChanged;
             CitadelLobbyManager.OnHeroUpgraded += HandleHeroUpgraded;
             CitadelLobbyManager.OnHeroStarPromoted += HandleHeroStarPromoted;
+            CitadelSummonManager.OnGachaPullsCompleted += HandleGachaPullsCompleted;
             FantasyDefense.Localization.CitadelLocalizationManager.OnLanguageChanged += HandleLanguageChanged;
 
             ApplyResponsiveLayout();
@@ -168,6 +169,7 @@ namespace FantasyDefense.UI
             CitadelLobbyManager.OnCitadelLevelChanged -= HandleLevelChanged;
             CitadelLobbyManager.OnHeroUpgraded -= HandleHeroUpgraded;
             CitadelLobbyManager.OnHeroStarPromoted -= HandleHeroStarPromoted;
+            CitadelSummonManager.OnGachaPullsCompleted -= HandleGachaPullsCompleted;
             FantasyDefense.Localization.CitadelLocalizationManager.OnLanguageChanged -= HandleLanguageChanged;
         }
 
@@ -353,7 +355,18 @@ namespace FantasyDefense.UI
             UpdateHeroCard(UnitType.Cedric, cedricInfoText, "Cedric", "Melee Striker");
             UpdateHeroCard(UnitType.RoseTanker, roseInfoText, "Rose Tanker", "Heavy Tanker");
             UpdateHeroCard(UnitType.RabbitMage, rabbitInfoText, "Rabbit Mage", "Magic AoE");
-            UpdateHeroCard(UnitType.WindRanger, windRangerInfoText, "Wind Ranger", "Physical Gale");
+            var windProfile = lobby.GetHeroProfile(UnitType.WindRanger);
+            if (windProfile != null && windProfile.isUnlocked)
+            {
+                UpdateHeroCard(UnitType.WindRanger, windRangerInfoText, "Wind Ranger", "Physical Gale");
+            } else if (windRangerInfoText != null)
+            {
+                windRangerInfoText.text = "<b>Wind Ranger</b>\n<color=#FFD700>Summon to unlock</color>";
+            }
+            if (windRangerCardButton != null)
+            {
+                windRangerCardButton.interactable = windProfile != null && windProfile.isUnlocked;
+            }
         }
 
         private void UpdateHeroCard(UnitType type, Text infoText, string defaultName, string role)
@@ -420,5 +433,6 @@ namespace FantasyDefense.UI
         private void HandleLevelChanged(int lvl, int exp) => RefreshDisplays();
         private void HandleHeroUpgraded(HeroLobbyProfile p) => RefreshDisplays();
         private void HandleHeroStarPromoted(HeroLobbyProfile p) => RefreshDisplays();
+        private void HandleGachaPullsCompleted(System.Collections.Generic.List<GachaResultItem> results) => RefreshDisplays();
     }
 }

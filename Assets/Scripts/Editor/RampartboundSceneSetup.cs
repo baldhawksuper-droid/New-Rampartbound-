@@ -377,12 +377,18 @@ namespace Rampartbound.Editor
             var gmSO = new SerializedObject(gm);
             if (levelConfig != null) gmSO.FindProperty("activeLevelConfig").objectReferenceValue = levelConfig;
             var heroPoolProp = gmSO.FindProperty("starterHeroPool");
+            // Only the approved opening trio should be free starter heroes.
+            // Keep the wider activeHeroPool above intact for combat/gacha behavior.
+            var starterHeroList = heroList.FindAll(hero => hero != null &&
+                (hero.unitType == UnitType.Cedric ||
+                 hero.unitType == UnitType.RoseTanker ||
+                 hero.unitType == UnitType.RabbitMage));
             if (heroPoolProp != null)
             {
-                heroPoolProp.arraySize = heroList.Count;
-                for (int i = 0; i < heroList.Count; i++)
+                heroPoolProp.arraySize = starterHeroList.Count;
+                for (int i = 0; i < starterHeroList.Count; i++)
                 {
-                    heroPoolProp.GetArrayElementAtIndex(i).objectReferenceValue = heroList[i];
+                    heroPoolProp.GetArrayElementAtIndex(i).objectReferenceValue = starterHeroList[i];
                 }
             }
             var autoStartProp = gmSO.FindProperty("autoStartBattleOnAwake");
@@ -555,10 +561,12 @@ namespace Rampartbound.Editor
             AttachRarityBorder(rabbitCard.transform, _borderEpic);
             SetupHeroCardPortrait(rabbitCard, _heroRabbitSprite);
 
-            var windCard = CreateButton(heroesContainer.transform, "WindCard", "<b>Wind Ranger</b>\nLv.1 ★☆☆\n<color=#FFD700>CP: 125</color>", new Color(0.15f, 0.4f, 0.25f), Color.white, 20, defaultFont);
-            PositionUI(windCard, 0.765f, 0.05f, 0.98f, 0.95f);
+            var windCard = CreateButton(heroesContainer.transform, "WindCard", "<b>Wind Ranger</b>\nSummon to Unlock", new Color(0.15f, 0.4f, 0.25f), Color.white, 18, defaultFont);
+            PositionUI(windCard, 0.77f, 0.05f, 0.98f, 0.95f);
             AttachRarityBorder(windCard.transform, _borderLegendary);
             SetupHeroCardPortrait(windCard, _heroWindSprite);
+            var windCardButton = windCard.GetComponent<Button>();
+            if (windCardButton != null) windCardButton.interactable = false;
 
             // Core Action Buttons
             var defendBtn = CreateButton(lobbyPanelObj.transform, "DefendCitadelButton", "⚔️ PERTAHANKAN BENTENG (BATTLE)", new Color(0.92f, 0.35f, 0.18f), Color.white, 28, defaultFont);

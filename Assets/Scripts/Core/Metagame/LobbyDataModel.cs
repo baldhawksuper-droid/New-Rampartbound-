@@ -18,14 +18,14 @@ namespace FantasyDefense.Metagame
 
         public int starRank = 1; // Tingkat Bintang Hero (1★ hingga 5★)
         public int heroShards = 0; // Keping pecahan pahlawan untuk promosi bintang
-        public bool isUnlocked = true; // Status keterbukaan hero dalam akun
+        public bool isUnlocked = false; // Status keterbukaan hero dalam akun
 
         // Slot perlengkapan tempur (Weapon, Armor, Relic)
         public List<EquipmentItem> equippedItems = new List<EquipmentItem>();
 
         public HeroLobbyProfile() { }
 
-        public HeroLobbyProfile(UnitType type, string name, int lvl, int cp, float atk, float hp, float crit = 0.05f, int star = 1, bool unlocked = true)
+        public HeroLobbyProfile(UnitType type, string name, int lvl, int cp, float atk, float hp, float crit = 0.05f, int star = 1, bool unlocked = false)
         {
             unitType = type;
             heroName = name;

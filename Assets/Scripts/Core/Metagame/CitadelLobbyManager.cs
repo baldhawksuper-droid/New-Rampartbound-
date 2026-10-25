@@ -170,7 +170,7 @@ namespace FantasyDefense.Metagame
             rose.CalculateCombatPower();
             accountData.activeRoster.Add(rose);
 
-            // 4. Wind Ranger (Pemanah Angin) - Roster Hero ke-4 (Level 1 Awal)
+            // Wind Ranger is visible in the account roster but remains locked until a summon unlocks her.
             var wind = new HeroLobbyProfile(
                 type: UnitType.WindRanger,
                 name: "Wind Ranger (Pemanah Angin)",
@@ -180,10 +180,12 @@ namespace FantasyDefense.Metagame
                 hp: 120f,
                 crit: 0.12f,
                 star: 1,
-                unlocked: true
+                unlocked: false
             );
             wind.CalculateCombatPower();
             accountData.activeRoster.Add(wind);
+
+            // Wind Ranger tidak termasuk hero starter gratis; tetap terkunci hingga diperoleh lewat summon.
 
             // Konfigurasi awal akun pemain baru (Guest Mode)
             accountData.citadelLevel = 1;
