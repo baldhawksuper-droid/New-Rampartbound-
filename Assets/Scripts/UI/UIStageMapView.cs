@@ -268,7 +268,31 @@ namespace FantasyDefense.UI
 
                 if (txt != null)
                 {
-                    string starStr = isCleared ? new string('★', Mathf.Max(1, stars)) : (isUnlocked ? "<color=#FFD700>READY</color>" : "<color=#888888>🔒 LOCK</color>");
+                    string starStr;
+                    if (isCleared)
+                    {
+                        if (stars >= 3)
+                        {
+                            starStr = "<color=#FFD700>★★★</color>"; // Radiant gold 3-star
+                        }
+                        else if (stars == 2)
+                        {
+                            starStr = "<color=#FFD700>★★</color><color=#555555>★</color>";
+                        }
+                        else
+                        {
+                            starStr = "<color=#FFD700>★</color><color=#555555>★★</color>";
+                        }
+                    }
+                    else if (isUnlocked)
+                    {
+                        starStr = "<color=#00FFFF>READY</color>";
+                    }
+                    else
+                    {
+                        starStr = "<color=#666666>🔒 LOCK</color>";
+                    }
+
                     string bossPrefix = (stageIdx == 5) ? "👑 1-5" : ((stageIdx == 10) ? "💀 1-10" : $"1-{stageIdx}");
                     txt.text = $"<b>{bossPrefix}</b>\n{starStr}";
                 }

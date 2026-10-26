@@ -52,7 +52,8 @@ namespace FantasyDefense.UI
         [SerializeField] private Text modeBadgeText;
         [SerializeField] private GameObject puzzlePreparationPanel;
         [SerializeField] private Text movesRemainingText;
-        [SerializeField] private Button startDefenseNowButton;
+        [SerializeField] private Button startDefenseNowButton;
+
         [SerializeField] private Text upcomingThreatText;
         [SerializeField] private GameObject summonButtonContainer;
 
@@ -581,13 +582,20 @@ namespace FantasyDefense.UI
                 }
             }
 
-            HandleMovesRemainingChanged(bonusMoves);
-
-            if (upcomingThreatText != null && WaveSpawner.Instance != null)
-            {
-                string preview = WaveSpawner.Instance.GetUpcomingWavePreviewSummary(nextWaveNumber);
-                upcomingThreatText.gameObject.SetActive(!string.IsNullOrEmpty(preview));
-                upcomingThreatText.text = preview;
+            HandleMovesRemainingChanged(bonusMoves);
+
+
+
+            if (upcomingThreatText != null && WaveSpawner.Instance != null)
+
+            {
+
+                string preview = WaveSpawner.Instance.GetUpcomingWavePreviewSummary(nextWaveNumber);
+
+                upcomingThreatText.gameObject.SetActive(!string.IsNullOrEmpty(preview));
+
+                upcomingThreatText.text = preview;
+
             }
 
             if (interWaveBannerRoutine != null)
@@ -750,17 +758,27 @@ namespace FantasyDefense.UI
         #region HUD Display Updates
 
         private Coroutine castleHpTweenCoroutine;
+        private Coroutine hpBarShakeCoroutine;
+        private Vector3 hpBarOriginalScale = Vector3.one;
 
         private void UpdateCastleHpDisplay(int current, int max)
         {
             if (castleHpSlider != null)
             {
+                int prevVal = Mathf.RoundToInt(castleHpSlider.value);
                 castleHpSlider.maxValue = max;
                 if (castleHpTweenCoroutine != null)
                 {
                     StopCoroutine(castleHpTweenCoroutine);
                 }
                 castleHpTweenCoroutine = StartCoroutine(SmoothCastleHpRoutine(current));
+
+                // Shake & punch-scale pada slider saat menerima damage
+                if (current < prevVal && gameObject.activeInHierarchy)
+                {
+                    if (hpBarShakeCoroutine != null) StopCoroutine(hpBarShakeCoroutine);
+                    hpBarShakeCoroutine = StartCoroutine(PunchScaleHpBarRoutine());
+                }
             }
 
             if (castleHpText != null)
@@ -788,6 +806,31 @@ namespace FantasyDefense.UI
             {
                 StopLowHpDangerAlert();
             }
+        }
+
+        private IEnumerator PunchScaleHpBarRoutine()
+        {
+            if (castleHpSlider == null) yield break;
+            Transform tr = castleHpSlider.transform;
+            if (hpBarOriginalScale == Vector3.one && tr.localScale != Vector3.zero)
+            {
+                hpBarOriginalScale = tr.localScale;
+            }
+
+            float duration = 0.22f;
+            float elapsed = 0f;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = elapsed / duration;
+                float punch = Mathf.Sin(t * Mathf.PI) * 0.18f;
+                tr.localScale = new Vector3(hpBarOriginalScale.x * (1f + punch), hpBarOriginalScale.y * (1f - punch * 0.5f), hpBarOriginalScale.z);
+                yield return null;
+            }
+
+            tr.localScale = hpBarOriginalScale;
+            hpBarShakeCoroutine = null;
         }
 
         private IEnumerator SmoothCastleHpRoutine(float targetVal)
