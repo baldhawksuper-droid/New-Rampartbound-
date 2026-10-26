@@ -29,8 +29,10 @@ namespace FantasyDefense.Localization
             { "👑\nArtefak", "👑\nArtifacts" },
 
             // Tombol Utama & Header
-            { "⚔️ PERTAHANKAN BENTENG (BATTLE)", "⚔️ DEFEND CITADEL (BATTLE)" },
-            { "🌌 ABYSSAL TRIAL (ENDLESS MODE)", "🌌 ABYSSAL TRIAL (ENDLESS MODE)" },
+            { "⚔️ BERTAHAN (BATTLE)", "⚔️ BATTLE (DEFEND)" },
+            { "⚔️ PERTAHANKAN BENTENG (BATTLE)", "⚔️ BATTLE (DEFEND)" },
+            { "🌌 UJIAN ABYSSAL (ENDLESS)", "🌌 ABYSSAL TRIAL (ENDLESS)" },
+            { "🌌 ABYSSAL TRIAL (ENDLESS MODE)", "🌌 ABYSSAL TRIAL (ENDLESS)" },
             { "Komandan Benteng", "Citadel Commander" },
             { "⚔️ MULAI PERTEMPURAN SEKARANG", "⚔️ COMMENCE DEFENSE NOW" },
             { "MULAI BERTAHAN SEKARANG", "COMMENCE DEFENSE NOW" },
@@ -39,7 +41,9 @@ namespace FantasyDefense.Localization
             { "COBA LAGI", "RETRY DEFENSE" },
             { "COBA LAGI (RETRY)", "RETRY DEFENSE" },
             { "PERMAINAN DIHENTIKAN", "GAME PAUSED" },
+            { "LANJUTKAN", "RESUME" },
             { "LANJUTKAN (RESUME)", "RESUME" },
+            { "MENYERAH", "SURRENDER" },
             { "MENYERAH & KEMBALI KE CITADEL", "SURRENDER & RETURN" },
             { "KEMENANGAN TELAK!", "VICTORY!" },
             { "PERTAHANAN GAGAL!", "DEFENSE FAILED!" },

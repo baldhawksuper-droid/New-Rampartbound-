@@ -14,8 +14,11 @@ namespace FantasyDefense.UI
 
         private GameObject toastRoot;
         private Text toastText;
+        private Button actionButton;
+        private Text actionButtonText;
         private CanvasGroup toastCanvasGroup;
         private Coroutine activeRoutine;
+        private System.Action onActionCallback;
 
         private void Awake()
         {
@@ -53,13 +56,13 @@ namespace FantasyDefense.UI
             toastRoot.transform.SetParent(canvasObj.transform, false);
 
             var rect = toastRoot.AddComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.08f, 0.72f);
-            rect.anchorMax = new Vector2(0.92f, 0.80f);
+            rect.anchorMin = new Vector2(0.06f, 0.70f);
+            rect.anchorMax = new Vector2(0.94f, 0.81f);
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
 
             var bgImg = toastRoot.AddComponent<Image>();
-            bgImg.color = new Color(0.10f, 0.12f, 0.20f, 0.95f);
+            bgImg.color = new Color(0.10f, 0.12f, 0.20f, 0.96f);
 
             var outline = toastRoot.AddComponent<Outline>();
             outline.effectColor = new Color(1f, 0.75f, 0.2f, 0.9f);
@@ -67,31 +70,71 @@ namespace FantasyDefense.UI
 
             toastCanvasGroup = toastRoot.AddComponent<CanvasGroup>();
             toastCanvasGroup.alpha = 0f;
-            toastCanvasGroup.blocksRaycasts = false;
+            toastCanvasGroup.blocksRaycasts = true;
 
             // Text Label
             var textObj = new GameObject("ToastMessage");
             textObj.transform.SetParent(toastRoot.transform, false);
 
             var textRect = textObj.AddComponent<RectTransform>();
-            textRect.anchorMin = new Vector2(0.04f, 0.05f);
+            textRect.anchorMin = new Vector2(0.04f, 0.36f);
             textRect.anchorMax = new Vector2(0.96f, 0.95f);
             textRect.offsetMin = Vector2.zero;
             textRect.offsetMax = Vector2.zero;
 
             toastText = textObj.AddComponent<Text>();
             toastText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-            toastText.fontSize = 28;
+            toastText.fontSize = 24;
             toastText.alignment = TextAnchor.MiddleCenter;
             toastText.fontStyle = FontStyle.Bold;
             toastText.color = Color.white;
             toastText.horizontalOverflow = HorizontalWrapMode.Wrap;
             toastText.verticalOverflow = VerticalWrapMode.Truncate;
 
+            // Action Button Container (Pintasan Cepat ke Toko)
+            var btnObj = new GameObject("ToastActionButton");
+            btnObj.transform.SetParent(toastRoot.transform, false);
+
+            var btnRect = btnObj.AddComponent<RectTransform>();
+            btnRect.anchorMin = new Vector2(0.20f, 0.06f);
+            btnRect.anchorMax = new Vector2(0.80f, 0.34f);
+            btnRect.offsetMin = Vector2.zero;
+            btnRect.offsetMax = Vector2.zero;
+
+            var btnBg = btnObj.AddComponent<Image>();
+            btnBg.color = new Color(0.92f, 0.65f, 0.15f, 1f);
+
+            actionButton = btnObj.AddComponent<Button>();
+            actionButton.targetGraphic = btnBg;
+            actionButton.onClick.AddListener(OnActionButtonClicked);
+
+            var btnTxtObj = new GameObject("BtnText");
+            btnTxtObj.transform.SetParent(btnObj.transform, false);
+
+            var btnTxtRect = btnTxtObj.AddComponent<RectTransform>();
+            btnTxtRect.anchorMin = Vector2.zero;
+            btnTxtRect.anchorMax = Vector2.one;
+            btnTxtRect.offsetMin = Vector2.zero;
+            btnTxtRect.offsetMax = Vector2.zero;
+
+            actionButtonText = btnTxtObj.AddComponent<Text>();
+            actionButtonText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            actionButtonText.fontSize = 18;
+            actionButtonText.alignment = TextAnchor.MiddleCenter;
+            actionButtonText.fontStyle = FontStyle.Bold;
+            actionButtonText.color = new Color(0.12f, 0.08f, 0.02f);
+            actionButtonText.text = "💎 BUKA TOKO (REFILL)";
+
+            btnObj.SetActive(false);
             toastRoot.SetActive(false);
         }
 
         public static void Show(string message, float duration = 2.8f)
+        {
+            ShowWithAction(message, null, null, duration);
+        }
+
+        public static void ShowWithAction(string message, string actionLabel, System.Action action, float duration = 4.0f)
         {
             if (Instance == null)
             {
@@ -99,19 +142,48 @@ namespace FantasyDefense.UI
                 Instance = go.AddComponent<CitadelToastNotice>();
             }
 
-            Instance.TriggerToast(message, duration);
+            Instance.TriggerToast(message, actionLabel, action, duration);
         }
 
-        public void TriggerToast(string message, float duration)
+        public void TriggerToast(string message, string actionLabel, System.Action action, float duration)
         {
             if (toastRoot == null) BuildToastUI();
             if (toastText != null) toastText.text = message;
+
+            onActionCallback = action;
+            if (actionButton != null)
+            {
+                bool hasAction = !string.IsNullOrEmpty(actionLabel) && action != null;
+                actionButton.gameObject.SetActive(hasAction);
+                if (hasAction && actionButtonText != null)
+                {
+                    actionButtonText.text = actionLabel;
+                }
+            }
 
             if (activeRoutine != null)
             {
                 StopCoroutine(activeRoutine);
             }
             activeRoutine = StartCoroutine(ToastRoutine(duration));
+        }
+
+        private void OnActionButtonClicked()
+        {
+            var cb = onActionCallback;
+            HideImmediate();
+            cb?.Invoke();
+        }
+
+        private void HideImmediate()
+        {
+            if (activeRoutine != null)
+            {
+                StopCoroutine(activeRoutine);
+                activeRoutine = null;
+            }
+            if (toastCanvasGroup != null) toastCanvasGroup.alpha = 0f;
+            if (toastRoot != null) toastRoot.SetActive(false);
         }
 
         private IEnumerator ToastRoutine(float duration)

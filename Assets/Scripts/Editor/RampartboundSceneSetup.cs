@@ -648,10 +648,10 @@ namespace Rampartbound.Editor
             if (windCardButton != null) windCardButton.interactable = false;
 
             // Core Action Buttons
-            var defendBtn = CreateButton(lobbyPanelObj.transform, "DefendCitadelButton", "⚔️ PERTAHANKAN BENTENG (BATTLE)", new Color(0.92f, 0.35f, 0.18f), Color.white, 28, defaultFont);
+            var defendBtn = CreateButton(lobbyPanelObj.transform, "DefendCitadelButton", "⚔️ BERTAHAN (BATTLE)", new Color(0.92f, 0.35f, 0.18f), Color.white, 28, defaultFont);
             PositionUI(defendBtn, 0.08f, 0.15f, 0.92f, 0.28f);
 
-            var trialBtn = CreateButton(lobbyPanelObj.transform, "AbyssalTrialButton", "🌌 ABYSSAL TRIAL (ENDLESS MODE)", new Color(0.42f, 0.25f, 0.75f), Color.white, 24, defaultFont);
+            var trialBtn = CreateButton(lobbyPanelObj.transform, "AbyssalTrialButton", "🌌 UJIAN ABYSSAL (ENDLESS)", new Color(0.42f, 0.25f, 0.75f), Color.white, 24, defaultFont);
             PositionUI(trialBtn, 0.12f, 0.23f, 0.88f, 0.30f);
             trialBtn.SetActive(false); // Sembunyikan Abyssal Trial sesuai arahan
 

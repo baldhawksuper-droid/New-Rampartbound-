@@ -31,8 +31,8 @@ namespace FantasyDefense.Localization
         {
             // Lobby & Header
             { "LOBBY_COMMANDER", ("Komandan Benteng", "Citadel Commander") },
-            { "LOBBY_DEFEND_BTN", ("⚔️ PERTAHANKAN BENTENG (BATTLE)", "⚔️ DEFEND CITADEL (BATTLE)") },
-            { "LOBBY_ABYSSAL_BTN", ("🌌 ABYSSAL TRIAL (ENDLESS MODE)", "🌌 ABYSSAL TRIAL (ENDLESS MODE)") },
+            { "LOBBY_DEFEND_BTN", ("⚔️ BERTAHAN (BATTLE)", "⚔️ BATTLE (DEFEND)") },
+            { "LOBBY_ABYSSAL_BTN", ("🌌 UJIAN ABYSSAL (ENDLESS)", "🌌 ABYSSAL TRIAL (ENDLESS)") },
             { "LOBBY_TEAM_CP", ("Team CP", "Team CP") },
 
             // Bottom Navigation Dock

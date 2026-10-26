@@ -198,7 +198,7 @@ namespace FantasyDefense.UI
                 var txt = defendCitadelButton.GetComponentInChildren<Text>();
                 if (txt != null)
                 {
-                    txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("LOBBY_DEFEND_BTN", "⚔️ PERTAHANKAN BENTENG (BATTLE)", "⚔️ DEFEND CITADEL (BATTLE)");
+                    txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("LOBBY_DEFEND_BTN", "⚔️ BERTAHAN (BATTLE)", "⚔️ BATTLE (DEFEND)");
                 }
             }
 
@@ -418,7 +418,13 @@ namespace FantasyDefense.UI
                     $"⚡ Stamina Tidak Cukup!\nMembutuhkan 5 Stamina untuk bertempur. (Tersedia: {currentEnergy})",
                     $"⚡ Not Enough Energy!\nRequires 5 Stamina to commence defense. (Available: {currentEnergy})"
                 );
-                CitadelToastNotice.Show(toastMsg);
+                string btnLabel = FantasyDefense.Localization.CitadelLocalizationManager.Text("💎 BUKA TOKO (REFILL)", "💎 OPEN STORE (REFILL)");
+                CitadelToastNotice.ShowWithAction(toastMsg, btnLabel, () => {
+                    if (GameFlowManager.Instance != null)
+                    {
+                        GameFlowManager.Instance.OpenPanel(GamePanelType.Store);
+                    }
+                }, 4.2f);
 
                 if (AudioManager.Instance != null)
                 {

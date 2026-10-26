@@ -410,7 +410,13 @@ namespace FantasyDefense.UI
                     $"⚡ Stamina Tidak Cukup!\nMembutuhkan {cost} Stamina untuk bertempur. (Tersedia: {currentEnergy})",
                     $"⚡ Not Enough Energy!\nRequires {cost} Stamina to commence defense. (Available: {currentEnergy})"
                 );
-                CitadelToastNotice.Show(toastMsg);
+                string btnLabel = FantasyDefense.Localization.CitadelLocalizationManager.Text("💎 BUKA TOKO (REFILL)", "💎 OPEN STORE (REFILL)");
+                CitadelToastNotice.ShowWithAction(toastMsg, btnLabel, () => {
+                    if (FantasyDefense.Core.GameFlowManager.Instance != null)
+                    {
+                        FantasyDefense.Core.GameFlowManager.Instance.OpenPanel(FantasyDefense.Core.GamePanelType.Store);
+                    }
+                }, 4.2f);
 
                 if (AudioManager.Instance != null)
                 {
