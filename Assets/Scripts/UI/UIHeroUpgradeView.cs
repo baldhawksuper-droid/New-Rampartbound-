@@ -59,6 +59,8 @@ namespace FantasyDefense.UI
         [Header("Equipment Actions")]
         [SerializeField] private Button autoEquipButton;
         [SerializeField] private Button unequipAllButton;
+        [SerializeField] private Button deployToFormationButton;
+        [SerializeField] private Text deployButtonText;
 
         [Header("Forge Shortcut (Optional)")]
         [SerializeField] private Button openForgeButton;
@@ -129,6 +131,9 @@ namespace FantasyDefense.UI
 
             if (unequipAllButton != null)
                 unequipAllButton.onClick.AddListener(UnequipAllItems);
+
+            if (deployToFormationButton != null)
+                deployToFormationButton.onClick.AddListener(OnDeployButtonClicked);
 
             if (openForgeButton != null)
                 openForgeButton.onClick.AddListener(OnOpenForgeClicked);
@@ -237,6 +242,32 @@ namespace FantasyDefense.UI
                 if (txt != null) txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Text("📦 LEPAS SEMUA", "📦 UNEQUIP ALL");
             }
 
+            // Status Pemasangan ke Formasi (Slot 1 - 4)
+            var currentFormation = CitadelLobbyManager.Instance.GetDeployedFormation();
+            int slotIdx = currentFormation.IndexOf(selectedHeroType);
+            bool isDeployed = slotIdx != -1;
+
+            if (deployToFormationButton != null)
+            {
+                deployToFormationButton.interactable = profile.isUnlocked;
+                var txt = deployButtonText != null ? deployButtonText : deployToFormationButton.GetComponentInChildren<Text>();
+                if (txt != null)
+                {
+                    if (!profile.isUnlocked)
+                    {
+                        txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Text("🔒 TERKUNCI (GACHA)", "🔒 LOCKED (GACHA)");
+                    }
+                    else if (isDeployed)
+                    {
+                        txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Text($"🛡️ DIPASANG (SLOT {slotIdx + 1})", $"🛡️ DEPLOYED (SLOT {slotIdx + 1})");
+                    }
+                    else
+                    {
+                        txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Text("➕ PASANG KE FORMASI", "➕ DEPLOY TO FORMATION");
+                    }
+                }
+            }
+
             if (upgradeHeroButton != null)
             {
                 upgradeHeroButton.interactable = canAfford;
@@ -260,6 +291,46 @@ namespace FantasyDefense.UI
 
             // Update Slot Equipment
             UpdateEquipmentSlotDisplay(profile);
+        }
+
+        private void OnDeployButtonClicked()
+        {
+            if (CitadelLobbyManager.Instance == null) return;
+
+            var profile = CitadelLobbyManager.Instance.GetHeroProfile(selectedHeroType);
+            if (profile == null) return;
+
+            if (!profile.isUnlocked)
+            {
+                string msg = FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                    $"🔒 {profile.heroName} masih terkunci! Dapatkan melalui Balai Gacha.",
+                    $"🔒 {profile.heroName} is locked! Summon in the Gacha Hall."
+                );
+                CitadelToastNotice.Show(msg, 3.0f);
+                return;
+            }
+
+            // Cari slot yang kosong atau ganti slot ke-4 / slot rotasi
+            var formation = CitadelLobbyManager.Instance.GetDeployedFormation();
+            int currentSlot = formation.IndexOf(selectedHeroType);
+
+            int targetSlot = 3; // Default ke slot ke-4 jika belum terpasang
+            if (currentSlot != -1)
+            {
+                // Jika sudah terpasang di salah satu slot, rotasikan ke slot berikutnya
+                targetSlot = (currentSlot + 1) % 4;
+            }
+
+            bool success = CitadelLobbyManager.Instance.TryAssignFormationSlot(targetSlot, selectedHeroType, out string resultMsg);
+            if (success)
+            {
+                CitadelToastNotice.Show($"✅ {resultMsg}", 2.8f);
+                RefreshDisplay();
+            }
+            else
+            {
+                CitadelToastNotice.Show($"⚠️ {resultMsg}", 3.0f);
+            }
         }
 
         private float GetBonusAtk(HeroLobbyProfile profile)

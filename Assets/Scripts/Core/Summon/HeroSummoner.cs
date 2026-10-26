@@ -282,6 +282,38 @@ namespace FantasyDefense.Summon
         }
 
         /// <summary>
+        /// Menyinkronkan hero pool pertempuran agar hanya memunculkan permata/token pahlawan yang aktif di formasi.
+        /// </summary>
+        public void SynchronizeWithFormation(System.Collections.Generic.List<FantasyDefense.Data.UnitType> formation)
+        {
+            if (formation == null || formation.Count == 0) return;
+
+            EnsureHeroPoolLoaded();
+
+            // Kumpulkan hero yang ada di formasi dan sudah terbuka
+            var newPool = new System.Collections.Generic.List<FantasyDefense.Data.UnitDataSO>();
+            var lobby = FantasyDefense.Metagame.CitadelLobbyManager.Instance;
+
+            foreach (var heroType in formation)
+            {
+                var profile = lobby != null ? lobby.GetHeroProfile(heroType) : null;
+                if (profile != null && !profile.isUnlocked) continue; // Jangan masukkan jika terkunci
+
+                var matchingHeroSO = activeHeroPool.Find(h => h != null && h.unitType == heroType);
+                if (matchingHeroSO != null && !newPool.Contains(matchingHeroSO))
+                {
+                    newPool.Add(matchingHeroSO);
+                }
+            }
+
+            if (newPool.Count > 0)
+            {
+                activeHeroPool = newPool;
+                Debug.Log($"[HeroSummoner] ActiveHeroPool disinkronkan dengan formasi: {activeHeroPool.Count} pahlawan aktif.");
+            }
+        }
+
+        /// <summary>
         /// Mengambil data hero acak dari roster aktif Trio Hero.
         /// </summary>
         public UnitDataSO GetRandomHeroFromPool()

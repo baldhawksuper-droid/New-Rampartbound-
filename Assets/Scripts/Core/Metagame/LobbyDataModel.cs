@@ -301,6 +301,16 @@ namespace FantasyDefense.Metagame
         public List<HeroLobbyProfile> activeRoster = new List<HeroLobbyProfile>();
         public List<EquipmentItem> equipmentInventory = new List<EquipmentItem>();
 
+        // Formasi 4 Slot Pahlawan Tempur (Sprint 50)
+        // Menyimpan urutan pahlawan yang dipasang di pelataran Lobby dan arena pertempuran
+        public List<UnitType> deployedFormation = new List<UnitType>
+        {
+            UnitType.RabbitMage,
+            UnitType.Cedric,
+            UnitType.RoseTanker,
+            UnitType.WindRanger
+        };
+
         // Citadel Artifacts & Relic Set Synergies (Sprint 13)
         public List<string> equippedArtifactIds = new List<string>();
         public List<string> ownedArtifactIds = new List<string>();

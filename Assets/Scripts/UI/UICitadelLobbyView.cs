@@ -155,6 +155,7 @@ namespace FantasyDefense.UI
             CitadelLobbyManager.OnCitadelLevelChanged += HandleLevelChanged;
             CitadelLobbyManager.OnHeroUpgraded += HandleHeroUpgraded;
             CitadelLobbyManager.OnHeroStarPromoted += HandleHeroStarPromoted;
+            CitadelLobbyManager.OnFormationChanged += HandleFormationChanged;
             CitadelSummonManager.OnGachaPullsCompleted += HandleGachaPullsCompleted;
             FantasyDefense.Localization.CitadelLocalizationManager.OnLanguageChanged += HandleLanguageChanged;
 
@@ -172,6 +173,7 @@ namespace FantasyDefense.UI
             CitadelLobbyManager.OnCitadelLevelChanged -= HandleLevelChanged;
             CitadelLobbyManager.OnHeroUpgraded -= HandleHeroUpgraded;
             CitadelLobbyManager.OnHeroStarPromoted -= HandleHeroStarPromoted;
+            CitadelLobbyManager.OnFormationChanged -= HandleFormationChanged;
             CitadelSummonManager.OnGachaPullsCompleted -= HandleGachaPullsCompleted;
             FantasyDefense.Localization.CitadelLocalizationManager.OnLanguageChanged -= HandleLanguageChanged;
         }
@@ -252,14 +254,14 @@ namespace FantasyDefense.UI
                 settingsButton.onClick.AddListener(() => OpenPanel(GamePanelType.AudioSettings));
 
             // Courtyard Standees (Mendukung Tap Emote Juice & Hero Upgrade)
-            if (cedricCardButton != null)
-                cedricCardButton.onClick.AddListener(() => OnStandeeTapped(cedricCardButton, UnitType.Cedric));
-            if (roseCardButton != null)
-                roseCardButton.onClick.AddListener(() => OnStandeeTapped(roseCardButton, UnitType.RoseTanker));
             if (rabbitCardButton != null)
-                rabbitCardButton.onClick.AddListener(() => OnStandeeTapped(rabbitCardButton, UnitType.RabbitMage));
+                rabbitCardButton.onClick.AddListener(() => OnStandeeSlotTapped(rabbitCardButton, 0));
+            if (cedricCardButton != null)
+                cedricCardButton.onClick.AddListener(() => OnStandeeSlotTapped(cedricCardButton, 1));
+            if (roseCardButton != null)
+                roseCardButton.onClick.AddListener(() => OnStandeeSlotTapped(roseCardButton, 2));
             if (windRangerCardButton != null)
-                windRangerCardButton.onClick.AddListener(() => OnStandeeTapped(windRangerCardButton, UnitType.WindRanger));
+                windRangerCardButton.onClick.AddListener(() => OnStandeeSlotTapped(windRangerCardButton, 3));
 
             // Core Actions
             if (defendCitadelButton != null)
@@ -355,41 +357,40 @@ namespace FantasyDefense.UI
                 teamCpText.text = $"⚡ TEAM CP: {lobby.TotalTeamCP:N0}";
             }
 
-            // Update Courtyard Standees (Formasi 4 Slot)
-            UpdateHeroCard(UnitType.RabbitMage, rabbitInfoText, "Pippin", "Lv.12 ★★★");
-            UpdateHeroCard(UnitType.Cedric, cedricInfoText, "Cedric", "Lv.15 ★★★");
-            UpdateHeroCard(UnitType.RoseTanker, roseInfoText, "Commander Rose", "Lv.14 ★★★");
-            
-            var windProfile = lobby.GetHeroProfile(UnitType.WindRanger);
-            if (windProfile != null && windProfile.isUnlocked)
+            // Update Standee Badges Sesuai Formasi Terkini (Slot 0 - 3)
+            var formation = lobby.GetDeployedFormation();
+            Button[] standeeButtons = { rabbitCardButton, cedricCardButton, roseCardButton, windRangerCardButton };
+            Text[] infoTexts = { rabbitInfoText, cedricInfoText, roseInfoText, windRangerInfoText };
+
+            for (int i = 0; i < 4; i++)
             {
-                UpdateHeroCard(UnitType.WindRanger, windRangerInfoText, "Wind Ranger", "Lv.10 ★☆☆");
-                if (windRangerCardButton != null)
+                if (i >= standeeButtons.Length || standeeButtons[i] == null) continue;
+                UnitType heroType = i < formation.Count ? formation[i] : (UnitType)i;
+                var heroProfile = lobby.GetHeroProfile(heroType);
+
+                if (heroProfile != null && heroProfile.isUnlocked)
                 {
-                    windRangerCardButton.interactable = true;
-                    var img = windRangerCardButton.transform.Find("HeroPortrait")?.GetComponent<Image>();
-                    if (img != null) img.color = Color.white;
+                    UpdateStandeeDisplay(heroType, infoTexts[i], standeeButtons[i], heroProfile.heroName, heroProfile.level);
                 }
-            }
-            else
-            {
-                if (windRangerInfoText != null)
+                else
                 {
-                    windRangerInfoText.text = "<b><color=#AAAAAA>[SLOT 4]</color></b>\n<color=#FFD700>🔒 Gacha to Unlock</color>";
-                }
-                if (windRangerCardButton != null)
-                {
-                    windRangerCardButton.interactable = true; // Bisa diklik untuk info toast
-                    var img = windRangerCardButton.transform.Find("HeroPortrait")?.GetComponent<Image>();
-                    if (img != null)
+                    if (infoTexts[i] != null)
                     {
-                        img.color = new Color(0.25f, 0.28f, 0.38f, 0.45f); // Siluet terkunci
+                        infoTexts[i].text = $"<b><color=#AAAAAA>[SLOT {i + 1}]</color></b>\n<color=#FFD700>🔒 Gacha to Unlock</color>";
+                    }
+                    if (standeeButtons[i] != null)
+                    {
+                        var img = standeeButtons[i].transform.Find("HeroPortrait")?.GetComponent<Image>();
+                        if (img != null)
+                        {
+                            img.color = new Color(0.25f, 0.28f, 0.38f, 0.45f); // Siluet terkunci
+                        }
                     }
                 }
             }
         }
 
-        private void UpdateHeroCard(UnitType type, Text infoText, string defaultName, string role)
+        private void UpdateStandeeDisplay(UnitType type, Text infoText, Button btn, string defaultName, int defaultLvl)
         {
             if (infoText == null) return;
 
@@ -402,8 +403,46 @@ namespace FantasyDefense.UI
             }
             else
             {
-                infoText.text = $"<b>{defaultName}</b>\n<color=#00FFFF>{role}</color>\n<color=#FFD700>CP: 1,500</color>";
+                infoText.text = $"<b>{defaultName}</b>\n<color=#00FFFF>Lv.{defaultLvl} ★☆☆</color>\n<color=#FFD700>CP: 1,500</color>";
             }
+
+            if (btn != null)
+            {
+                var img = btn.transform.Find("HeroPortrait")?.GetComponent<Image>();
+                if (img != null)
+                {
+                    img.color = Color.white;
+                    Sprite heroSprite = GetHeroSpriteForType(type);
+                    if (heroSprite != null)
+                    {
+                        img.sprite = heroSprite;
+                    }
+                }
+            }
+        }
+
+        private Sprite GetHeroSpriteForType(UnitType type)
+        {
+            string spriteName = type switch
+            {
+                UnitType.Cedric => "Cedric_T1",
+                UnitType.RoseTanker => "Rose_T1",
+                UnitType.RabbitMage => "Pippin_T1",
+                UnitType.WindRanger => "Wind_Ranger_T1",
+                _ => "Cedric_T1"
+            };
+
+            var sp = Resources.Load<Sprite>($"Sprites/Heroes/{spriteName}") ?? Resources.Load<Sprite>($"Art/Sprites/Heroes/{spriteName}");
+            return sp;
+        }
+
+        private void OnStandeeSlotTapped(Button btn, int slotIndex)
+        {
+            var lobby = CitadelLobbyManager.Instance;
+            var formation = lobby != null ? lobby.GetDeployedFormation() : null;
+            UnitType currentType = (formation != null && slotIndex < formation.Count) ? formation[slotIndex] : (UnitType)slotIndex;
+
+            OnStandeeTapped(btn, currentType);
         }
 
         private void OnStandeeTapped(Button btn, UnitType type)
@@ -521,6 +560,7 @@ namespace FantasyDefense.UI
         private void HandleLevelChanged(int lvl, int exp) => RefreshDisplays();
         private void HandleHeroUpgraded(HeroLobbyProfile p) => RefreshDisplays();
         private void HandleHeroStarPromoted(HeroLobbyProfile p) => RefreshDisplays();
-        private void HandleGachaPullsCompleted(System.Collections.Generic.List<GachaResultItem> results) => RefreshDisplays();
+        private void HandleFormationChanged(List<UnitType> formation) => RefreshDisplays();
+        private void HandleGachaPullsCompleted(List<GachaResultItem> results) => RefreshDisplays();
     }
 }

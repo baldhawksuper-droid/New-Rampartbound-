@@ -1252,11 +1252,14 @@ namespace Rampartbound.Editor
             var unequipBtn = CreateButton(equipPanel.transform, "UnequipAllButton", "📦 LEPAS SEMUA", new Color(0.35f, 0.38f, 0.45f), Color.white, 18, defaultFont);
             PositionUI(unequipBtn, 0.67f, 0.08f, 0.97f, 0.48f);
 
+            var deployBtn = CreateButton(heroContent, "DeployToFormationButton", "🛡️ PASANG KE FORMASI", new Color(0.18f, 0.5f, 0.75f), Color.white, 20, defaultFont);
+            PositionUI(deployBtn, 0.04f, 0.02f, 0.96f, 0.065f);
+
             var forgeBtn = CreateButton(equipPanel.transform, "OpenForgeButton", "🔨 KE FORGE", new Color(0.2f, 0.35f, 0.55f), Color.white, 20, defaultFont);
             forgeBtn.SetActive(false);
 
-            var heroFeedbackTxt = CreateText(heroContent, "HeroFeedbackText", "", 20, FontStyle.Italic, TextAnchor.MiddleCenter, Color.green, defaultFont);
-            PositionUI(heroFeedbackTxt.gameObject, 0.05f, 0.01f, 0.95f, 0.06f);
+            var heroFeedbackTxt = CreateText(heroContent, "HeroFeedbackText", "", 18, FontStyle.Italic, TextAnchor.MiddleCenter, Color.green, defaultFont);
+            PositionUI(heroFeedbackTxt.gameObject, 0.05f, 0.002f, 0.95f, 0.02f);
 
             var heroSO = new SerializedObject(heroView);
             heroSO.FindProperty("rootPanel").objectReferenceValue = heroPanel;
@@ -1285,6 +1288,8 @@ namespace Rampartbound.Editor
             heroSO.FindProperty("relicSlotText").objectReferenceValue = rSlotTxt;
             heroSO.FindProperty("autoEquipButton").objectReferenceValue = autoEquipBtn.GetComponent<Button>();
             heroSO.FindProperty("unequipAllButton").objectReferenceValue = unequipBtn.GetComponent<Button>();
+            heroSO.FindProperty("deployToFormationButton").objectReferenceValue = deployBtn.GetComponent<Button>();
+            heroSO.FindProperty("deployButtonText").objectReferenceValue = deployBtn.GetComponentInChildren<Text>();
             heroSO.FindProperty("openForgeButton").objectReferenceValue = forgeBtn.GetComponent<Button>();
             heroSO.FindProperty("feedbackMessageText").objectReferenceValue = heroFeedbackTxt;
             heroSO.ApplyModifiedProperties();

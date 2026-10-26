@@ -48,6 +48,7 @@ namespace FantasyDefense.Metagame
         public static event Action<HeroLobbyProfile> OnHeroStarPromoted; // (heroProfile)
         public static event Action<UnitType, HeroLobbyProfile> OnHeroEquipmentChanged; // (unitType, heroProfile)
         public static event Action<int, int, bool> OnStageProgressUpdated; // (stageId, stars, isFirstClear)
+        public static event Action<List<UnitType>> OnFormationChanged; // (deployedFormation)
 
         private void Awake()
         {
@@ -262,6 +263,85 @@ namespace FantasyDefense.Metagame
             }
             BroadcastAllStates();
             Debug.Log("[CitadelLobbyManager] Profil akun berhasil di-reset ke status awal pemain baru (Level 1).");
+        }
+
+        /// <summary>
+        /// Mengatur atau mengganti pahlawan pada slot formasi tertentu (0 sampai 3).
+        /// </summary>
+        public bool TryAssignFormationSlot(int slotIndex, UnitType newHeroType, out string resultMessage)
+        {
+            if (accountData == null)
+            {
+                resultMessage = "Data akun tidak tersedia!";
+                return false;
+            }
+
+            if (slotIndex < 0 || slotIndex >= 4)
+            {
+                resultMessage = "Indeks slot formasi tidak valid! (Maksimal 4 slot: 0 - 3)";
+                return false;
+            }
+
+            var targetProfile = GetHeroProfile(newHeroType);
+            if (targetProfile == null)
+            {
+                resultMessage = "Pahlawan tidak ditemukan dalam koleksi akun!";
+                return false;
+            }
+
+            if (!targetProfile.isUnlocked)
+            {
+                resultMessage = $"{targetProfile.heroName} masih terkunci! Dapatkan lewat Gacha terlebih dahulu.";
+                return false;
+            }
+
+            // Pastikan list deployedFormation terisi 4 elemen
+            if (accountData.deployedFormation == null)
+            {
+                accountData.deployedFormation = new List<UnitType> { UnitType.RabbitMage, UnitType.Cedric, UnitType.RoseTanker, UnitType.WindRanger };
+            }
+            while (accountData.deployedFormation.Count < 4)
+            {
+                accountData.deployedFormation.Add(UnitType.Cedric);
+            }
+
+            // Jika hero sudah ada di slot lain, lakukan swap (tukar posisi) agar tidak duplikat
+            int existingSlot = accountData.deployedFormation.IndexOf(newHeroType);
+            if (existingSlot != -1 && existingSlot != slotIndex)
+            {
+                UnitType replacedHero = accountData.deployedFormation[slotIndex];
+                accountData.deployedFormation[slotIndex] = newHeroType;
+                accountData.deployedFormation[existingSlot] = replacedHero;
+                resultMessage = $"Posisi ditukar! {targetProfile.heroName} kini di Slot {slotIndex + 1}.";
+            }
+            else
+            {
+                accountData.deployedFormation[slotIndex] = newHeroType;
+                resultMessage = $"{targetProfile.heroName} berhasil dipasang ke Slot {slotIndex + 1}!";
+            }
+
+            Debug.Log($"[CitadelLobbyManager] Formasi diperbarui: Slot {slotIndex + 1} -> {newHeroType}. {resultMessage}");
+
+            SaveManager.Instance?.SaveProfile(accountData);
+            OnFormationChanged?.Invoke(accountData.deployedFormation);
+            OnTeamCPUpdated?.Invoke(TotalTeamCP);
+
+            // Sinkronkan pool hero di HeroSummoner agar puzzle battle langsung menggunakan formasi terkini
+            if (FantasyDefense.Core.HeroSummoner.Instance != null)
+            {
+                FantasyDefense.Core.HeroSummoner.Instance.SynchronizeWithFormation(accountData.deployedFormation);
+            }
+
+            return true;
+        }
+
+        public List<UnitType> GetDeployedFormation()
+        {
+            if (accountData == null || accountData.deployedFormation == null || accountData.deployedFormation.Count == 0)
+            {
+                return new List<UnitType> { UnitType.RabbitMage, UnitType.Cedric, UnitType.RoseTanker, UnitType.WindRanger };
+            }
+            return new List<UnitType>(accountData.deployedFormation);
         }
 
         public void BroadcastAllStates()
