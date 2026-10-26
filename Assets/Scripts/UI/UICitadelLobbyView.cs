@@ -411,6 +411,22 @@ namespace FantasyDefense.UI
                 AudioManager.Instance.PlaySound(SoundType.ButtonClick);
             }
 
+            if (CitadelLobbyManager.Instance != null && !CitadelLobbyManager.Instance.CanStartBattle())
+            {
+                int currentEnergy = CitadelLobbyManager.Instance.CurrentEnergy;
+                string toastMsg = FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                    $"⚡ Stamina Tidak Cukup!\nMembutuhkan 5 Stamina untuk bertempur. (Tersedia: {currentEnergy})",
+                    $"⚡ Not Enough Energy!\nRequires 5 Stamina to commence defense. (Available: {currentEnergy})"
+                );
+                CitadelToastNotice.Show(toastMsg);
+
+                if (AudioManager.Instance != null)
+                {
+                    AudioManager.Instance.PlaySound(SoundType.DefeatChime);
+                }
+                return;
+            }
+
             // Buka World Map untuk memilih Stage atau langsung battle
             if (GameFlowManager.Instance != null)
             {

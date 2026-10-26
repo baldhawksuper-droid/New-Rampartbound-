@@ -283,6 +283,7 @@ namespace FantasyDefense.Combat
                 ? spriteRenderer.sprite.bounds.size.x
                 : (spriteRenderer.sprite != null ? (spriteRenderer.sprite.rect.width / spriteRenderer.sprite.pixelsPerUnit) : 1f);
             float targetScale = (cellW * fillRatio) / Mathf.Max(0.01f, spriteW);
+            targetScale = Mathf.Clamp(targetScale, 0.65f, 1.25f);
             Vector3 baseScale = Vector3.one * targetScale;
 
             Color origColor = spriteRenderer.color;
@@ -432,6 +433,8 @@ namespace FantasyDefense.Combat
                 ? spriteRenderer.sprite.bounds.size.x
                 : (spriteRenderer.sprite != null ? (spriteRenderer.sprite.rect.width / spriteRenderer.sprite.pixelsPerUnit) : 1f);
             float targetScale = (cellW * fillRatio) / Mathf.Max(0.01f, spriteW);
+            // Batas minimal skala (clamping) agar permata T0 tidak pernah mengecil secara abnormal saat next wave
+            targetScale = Mathf.Clamp(targetScale, 0.65f, 1.25f);
             Vector3 targetScaleVec = Vector3.one * targetScale;
 
             transform.localScale = Vector3.zero;
@@ -727,6 +730,10 @@ namespace FantasyDefense.Combat
 
             float currentFill = (isPreparationToken || currentTier == UnitTier.Tier0) ? fillRatio : (fillRatio * combatHeroScaleMultiplier);
             float targetScale = (cellW * currentFill) / Mathf.Max(0.01f, spriteW);
+            if (isPreparationToken || currentTier == UnitTier.Tier0)
+            {
+                targetScale = Mathf.Clamp(targetScale, 0.65f, 1.25f);
+            }
             transform.localScale = Vector3.one * targetScale;
 
             // Sorting Layer standar arsitektur: Gem (selalu di atas Cell dan Board)

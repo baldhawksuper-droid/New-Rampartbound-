@@ -106,6 +106,7 @@ namespace FantasyDefense.Localization
             PlayerPrefs.Save();
 
             Debug.Log($"[CitadelLocalizationManager] Bahasa aktif diubah ke: {currentLanguage}");
+            CitadelDynamicLocalizer.RefreshSceneLocalization(currentLanguage);
             OnLanguageChanged?.Invoke(currentLanguage);
         }
 

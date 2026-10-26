@@ -368,11 +368,18 @@ namespace FantasyDefense.UI
             if (startBattleButton != null)
             {
                 bool hasEnoughEnergy = currentEnergy >= stage.staminaCost;
-                startBattleButton.interactable = hasEnoughEnergy;
+                startBattleButton.interactable = true; // Selalu aktif agar pemain mendapat feedback jika stamina habis
                 var txt = startBattleButton.GetComponentInChildren<Text>();
                 if (txt != null)
                 {
-                    txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("MAP_START_BATTLE", "⚔️ MULAI PERTEMPURAN SEKARANG", "⚔️ COMMENCE DEFENSE NOW");
+                    if (hasEnoughEnergy)
+                    {
+                        txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("MAP_START_BATTLE", "⚔️ MULAI PERTEMPURAN SEKARANG", "⚔️ COMMENCE DEFENSE NOW");
+                    }
+                    else
+                    {
+                        txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Text("⚡ STAMINA TIDAK CUKUP", "⚡ NOT ENOUGH ENERGY");
+                    }
                 }
             }
         }
@@ -395,7 +402,16 @@ namespace FantasyDefense.UI
 
             if (!CitadelLobbyManager.Instance.CanStartBattle())
             {
-                Debug.LogWarning("[UIStageMapView] Stamina tidak cukup untuk memulai battle!");
+                int currentEnergy = CitadelLobbyManager.Instance.CurrentEnergy;
+                int cost = currentStage != null ? currentStage.staminaCost : 5;
+                Debug.LogWarning($"[UIStageMapView] Stamina tidak cukup! {currentEnergy}/{cost}");
+
+                string toastMsg = FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                    $"⚡ Stamina Tidak Cukup!\nMembutuhkan {cost} Stamina untuk bertempur. (Tersedia: {currentEnergy})",
+                    $"⚡ Not Enough Energy!\nRequires {cost} Stamina to commence defense. (Available: {currentEnergy})"
+                );
+                CitadelToastNotice.Show(toastMsg);
+
                 if (AudioManager.Instance != null)
                 {
                     AudioManager.Instance.PlaySound(SoundType.DefeatChime);

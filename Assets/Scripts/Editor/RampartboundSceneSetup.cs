@@ -369,6 +369,8 @@ namespace Rampartbound.Editor
             metaObj.AddComponent<CitadelTelemetryManager>();
             metaObj.AddComponent<FantasyDefense.Save.CloudSaveSyncService>();
             metaObj.AddComponent<FantasyDefense.Localization.CitadelLocalizationManager>();
+            metaObj.AddComponent<FantasyDefense.Localization.CitadelDynamicLocalizer>();
+            metaObj.AddComponent<CitadelToastNotice>();
             metaObj.AddComponent<CitadelInGameLogViewer>();
 
             // 7. GameManager Master Loop

@@ -192,6 +192,18 @@ namespace FantasyDefense.UI
                             FantasyDefense.Localization.CitadelLocalizationManager.Instance.CurrentLanguage == FantasyDefense.Localization.AppLanguage.Indonesian;
                 languageStatusText.text = isId ? "Bahasa: [ ID ] (Indonesia)" : "Language: [ EN ] (English)";
             }
+
+            if (languageToggleButton != null)
+            {
+                var btnTxt = languageToggleButton.GetComponentInChildren<Text>();
+                if (btnTxt != null)
+                {
+                    btnTxt.text = FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                        "🌐 GANTI BAHASA (SWITCH)",
+                        "🌐 SWITCH LANGUAGE (ID/EN)"
+                    );
+                }
+            }
         }
 
         private void RefreshAudioUI()
