@@ -24,6 +24,7 @@ namespace FantasyDefense.UI
         [SerializeField] private Image titleBackgroundImage;
 
         [Header("Typography & Branding")]
+        [SerializeField] private Image gameTitleLogoImage;
         [SerializeField] private Text gameTitleText;
         [SerializeField] private Text subtitleText;
         [SerializeField] private Text versionText;
@@ -188,18 +189,30 @@ namespace FantasyDefense.UI
 
         public void RefreshLocalization()
         {
-            if (gameTitleText != null)
+            if (gameTitleLogoImage != null && gameTitleLogoImage.sprite != null)
             {
-                gameTitleText.text = "RAMPARTBOUND\nMERGE DEFENSE";
+                // Jika sprite logo resmi terpasang, sembunyikan teks mentah agar tampilan mewah
+                if (gameTitleText != null) gameTitleText.gameObject.SetActive(false);
+                if (subtitleText != null) subtitleText.gameObject.SetActive(false);
             }
-            if (subtitleText != null)
+            else
             {
-                subtitleText.text = FantasyDefense.Localization.CitadelLocalizationManager.Get(
-                    "TITLE_SUBTITLE",
-                    "Pertahankan Gerbang Kerajaan dari Serbuan Abyssal",
-                    "Defend the Royal Gates from the Abyssal Incursion"
-                );
+                if (gameTitleText != null)
+                {
+                    gameTitleText.gameObject.SetActive(true);
+                    gameTitleText.text = "RAMPARTBOUND\nMERGE DEFENSE";
+                }
+                if (subtitleText != null)
+                {
+                    subtitleText.gameObject.SetActive(true);
+                    subtitleText.text = FantasyDefense.Localization.CitadelLocalizationManager.Get(
+                        "TITLE_SUBTITLE",
+                        "Pertahankan Gerbang Kerajaan dari Serbuan Abyssal",
+                        "Defend the Royal Gates from the Abyssal Incursion"
+                    );
+                }
             }
+
             if (enterCitadelButtonText != null)
             {
                 enterCitadelButtonText.text = FantasyDefense.Localization.CitadelLocalizationManager.Get(

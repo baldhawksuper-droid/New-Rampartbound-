@@ -422,12 +422,29 @@ namespace Rampartbound.Editor
             }
             var titleView = titlePanelObj.AddComponent<UITitleScreenView>();
 
+            // Official Title Logo (Sprite Gambar 3D Megah)
+            var logoObj = new GameObject("Title_Game_Logo_Img", typeof(RectTransform), typeof(Image));
+            logoObj.transform.SetParent(titlePanelObj.transform, false);
+            var logoRt = logoObj.GetComponent<RectTransform>();
+            logoRt.anchorMin = new Vector2(0.05f, 0.65f);
+            logoRt.anchorMax = new Vector2(0.95f, 0.90f);
+            logoRt.offsetMin = Vector2.zero;
+            logoRt.offsetMax = Vector2.zero;
+            var logoImg = logoObj.GetComponent<Image>();
+            if (_titleGameLogo != null)
+            {
+                logoImg.sprite = _titleGameLogo;
+                logoImg.preserveAspect = true;
+            }
+            logoImg.raycastTarget = false;
+
             var gameTitleTxt = CreateText(titlePanelObj.transform, "GameTitleText", "RAMPARTBOUND\nMERGE DEFENSE", 58, FontStyle.Bold, TextAnchor.MiddleCenter, new Color(1f, 0.85f, 0.35f), defaultFont);
             var titleRect = gameTitleTxt.GetComponent<RectTransform>();
             titleRect.anchorMin = new Vector2(0.1f, 0.65f);
             titleRect.anchorMax = new Vector2(0.9f, 0.88f);
             titleRect.offsetMin = Vector2.zero;
             titleRect.offsetMax = Vector2.zero;
+            if (_titleGameLogo != null) gameTitleTxt.gameObject.SetActive(false); // Sembunyikan teks polos jika sprite logo ada
 
             var subtitleTxt = CreateText(titlePanelObj.transform, "SubtitleText", "Pertahankan Gerbang Kerajaan dari Serbuan Abyssal", 28, FontStyle.Normal, TextAnchor.MiddleCenter, new Color(0.7f, 0.85f, 1f), defaultFont);
             var subRect = subtitleTxt.GetComponent<RectTransform>();
@@ -435,12 +452,14 @@ namespace Rampartbound.Editor
             subRect.anchorMax = new Vector2(0.95f, 0.64f);
             subRect.offsetMin = Vector2.zero;
             subRect.offsetMax = Vector2.zero;
+            if (_titleGameLogo != null) subtitleTxt.gameObject.SetActive(false); // Sembunyikan jika sprite logo sudah memiliki banner 'MERGE DEFENSE'
 
             // Start Button: 3D Button Timbul Tanpa Frame Kosong & Anti-Teks Bertumpuk
-            var startBtnObj = CreateButton(titlePanelObj.transform, "EnterCitadelButton", "🏰 TAP TO START", new Color(0.98f, 0.78f, 0.18f), new Color(0.12f, 0.08f, 0.02f), 34, defaultFont);
+            // Menggunakan warna teks Putih Bersih Tebal (High-Readability) dengan Outline Gelap Tajam
+            var startBtnObj = CreateButton(titlePanelObj.transform, "EnterCitadelButton", "🏰 TAP TO START", Color.white, Color.white, 38, defaultFont);
             var startBtnRect = startBtnObj.GetComponent<RectTransform>();
-            startBtnRect.anchorMin = new Vector2(0.15f, 0.12f);
-            startBtnRect.anchorMax = new Vector2(0.85f, 0.22f);
+            startBtnRect.anchorMin = new Vector2(0.12f, 0.12f);
+            startBtnRect.anchorMax = new Vector2(0.88f, 0.22f);
             startBtnRect.offsetMin = Vector2.zero;
             startBtnRect.offsetMax = Vector2.zero;
             if (_titleBtnTap != null)
@@ -448,6 +467,20 @@ namespace Rampartbound.Editor
                 var btnImg = startBtnObj.GetComponent<Image>();
                 btnImg.sprite = _titleBtnTap;
                 btnImg.type = Image.Type.Sliced;
+            }
+
+            // Tambahkan Outline dan Shadow pada teks tombol agar terbaca sangat tajam dan kontras
+            var btnTxt = startBtnObj.GetComponentInChildren<Text>();
+            if (btnTxt != null)
+            {
+                btnTxt.color = new Color(1f, 0.98f, 0.88f); // Warm ivory gold
+                btnTxt.fontStyle = FontStyle.Bold;
+                var outline = btnTxt.gameObject.AddComponent<Outline>();
+                outline.effectColor = new Color(0.25f, 0.12f, 0.02f, 0.95f); // Dark bronze outline
+                outline.effectDistance = new Vector2(2.5f, -2.5f);
+                var shadow = btnTxt.gameObject.AddComponent<Shadow>();
+                shadow.effectColor = new Color(0f, 0f, 0f, 0.75f);
+                shadow.effectDistance = new Vector2(3f, -3f);
             }
 
             var pulseTxt = CreateText(titlePanelObj.transform, "PulsingHintText", "Ketuk Layar untuk Memulai Pertahanan", 24, FontStyle.Italic, TextAnchor.MiddleCenter, new Color(1f, 1f, 1f, 0.85f), defaultFont);
@@ -553,6 +586,7 @@ namespace Rampartbound.Editor
             var titleSO = new SerializedObject(titleView);
             titleSO.FindProperty("titleScreenPanel").objectReferenceValue = titlePanelObj;
             titleSO.FindProperty("titleBackgroundImage").objectReferenceValue = titleImg;
+            titleSO.FindProperty("gameTitleLogoImage").objectReferenceValue = logoImg;
             titleSO.FindProperty("gameTitleText").objectReferenceValue = gameTitleTxt;
             titleSO.FindProperty("subtitleText").objectReferenceValue = subtitleTxt;
             titleSO.FindProperty("versionText").objectReferenceValue = versionTxt;
@@ -2064,6 +2098,7 @@ namespace Rampartbound.Editor
         private static Sprite _borderEpic;
         private static Sprite _borderLegendary;
         private static Sprite _titleBackdrop;
+        private static Sprite _titleGameLogo;
         private static Sprite _titleBtnTap;
         private static Sprite _handCursor;
         private static Sprite _shadowOval;
@@ -2101,7 +2136,8 @@ namespace Rampartbound.Editor
             if (_borderEpic == null) _borderEpic = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Border_Rarity_Epic.png");
             if (_borderLegendary == null) _borderLegendary = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Border_Rarity_Legendary.png");
             if (_titleBackdrop == null) _titleBackdrop = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Title_Screen_Canonical_Backdrop_Pure.png") ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Title_Screen_Backdrop.png") ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Rampartbound_KeyVisual_Banner.jpg");
-            if (_titleBtnTap == null) _titleBtnTap = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Title_Btn_Tap_To_Start.png");
+            if (_titleGameLogo == null) _titleGameLogo = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Title_Game_Logo_Rampartbound.png");
+            if (_titleBtnTap == null) _titleBtnTap = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Title_Btn_Tap_To_Start_V2.png") ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Title_Btn_Tap_To_Start.png");
             if (_handCursor == null) _handCursor = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Hand_Cursor.png");
             if (_shadowOval == null) _shadowOval = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Shadow_Ground_Oval.png");
             if (_plinthT1 == null) _plinthT1 = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Combat/Plinth_Hero_Base_T1.png");
