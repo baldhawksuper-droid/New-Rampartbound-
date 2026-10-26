@@ -327,9 +327,9 @@ namespace FantasyDefense.Metagame
             OnTeamCPUpdated?.Invoke(TotalTeamCP);
 
             // Sinkronkan pool hero di HeroSummoner agar puzzle battle langsung menggunakan formasi terkini
-            if (FantasyDefense.Core.HeroSummoner.Instance != null)
+            if (FantasyDefense.Summon.HeroSummoner.Instance != null)
             {
-                FantasyDefense.Core.HeroSummoner.Instance.SynchronizeWithFormation(accountData.deployedFormation);
+                FantasyDefense.Summon.HeroSummoner.Instance.SynchronizeWithFormation(accountData.deployedFormation);
             }
 
             return true;

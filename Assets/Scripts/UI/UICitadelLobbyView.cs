@@ -71,7 +71,7 @@ namespace FantasyDefense.UI
         [SerializeField] private bool showBattlePass = false;
         [SerializeField] private bool showEventArena = false;
         [SerializeField] private bool showArtifacts = false;
-        [SerializeField] private bool showForge = false;
+        [SerializeField] private bool showForge = true;
         [SerializeField] private bool showFeaturePreview = false;
 
         private void Awake()
@@ -102,6 +102,7 @@ namespace FantasyDefense.UI
             if (navEventArenaButton != null) navEventArenaButton.gameObject.SetActive(showEventArena);
             if (navArtifactsButton != null) navArtifactsButton.gameObject.SetActive(showArtifacts);
             if (navForgeButton != null) navForgeButton.gameObject.SetActive(showForge);
+            if (navSummonButton != null) navSummonButton.gameObject.SetActive(false);
 
             // Jika quick action bar semua disembunyikan, sembunyikan bar container-nya
             if (navTalentsButton != null && navTalentsButton.transform.parent != null)
@@ -205,7 +206,7 @@ namespace FantasyDefense.UI
                 var txt = defendCitadelButton.GetComponentInChildren<Text>();
                 if (txt != null)
                 {
-                    txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("LOBBY_DEFEND_BTN", "⚔️ BERTAHAN (BATTLE)", "⚔️ BATTLE (DEFEND)");
+                    txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("LOBBY_DEFEND_BTN", "⚔️ BATTLE (5 ⚡)", "⚔️ BATTLE (5 ⚡)");
                 }
             }
 
@@ -221,13 +222,13 @@ namespace FantasyDefense.UI
             if (navStageMapButton != null)
             {
                 var txt = navStageMapButton.GetComponentInChildren<Text>();
-                if (txt != null) txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_MAP", "🗺️\nPeta", "🗺️\nMap");
+                if (txt != null) txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_CITADEL", "🏰\nCitadel", "🏰\nCitadel");
             }
 
             if (navHeroesButton != null)
             {
                 var txt = navHeroesButton.GetComponentInChildren<Text>();
-                if (txt != null) txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_HEROES", "🛡️\nHero", "🛡️\nHeroes");
+                if (txt != null) txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_HEROES", "🛡️\nHeroes", "🛡️\nHeroes");
             }
 
             if (navSummonButton != null)
@@ -239,13 +240,13 @@ namespace FantasyDefense.UI
             if (navStoreButton != null)
             {
                 var txt = navStoreButton.GetComponentInChildren<Text>();
-                if (txt != null) txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_STORE", "💎\nToko", "💎\nStore");
+                if (txt != null) txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_BAG", "🎒\nBag", "🎒\nBag");
             }
 
             if (navForgeButton != null)
             {
                 var txt = navForgeButton.GetComponentInChildren<Text>();
-                if (txt != null) txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_FORGE", "🔨\nTempa", "🔨\nForge");
+                if (txt != null) txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_FORGE", "🔨\nForge", "🔨\nForge");
             }
         }
 
@@ -344,7 +345,7 @@ namespace FantasyDefense.UI
             }
             if (energyText != null)
             {
-                energyText.text = $"{data.currentEnergy} / {data.maxEnergy}";
+                energyText.text = $"{data.currentEnergy}/{data.maxEnergy}";
             }
             if (goldText != null)
             {
@@ -400,12 +401,11 @@ namespace FantasyDefense.UI
             var profile = lobby != null ? lobby.GetHeroProfile(type) : null;
             if (profile != null)
             {
-                string stars = new string('★', Mathf.Max(1, profile.starRank));
-                infoText.text = $"<b>{profile.heroName}</b>\n<color=#00FFFF>Lv.{profile.level} {stars}</color>\n<color=#FFD700>CP: {profile.CalculateHeroCP():N0}</color>";
+                infoText.text = $"<b>Lv.{profile.level} | CP {profile.CalculateHeroCP():N0}</b>";
             }
             else
             {
-                infoText.text = $"<b>{defaultName}</b>\n<color=#00FFFF>Lv.{defaultLvl} ★☆☆</color>\n<color=#FFD700>CP: 1,500</color>";
+                infoText.text = $"<b>Lv.{defaultLvl} | CP 1,500</b>";
             }
 
             if (btn != null)

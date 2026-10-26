@@ -617,127 +617,112 @@ namespace Rampartbound.Editor
             var lobbyView = lobbyPanelObj.AddComponent<UICitadelLobbyView>();
 
             // Top Header Panel
-            var lobbyHeaderObj = CreatePanel(lobbyPanelObj.transform, "HeaderPanel", new Color(0.09f, 0.12f, 0.2f, 0.95f));
+            var lobbyHeaderObj = CreatePanel(lobbyPanelObj.transform, "HeaderPanel", new Color(0.08f, 0.11f, 0.18f, 0.95f));
             var headerRect = lobbyHeaderObj.GetComponent<RectTransform>();
-            headerRect.anchorMin = new Vector2(0f, 0.88f);
+            headerRect.anchorMin = new Vector2(0f, 0.915f);
             headerRect.anchorMax = new Vector2(1f, 1f);
             headerRect.offsetMin = Vector2.zero;
             headerRect.offsetMax = Vector2.zero;
 
-            var cmdNameTxt = CreateText(lobbyHeaderObj.transform, "CommanderName", "Komandan Benteng", 28, FontStyle.Bold, TextAnchor.MiddleLeft, Color.white, defaultFont);
-            PositionUI(cmdNameTxt.gameObject, 0.04f, 0.55f, 0.35f, 0.9f);
-
-            var lvlTxt = CreateText(lobbyHeaderObj.transform, "CitadelLevel", "Citadel Lv. 1", 24, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(1f, 0.84f, 0.2f), defaultFont);
-            PositionUI(lvlTxt.gameObject, 0.04f, 0.12f, 0.35f, 0.48f);
+            var lvlTxt = CreateText(lobbyHeaderObj.transform, "CitadelLevel", "🏰 Citadel Lv.8", 22, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(1f, 0.88f, 0.45f), defaultFont);
+            PositionUI(lvlTxt.gameObject, 0.04f, 0.15f, 0.36f, 0.85f);
+            var cmdNameTxt = lvlTxt;
 
             Text energyTxt;
-            var energyPill = CreateResourcePill(lobbyHeaderObj.transform, "EnergyPill", _iconEnergyCyan, "30 / 30", new Color(0.3f, 0.9f, 1f), ResourceCommodityType.Energy, defaultFont, out energyTxt);
-            PositionUI(energyPill, 0.36f, 0.52f, 0.62f, 0.92f);
+            var energyPill = CreateResourcePill(lobbyHeaderObj.transform, "EnergyPill", _iconEnergyCyan, "30/30", new Color(0.2f, 0.95f, 0.4f), ResourceCommodityType.Energy, defaultFont, out energyTxt);
+            PositionUI(energyPill, 0.38f, 0.15f, 0.62f, 0.85f);
             CreateNotificationBadge(energyPill.transform, NotificationBadgeType.EnergyFull);
 
             Text goldTxt;
-            var goldPill = CreateResourcePill(lobbyHeaderObj.transform, "GoldPill", _iconGoldCoin, "1,000", new Color(1f, 0.85f, 0.2f), ResourceCommodityType.Gold, defaultFont, out goldTxt);
-            PositionUI(goldPill, 0.36f, 0.08f, 0.62f, 0.48f);
+            var goldPill = CreateResourcePill(lobbyHeaderObj.transform, "GoldPill", _iconGoldCoin, "500", new Color(1f, 0.85f, 0.2f), ResourceCommodityType.Gold, defaultFont, out goldTxt);
+            PositionUI(goldPill, 0.64f, 0.15f, 0.86f, 0.85f);
 
-            Text gemsTxt;
-            var gemsPill = CreateResourcePill(lobbyHeaderObj.transform, "GemsPill", _iconGemBlue, "100", new Color(0.35f, 0.95f, 0.8f), ResourceCommodityType.Gems, defaultFont, out gemsTxt);
-            PositionUI(gemsPill, 0.64f, 0.52f, 0.88f, 0.92f);
+            Text gemsTxt = null;
 
-            var cpTxt = CreateText(lobbyHeaderObj.transform, "TeamCpText", "CP: 500", 22, FontStyle.Bold, TextAnchor.MiddleCenter, new Color(1f, 0.45f, 0.45f), defaultFont);
-            PositionUI(cpTxt.gameObject, 0.64f, 0.08f, 0.88f, 0.48f);
+            var settingsBtn = CreateButton(lobbyHeaderObj.transform, "SettingsButton", "⚙️", new Color(0.18f, 0.24f, 0.36f), Color.white, 24, defaultFont);
+            PositionUI(settingsBtn, 0.88f, 0.15f, 0.97f, 0.85f);
 
-            var settingsBtn = CreateButton(lobbyHeaderObj.transform, "SettingsButton", "⚙️", new Color(0.2f, 0.25f, 0.35f), Color.white, 28, defaultFont);
-            PositionUI(settingsBtn, 0.9f, 0.25f, 0.98f, 0.75f);
-
-            // Hero Courtyard Assembly (Mendukung Formasi hingga 4 Hero Standee Sesuai Bab 4.2)
-            var heroesContainer = CreatePanel(lobbyPanelObj.transform, "HeroCourtyardAssembly", new Color(0.08f, 0.1f, 0.16f, 0.45f));
-            if (_frameStoneBastion != null)
+            // Sub-Header Floating Banner: TEAM CP (matching mockup 1:1)
+            var cpBannerObj = CreatePanel(lobbyPanelObj.transform, "TeamCpBanner", Color.white);
+            PositionUI(cpBannerObj, 0.24f, 0.840f, 0.76f, 0.902f);
+            var cpBannerImg = cpBannerObj.GetComponent<Image>();
+            if (_bannerTeamCP != null)
             {
-                var hImg = heroesContainer.GetComponent<Image>();
-                hImg.sprite = _frameStoneBastion;
-                hImg.type = Image.Type.Sliced;
-                hImg.color = new Color(1f, 1f, 1f, 0.75f);
+                cpBannerImg.sprite = _bannerTeamCP;
+                cpBannerImg.type = Image.Type.Simple;
+                cpBannerImg.preserveAspect = false;
             }
-            PositionUI(heroesContainer, 0.03f, 0.28f, 0.97f, 0.85f);
+            else
+            {
+                cpBannerImg.color = new Color(0.35f, 0.22f, 0.1f, 0.95f);
+            }
+            var cpTxt = CreateText(cpBannerObj.transform, "TeamCpText", "⚡ TEAM CP: 4,850", 21, FontStyle.Bold, TextAnchor.MiddleCenter, new Color(1f, 0.95f, 0.7f), defaultFont);
+            PositionUI(cpTxt.gameObject, 0f, 0f, 1f, 1f);
+            var cpOutline = cpTxt.gameObject.AddComponent<Outline>();
+            cpOutline.effectColor = new Color(0.25f, 0.12f, 0.02f, 0.95f);
+            cpOutline.effectDistance = new Vector2(1.5f, -1.5f);
 
-            // Formasi 4 Slot: Pippin (Slot 1), Cedric (Slot 2/Center), Rose (Slot 3), Wind Ranger / Locked (Slot 4)
-            var rabbitCard = CreateButton(heroesContainer.transform, "RabbitCard", "<b>Pippin</b>\nLv.12 ★★★\n<color=#FFD700>CP: 1,600</color>", new Color(0.12f, 0.2f, 0.38f, 0.85f), Color.white, 18, defaultFont);
-            PositionUI(rabbitCard, 0.015f, 0.04f, 0.25f, 0.96f);
-            AttachRarityBorder(rabbitCard.transform, _borderEpic);
-            SetupHeroCardPortrait(rabbitCard, _heroRabbitSprite);
+            // Hero Courtyard Assembly: Transparent container so the fairytale castle cobblestone terrace shows through!
+            var heroesContainer = CreatePanel(lobbyPanelObj.transform, "HeroCourtyardAssembly", new Color(0f, 0f, 0f, 0f));
+            PositionUI(heroesContainer, 0.02f, 0.225f, 0.98f, 0.835f);
 
-            var cedricCard = CreateButton(heroesContainer.transform, "CedricCard", "<b>Cedric</b>\nLv.15 ★★★\n<color=#FFD700>CP: 1,850</color>", new Color(0.38f, 0.12f, 0.12f, 0.85f), Color.white, 18, defaultFont);
-            PositionUI(cedricCard, 0.26f, 0.04f, 0.495f, 0.96f);
-            AttachRarityBorder(cedricCard.transform, _borderLegendary ?? _borderRare);
-            SetupHeroCardPortrait(cedricCard, _heroCedricSprite);
+            // Formasi Trio Hero V-Formation:
+            // Pippin (Slot 1, Kiri): Lv.12, CP 1,600
+            var rabbitCard = CreateButton(heroesContainer.transform, "RabbitCard", "Lv.12 | CP 1,600", new Color(0f, 0f, 0f, 0f), Color.white, 16, defaultFont);
+            PositionUI(rabbitCard, 0.02f, 0.12f, 0.36f, 0.88f);
+            SetupHeroCardPortrait(rabbitCard, _heroRabbitSprite, null);
 
-            var roseCard = CreateButton(heroesContainer.transform, "RoseCard", "<b>Rose Tank</b>\nLv.14 ★★★\n<color=#FFD700>CP: 1,400</color>", new Color(0.38f, 0.15f, 0.28f, 0.85f), Color.white, 18, defaultFont);
-            PositionUI(roseCard, 0.505f, 0.04f, 0.74f, 0.96f);
-            AttachRarityBorder(roseCard.transform, _borderRare);
-            SetupHeroCardPortrait(roseCard, _heroRoseSprite);
+            // Cedric (Slot 2, Tengah Depan): Cedric, Lv.15, CP 1,850
+            var cedricCard = CreateButton(heroesContainer.transform, "CedricCard", "Lv.15 | CP 1,850", new Color(0f, 0f, 0f, 0f), Color.white, 16, defaultFont);
+            PositionUI(cedricCard, 0.32f, 0.03f, 0.68f, 0.84f);
+            SetupHeroCardPortrait(cedricCard, _heroCedricSprite, "Cedric");
 
-            // Slot Ke-4 (Mendukung slot ekspansi hingga 4 hero)
-            var windCard = CreateButton(heroesContainer.transform, "WindCard", "<b>[SLOT 4]</b>\n<color=#FFD700>🔒 Gacha to Unlock</color>", new Color(0.12f, 0.15f, 0.22f, 0.8f), Color.white, 17, defaultFont);
-            PositionUI(windCard, 0.75f, 0.04f, 0.985f, 0.96f);
-            AttachRarityBorder(windCard.transform, _borderCommon ?? _borderRare);
-            SetupHeroCardPortrait(windCard, _heroWindSprite);
+            // Rose (Slot 3, Kanan): Lv.14, CP 1,400 (Chibi Palu Emas Raksasa)
+            var roseCard = CreateButton(heroesContainer.transform, "RoseCard", "Lv.14 | CP 1,400", new Color(0f, 0f, 0f, 0f), Color.white, 16, defaultFont);
+            PositionUI(roseCard, 0.64f, 0.12f, 0.98f, 0.88f);
+            SetupHeroCardPortrait(roseCard, _heroRoseSprite, null);
 
-            // Core Action Buttons (Tombol Besar Terpusat)
-            var defendBtn = CreateButton(lobbyPanelObj.transform, "DefendCitadelButton", "⚔️ BERTAHAN (5 ⚡)", new Color(0.95f, 0.38f, 0.15f), Color.white, 30, defaultFont);
-            PositionUI(defendBtn, 0.08f, 0.14f, 0.92f, 0.25f);
+            // Slot Ke-4 (Wind Ranger - Expansion Slot)
+            var windCard = CreateButton(heroesContainer.transform, "WindCard", "", new Color(0f, 0f, 0f, 0f), Color.white, 14, defaultFont);
+            windCard.SetActive(false);
 
-            var trialBtn = CreateButton(lobbyPanelObj.transform, "AbyssalTrialButton", "🌌 UJIAN ABYSSAL (ENDLESS)", new Color(0.42f, 0.25f, 0.75f), Color.white, 24, defaultFont);
-            PositionUI(trialBtn, 0.12f, 0.23f, 0.88f, 0.30f);
-            trialBtn.SetActive(false); // Sembunyikan Abyssal Trial sesuai arahan
+            // Core Battle Button (Crimson 3D Gold Frame with studs)
+            var defendBtn = CreateButton(lobbyPanelObj.transform, "DefendCitadelButton", "⚔️ BATTLE (5 ⚡)", new Color(0.85f, 0.15f, 0.15f), Color.white, 32, defaultFont);
+            PositionUI(defendBtn, 0.10f, 0.125f, 0.90f, 0.220f);
 
-            // Mid Quick Actions Bar (6 Feature Shortcuts)
-            var quickBarObj = CreatePanel(lobbyPanelObj.transform, "QuickActionsBar", new Color(0.06f, 0.09f, 0.15f, 0.9f));
-            PositionUI(quickBarObj, 0.02f, 0.125f, 0.98f, 0.215f);
+            var trialBtn = CreateButton(lobbyPanelObj.transform, "AbyssalTrialButton", "🌌 UJIAN ABYSSAL", new Color(0.42f, 0.25f, 0.75f), Color.white, 24, defaultFont);
+            trialBtn.SetActive(false);
 
-            var navTalentBtn = CreateButton(quickBarObj.transform, "NavTalents", "✨\nTalenta", new Color(0.18f, 0.25f, 0.38f), Color.white, 16, defaultFont);
-            PositionUI(navTalentBtn, 0.01f, 0.08f, 0.16f, 0.92f);
+            // Quick Actions Bar (hidden)
+            var quickBarObj = CreatePanel(lobbyPanelObj.transform, "QuickActionsBar", new Color(0f, 0f, 0f, 0f));
+            quickBarObj.SetActive(false);
+            var navTalentBtn = CreateButton(quickBarObj.transform, "NavTalents", "", Color.clear, Color.white, 14, defaultFont);
+            var navQuestBtn = CreateButton(quickBarObj.transform, "NavQuests", "", Color.clear, Color.white, 14, defaultFont);
+            var navGuildBtn = CreateButton(quickBarObj.transform, "NavGuild", "", Color.clear, Color.white, 14, defaultFont);
+            var navPassBtn = CreateButton(quickBarObj.transform, "NavBattlePass", "", Color.clear, Color.white, 14, defaultFont);
+            var navEventBtn = CreateButton(quickBarObj.transform, "NavEventArena", "", Color.clear, Color.white, 14, defaultFont);
+            var navArtifactBtn = CreateButton(quickBarObj.transform, "NavArtifacts", "", Color.clear, Color.white, 14, defaultFont);
 
-            var navQuestBtn = CreateButton(quickBarObj.transform, "NavQuests", "📜\nMisi", new Color(0.18f, 0.25f, 0.38f), Color.white, 16, defaultFont);
-            PositionUI(navQuestBtn, 0.175f, 0.08f, 0.325f, 0.92f);
-            CreateNotificationBadge(navQuestBtn.transform, NotificationBadgeType.QuestsUnclaimed);
+            // Bottom Navigation Dock (4 Tabs: Citadel, Forge, Heroes, Bag)
+            var dockObj = CreatePanel(lobbyPanelObj.transform, "BottomNavigationDock", new Color(0.06f, 0.08f, 0.14f, 0.98f));
+            PositionUI(dockObj, 0f, 0f, 1f, 0.115f);
 
-            var navGuildBtn = CreateButton(quickBarObj.transform, "NavGuild", "🏰\nGuild", new Color(0.18f, 0.25f, 0.38f), Color.white, 16, defaultFont);
-            PositionUI(navGuildBtn, 0.34f, 0.08f, 0.49f, 0.92f);
-
-            var navPassBtn = CreateButton(quickBarObj.transform, "NavBattlePass", "🎖️\nPass", new Color(0.18f, 0.25f, 0.38f), Color.white, 16, defaultFont);
-            PositionUI(navPassBtn, 0.505f, 0.08f, 0.655f, 0.92f);
-
-            var navEventBtn = CreateButton(quickBarObj.transform, "NavEventArena", "🔥\nEvent", new Color(0.18f, 0.25f, 0.38f), Color.white, 16, defaultFont);
-            PositionUI(navEventBtn, 0.67f, 0.08f, 0.82f, 0.92f);
-
-            var navArtifactBtn = CreateButton(quickBarObj.transform, "NavArtifacts", "👑\nArtefak", new Color(0.18f, 0.25f, 0.38f), Color.white, 16, defaultFont);
-            PositionUI(navArtifactBtn, 0.835f, 0.08f, 0.99f, 0.92f);
-
-            quickBarObj.SetActive(false); // Sembunyikan talenta, misi, guild, pass, event, artefak
-
-            // Bottom Navigation Dock (Dermaga Navigasi Bawah Responsif)
-            var dockObj = CreatePanel(lobbyPanelObj.transform, "BottomNavigationDock", new Color(0.05f, 0.07f, 0.12f, 0.98f));
-            PositionUI(dockObj, 0f, 0f, 1f, 0.12f);
-
-            // Pasang HorizontalLayoutGroup agar tombol secara dinamis dan simetris mengisi 100% lebar layar
             var dockHlg = dockObj.AddComponent<HorizontalLayoutGroup>();
             dockHlg.childAlignment = TextAnchor.MiddleCenter;
             dockHlg.childControlWidth = true;
             dockHlg.childControlHeight = true;
             dockHlg.childForceExpandWidth = true;
             dockHlg.childForceExpandHeight = true;
-            dockHlg.spacing = 12f;
-            dockHlg.padding = new RectOffset(16, 16, 8, 8);
+            dockHlg.spacing = 10f;
+            dockHlg.padding = new RectOffset(12, 12, 6, 6);
 
-            var navStageBtn = CreateButton(dockObj.transform, "NavStageMap", "🗺️\nPeta", new Color(0.15f, 0.2f, 0.3f), Color.white, 20, defaultFont);
-            var navHeroBtn = CreateButton(dockObj.transform, "NavHeroes", "🛡️\nHero", new Color(0.15f, 0.2f, 0.3f), Color.white, 20, defaultFont);
-            var navSummonBtn = CreateButton(dockObj.transform, "NavSummon", "🔮\nGacha", new Color(0.15f, 0.2f, 0.3f), Color.white, 20, defaultFont);
-            CreateNotificationBadge(navSummonBtn.transform, NotificationBadgeType.DailySummonFree);
+            var navStageBtn = CreateButton(dockObj.transform, "NavStageMap", "🏰\nCitadel", new Color(0.85f, 0.60f, 0.15f), Color.white, 20, defaultFont);
+            var navForgeBtn = CreateButton(dockObj.transform, "NavForge", "🔨\nForge", new Color(0.14f, 0.18f, 0.28f), Color.white, 20, defaultFont);
+            var navHeroBtn = CreateButton(dockObj.transform, "NavHeroes", "🛡️\nHeroes", new Color(0.14f, 0.18f, 0.28f), Color.white, 20, defaultFont);
+            var navStoreBtn = CreateButton(dockObj.transform, "NavStore", "🎒\nBag", new Color(0.14f, 0.18f, 0.28f), Color.white, 20, defaultFont);
 
-            var navForgeBtn = CreateButton(dockObj.transform, "NavForge", "🔨\nTempa", new Color(0.15f, 0.2f, 0.3f), Color.white, 20, defaultFont);
-            navForgeBtn.SetActive(false); // Sembunyikan Tempa (Forge) sesuai instruksi, sehingga 4 tombol tersisa otomatis merenggang penuh!
-
-            var navStoreBtn = CreateButton(dockObj.transform, "NavStore", "💎\nToko", new Color(0.2f, 0.35f, 0.25f), new Color(1f, 0.9f, 0.3f), 20, defaultFont);
+            var navSummonBtn = CreateButton(dockObj.transform, "NavSummon", "🔮\nGacha", new Color(0.14f, 0.18f, 0.28f), Color.white, 20, defaultFont);
+            navSummonBtn.SetActive(false);
 
             // Bind serialized properties ke UICitadelLobbyView
             var lobbySO = new SerializedObject(lobbyView);
@@ -2112,6 +2097,9 @@ namespace Rampartbound.Editor
         private static Sprite _heroWindSprite;
         private static Sprite _bannerTacticalPhase;
         private static Sprite _iconTacticalMove;
+        private static Sprite _btnBattleCrimson;
+        private static Sprite _bannerTeamCP;
+        private static Sprite _badgeHeroPill;
 
         private static void LoadUISprites()
         {
@@ -2146,8 +2134,11 @@ namespace Rampartbound.Editor
             if (_keyVisualBanner == null) _keyVisualBanner = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Rampartbound_KeyVisual_Banner.jpg");
             if (_heroCedricSprite == null) _heroCedricSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Heroes/Cedric_T1.png");
             if (_heroRoseSprite == null) _heroRoseSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Heroes/Rose_T1.png");
-            if (_heroRabbitSprite == null) _heroRabbitSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Heroes/RabbitMage_T1.png");
+            if (_heroRabbitSprite == null) _heroRabbitSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Heroes/RabbitMage_T1.png") ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Heroes/Pippin_T1.png");
             if (_heroWindSprite == null) _heroWindSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Heroes/WindRanger_T1.png");
+            if (_btnBattleCrimson == null) _btnBattleCrimson = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Btn_Battle_Crimson.png");
+            if (_bannerTeamCP == null) _bannerTeamCP = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Banner_Team_CP.png");
+            if (_badgeHeroPill == null) _badgeHeroPill = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Badge_Hero_Pill.png");
         }
 
         private static void AttachRarityBorder(Transform parentCard, Sprite borderSprite)
@@ -2167,20 +2158,20 @@ namespace Rampartbound.Editor
             img.raycastTarget = false;
         }
 
-        private static void SetupHeroCardPortrait(GameObject cardObj, Sprite heroSprite)
+        private static void SetupHeroCardPortrait(GameObject cardObj, Sprite heroSprite, string heroName = null)
         {
             if (cardObj == null) return;
 
             // 1. Oval Ground Shadow (di bawah kaki hero standee)
             var shadowObj = new GameObject("GroundShadow", typeof(RectTransform), typeof(Image));
             shadowObj.transform.SetParent(cardObj.transform, false);
-            PositionUI(shadowObj, 0.15f, 0.28f, 0.85f, 0.40f);
+            PositionUI(shadowObj, 0.15f, 0.16f, 0.85f, 0.30f);
             var shadowImg = shadowObj.GetComponent<Image>();
             if (_shadowOval != null)
             {
                 shadowImg.sprite = _shadowOval;
             }
-            shadowImg.color = new Color(0f, 0f, 0f, 0.48f);
+            shadowImg.color = new Color(0f, 0f, 0f, 0.55f);
             shadowImg.raycastTarget = false;
 
             // 2. Hero Standee Portrait
@@ -2188,25 +2179,64 @@ namespace Rampartbound.Editor
             {
                 var portraitObj = new GameObject("HeroPortrait", typeof(RectTransform), typeof(Image));
                 portraitObj.transform.SetParent(cardObj.transform, false);
-                PositionUI(portraitObj, 0.05f, 0.32f, 0.95f, 0.96f);
+                PositionUI(portraitObj, 0.02f, 0.22f, 0.98f, 0.98f);
                 var img = portraitObj.GetComponent<Image>();
                 img.sprite = heroSprite;
                 img.preserveAspect = true;
                 img.raycastTarget = false;
             }
 
-            // 3. Info Badge Ribbon (Lv, Stars, CP) di bawah pelataran kaki
+            // 3. Name Label (misal Cedric)
+            if (!string.IsNullOrEmpty(heroName))
+            {
+                var nameTxt = CreateText(cardObj.transform, "HeroName", heroName, 20, FontStyle.Bold, TextAnchor.MiddleCenter, Color.white, null);
+                PositionUI(nameTxt.gameObject, 0.05f, 0.18f, 0.95f, 0.28f);
+                var nShadow = nameTxt.gameObject.AddComponent<Shadow>();
+                nShadow.effectColor = new Color(0f, 0f, 0f, 0.9f);
+                nShadow.effectDistance = new Vector2(1.5f, -1.5f);
+            }
+
+            // 4. Info Badge Pill (Lv, CP) di bawah kaki
+            var badgeObj = new GameObject("BadgePill", typeof(RectTransform), typeof(Image));
+            badgeObj.transform.SetParent(cardObj.transform, false);
+            PositionUI(badgeObj, 0.04f, 0.02f, 0.96f, 0.17f);
+            var badgeImg = badgeObj.GetComponent<Image>();
+            if (_badgeHeroPill != null)
+            {
+                badgeImg.sprite = _badgeHeroPill;
+                badgeImg.type = Image.Type.Simple;
+                badgeImg.preserveAspect = false;
+                badgeImg.color = Color.white;
+            }
+            else
+            {
+                badgeImg.color = new Color(0.08f, 0.12f, 0.2f, 0.9f);
+            }
+            badgeImg.raycastTarget = false;
+
             var txtTrans = cardObj.transform.Find("Text");
             if (txtTrans != null)
             {
                 var rt = txtTrans.GetComponent<RectTransform>();
                 if (rt != null)
                 {
-                    rt.anchorMin = new Vector2(0.02f, 0.02f);
-                    rt.anchorMax = new Vector2(0.98f, 0.30f);
+                    rt.anchorMin = new Vector2(0.04f, 0.02f);
+                    rt.anchorMax = new Vector2(0.96f, 0.17f);
                     rt.offsetMin = Vector2.zero;
                     rt.offsetMax = Vector2.zero;
                 }
+                var txt = txtTrans.GetComponent<Text>();
+                if (txt != null)
+                {
+                    txt.alignment = TextAnchor.MiddleCenter;
+                    txt.fontSize = 17;
+                    txt.fontStyle = FontStyle.Bold;
+                    txt.color = Color.white;
+                }
+                var shadow = txtTrans.gameObject.GetComponent<Shadow>() ?? txtTrans.gameObject.AddComponent<Shadow>();
+                shadow.effectColor = new Color(0f, 0f, 0f, 0.85f);
+                shadow.effectDistance = new Vector2(1.5f, -1.5f);
+                txtTrans.SetAsLastSibling();
             }
         }
 
@@ -2417,6 +2447,8 @@ namespace Rampartbound.Editor
             bool isClose = name.Contains("Close") || name.Contains("Btn_Close");
             bool isSecondary = name.Contains("Cancel") || name.Contains("Back") || name.Contains("Batal") || name.Contains("Kembali") || name.Contains("Surrender") || name.Contains("Reset");
             bool isTitleStart = name.Contains("EnterCitadel") || name.Contains("StartBtn");
+            bool isBattleBtn = name.Contains("DefendCitadel") || name.Contains("Battle");
+            bool isHeroCard = name.EndsWith("Card");
 
             if (isClose && _btnCloseX != null)
             {
@@ -2428,6 +2460,17 @@ namespace Rampartbound.Editor
                     var ss = new SpriteState { pressedSprite = _btnCloseXPressed, highlightedSprite = _btnCloseX };
                     btn.spriteState = ss;
                 }
+            }
+            else if (isBattleBtn && _btnBattleCrimson != null)
+            {
+                img.sprite = _btnBattleCrimson;
+                img.type = Image.Type.Simple;
+                img.preserveAspect = false;
+                img.color = Color.white;
+            }
+            else if (isHeroCard)
+            {
+                img.color = new Color(0f, 0f, 0f, 0f);
             }
             else if (isTitleStart && _titleBtnTap != null)
             {
@@ -2487,6 +2530,16 @@ namespace Rampartbound.Editor
             txt.resizeTextMinSize = 10;
             txt.resizeTextMaxSize = fontSize;
             txt.raycastTarget = false; // WAJIB false agar sentuhan jari langsung mengenai komponen Button!
+
+            if (isBattleBtn)
+            {
+                var outline = txtObj.AddComponent<Outline>();
+                outline.effectColor = new Color(0.2f, 0.04f, 0.04f, 0.95f);
+                outline.effectDistance = new Vector2(2f, -2f);
+                var shadow = txtObj.AddComponent<Shadow>();
+                shadow.effectColor = new Color(0f, 0f, 0f, 0.85f);
+                shadow.effectDistance = new Vector2(2.5f, -2.5f);
+            }
 
             if (btnObj.GetComponent<UIButtonJuice>() == null)
             {

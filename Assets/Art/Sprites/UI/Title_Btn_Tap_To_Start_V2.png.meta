@@ -32,8 +32,8 @@ TextureImporter:
   maxTextureSize: 2048
   spriteMode: 1
   spritePixelsToUnits: 100
-  spritePivot: {{x: 0.5, y: 0.5}}
-  spriteBorder: {{x: 48, y: 32, z: 48, w: 32}}
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 48, y: 32, z: 48, w: 32}
   spriteGenerateFallbackPhysicsShape: 0
   alphaIsTransparency: 1
   spriteMeshType: 1
