@@ -1460,11 +1460,47 @@ namespace FantasyDefense.Combat
             {
                 visualAnimator.PlayDefeatAnimation();
             }
+
+            // Jika HP 0, hero gugur dan dihilangkan dari papan pada wave tempur tersebut
+            if (gameObject.activeInHierarchy)
+            {
+                StartCoroutine(DefeatedDisappearRoutine());
+            }
+            else
+            {
+                gameObject.SetActive(false);
+            }
+        }
+
+        private IEnumerator DefeatedDisappearRoutine()
+        {
+            // Efek dissolve/fade out saat pahlawan gugur di tengah pertempuran
+            float duration = 0.45f;
+            float elapsed = 0f;
+            Vector3 initialScale = transform.localScale;
+            Color initColor = spriteRenderer != null ? spriteRenderer.color : Color.white;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / duration;
+                transform.localScale = Vector3.Lerp(initialScale, Vector3.zero, t);
+                if (spriteRenderer != null)
+                {
+                    spriteRenderer.color = new Color(initColor.r, initColor.g, initColor.b, Mathf.Lerp(initColor.a, 0f, t));
+                }
+                yield return null;
+            }
+
+            // Nonaktifkan visual dan objek di papan wave ini agar monster dapat lewat jika tidak ada hero lain yang menghadang
+            gameObject.SetActive(false);
         }
 
         public virtual void ReviveHero()
         {
             currentHealth = maxHealth;
+            gameObject.SetActive(true);
+            UpdateVisualAppearance();
             if (visualAnimator != null)
             {
                 visualAnimator.RestoreNormalVisual();

@@ -101,7 +101,7 @@ namespace Rampartbound.Editor
             }
 
             // 4c. Konfigurasi Ikon Aplikasi Resmi Android & Desktop (Launcher / Homescreen Icon)
-            Texture2D appIcon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Art/Sprites/UI/App_Icon_512.png");
+            Texture2D appIcon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Art/Sprites/UI/App_Icon_Pippin_512.png") ?? AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Art/Sprites/UI/App_Icon_512.png");
             if (appIcon != null)
             {
                 PlayerSettings.SetIconsForTargetGroup(BuildTargetGroup.Android, new Texture2D[] { appIcon });
