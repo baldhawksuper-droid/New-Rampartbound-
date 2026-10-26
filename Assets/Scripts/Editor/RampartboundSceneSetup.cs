@@ -614,42 +614,42 @@ namespace Rampartbound.Editor
             var settingsBtn = CreateButton(lobbyHeaderObj.transform, "SettingsButton", "⚙️", new Color(0.2f, 0.25f, 0.35f), Color.white, 28, defaultFont);
             PositionUI(settingsBtn, 0.9f, 0.25f, 0.98f, 0.75f);
 
-            // Hero Quartet Showcase Container
-            var heroesContainer = CreatePanel(lobbyPanelObj.transform, "HeroQuartetShowcase", new Color(0.08f, 0.1f, 0.16f, 0.8f));
+            // Hero Courtyard Assembly (Mendukung Formasi hingga 4 Hero Standee Sesuai Bab 4.2)
+            var heroesContainer = CreatePanel(lobbyPanelObj.transform, "HeroCourtyardAssembly", new Color(0.08f, 0.1f, 0.16f, 0.45f));
             if (_frameStoneBastion != null)
             {
                 var hImg = heroesContainer.GetComponent<Image>();
                 hImg.sprite = _frameStoneBastion;
                 hImg.type = Image.Type.Sliced;
-                hImg.color = Color.white;
+                hImg.color = new Color(1f, 1f, 1f, 0.75f);
             }
-            PositionUI(heroesContainer, 0.04f, 0.31f, 0.96f, 0.85f);
+            PositionUI(heroesContainer, 0.03f, 0.28f, 0.97f, 0.85f);
 
-            var cedricCard = CreateButton(heroesContainer.transform, "CedricCard", "<b>Cedric</b>\nLv.1 ★☆☆\n<color=#FFD700>CP: 125</color>", new Color(0.45f, 0.15f, 0.15f), Color.white, 20, defaultFont);
-            PositionUI(cedricCard, 0.02f, 0.05f, 0.245f, 0.95f);
-            AttachRarityBorder(cedricCard.transform, _borderRare ?? _borderCommon);
-            SetupHeroCardPortrait(cedricCard, _heroCedricSprite);
-
-            var roseCard = CreateButton(heroesContainer.transform, "RoseCard", "<b>Rose Tank</b>\nLv.1 ★☆☆\n<color=#FFD700>CP: 125</color>", new Color(0.45f, 0.2f, 0.35f), Color.white, 20, defaultFont);
-            PositionUI(roseCard, 0.265f, 0.05f, 0.495f, 0.95f);
-            AttachRarityBorder(roseCard.transform, _borderRare);
-            SetupHeroCardPortrait(roseCard, _heroRoseSprite);
-
-            var rabbitCard = CreateButton(heroesContainer.transform, "RabbitCard", "<b>Rabbit Mage</b>\nLv.1 ★☆☆\n<color=#FFD700>CP: 125</color>", new Color(0.15f, 0.25f, 0.5f), Color.white, 20, defaultFont);
-            PositionUI(rabbitCard, 0.515f, 0.05f, 0.745f, 0.95f);
+            // Formasi 4 Slot: Pippin (Slot 1), Cedric (Slot 2/Center), Rose (Slot 3), Wind Ranger / Locked (Slot 4)
+            var rabbitCard = CreateButton(heroesContainer.transform, "RabbitCard", "<b>Pippin</b>\nLv.12 ★★★\n<color=#FFD700>CP: 1,600</color>", new Color(0.12f, 0.2f, 0.38f, 0.85f), Color.white, 18, defaultFont);
+            PositionUI(rabbitCard, 0.015f, 0.04f, 0.25f, 0.96f);
             AttachRarityBorder(rabbitCard.transform, _borderEpic);
             SetupHeroCardPortrait(rabbitCard, _heroRabbitSprite);
 
-            var windCard = CreateButton(heroesContainer.transform, "WindCard", "<b>Wind Ranger</b>\nSummon to Unlock", new Color(0.15f, 0.4f, 0.25f), Color.white, 18, defaultFont);
-            PositionUI(windCard, 0.77f, 0.05f, 0.98f, 0.95f);
-            AttachRarityBorder(windCard.transform, _borderLegendary);
-            SetupHeroCardPortrait(windCard, _heroWindSprite);
-            var windCardButton = windCard.GetComponent<Button>();
-            if (windCardButton != null) windCardButton.interactable = false;
+            var cedricCard = CreateButton(heroesContainer.transform, "CedricCard", "<b>Cedric</b>\nLv.15 ★★★\n<color=#FFD700>CP: 1,850</color>", new Color(0.38f, 0.12f, 0.12f, 0.85f), Color.white, 18, defaultFont);
+            PositionUI(cedricCard, 0.26f, 0.04f, 0.495f, 0.96f);
+            AttachRarityBorder(cedricCard.transform, _borderLegendary ?? _borderRare);
+            SetupHeroCardPortrait(cedricCard, _heroCedricSprite);
 
-            // Core Action Buttons
-            var defendBtn = CreateButton(lobbyPanelObj.transform, "DefendCitadelButton", "⚔️ BERTAHAN (BATTLE)", new Color(0.92f, 0.35f, 0.18f), Color.white, 28, defaultFont);
-            PositionUI(defendBtn, 0.08f, 0.15f, 0.92f, 0.28f);
+            var roseCard = CreateButton(heroesContainer.transform, "RoseCard", "<b>Rose Tank</b>\nLv.14 ★★★\n<color=#FFD700>CP: 1,400</color>", new Color(0.38f, 0.15f, 0.28f, 0.85f), Color.white, 18, defaultFont);
+            PositionUI(roseCard, 0.505f, 0.04f, 0.74f, 0.96f);
+            AttachRarityBorder(roseCard.transform, _borderRare);
+            SetupHeroCardPortrait(roseCard, _heroRoseSprite);
+
+            // Slot Ke-4 (Mendukung slot ekspansi hingga 4 hero)
+            var windCard = CreateButton(heroesContainer.transform, "WindCard", "<b>[SLOT 4]</b>\n<color=#FFD700>🔒 Gacha to Unlock</color>", new Color(0.12f, 0.15f, 0.22f, 0.8f), Color.white, 17, defaultFont);
+            PositionUI(windCard, 0.75f, 0.04f, 0.985f, 0.96f);
+            AttachRarityBorder(windCard.transform, _borderCommon ?? _borderRare);
+            SetupHeroCardPortrait(windCard, _heroWindSprite);
+
+            // Core Action Buttons (Tombol Besar Terpusat)
+            var defendBtn = CreateButton(lobbyPanelObj.transform, "DefendCitadelButton", "⚔️ BERTAHAN (5 ⚡)", new Color(0.95f, 0.38f, 0.15f), Color.white, 30, defaultFont);
+            PositionUI(defendBtn, 0.08f, 0.14f, 0.92f, 0.25f);
 
             var trialBtn = CreateButton(lobbyPanelObj.transform, "AbyssalTrialButton", "🌌 UJIAN ABYSSAL (ENDLESS)", new Color(0.42f, 0.25f, 0.75f), Color.white, 24, defaultFont);
             PositionUI(trialBtn, 0.12f, 0.23f, 0.88f, 0.30f);
@@ -714,12 +714,12 @@ namespace Rampartbound.Editor
             lobbySO.FindProperty("gemsText").objectReferenceValue = gemsTxt;
             lobbySO.FindProperty("teamCpText").objectReferenceValue = cpTxt;
             lobbySO.FindProperty("settingsButton").objectReferenceValue = settingsBtn.GetComponent<Button>();
+            lobbySO.FindProperty("rabbitCardButton").objectReferenceValue = rabbitCard.GetComponent<Button>();
+            lobbySO.FindProperty("rabbitInfoText").objectReferenceValue = rabbitCard.GetComponentInChildren<Text>();
             lobbySO.FindProperty("cedricCardButton").objectReferenceValue = cedricCard.GetComponent<Button>();
             lobbySO.FindProperty("cedricInfoText").objectReferenceValue = cedricCard.GetComponentInChildren<Text>();
             lobbySO.FindProperty("roseCardButton").objectReferenceValue = roseCard.GetComponent<Button>();
             lobbySO.FindProperty("roseInfoText").objectReferenceValue = roseCard.GetComponentInChildren<Text>();
-            lobbySO.FindProperty("rabbitCardButton").objectReferenceValue = rabbitCard.GetComponent<Button>();
-            lobbySO.FindProperty("rabbitInfoText").objectReferenceValue = rabbitCard.GetComponentInChildren<Text>();
             lobbySO.FindProperty("windRangerCardButton").objectReferenceValue = windCard.GetComponent<Button>();
             lobbySO.FindProperty("windRangerInfoText").objectReferenceValue = windCard.GetComponentInChildren<Text>();
             lobbySO.FindProperty("defendCitadelButton").objectReferenceValue = defendBtn.GetComponent<Button>();
@@ -2127,24 +2127,41 @@ namespace Rampartbound.Editor
 
         private static void SetupHeroCardPortrait(GameObject cardObj, Sprite heroSprite)
         {
-            if (cardObj == null || heroSprite == null) return;
+            if (cardObj == null) return;
 
-            var portraitObj = new GameObject("HeroPortrait", typeof(RectTransform), typeof(Image));
-            portraitObj.transform.SetParent(cardObj.transform, false);
-            PositionUI(portraitObj, 0.08f, 0.38f, 0.92f, 0.95f);
-            var img = portraitObj.GetComponent<Image>();
-            img.sprite = heroSprite;
-            img.preserveAspect = true;
-            img.raycastTarget = false;
+            // 1. Oval Ground Shadow (di bawah kaki hero standee)
+            var shadowObj = new GameObject("GroundShadow", typeof(RectTransform), typeof(Image));
+            shadowObj.transform.SetParent(cardObj.transform, false);
+            PositionUI(shadowObj, 0.15f, 0.28f, 0.85f, 0.40f);
+            var shadowImg = shadowObj.GetComponent<Image>();
+            if (_shadowOval != null)
+            {
+                shadowImg.sprite = _shadowOval;
+            }
+            shadowImg.color = new Color(0f, 0f, 0f, 0.48f);
+            shadowImg.raycastTarget = false;
 
+            // 2. Hero Standee Portrait
+            if (heroSprite != null)
+            {
+                var portraitObj = new GameObject("HeroPortrait", typeof(RectTransform), typeof(Image));
+                portraitObj.transform.SetParent(cardObj.transform, false);
+                PositionUI(portraitObj, 0.05f, 0.32f, 0.95f, 0.96f);
+                var img = portraitObj.GetComponent<Image>();
+                img.sprite = heroSprite;
+                img.preserveAspect = true;
+                img.raycastTarget = false;
+            }
+
+            // 3. Info Badge Ribbon (Lv, Stars, CP) di bawah pelataran kaki
             var txtTrans = cardObj.transform.Find("Text");
             if (txtTrans != null)
             {
                 var rt = txtTrans.GetComponent<RectTransform>();
                 if (rt != null)
                 {
-                    rt.anchorMin = new Vector2(0.04f, 0.03f);
-                    rt.anchorMax = new Vector2(0.96f, 0.38f);
+                    rt.anchorMin = new Vector2(0.02f, 0.02f);
+                    rt.anchorMax = new Vector2(0.98f, 0.30f);
                     rt.offsetMin = Vector2.zero;
                     rt.offsetMax = Vector2.zero;
                 }

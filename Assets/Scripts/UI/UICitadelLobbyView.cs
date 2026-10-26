@@ -9,10 +9,12 @@ using FantasyDefense.Metagame;
 namespace FantasyDefense.UI
 {
     /// <summary>
-    /// Master UI Controller untuk Pusat Benteng (Citadel Lobby).
-    /// Menghubungkan seluruh status metagame: Saldo Gold, Gems, Stamina/Energi, Level Citadel, Team CP,
-    /// Showcase Kuartet Pahlawan (Cedric, Rose Tanker, Rabbit Mage, Wind Ranger),
-    /// Tombol Utama 'Pertahankan Benteng (Battle)', serta Dermaga Navigasi Bawah (Shop, Gacha, Forge, Talenta, Quests, Guild, Pass, dsb).
+    /// Master UI Controller untuk Pusat Benteng (Citadel Lobby) berdasarkan Master Spec Bab 4.2:
+    /// 1. Top Header Zone: Level Citadel, Kas Emas, Saldo Gems, Meteran Stamina 30/30, & Total Team CP.
+    /// 2. Citadel Courtyard Assembly: Formasi 4 slot pahlawan Chibi (Pippin, Cedric, Rose, & Slot ke-4 Wind Ranger / Locked).
+    ///    Mendukung interaksi sentuh (bounce juice), bayangan tanah oval, serta kartu lencana info mengambang.
+    /// 3. Primary Action Zone: Tombol besar terpusat 3D "⚔️ BERTAHAN (5 ⚡) / BATTLE".
+    /// 4. Bottom Navigation Dock: 4 Tab Utama responsif [🗺️ Peta] [🛡️ Hero] [🔮 Gacha] [💎 Toko].
     /// </summary>
     public class UICitadelLobbyView : MonoBehaviour
     {
@@ -30,7 +32,8 @@ namespace FantasyDefense.UI
         [SerializeField] private Text teamCpText;
         [SerializeField] private Button settingsButton;
 
-        [Header("Hero Quartet Showcase Cards")]
+        [Header("Courtyard Hero Assembly (Max 4 Slots)")]
+        [SerializeField] private Transform courtyardContainer;
         [SerializeField] private Button cedricCardButton;
         [SerializeField] private Text cedricInfoText;
         [SerializeField] private Button roseCardButton;
@@ -248,15 +251,15 @@ namespace FantasyDefense.UI
             if (settingsButton != null)
                 settingsButton.onClick.AddListener(() => OpenPanel(GamePanelType.AudioSettings));
 
-            // Hero Quartet Shortcuts
+            // Courtyard Standees (Mendukung Tap Emote Juice & Hero Upgrade)
             if (cedricCardButton != null)
-                cedricCardButton.onClick.AddListener(() => OpenHeroUpgrade(UnitType.Cedric));
+                cedricCardButton.onClick.AddListener(() => OnStandeeTapped(cedricCardButton, UnitType.Cedric));
             if (roseCardButton != null)
-                roseCardButton.onClick.AddListener(() => OpenHeroUpgrade(UnitType.RoseTanker));
+                roseCardButton.onClick.AddListener(() => OnStandeeTapped(roseCardButton, UnitType.RoseTanker));
             if (rabbitCardButton != null)
-                rabbitCardButton.onClick.AddListener(() => OpenHeroUpgrade(UnitType.RabbitMage));
+                rabbitCardButton.onClick.AddListener(() => OnStandeeTapped(rabbitCardButton, UnitType.RabbitMage));
             if (windRangerCardButton != null)
-                windRangerCardButton.onClick.AddListener(() => OpenHeroUpgrade(UnitType.WindRanger));
+                windRangerCardButton.onClick.AddListener(() => OnStandeeTapped(windRangerCardButton, UnitType.WindRanger));
 
             // Core Actions
             if (defendCitadelButton != null)
@@ -349,23 +352,40 @@ namespace FantasyDefense.UI
             }
             if (teamCpText != null)
             {
-                teamCpText.text = $"CP: {lobby.TotalTeamCP:N0}";
+                teamCpText.text = $"⚡ TEAM CP: {lobby.TotalTeamCP:N0}";
             }
 
-            UpdateHeroCard(UnitType.Cedric, cedricInfoText, "Cedric", "Melee Striker");
-            UpdateHeroCard(UnitType.RoseTanker, roseInfoText, "Rose Tanker", "Heavy Tanker");
-            UpdateHeroCard(UnitType.RabbitMage, rabbitInfoText, "Rabbit Mage", "Magic AoE");
+            // Update Courtyard Standees (Formasi 4 Slot)
+            UpdateHeroCard(UnitType.RabbitMage, rabbitInfoText, "Pippin", "Lv.12 ★★★");
+            UpdateHeroCard(UnitType.Cedric, cedricInfoText, "Cedric", "Lv.15 ★★★");
+            UpdateHeroCard(UnitType.RoseTanker, roseInfoText, "Commander Rose", "Lv.14 ★★★");
+            
             var windProfile = lobby.GetHeroProfile(UnitType.WindRanger);
             if (windProfile != null && windProfile.isUnlocked)
             {
-                UpdateHeroCard(UnitType.WindRanger, windRangerInfoText, "Wind Ranger", "Physical Gale");
-            } else if (windRangerInfoText != null)
-            {
-                windRangerInfoText.text = "<b>Wind Ranger</b>\n<color=#FFD700>Summon to unlock</color>";
+                UpdateHeroCard(UnitType.WindRanger, windRangerInfoText, "Wind Ranger", "Lv.10 ★☆☆");
+                if (windRangerCardButton != null)
+                {
+                    windRangerCardButton.interactable = true;
+                    var img = windRangerCardButton.transform.Find("HeroPortrait")?.GetComponent<Image>();
+                    if (img != null) img.color = Color.white;
+                }
             }
-            if (windRangerCardButton != null)
+            else
             {
-                windRangerCardButton.interactable = windProfile != null && windProfile.isUnlocked;
+                if (windRangerInfoText != null)
+                {
+                    windRangerInfoText.text = "<b><color=#AAAAAA>[SLOT 4]</color></b>\n<color=#FFD700>🔒 Gacha to Unlock</color>";
+                }
+                if (windRangerCardButton != null)
+                {
+                    windRangerCardButton.interactable = true; // Bisa diklik untuk info toast
+                    var img = windRangerCardButton.transform.Find("HeroPortrait")?.GetComponent<Image>();
+                    if (img != null)
+                    {
+                        img.color = new Color(0.25f, 0.28f, 0.38f, 0.45f); // Siluet terkunci
+                    }
+                }
             }
         }
 
@@ -377,16 +397,62 @@ namespace FantasyDefense.UI
             var profile = lobby != null ? lobby.GetHeroProfile(type) : null;
             if (profile != null)
             {
-                string stars = new string('★', profile.starRank);
-                infoText.text = $"<b>{profile.heroName}</b>\nLv.{profile.level} {stars}\n<color=#FFD700>CP: {profile.CalculateHeroCP():N0}</color>";
+                string stars = new string('★', Mathf.Max(1, profile.starRank));
+                infoText.text = $"<b>{profile.heroName}</b>\n<color=#00FFFF>Lv.{profile.level} {stars}</color>\n<color=#FFD700>CP: {profile.CalculateHeroCP():N0}</color>";
             }
             else
             {
-                infoText.text = $"<b>{defaultName}</b>\n{role}\n<color=#AAAAAA>Siap Bertarung</color>";
+                infoText.text = $"<b>{defaultName}</b>\n<color=#00FFFF>{role}</color>\n<color=#FFD700>CP: 1,500</color>";
             }
         }
 
-        private void OpenHeroUpgrade(UnitType type)
+        private void OnStandeeTapped(Button btn, UnitType type)
+        {
+            if (btn != null && btn.gameObject.activeInHierarchy)
+            {
+                StartCoroutine(StandeeTapJuiceRoutine(btn.transform));
+            }
+
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySound(SoundType.ButtonClick);
+            }
+
+            var lobby = CitadelLobbyManager.Instance;
+            var profile = lobby != null ? lobby.GetHeroProfile(type) : null;
+            if (profile != null && !profile.isUnlocked)
+            {
+                string lockedMsg = FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                    "🔒 Slot Pahlawan ke-4 ini masih terkunci!\nDapatkan Wind Ranger melalui Balai Pemanggilan (Gacha).",
+                    "🔒 The 4th Hero Slot is currently locked!\nSummon Wind Ranger in the Summoning Hall."
+                );
+                string btnStore = FantasyDefense.Localization.CitadelLocalizationManager.Text("🔮 GACHA SEKARANG", "🔮 SUMMON NOW");
+                CitadelToastNotice.ShowWithAction(lockedMsg, btnStore, () => OpenPanel(GamePanelType.SummonHall), 3.5f);
+                return;
+            }
+
+            OpenHeroUpgrade(type);
+        }
+
+        private IEnumerator StandeeTapJuiceRoutine(Transform tr)
+        {
+            Vector3 originalScale = tr.localScale;
+            float duration = 0.22f;
+            float elapsed = 0f;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = elapsed / duration;
+                float bounce = Mathf.Sin(t * Mathf.PI) * 0.16f;
+                tr.localScale = new Vector3(originalScale.x * (1f + bounce * 0.8f), originalScale.y * (1f + bounce), originalScale.z);
+                yield return null;
+            }
+
+            tr.localScale = originalScale;
+        }
+
+        private void OpenHeroUpgrade(UnitType heroType)
         {
             if (AudioManager.Instance != null)
             {
