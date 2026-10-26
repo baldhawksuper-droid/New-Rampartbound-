@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using FantasyDefense.Audio;
@@ -505,7 +507,7 @@ namespace FantasyDefense.UI
 
             if (UIHeroUpgradeView.Instance != null)
             {
-                UIHeroUpgradeView.Instance.SelectHero(type);
+                UIHeroUpgradeView.Instance.SelectHero(heroType);
             }
         }
 
