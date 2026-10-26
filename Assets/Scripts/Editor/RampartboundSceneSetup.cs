@@ -545,7 +545,7 @@ namespace Rampartbound.Editor
             if (_plinthT1 != null) { cedricPlinthImg.sprite = _plinthT1; cedricPlinthImg.preserveAspect = true; }
             cedricPlinthImg.raycastTarget = false;
 
-            // Cedric Sprite
+            // Cedric Sprite (Dibalik horizontal scale X = -1 agar menghadap ke kiri, menyambut dan berhadapan dengan Pippin!)
             var cedricSpriteObj = new GameObject("Cedric_Sprite_Img", typeof(RectTransform), typeof(Image));
             cedricSpriteObj.transform.SetParent(cedricGroup.transform, false);
             var cedricSpriteRt = cedricSpriteObj.GetComponent<RectTransform>();
@@ -553,6 +553,7 @@ namespace Rampartbound.Editor
             cedricSpriteRt.anchorMax = new Vector2(0.95f, 1f);
             cedricSpriteRt.offsetMin = Vector2.zero;
             cedricSpriteRt.offsetMax = Vector2.zero;
+            cedricSpriteRt.localScale = new Vector3(-1f, 1f, 1f); // Mirror horizontal agar saling berhadapan!
             var cedricImg = cedricSpriteObj.GetComponent<Image>();
             if (_heroCedricSprite != null) { cedricImg.sprite = _heroCedricSprite; cedricImg.preserveAspect = true; }
             cedricImg.raycastTarget = false;
