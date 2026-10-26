@@ -2100,7 +2100,7 @@ namespace Rampartbound.Editor
             if (_borderRare == null) _borderRare = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Border_Rarity_Rare.png");
             if (_borderEpic == null) _borderEpic = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Border_Rarity_Epic.png");
             if (_borderLegendary == null) _borderLegendary = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Border_Rarity_Legendary.png");
-            if (_titleBackdrop == null) _titleBackdrop = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Title_Screen_Backdrop.png") ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Rampartbound_KeyVisual_Banner.jpg");
+            if (_titleBackdrop == null) _titleBackdrop = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Title_Screen_Canonical_Backdrop_Pure.png") ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Title_Screen_Backdrop.png") ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Rampartbound_KeyVisual_Banner.jpg");
             if (_titleBtnTap == null) _titleBtnTap = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Title_Btn_Tap_To_Start.png");
             if (_handCursor == null) _handCursor = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Hand_Cursor.png");
             if (_shadowOval == null) _shadowOval = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Shadow_Ground_Oval.png");
