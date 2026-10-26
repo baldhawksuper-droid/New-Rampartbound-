@@ -716,13 +716,15 @@ namespace Rampartbound.Editor
             dockHlg.spacing = 10f;
             dockHlg.padding = new RectOffset(12, 12, 6, 6);
 
-            var navStageBtn = CreateButton(dockObj.transform, "NavStageMap", "🏰\nCitadel", new Color(0.85f, 0.60f, 0.15f), Color.white, 20, defaultFont);
-            var navForgeBtn = CreateButton(dockObj.transform, "NavForge", "🔨\nForge", new Color(0.14f, 0.18f, 0.28f), Color.white, 20, defaultFont);
-            var navHeroBtn = CreateButton(dockObj.transform, "NavHeroes", "🛡️\nHeroes", new Color(0.14f, 0.18f, 0.28f), Color.white, 20, defaultFont);
-            var navStoreBtn = CreateButton(dockObj.transform, "NavStore", "🎒\nBag", new Color(0.14f, 0.18f, 0.28f), Color.white, 20, defaultFont);
-
+            var navStageBtn = CreateButton(dockObj.transform, "NavStageMap", "🗺️\nPeta", new Color(0.14f, 0.18f, 0.28f), Color.white, 20, defaultFont);
+            var navHeroBtn = CreateButton(dockObj.transform, "NavHeroes", "🛡️\nHero", new Color(0.14f, 0.18f, 0.28f), Color.white, 20, defaultFont);
             var navSummonBtn = CreateButton(dockObj.transform, "NavSummon", "🔮\nGacha", new Color(0.14f, 0.18f, 0.28f), Color.white, 20, defaultFont);
-            navSummonBtn.SetActive(false);
+            CreateNotificationBadge(navSummonBtn.transform, NotificationBadgeType.DailySummonFree);
+
+            var navStoreBtn = CreateButton(dockObj.transform, "NavStore", "💎\nToko", new Color(0.2f, 0.35f, 0.25f), new Color(1f, 0.9f, 0.3f), 20, defaultFont);
+
+            var navForgeBtn = CreateButton(dockObj.transform, "NavForge", "🔨\nTempa", new Color(0.14f, 0.18f, 0.28f), Color.white, 20, defaultFont);
+            navForgeBtn.SetActive(false);
 
             // Bind serialized properties ke UICitadelLobbyView
             var lobbySO = new SerializedObject(lobbyView);

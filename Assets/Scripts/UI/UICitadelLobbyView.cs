@@ -71,7 +71,7 @@ namespace FantasyDefense.UI
         [SerializeField] private bool showBattlePass = false;
         [SerializeField] private bool showEventArena = false;
         [SerializeField] private bool showArtifacts = false;
-        [SerializeField] private bool showForge = true;
+        [SerializeField] private bool showForge = false;
         [SerializeField] private bool showFeaturePreview = false;
 
         private void Awake()
@@ -102,7 +102,7 @@ namespace FantasyDefense.UI
             if (navEventArenaButton != null) navEventArenaButton.gameObject.SetActive(showEventArena);
             if (navArtifactsButton != null) navArtifactsButton.gameObject.SetActive(showArtifacts);
             if (navForgeButton != null) navForgeButton.gameObject.SetActive(showForge);
-            if (navSummonButton != null) navSummonButton.gameObject.SetActive(false);
+            if (navSummonButton != null) navSummonButton.gameObject.SetActive(true);
 
             // Jika quick action bar semua disembunyikan, sembunyikan bar container-nya
             if (navTalentsButton != null && navTalentsButton.transform.parent != null)
@@ -222,13 +222,13 @@ namespace FantasyDefense.UI
             if (navStageMapButton != null)
             {
                 var txt = navStageMapButton.GetComponentInChildren<Text>();
-                if (txt != null) txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_CITADEL", "🏰\nCitadel", "🏰\nCitadel");
+                if (txt != null) txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_MAP", "🗺️\nPeta", "🗺️\nMap");
             }
 
             if (navHeroesButton != null)
             {
                 var txt = navHeroesButton.GetComponentInChildren<Text>();
-                if (txt != null) txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_HEROES", "🛡️\nHeroes", "🛡️\nHeroes");
+                if (txt != null) txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_HEROES", "🛡️\nHero", "🛡️\nHeroes");
             }
 
             if (navSummonButton != null)
@@ -240,13 +240,13 @@ namespace FantasyDefense.UI
             if (navStoreButton != null)
             {
                 var txt = navStoreButton.GetComponentInChildren<Text>();
-                if (txt != null) txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_BAG", "🎒\nBag", "🎒\nBag");
+                if (txt != null) txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_STORE", "💎\nToko", "💎\nStore");
             }
 
             if (navForgeButton != null)
             {
                 var txt = navForgeButton.GetComponentInChildren<Text>();
-                if (txt != null) txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_FORGE", "🔨\nForge", "🔨\nForge");
+                if (txt != null) txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_FORGE", "🔨\nTempa", "🔨\nForge");
             }
         }
 
