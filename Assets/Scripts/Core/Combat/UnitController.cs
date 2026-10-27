@@ -583,9 +583,11 @@ namespace FantasyDefense.Combat
 
         protected void UpdateGroundShadowVisibility(bool show)
         {
+            // Tatakan plinth kaku ditiadakan agar hero tampak alami dan menyatu langsung dengan petak arena
+            if (groundPlinthObj != null) groundPlinthObj.SetActive(false);
+
             if (currentTier == UnitTier.Tier0 || isPreparationToken)
             {
-                if (groundPlinthObj != null) groundPlinthObj.SetActive(false);
                 if (groundShadowObj != null) groundShadowObj.SetActive(false);
                 return;
             }
@@ -593,64 +595,8 @@ namespace FantasyDefense.Combat
             if (show)
             {
                 int sortOrder = Mathf.Max(15, normalSortingOrder - Mathf.RoundToInt(transform.position.y * 3));
-                int tierNum = Mathf.Clamp((int)currentTier, 1, 5);
 
-                // 1. 3D Tactile Hero Plinth Pedestal (Tatakan Hero Semi-3D)
-                if (groundPlinthObj == null)
-                {
-                    groundPlinthObj = new GameObject("HeroPlinth_3D");
-                    groundPlinthObj.transform.SetParent(transform, false);
-                    groundPlinthObj.transform.localPosition = new Vector3(0f, -0.22f, 0.05f);
-                    groundPlinthSr = groundPlinthObj.AddComponent<SpriteRenderer>();
-                    groundPlinthSr.sortingLayerName = "Gem";
-                }
-                else
-                {
-                    groundPlinthObj.transform.localPosition = new Vector3(0f, -0.22f, 0.05f);
-                }
-
-                Sprite plinthSprite = Resources.Load<Sprite>($"Sprites/Combat/Plinth_Hero_Base_T{tierNum}")
-                                   ?? Resources.Load<Sprite>($"Sprites/Grid/Plinth_Hero_Base_T{tierNum}")
-                                   ?? Resources.Load<Sprite>("Sprites/Combat/Plinth_Hero_Base_T1")
-                                   ?? Resources.Load<Sprite>("Sprites/Grid/Plinth_Hero_Base_T1");
-
-                if (groundPlinthSr != null)
-                {
-                    groundPlinthSr.sprite = plinthSprite;
-                    groundPlinthSr.sortingOrder = sortOrder - 1;
-
-                    // Warna tatakan menyesuaikan level/tier hero jika menggunakan fallback T1
-                    if (plinthSprite != null && plinthSprite.name.EndsWith("_T1") && tierNum > 1)
-                    {
-                        switch (currentTier)
-                        {
-                            case UnitTier.Tier2:
-                                groundPlinthSr.color = new Color(0.70f, 0.90f, 1.0f); // Polished Silver & Ice-Rune Blue
-                                break;
-                            case UnitTier.Tier3:
-                                groundPlinthSr.color = new Color(1.0f, 0.85f, 0.35f); // Radiant Gold Dragon
-                                break;
-                            case UnitTier.Tier4:
-                                groundPlinthSr.color = new Color(0.85f, 0.60f, 1.0f); // Astral Violet-Gold
-                                break;
-                            case UnitTier.Tier5:
-                                groundPlinthSr.color = new Color(1.0f, 0.95f, 0.70f); // Celestial Platinum-Gold
-                                break;
-                            default:
-                                groundPlinthSr.color = Color.white;
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        groundPlinthSr.color = Color.white;
-                    }
-
-                    groundPlinthObj.transform.localScale = new Vector3(0.95f, 0.95f, 1f);
-                    groundPlinthObj.SetActive(true);
-                }
-
-                // 2. Soft contact shadow di bawah plinth
+                // Soft contact shadow di bawah kaki hero (bayangan lembut alami menapak di tanah)
                 if (groundShadowObj == null)
                 {
                     groundShadowObj = new GameObject("GroundShadow_2.5D");
@@ -660,7 +606,7 @@ namespace FantasyDefense.Combat
                     groundShadowSr.sprite = Resources.Load<Sprite>("Sprites/UI/Shadow_Ground_Oval");
                     groundShadowSr.sortingLayerName = "Gem";
                     groundShadowSr.color = new Color(0f, 0f, 0f, 0.42f);
-                    groundShadowObj.transform.localScale = new Vector3(0.85f, 0.35f, 1f);
+                    groundShadowObj.transform.localScale = new Vector3(0.95f, 0.45f, 1f);
                 }
                 else
                 {
@@ -675,7 +621,6 @@ namespace FantasyDefense.Combat
             }
             else
             {
-                if (groundPlinthObj != null) groundPlinthObj.SetActive(false);
                 if (groundShadowObj != null) groundShadowObj.SetActive(false);
             }
         }

@@ -478,8 +478,8 @@ namespace Rampartbound.Editor
             pulseRect.offsetMin = Vector2.zero;
             pulseRect.offsetMax = Vector2.zero;
 
-            // Dual Heroes Title Screen (Pippin di kiri, Cedric di kanan menyambut berdua di atas jalan setapak)
-            // A. Pippin Container & Plinth (Diturunkan agar menapak di jalan setapak tanah)
+            // Dual Heroes Title Screen (Pippin di kiri, Cedric di kanan menyambut berdua langsung menapak di jalan setapak tanpa tatakan/plinth)
+            // A. Pippin Container & Ground Shadow
             var pippinGroup = new GameObject("Title_Hero_Pippin_Group", typeof(RectTransform));
             pippinGroup.transform.SetParent(titlePanelObj.transform, false);
             var pippinGroupRt = pippinGroup.GetComponent<RectTransform>();
@@ -488,23 +488,24 @@ namespace Rampartbound.Editor
             pippinGroupRt.offsetMin = Vector2.zero;
             pippinGroupRt.offsetMax = Vector2.zero;
 
-            // Pippin Plinth Base
-            var pippinPlinthObj = new GameObject("Pippin_Plinth_Base", typeof(RectTransform), typeof(Image));
-            pippinPlinthObj.transform.SetParent(pippinGroup.transform, false);
-            var pippinPlinthRt = pippinPlinthObj.GetComponent<RectTransform>();
-            pippinPlinthRt.anchorMin = new Vector2(0.08f, 0f);
-            pippinPlinthRt.anchorMax = new Vector2(0.92f, 0.26f);
-            pippinPlinthRt.offsetMin = Vector2.zero;
-            pippinPlinthRt.offsetMax = Vector2.zero;
-            var pippinPlinthImg = pippinPlinthObj.GetComponent<Image>();
-            if (_plinthT1 != null) { pippinPlinthImg.sprite = _plinthT1; pippinPlinthImg.preserveAspect = true; }
-            pippinPlinthImg.raycastTarget = false;
+            // Pippin Soft Ground Shadow (Bayangan alami di tanah tanpa tatakan plinth kaku)
+            var pippinShadowObj = new GameObject("Pippin_Ground_Shadow", typeof(RectTransform), typeof(Image));
+            pippinShadowObj.transform.SetParent(pippinGroup.transform, false);
+            var pippinShadowRt = pippinShadowObj.GetComponent<RectTransform>();
+            pippinShadowRt.anchorMin = new Vector2(0.18f, 0.02f);
+            pippinShadowRt.anchorMax = new Vector2(0.82f, 0.16f);
+            pippinShadowRt.offsetMin = Vector2.zero;
+            pippinShadowRt.offsetMax = Vector2.zero;
+            var pippinShadowImg = pippinShadowObj.GetComponent<Image>();
+            if (_shadowOval != null) { pippinShadowImg.sprite = _shadowOval; pippinShadowImg.preserveAspect = true; }
+            pippinShadowImg.color = new Color(0f, 0f, 0f, 0.45f);
+            pippinShadowImg.raycastTarget = false;
 
             // Pippin Sprite
             var pippinSpriteObj = new GameObject("Pippin_Sprite_Img", typeof(RectTransform), typeof(Image));
             pippinSpriteObj.transform.SetParent(pippinGroup.transform, false);
             var pippinSpriteRt = pippinSpriteObj.GetComponent<RectTransform>();
-            pippinSpriteRt.anchorMin = new Vector2(0.05f, 0.12f);
+            pippinSpriteRt.anchorMin = new Vector2(0.05f, 0.08f);
             pippinSpriteRt.anchorMax = new Vector2(0.95f, 1f);
             pippinSpriteRt.offsetMin = Vector2.zero;
             pippinSpriteRt.offsetMax = Vector2.zero;
@@ -512,7 +513,7 @@ namespace Rampartbound.Editor
             if (_heroRabbitSprite != null) { pippinImg.sprite = _heroRabbitSprite; pippinImg.preserveAspect = true; }
             pippinImg.raycastTarget = false;
 
-            // B. Cedric Container & Plinth (Diturunkan agar menapak di jalan setapak tanah)
+            // B. Cedric Container & Ground Shadow
             var cedricGroup = new GameObject("Title_Hero_Cedric_Group", typeof(RectTransform));
             cedricGroup.transform.SetParent(titlePanelObj.transform, false);
             var cedricGroupRt = cedricGroup.GetComponent<RectTransform>();
@@ -521,23 +522,24 @@ namespace Rampartbound.Editor
             cedricGroupRt.offsetMin = Vector2.zero;
             cedricGroupRt.offsetMax = Vector2.zero;
 
-            // Cedric Plinth Base
-            var cedricPlinthObj = new GameObject("Cedric_Plinth_Base", typeof(RectTransform), typeof(Image));
-            cedricPlinthObj.transform.SetParent(cedricGroup.transform, false);
-            var cedricPlinthRt = cedricPlinthObj.GetComponent<RectTransform>();
-            cedricPlinthRt.anchorMin = new Vector2(0.08f, 0f);
-            cedricPlinthRt.anchorMax = new Vector2(0.92f, 0.26f);
-            cedricPlinthRt.offsetMin = Vector2.zero;
-            cedricPlinthRt.offsetMax = Vector2.zero;
-            var cedricPlinthImg = cedricPlinthObj.GetComponent<Image>();
-            if (_plinthT1 != null) { cedricPlinthImg.sprite = _plinthT1; cedricPlinthImg.preserveAspect = true; }
-            cedricPlinthImg.raycastTarget = false;
+            // Cedric Soft Ground Shadow (Bayangan alami di tanah tanpa tatakan plinth kaku)
+            var cedricShadowObj = new GameObject("Cedric_Ground_Shadow", typeof(RectTransform), typeof(Image));
+            cedricShadowObj.transform.SetParent(cedricGroup.transform, false);
+            var cedricShadowRt = cedricShadowObj.GetComponent<RectTransform>();
+            cedricShadowRt.anchorMin = new Vector2(0.18f, 0.02f);
+            cedricShadowRt.anchorMax = new Vector2(0.82f, 0.16f);
+            cedricShadowRt.offsetMin = Vector2.zero;
+            cedricShadowRt.offsetMax = Vector2.zero;
+            var cedricShadowImg = cedricShadowObj.GetComponent<Image>();
+            if (_shadowOval != null) { cedricShadowImg.sprite = _shadowOval; cedricShadowImg.preserveAspect = true; }
+            cedricShadowImg.color = new Color(0f, 0f, 0f, 0.45f);
+            cedricShadowImg.raycastTarget = false;
 
             // Cedric Sprite (Dibalik horizontal scale X = -1 agar menghadap ke kiri, menyambut dan berhadapan dengan Pippin!)
             var cedricSpriteObj = new GameObject("Cedric_Sprite_Img", typeof(RectTransform), typeof(Image));
             cedricSpriteObj.transform.SetParent(cedricGroup.transform, false);
             var cedricSpriteRt = cedricSpriteObj.GetComponent<RectTransform>();
-            cedricSpriteRt.anchorMin = new Vector2(0.05f, 0.12f);
+            cedricSpriteRt.anchorMin = new Vector2(0.05f, 0.08f);
             cedricSpriteRt.anchorMax = new Vector2(0.95f, 1f);
             cedricSpriteRt.offsetMin = Vector2.zero;
             cedricSpriteRt.offsetMax = Vector2.zero;
