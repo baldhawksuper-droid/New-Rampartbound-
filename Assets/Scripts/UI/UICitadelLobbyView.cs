@@ -102,7 +102,10 @@ namespace FantasyDefense.UI
             if (navEventArenaButton != null) navEventArenaButton.gameObject.SetActive(showEventArena);
             if (navArtifactsButton != null) navArtifactsButton.gameObject.SetActive(showArtifacts);
             if (navForgeButton != null) navForgeButton.gameObject.SetActive(showForge);
+            if (navStageMapButton != null) navStageMapButton.gameObject.SetActive(true);
+            if (navHeroesButton != null) navHeroesButton.gameObject.SetActive(true);
             if (navSummonButton != null) navSummonButton.gameObject.SetActive(true);
+            if (navStoreButton != null) navStoreButton.gameObject.SetActive(true);
 
             // Jika quick action bar semua disembunyikan, sembunyikan bar container-nya
             if (navTalentsButton != null && navTalentsButton.transform.parent != null)

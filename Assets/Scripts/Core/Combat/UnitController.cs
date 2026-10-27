@@ -681,8 +681,8 @@ namespace FantasyDefense.Combat
         }
 
         [Header("Combat Presentation Scaling")]
-        [Tooltip("Rasio ukuran unit hero saat mode tempur (berdiri di atas tatakan plinth)")]
-        [SerializeField] protected float combatHeroScaleMultiplier = 0.72f;
+        [Tooltip("Rasio ukuran unit hero saat mode tempur (berdiri di atas tatakan plinth). Diset 1.05f agar tampak gagah dan berbobot tanpa mengecil.")]
+        [SerializeField] protected float combatHeroScaleMultiplier = 1.05f;
 
         public virtual void UpdateVisualAppearance()
         {
@@ -732,7 +732,8 @@ namespace FantasyDefense.Combat
             float targetScale = (cellW * currentFill) / Mathf.Max(0.01f, spriteW);
             if (isPreparationToken || currentTier == UnitTier.Tier0)
             {
-                targetScale = Mathf.Clamp(targetScale, 0.65f, 1.25f);
+                // Kalibrasi ketat agar Gem pas di dalam kotak dan tidak meluap keluar garis batas petak
+                targetScale = Mathf.Clamp(targetScale, 0.65f, 0.82f);
             }
             transform.localScale = Vector3.one * targetScale;
 

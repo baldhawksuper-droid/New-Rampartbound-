@@ -211,19 +211,7 @@ namespace Rampartbound.Editor
             var archerTurret = archerObj.AddComponent<CitadelDefenseTurret>();
             archerTurret.Initialize(CitadelTurretType.Archer, archerSprite);
 
-            // Relik Inti Benteng Kerajaan (Citadel Arcane Core Relic)
-            var coreObj = new GameObject("Citadel_Core_Relic");
-            coreObj.transform.SetParent(barricadeObj.transform);
-            coreObj.transform.localPosition = new Vector3(0f, -0.65f, 0);
-            var coreSr = coreObj.AddComponent<SpriteRenderer>();
-            var coreSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Combat/arcane_rune_cube.png");
-            if (coreSprite != null)
-            {
-                coreSr.sprite = coreSprite;
-                coreSr.sortingLayerName = "Board";
-                coreSr.sortingOrder = 9;
-                coreObj.transform.localScale = Vector3.one * 0.48f;
-            }
+            // Relik Inti Benteng / Turret Clutter ditiadakan agar arena bersih sesuai QA standard dan tidak menutupi barikade/grid.
 
             // Waypoints Lintasan Monster Adaptif (MonsterPathManager)
             // Membiarkan MonsterPathManager menghitung lintasan U-shape perimeter di sisi luar petak Grid
@@ -458,8 +446,8 @@ namespace Rampartbound.Editor
             // Menggunakan warna teks Putih Bersih Tebal (High-Readability) dengan Outline Gelap Tajam
             var startBtnObj = CreateButton(titlePanelObj.transform, "EnterCitadelButton", "🏰 TAP TO START", Color.white, Color.white, 38, defaultFont);
             var startBtnRect = startBtnObj.GetComponent<RectTransform>();
-            startBtnRect.anchorMin = new Vector2(0.12f, 0.12f);
-            startBtnRect.anchorMax = new Vector2(0.88f, 0.22f);
+            startBtnRect.anchorMin = new Vector2(0.12f, 0.09f);
+            startBtnRect.anchorMax = new Vector2(0.88f, 0.19f);
             startBtnRect.offsetMin = Vector2.zero;
             startBtnRect.offsetMax = Vector2.zero;
             if (_titleBtnTap != null)
@@ -485,18 +473,18 @@ namespace Rampartbound.Editor
 
             var pulseTxt = CreateText(titlePanelObj.transform, "PulsingHintText", "Ketuk Layar untuk Memulai Pertahanan", 24, FontStyle.Italic, TextAnchor.MiddleCenter, new Color(1f, 1f, 1f, 0.85f), defaultFont);
             var pulseRect = pulseTxt.GetComponent<RectTransform>();
-            pulseRect.anchorMin = new Vector2(0.1f, 0.06f);
-            pulseRect.anchorMax = new Vector2(0.9f, 0.11f);
+            pulseRect.anchorMin = new Vector2(0.1f, 0.035f);
+            pulseRect.anchorMax = new Vector2(0.9f, 0.085f);
             pulseRect.offsetMin = Vector2.zero;
             pulseRect.offsetMax = Vector2.zero;
 
-            // Dual Heroes Title Screen (Pippin di kiri, Cedric di kanan menyambut berdua)
-            // A. Pippin Container & Plinth
+            // Dual Heroes Title Screen (Pippin di kiri, Cedric di kanan menyambut berdua di atas jalan setapak)
+            // A. Pippin Container & Plinth (Diturunkan agar menapak di jalan setapak tanah)
             var pippinGroup = new GameObject("Title_Hero_Pippin_Group", typeof(RectTransform));
             pippinGroup.transform.SetParent(titlePanelObj.transform, false);
             var pippinGroupRt = pippinGroup.GetComponent<RectTransform>();
-            pippinGroupRt.anchorMin = new Vector2(0.04f, 0.23f);
-            pippinGroupRt.anchorMax = new Vector2(0.48f, 0.60f);
+            pippinGroupRt.anchorMin = new Vector2(0.04f, 0.12f);
+            pippinGroupRt.anchorMax = new Vector2(0.48f, 0.49f);
             pippinGroupRt.offsetMin = Vector2.zero;
             pippinGroupRt.offsetMax = Vector2.zero;
 
@@ -524,12 +512,12 @@ namespace Rampartbound.Editor
             if (_heroRabbitSprite != null) { pippinImg.sprite = _heroRabbitSprite; pippinImg.preserveAspect = true; }
             pippinImg.raycastTarget = false;
 
-            // B. Cedric Container & Plinth
+            // B. Cedric Container & Plinth (Diturunkan agar menapak di jalan setapak tanah)
             var cedricGroup = new GameObject("Title_Hero_Cedric_Group", typeof(RectTransform));
             cedricGroup.transform.SetParent(titlePanelObj.transform, false);
             var cedricGroupRt = cedricGroup.GetComponent<RectTransform>();
-            cedricGroupRt.anchorMin = new Vector2(0.52f, 0.23f);
-            cedricGroupRt.anchorMax = new Vector2(0.96f, 0.60f);
+            cedricGroupRt.anchorMin = new Vector2(0.52f, 0.12f);
+            cedricGroupRt.anchorMax = new Vector2(0.96f, 0.49f);
             cedricGroupRt.offsetMin = Vector2.zero;
             cedricGroupRt.offsetMax = Vector2.zero;
 

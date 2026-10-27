@@ -61,6 +61,8 @@ namespace FantasyDefense.Combat
 
         [Header("Barricade Combat Interaction")]
         [SerializeField] protected bool isAttackingBarricade = false;
+        [SerializeField] protected bool isAttackingHero = false;
+        public bool IsAttackingHero => isAttackingHero;
         [SerializeField] protected float barricadeAttackInterval = 1.2f;
         protected float barricadeAttackTimer = 0f;
 
@@ -243,8 +245,13 @@ namespace FantasyDefense.Combat
             UnitController blockingHero = FindBlockingHero();
             if (blockingHero != null && blockingHero.IsAlive)
             {
+                isAttackingHero = true;
                 EngageHero(blockingHero);
                 return;
+            }
+            else
+            {
+                isAttackingHero = false;
             }
 
             MoveAlongWaypoints();
@@ -252,6 +259,7 @@ namespace FantasyDefense.Combat
 
         /// <summary>
         /// Mencari pahlawan (UnitController) terdekat yang berada di depan monster untuk dihadang dan diserang terlebih dahulu.
+        /// Menggunakan deteksi body-blocking berbasis lajur (lane) horizontal & vertikal agar monster tidak menyelinap lewat sisi tepi.
         /// </summary>
         protected virtual UnitController FindBlockingHero()
         {
@@ -265,12 +273,26 @@ namespace FantasyDefense.Combat
                 var hero = heroes[i];
                 if (hero == null || !hero.IsAlive || hero.CurrentTier == UnitTier.Tier0) continue;
 
+                float dx = Mathf.Abs(hero.transform.position.x - myPos.x);
+                float dy = myPos.y - hero.transform.position.y; // bernilai positif jika monster berada di atas hero (menuju hero)
                 float dist = Vector3.Distance(myPos, hero.transform.position);
-                // Hero yang berada di depan/bawah monster dalam jangkauan melee (monster bergerak turun)
-                if (dist <= closestDist && hero.transform.position.y <= myPos.y + 0.35f)
+
+                // Body-Blocking Hard Gate:
+                // 1. Hero berada di radius lingkaran melee (dist <= closestDist)
+                // 2. ATAU monster berada di lajur yang sama (|dx| <= 0.85f) dan sedang melaju turun tepat di depan hero (dy antara -0.2f dan 1.25f)
+                bool isInLaneFront = (dx <= 0.85f && dy >= -0.2f && dy <= 1.25f);
+
+                if (dist <= closestDist || isInLaneFront)
                 {
-                    closestDist = dist;
-                    bestHero = hero;
+                    if (dist < closestDist)
+                    {
+                        closestDist = dist;
+                        bestHero = hero;
+                    }
+                    else if (bestHero == null)
+                    {
+                        bestHero = hero;
+                    }
                 }
             }
 
@@ -340,6 +362,7 @@ namespace FantasyDefense.Combat
 
         protected virtual void MoveAlongWaypoints()
         {
+            if (isAttackingHero || isAttackingBarricade) return;
             if (waypoints == null || currentWaypointIndex >= waypoints.Length) return;
 
             Vector3 targetPoint = waypoints[currentWaypointIndex] + new Vector3(laneOffset, 0f, 0f);
@@ -559,6 +582,7 @@ namespace FantasyDefense.Combat
             if (isDead) return;
             isDead = true;
             isAttackingBarricade = false;
+            isAttackingHero = false;
 
             if (miniHpBarRoot != null)
             {
