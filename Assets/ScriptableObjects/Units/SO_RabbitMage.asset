@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: SO_RabbitMage
   unitType: 2
   tier: 1
-  heroName: Rabbit Mage
-  title: Penyihir Kelinci
+  heroName: Pippin
+  title: The Rabbit Mage
   description: Penyihir bertopi biru bertongkat kristal. Menembakkan sihir dari kejauhan dengan damage ledakan area dan efek slow.
   baseDamage: 26
   attackRate: 0.8
@@ -29,9 +29,13 @@ MonoBehaviour:
   tier1Sprite: {fileID: 21300000, guid: 054ffe8b651740a1aef057e195bb258c, type: 3}
   tier2Sprite: {fileID: 21300000, guid: beb51c4203af4119b916917a0ec16bab, type: 3}
   tier3Sprite: {fileID: 21300000, guid: 0487eda6da4240e5ae834782b9e4845f, type: 3}
+  tier4Sprite: {fileID: 21300000, guid: b6b39f4fcd88400c8eb160d79a815ce9, type: 3}
+  tier5Sprite: {fileID: 21300000, guid: 99dd1b1bd2c8418db6b8a26553e811a5, type: 3}
   preparationTokenSprite: {fileID: 21300000, guid: 767875503dce432cac353e0dac9fa733, type: 3}
   preparationTokenTier2Sprite: {fileID: 21300000, guid: 0cac2ba3f44d9ffbbbd06ef179caf23e, type: 3}
   preparationTokenTier3Sprite: {fileID: 21300000, guid: bdd7cc24eff803d4903b6af3b313a9ac, type: 3}
+  preparationTokenTier4Sprite: {fileID: 21300000, guid: 907b047fe799431da6f61770d6311aa0, type: 3}
+  preparationTokenTier5Sprite: {fileID: 21300000, guid: 2d7d604bc91e4cb2b5fa865e5ba45cf1, type: 3}
   skillName: Meteor Strike
   skillDescription: Hujan meteor api kristal yang membakar dan memperlambat pergerakan monster.
   skillCooldown: 7

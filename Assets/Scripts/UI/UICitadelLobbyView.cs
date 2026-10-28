@@ -432,7 +432,7 @@ namespace FantasyDefense.UI
             {
                 UnitType.Cedric => "Cedric_T1",
                 UnitType.RoseTanker => "Rose_T1",
-                UnitType.RabbitMage => "Pippin_T1",
+                UnitType.RabbitMage => "RabbitMage_T1",
                 UnitType.WindRanger => "WindRanger_T1",
                 _ => "Cedric_T1"
             };

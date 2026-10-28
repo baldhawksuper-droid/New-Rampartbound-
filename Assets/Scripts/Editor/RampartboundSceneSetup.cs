@@ -2133,7 +2133,7 @@ namespace Rampartbound.Editor
             if (_keyVisualBanner == null) _keyVisualBanner = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Rampartbound_KeyVisual_Banner.jpg");
             if (_heroCedricSprite == null) _heroCedricSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Heroes/Cedric_T1.png");
             if (_heroRoseSprite == null) _heroRoseSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Heroes/Rose_T1.png");
-            if (_heroRabbitSprite == null) _heroRabbitSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Heroes/RabbitMage_T1.png") ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Heroes/Pippin_T1.png");
+            if (_heroRabbitSprite == null) _heroRabbitSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Heroes/RabbitMage_T1.png");
             if (_heroWindSprite == null) _heroWindSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Heroes/WindRanger_T1.png");
             if (_btnBattleCrimson == null) _btnBattleCrimson = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Btn_Battle_Crimson.png");
             if (_bannerTeamCP == null) _bannerTeamCP = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Banner_Team_CP.png");
