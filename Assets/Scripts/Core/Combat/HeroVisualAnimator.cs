@@ -29,6 +29,16 @@ namespace FantasyDefense.Combat
         [SerializeField] private Sprite[] skillFrames;
         [SerializeField] private float frameRate = 8f;
 
+        public void SetAttackFrames(Sprite[] frames)
+        {
+            attackFrames = frames;
+        }
+
+        public void SetIdleFrames(Sprite[] frames)
+        {
+            idleFrames = frames;
+        }
+
         [Header("Procedural Juice Settings")]
         [Tooltip("Aktifkan animasi nafas (breathing bobbing) saat posisi diam")]
         [SerializeField] private bool enableIdleBreathing = true;
@@ -197,6 +207,8 @@ namespace FantasyDefense.Combat
             Vector3 windupPos = anchorPos - dir * 0.08f;
             Vector3 lungePos = anchorPos + dir * attackLungeDistance;
 
+            Sprite defaultSprite = spriteRenderer != null ? spriteRenderer.sprite : null;
+
             // Orientasi serangan: Kemiringan hero condong halus ke arah lintasan tebasan monster
             float attackTilt = Mathf.Clamp(-dir.x * 22f, -25f, 25f);
             Quaternion strikeRot = Quaternion.Euler(0f, 0f, attackTilt);
@@ -209,6 +221,11 @@ namespace FantasyDefense.Combat
             float tReturn = totalDur * 0.38f;
 
             // 1. Fase Windup / Tarikan Mundur (Mengumpulkan tenaga tebasan dengan squash halus)
+            if (attackFrames != null && attackFrames.Length > 0 && attackFrames[0] != null && spriteRenderer != null)
+            {
+                spriteRenderer.sprite = attackFrames[0];
+            }
+
             float elapsed = 0f;
             while (elapsed < tWindup)
             {
@@ -223,7 +240,12 @@ namespace FantasyDefense.Combat
                 yield return null;
             }
 
-            // 2. Fase Dynamic Slash Lunge (Terjangan tebasan maju bertenaga dengan akselerasi cubic out)
+            // 2. Fase Dynamic Slash / Ground Slam Impact (Berganti ke pose hantaman/tebasan seketika saat menerjang)
+            if (attackFrames != null && attackFrames.Length > 1 && attackFrames[1] != null && spriteRenderer != null)
+            {
+                spriteRenderer.sprite = attackFrames[1];
+            }
+
             elapsed = 0f;
             while (elapsed < tLunge)
             {
@@ -238,7 +260,12 @@ namespace FantasyDefense.Combat
                 yield return null;
             }
 
-            // 3. Fase Follow-Through Apex (Menahan sejenak di puncak tebasan saat proyektil tebasan meluncur)
+            // 3. Fase Follow-Through Apex (Menahan sejenak di puncak tebasan saat efek gempa/sabit api meledak)
+            if (attackFrames != null && attackFrames.Length > 2 && attackFrames[2] != null && spriteRenderer != null)
+            {
+                spriteRenderer.sprite = attackFrames[2];
+            }
+
             elapsed = 0f;
             while (elapsed < tFollow)
             {
@@ -249,7 +276,7 @@ namespace FantasyDefense.Combat
                 yield return null;
             }
 
-            // 4. Fase Elastic Return & Settle (Kembali meluncur mulus ke tatakan plinth dengan pendaratan empuk)
+            // 4. Fase Elastic Return & Settle (Kembali meluncur mulus ke tatakan plinth dengan pose siaga)
             elapsed = 0f;
             Vector3 peakPos = transform.position;
             Quaternion peakRot = transform.localRotation;
@@ -266,6 +293,11 @@ namespace FantasyDefense.Combat
                                                    baseScale.z);
                 transform.localRotation = Quaternion.Slerp(peakRot, Quaternion.identity, ease);
                 yield return null;
+            }
+
+            if (defaultSprite != null && spriteRenderer != null)
+            {
+                spriteRenderer.sprite = defaultSprite;
             }
 
             transform.position = anchorPos;

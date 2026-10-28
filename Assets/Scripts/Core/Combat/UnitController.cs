@@ -695,6 +695,24 @@ namespace FantasyDefense.Combat
                 {
                     targetSprite = unitData.GetSpriteForTier(currentTier);
                 }
+
+                // Pemuatan dinamis multi-frame combat sequence (Ready, Strike, Follow-through) jika tersedia
+                if (!isPreparationToken && currentTier > UnitTier.Tier0 && visualAnimator != null && !string.IsNullOrEmpty(combatPath))
+                {
+                    var frameList = new System.Collections.Generic.List<Sprite>();
+                    if (targetSprite != null) frameList.Add(targetSprite);
+
+                    Sprite strikeFrame = Resources.Load<Sprite>($"{combatPath}_Strike");
+                    if (strikeFrame != null) frameList.Add(strikeFrame);
+
+                    Sprite followFrame = Resources.Load<Sprite>($"{combatPath}_Follow");
+                    if (followFrame != null) frameList.Add(followFrame);
+
+                    if (frameList.Count > 1)
+                    {
+                        visualAnimator.SetAttackFrames(frameList.ToArray());
+                    }
+                }
             }
 
             if (targetSprite != null)
