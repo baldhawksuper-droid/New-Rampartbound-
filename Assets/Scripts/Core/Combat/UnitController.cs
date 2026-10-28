@@ -678,7 +678,7 @@ namespace FantasyDefense.Combat
                 // Cari variasi sprite tempur aktif (Combat / Combat_North) jika tersedia di Resources
                 string combatPath = unitData.unitType switch
                 {
-                    UnitType.Cedric => $"Sprites/Heroes/Cedric_T{(int)currentTier}_Combat_North",
+                    UnitType.Cedric => $"Sprites/Heroes/Cedric_T{(int)currentTier}_Combat",
                     UnitType.RabbitMage => $"Sprites/Heroes/RabbitMage_T{(int)currentTier}_Combat",
                     UnitType.RoseTanker => $"Sprites/Heroes/Rose_T{(int)currentTier}_Combat",
                     _ => null
@@ -686,7 +686,8 @@ namespace FantasyDefense.Combat
 
                 if (!string.IsNullOrEmpty(combatPath))
                 {
-                    targetSprite = Resources.Load<Sprite>(combatPath);
+                    targetSprite = Resources.Load<Sprite>(combatPath)
+                                ?? Resources.Load<Sprite>($"{combatPath}_North");
                 }
 
                 // Fallback default: Gunakan master sprite kanonikal hero berdasarkan tier
