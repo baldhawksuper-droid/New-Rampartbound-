@@ -675,14 +675,21 @@ namespace FantasyDefense.Combat
             }
             else
             {
-                // Untuk Cedric T1, gunakan sprite tempur menghadap ke depan/utara medan perang
-                if (unitData.unitType == UnitType.Cedric && currentTier == UnitTier.Tier1)
+                // Cari variasi sprite tempur aktif (Combat / Combat_North) jika tersedia di Resources
+                string combatPath = unitData.unitType switch
                 {
-                    targetSprite = Resources.Load<Sprite>("Sprites/Heroes/Cedric_T1_Combat_North");
+                    UnitType.Cedric => $"Sprites/Heroes/Cedric_T{(int)currentTier}_Combat_North",
+                    UnitType.RabbitMage => $"Sprites/Heroes/RabbitMage_T{(int)currentTier}_Combat",
+                    UnitType.RoseTanker => $"Sprites/Heroes/Rose_T{(int)currentTier}_Combat",
+                    _ => null
+                };
+
+                if (!string.IsNullOrEmpty(combatPath))
+                {
+                    targetSprite = Resources.Load<Sprite>(combatPath);
                 }
 
-                // Untuk Pippin dan Rose (serta seluruh tier pahlawan lainnya), pertahankan 100% konsistensi
-                // sprite master chibi kanonikal (ekspresi wajah, mata, dan proporsi detail terlihat jelas)
+                // Fallback default: Gunakan master sprite kanonikal hero berdasarkan tier
                 if (targetSprite == null)
                 {
                     targetSprite = unitData.GetSpriteForTier(currentTier);
