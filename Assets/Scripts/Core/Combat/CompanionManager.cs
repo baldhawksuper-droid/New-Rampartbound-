@@ -14,11 +14,11 @@ namespace FantasyDefense.Combat
         public static CompanionManager Instance { get; private set; }
 
         [Header("Ignis The Pyre Owl (Turret Attack Speed Booster)")]
-        [SerializeField] private bool isIgnisUnlocked = true;
+        [SerializeField] private bool isIgnisUnlocked = false; // Disimpan / nonaktif sementara sesuai arahan pemain
         [SerializeField] private float ignisCannonSpeedBoostPercent = 0.15f; // +15%
 
         [Header("Barnaby The Bulwark Porter (Wave Barricade Repairer)")]
-        [SerializeField] private bool isBarnabyUnlocked = true;
+        [SerializeField] private bool isBarnabyUnlocked = false; // Disimpan / nonaktif sementara sesuai arahan pemain
         [SerializeField] private int barnabyWaveRepairAmount = 10; // +10 HP
 
         public bool IsIgnisUnlocked => isIgnisUnlocked;
