@@ -100,39 +100,15 @@ namespace Rampartbound.Editor
                 EditorPrefs.SetBool("AndroidNdkUseEmbedded", true);
             }
 
-            // 4c. Konfigurasi Ikon Aplikasi Resmi Android & Desktop (Legacy & Android 8+ Adaptive Icons)
+            // 4c. Konfigurasi Ikon Aplikasi Resmi Android & Desktop
             Texture2D appIcon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Art/Sprites/UI/App_Icon_Pippin_512.png") ?? AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Art/Sprites/UI/App_Icon_512.png");
             if (appIcon != null)
             {
+#pragma warning disable CS0618
                 PlayerSettings.SetIconsForTargetGroup(BuildTargetGroup.Android, new Texture2D[] { appIcon });
                 PlayerSettings.SetIconsForTargetGroup(BuildTargetGroup.Unknown, new Texture2D[] { appIcon });
                 PlayerSettings.SetIconsForTargetGroup(BuildTargetGroup.Standalone, new Texture2D[] { appIcon });
-
-                // Konfigurasi Android Adaptive Icon (Foreground & Background) agar Unity tidak menimpa kubus default di tengah!
-                try
-                {
-                    var platform = UnityEditor.Android.AndroidPlatformIconProvider.AndroidPlatformIcon;
-                    var icons = PlayerSettings.GetPlatformIcons(BuildTargetGroup.Android, platform);
-                    for (int i = 0; i < icons.Length; i++)
-                    {
-                        var kind = icons[i].GetKind();
-                        if (kind == UnityEditor.Android.AndroidPlatformIconKind.Adaptive)
-                        {
-                            // Layer 0: Background, Layer 1: Foreground
-                            icons[i].SetTextures(new Texture2D[] { appIcon, appIcon });
-                        }
-                        else
-                        {
-                            icons[i].SetTexture(appIcon);
-                        }
-                    }
-                    PlayerSettings.SetPlatformIcons(BuildTargetGroup.Android, platform, icons);
-                    Debug.Log("[BuildPipeline] Android Adaptive Platform Icons berhasil disinkronkan ke Pippin 512!");
-                }
-                catch (System.Exception ex)
-                {
-                    Debug.LogWarning("[BuildPipeline] Lewati konfigurasi Adaptive Platform Icons: " + ex.Message);
-                }
+#pragma warning restore CS0618
 
                 Debug.Log("[BuildPipeline] Ikon resmi Rampartbound: Merge Defense (512x512) berhasil didaftarkan ke PlayerSettings!");
             }
