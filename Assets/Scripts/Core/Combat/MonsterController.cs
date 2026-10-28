@@ -55,9 +55,10 @@ namespace FantasyDefense.Combat
         protected Vector3 baseScale = Vector3.one;
 
         [Header("Hero Combat Interaction")]
-        [SerializeField] protected float heroEngagementRange = 0.95f;
+        [SerializeField] protected float heroEngagementRange = 1.35f;
         [SerializeField] protected float heroAttackInterval = 1.0f;
         protected float heroAttackTimer = 0f;
+        protected UnitController currentEngagedHero = null;
 
         [Header("Barricade Combat Interaction")]
         [SerializeField] protected bool isAttackingBarricade = false;
@@ -241,10 +242,30 @@ namespace FantasyDefense.Combat
                 return;
             }
 
-            // Prioritas Tempur: Monster mendeteksi pahlawan (hero defender) yang menghadang di depan
+            // Prioritas Tempur: Cek apakah monster sudah mengunci pertarungan dengan pahlawan penghadang (Sticky Engagement)
+            if (currentEngagedHero != null && currentEngagedHero.IsAlive && currentEngagedHero.gameObject.activeInHierarchy)
+            {
+                // Hard Body-Blocking Barrier: Monster tidak boleh melangkah menembus melewati garis tubuh pahlawan
+                float minBlockingY = currentEngagedHero.transform.position.y + 0.35f;
+                if (transform.position.y < minBlockingY)
+                {
+                    transform.position = new Vector3(transform.position.x, minBlockingY, transform.position.z);
+                }
+
+                isAttackingHero = true;
+                EngageHero(currentEngagedHero);
+                return;
+            }
+            else
+            {
+                currentEngagedHero = null;
+            }
+
+            // Deteksi pahlawan (hero defender) yang menghadang di lajur depan
             UnitController blockingHero = FindBlockingHero();
             if (blockingHero != null && blockingHero.IsAlive)
             {
+                currentEngagedHero = blockingHero;
                 isAttackingHero = true;
                 EngageHero(blockingHero);
                 return;
@@ -271,16 +292,16 @@ namespace FantasyDefense.Combat
             for (int i = 0; i < heroes.Count; i++)
             {
                 var hero = heroes[i];
-                if (hero == null || !hero.IsAlive || hero.CurrentTier == UnitTier.Tier0) continue;
+                if (hero == null || !hero.IsAlive || hero.CurrentTier == UnitTier.Tier0 || !hero.gameObject.activeInHierarchy) continue;
 
                 float dx = Mathf.Abs(hero.transform.position.x - myPos.x);
                 float dy = myPos.y - hero.transform.position.y; // bernilai positif jika monster berada di atas hero (menuju hero)
                 float dist = Vector3.Distance(myPos, hero.transform.position);
 
                 // Body-Blocking Hard Gate:
-                // 1. Hero berada di radius lingkaran melee (dist <= closestDist)
-                // 2. ATAU monster berada di lajur yang sama (|dx| <= 0.85f) dan sedang melaju turun tepat di depan hero (dy antara -0.2f dan 1.25f)
-                bool isInLaneFront = (dx <= 0.85f && dy >= -0.2f && dy <= 1.25f);
+                // 1. Hero berada di radius lingkaran benturan melee (dist <= closestDist)
+                // 2. ATAU monster berada di lajur yang sama atau petak bersebelahan (|dx| <= 1.25f) dan sedang melaju turun tepat di depan hero (dy antara -0.3f dan 1.6f)
+                bool isInLaneFront = (dx <= 1.25f && dy >= -0.3f && dy <= 1.6f);
 
                 if (dist <= closestDist || isInLaneFront)
                 {
@@ -340,7 +361,13 @@ namespace FantasyDefense.Combat
         {
             if (targetHero == null) yield break;
             Vector3 startPos = transform.position;
-            Vector3 lungeTarget = Vector3.Lerp(startPos, targetHero.transform.position, 0.35f);
+            // Lunge dibatasi agar tidak meluncur melewati posisi pahlawan
+            float targetY = Mathf.Max(startPos.y - 0.25f, targetHero.transform.position.y + 0.35f);
+            Vector3 lungeTarget = new Vector3(
+                Mathf.Lerp(startPos.x, targetHero.transform.position.x, 0.45f),
+                targetY,
+                startPos.z
+            );
 
             float t = 0f;
             while (t < 0.10f)

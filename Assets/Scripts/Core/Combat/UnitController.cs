@@ -283,7 +283,7 @@ namespace FantasyDefense.Combat
                 ? spriteRenderer.sprite.bounds.size.x
                 : (spriteRenderer.sprite != null ? (spriteRenderer.sprite.rect.width / spriteRenderer.sprite.pixelsPerUnit) : 1f);
             float targetScale = (cellW * fillRatio) / Mathf.Max(0.01f, spriteW);
-            targetScale = Mathf.Clamp(targetScale, 0.65f, 1.25f);
+            targetScale = Mathf.Clamp(targetScale, 0.20f, 1.10f);
             Vector3 baseScale = Vector3.one * targetScale;
 
             Color origColor = spriteRenderer.color;
@@ -433,8 +433,7 @@ namespace FantasyDefense.Combat
                 ? spriteRenderer.sprite.bounds.size.x
                 : (spriteRenderer.sprite != null ? (spriteRenderer.sprite.rect.width / spriteRenderer.sprite.pixelsPerUnit) : 1f);
             float targetScale = (cellW * fillRatio) / Mathf.Max(0.01f, spriteW);
-            // Batas minimal skala (clamping) agar permata T0 tidak pernah mengecil secara abnormal saat next wave
-            targetScale = Mathf.Clamp(targetScale, 0.65f, 1.25f);
+            targetScale = Mathf.Clamp(targetScale, 0.20f, 1.10f);
             Vector3 targetScaleVec = Vector3.one * targetScale;
 
             transform.localScale = Vector3.zero;
@@ -677,8 +676,8 @@ namespace FantasyDefense.Combat
             float targetScale = (cellW * currentFill) / Mathf.Max(0.01f, spriteW);
             if (isPreparationToken || currentTier == UnitTier.Tier0)
             {
-                // Kalibrasi ketat agar Gem pas di dalam kotak dan tidak meluap keluar garis batas petak
-                targetScale = Mathf.Clamp(targetScale, 0.65f, 0.82f);
+                // Kalibrasi proporsional agar Gem selalu pas di dalam petak heksagonal dan tidak meluap keluar garis batas
+                targetScale = Mathf.Clamp(targetScale, 0.20f, 1.10f);
             }
             transform.localScale = Vector3.one * targetScale;
 

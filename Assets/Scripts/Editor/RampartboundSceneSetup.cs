@@ -478,13 +478,13 @@ namespace Rampartbound.Editor
             pulseRect.offsetMin = Vector2.zero;
             pulseRect.offsetMax = Vector2.zero;
 
-            // Dual Heroes Title Screen (Pippin di kiri, Cedric di kanan menyambut berdua langsung menapak di jalan setapak tanpa tatakan/plinth)
-            // A. Pippin Container & Ground Shadow
+            // Dual Heroes Title Screen (Pippin dan Cedric berdiri berdampingan kokoh di atas batu jalan setapak)
+            // A. Pippin Container & Ground Shadow (Diposisikan di koridor batu jalan setapak)
             var pippinGroup = new GameObject("Title_Hero_Pippin_Group", typeof(RectTransform));
             pippinGroup.transform.SetParent(titlePanelObj.transform, false);
             var pippinGroupRt = pippinGroup.GetComponent<RectTransform>();
-            pippinGroupRt.anchorMin = new Vector2(0.04f, 0.12f);
-            pippinGroupRt.anchorMax = new Vector2(0.48f, 0.49f);
+            pippinGroupRt.anchorMin = new Vector2(0.24f, 0.12f);
+            pippinGroupRt.anchorMax = new Vector2(0.58f, 0.48f);
             pippinGroupRt.offsetMin = Vector2.zero;
             pippinGroupRt.offsetMax = Vector2.zero;
 
@@ -498,7 +498,7 @@ namespace Rampartbound.Editor
             pippinShadowRt.offsetMax = Vector2.zero;
             var pippinShadowImg = pippinShadowObj.GetComponent<Image>();
             if (_shadowOval != null) { pippinShadowImg.sprite = _shadowOval; pippinShadowImg.preserveAspect = true; }
-            pippinShadowImg.color = new Color(0f, 0f, 0f, 0.45f);
+            pippinShadowImg.color = new Color(0f, 0f, 0f, 0.55f);
             pippinShadowImg.raycastTarget = false;
 
             // Pippin Sprite
@@ -513,12 +513,12 @@ namespace Rampartbound.Editor
             if (_heroRabbitSprite != null) { pippinImg.sprite = _heroRabbitSprite; pippinImg.preserveAspect = true; }
             pippinImg.raycastTarget = false;
 
-            // B. Cedric Container & Ground Shadow
+            // B. Cedric Container & Ground Shadow (Menyambut di atas batu jalan setapak berhadapan dengan Pippin)
             var cedricGroup = new GameObject("Title_Hero_Cedric_Group", typeof(RectTransform));
             cedricGroup.transform.SetParent(titlePanelObj.transform, false);
             var cedricGroupRt = cedricGroup.GetComponent<RectTransform>();
-            cedricGroupRt.anchorMin = new Vector2(0.52f, 0.12f);
-            cedricGroupRt.anchorMax = new Vector2(0.96f, 0.49f);
+            cedricGroupRt.anchorMin = new Vector2(0.46f, 0.10f);
+            cedricGroupRt.anchorMax = new Vector2(0.82f, 0.47f);
             cedricGroupRt.offsetMin = Vector2.zero;
             cedricGroupRt.offsetMax = Vector2.zero;
 
@@ -532,7 +532,7 @@ namespace Rampartbound.Editor
             cedricShadowRt.offsetMax = Vector2.zero;
             var cedricShadowImg = cedricShadowObj.GetComponent<Image>();
             if (_shadowOval != null) { cedricShadowImg.sprite = _shadowOval; cedricShadowImg.preserveAspect = true; }
-            cedricShadowImg.color = new Color(0f, 0f, 0f, 0.45f);
+            cedricShadowImg.color = new Color(0f, 0f, 0f, 0.55f);
             cedricShadowImg.raycastTarget = false;
 
             // Cedric Sprite (Dibalik horizontal scale X = -1 agar menghadap ke kiri, menyambut dan berhadapan dengan Pippin!)
@@ -548,12 +548,12 @@ namespace Rampartbound.Editor
             if (_heroCedricSprite != null) { cedricImg.sprite = _heroCedricSprite; cedricImg.preserveAspect = true; }
             cedricImg.raycastTarget = false;
 
-            // Layer Kursor Tangan Interaktif (Draggable & Idle Tapping)
+            // Layer Kursor Tangan Interaktif (Draggable & Idle Tapping - Tepat menunjuk ke tombol TAP TO START)
             var handObj = new GameObject("Interactive_Hand_Cursor", typeof(RectTransform), typeof(Image));
             handObj.transform.SetParent(titlePanelObj.transform, false);
             var handRt = handObj.GetComponent<RectTransform>();
-            handRt.anchorMin = new Vector2(0.55f, 0.22f);
-            handRt.anchorMax = new Vector2(0.68f, 0.32f);
+            handRt.anchorMin = new Vector2(0.58f, 0.05f);
+            handRt.anchorMax = new Vector2(0.76f, 0.16f);
             handRt.offsetMin = Vector2.zero;
             handRt.offsetMax = Vector2.zero;
             var handImg = handObj.GetComponent<Image>();
@@ -652,24 +652,24 @@ namespace Rampartbound.Editor
             cpOutline.effectColor = new Color(0.25f, 0.12f, 0.02f, 0.95f);
             cpOutline.effectDistance = new Vector2(1.5f, -1.5f);
 
-            // Hero Courtyard Assembly: Transparent container so the fairytale castle cobblestone terrace shows through!
+            // Hero Courtyard Assembly: Wadah pahlawan di teras lantai batu datar depan kastil
             var heroesContainer = CreatePanel(lobbyPanelObj.transform, "HeroCourtyardAssembly", new Color(0f, 0f, 0f, 0f));
-            PositionUI(heroesContainer, 0.02f, 0.225f, 0.98f, 0.835f);
+            PositionUI(heroesContainer, 0.02f, 0.17f, 0.98f, 0.74f);
 
             // Formasi Trio Hero V-Formation:
             // Pippin (Slot 1, Kiri): Lv.12, CP 1,600
             var rabbitCard = CreateButton(heroesContainer.transform, "RabbitCard", "Lv.12 | CP 1,600", new Color(0f, 0f, 0f, 0f), Color.white, 16, defaultFont);
-            PositionUI(rabbitCard, 0.02f, 0.12f, 0.36f, 0.88f);
+            PositionUI(rabbitCard, 0.04f, 0.05f, 0.36f, 0.92f);
             SetupHeroCardPortrait(rabbitCard, _heroRabbitSprite, null);
 
             // Cedric (Slot 2, Tengah Depan): Cedric, Lv.15, CP 1,850
             var cedricCard = CreateButton(heroesContainer.transform, "CedricCard", "Lv.15 | CP 1,850", new Color(0f, 0f, 0f, 0f), Color.white, 16, defaultFont);
-            PositionUI(cedricCard, 0.32f, 0.03f, 0.68f, 0.84f);
-            SetupHeroCardPortrait(cedricCard, _heroCedricSprite, "Cedric");
+            PositionUI(cedricCard, 0.34f, 0.01f, 0.66f, 0.96f);
+            SetupHeroCardPortrait(cedricCard, _heroCedricSprite, null); // Tidak membuat label teks nama terpisah agar tidak menduplikasi info badge
 
             // Rose (Slot 3, Kanan): Lv.14, CP 1,400 (Chibi Palu Emas Raksasa)
             var roseCard = CreateButton(heroesContainer.transform, "RoseCard", "Lv.14 | CP 1,400", new Color(0f, 0f, 0f, 0f), Color.white, 16, defaultFont);
-            PositionUI(roseCard, 0.64f, 0.12f, 0.98f, 0.88f);
+            PositionUI(roseCard, 0.64f, 0.05f, 0.96f, 0.92f);
             SetupHeroCardPortrait(roseCard, _heroRoseSprite, null);
 
             // Slot Ke-4 (Wind Ranger - Expansion Slot)
@@ -678,7 +678,7 @@ namespace Rampartbound.Editor
 
             // Core Battle Button (Crimson 3D Gold Frame with studs)
             var defendBtn = CreateButton(lobbyPanelObj.transform, "DefendCitadelButton", "⚔️ BATTLE (5 ⚡)", new Color(0.85f, 0.15f, 0.15f), Color.white, 32, defaultFont);
-            PositionUI(defendBtn, 0.10f, 0.125f, 0.90f, 0.220f);
+            PositionUI(defendBtn, 0.10f, 0.115f, 0.90f, 0.185f);
 
             var trialBtn = CreateButton(lobbyPanelObj.transform, "AbyssalTrialButton", "🌌 UJIAN ABYSSAL", new Color(0.42f, 0.25f, 0.75f), Color.white, 24, defaultFont);
             trialBtn.SetActive(false);
@@ -2154,10 +2154,10 @@ namespace Rampartbound.Editor
         {
             if (cardObj == null) return;
 
-            // 1. Oval Ground Shadow (di bawah kaki hero standee)
+            // 1. Oval Ground Shadow (di bawah kaki hero standee tepat di atas teras batu)
             var shadowObj = new GameObject("GroundShadow", typeof(RectTransform), typeof(Image));
             shadowObj.transform.SetParent(cardObj.transform, false);
-            PositionUI(shadowObj, 0.15f, 0.16f, 0.85f, 0.30f);
+            PositionUI(shadowObj, 0.15f, 0.10f, 0.85f, 0.22f);
             var shadowImg = shadowObj.GetComponent<Image>();
             if (_shadowOval != null)
             {
@@ -2166,32 +2166,22 @@ namespace Rampartbound.Editor
             shadowImg.color = new Color(0f, 0f, 0f, 0.55f);
             shadowImg.raycastTarget = false;
 
-            // 2. Hero Standee Portrait
+            // 2. Hero Standee Portrait (Proporsional menapak di teras lantai batu)
             if (heroSprite != null)
             {
                 var portraitObj = new GameObject("HeroPortrait", typeof(RectTransform), typeof(Image));
                 portraitObj.transform.SetParent(cardObj.transform, false);
-                PositionUI(portraitObj, 0.02f, 0.22f, 0.98f, 0.98f);
+                PositionUI(portraitObj, 0.02f, 0.14f, 0.98f, 0.98f);
                 var img = portraitObj.GetComponent<Image>();
                 img.sprite = heroSprite;
                 img.preserveAspect = true;
                 img.raycastTarget = false;
             }
 
-            // 3. Name Label (misal Cedric)
-            if (!string.IsNullOrEmpty(heroName))
-            {
-                var nameTxt = CreateText(cardObj.transform, "HeroName", heroName, 20, FontStyle.Bold, TextAnchor.MiddleCenter, Color.white, null);
-                PositionUI(nameTxt.gameObject, 0.05f, 0.18f, 0.95f, 0.28f);
-                var nShadow = nameTxt.gameObject.AddComponent<Shadow>();
-                nShadow.effectColor = new Color(0f, 0f, 0f, 0.9f);
-                nShadow.effectDistance = new Vector2(1.5f, -1.5f);
-            }
-
-            // 4. Info Badge Pill (Lv, CP) di bawah kaki
+            // 3. Info Badge Pill (Lv, CP) menempel rapi tepat di bawah kaki hero
             var badgeObj = new GameObject("BadgePill", typeof(RectTransform), typeof(Image));
             badgeObj.transform.SetParent(cardObj.transform, false);
-            PositionUI(badgeObj, 0.04f, 0.02f, 0.96f, 0.17f);
+            PositionUI(badgeObj, 0.04f, 0.01f, 0.96f, 0.12f);
             var badgeImg = badgeObj.GetComponent<Image>();
             if (_badgeHeroPill != null)
             {
@@ -2212,8 +2202,8 @@ namespace Rampartbound.Editor
                 var rt = txtTrans.GetComponent<RectTransform>();
                 if (rt != null)
                 {
-                    rt.anchorMin = new Vector2(0.04f, 0.02f);
-                    rt.anchorMax = new Vector2(0.96f, 0.17f);
+                    rt.anchorMin = new Vector2(0.04f, 0.01f);
+                    rt.anchorMax = new Vector2(0.96f, 0.12f);
                     rt.offsetMin = Vector2.zero;
                     rt.offsetMax = Vector2.zero;
                 }
@@ -2391,12 +2381,14 @@ namespace Rampartbound.Editor
             var badgeObj = new GameObject("NotificationBadge", typeof(RectTransform), typeof(Image), typeof(UINotificationBadge));
             badgeObj.transform.SetParent(parent, false);
             var rt = badgeObj.GetComponent<RectTransform>();
-            rt.anchorMin = new Vector2(0.70f, 0.65f);
-            rt.anchorMax = new Vector2(0.98f, 0.98f);
-            rt.offsetMin = Vector2.zero;
-            rt.offsetMax = Vector2.zero;
+            rt.anchorMin = new Vector2(1f, 1f);
+            rt.anchorMax = new Vector2(1f, 1f);
+            rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.anchoredPosition = new Vector2(-6f, -6f);
+            rt.sizeDelta = new Vector2(16f, 16f);
 
             var img = badgeObj.GetComponent<Image>();
+            if (_shadowOval != null) img.sprite = _shadowOval;
             img.color = new Color(0.95f, 0.2f, 0.2f, 1f);
             img.raycastTarget = false;
 
