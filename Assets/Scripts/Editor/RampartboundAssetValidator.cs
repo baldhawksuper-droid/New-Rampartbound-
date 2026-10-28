@@ -65,10 +65,14 @@ namespace Rampartbound.Editor
             AuditHero("Cedric Tier 1", "Assets/Art/Sprites/Heroes/Cedric_T1.png", "Assets/ScriptableObjects/Units/SO_Cedric.asset", 1);
             AuditHero("Cedric Tier 2", "Assets/Art/Sprites/Heroes/Cedric_T2.png", "Assets/ScriptableObjects/Units/SO_Cedric.asset", 2);
             AuditHero("Cedric Tier 3", "Assets/Art/Sprites/Heroes/Cedric_T3.png", "Assets/ScriptableObjects/Units/SO_Cedric.asset", 3);
+            AuditHero("Cedric Tier 4", "Assets/Art/Sprites/Heroes/Cedric_T4.png", "Assets/ScriptableObjects/Units/SO_Cedric.asset", 4);
+            AuditHero("Cedric Tier 5", "Assets/Art/Sprites/Heroes/Cedric_T5.png", "Assets/ScriptableObjects/Units/SO_Cedric.asset", 5);
 
             AuditHero("Rose Tanker Tier 1", "Assets/Art/Sprites/Heroes/Rose_T1.png", "Assets/ScriptableObjects/Units/SO_RoseTanker.asset", 1);
             AuditHero("Rose Tanker Tier 2", "Assets/Art/Sprites/Heroes/Rose_T2.png", "Assets/ScriptableObjects/Units/SO_RoseTanker.asset", 2);
             AuditHero("Rose Tanker Tier 3", "Assets/Art/Sprites/Heroes/Rose_T3.png", "Assets/ScriptableObjects/Units/SO_RoseTanker.asset", 3);
+            AuditHero("Rose Tanker Tier 4", "Assets/Art/Sprites/Heroes/Rose_T4.png", "Assets/ScriptableObjects/Units/SO_RoseTanker.asset", 4);
+            AuditHero("Rose Tanker Tier 5", "Assets/Art/Sprites/Heroes/Rose_T5.png", "Assets/ScriptableObjects/Units/SO_RoseTanker.asset", 5);
 
             AuditHero("Rabbit Mage Tier 1", "Assets/Art/Sprites/Heroes/RabbitMage_T1.png", "Assets/ScriptableObjects/Units/SO_RabbitMage.asset", 1);
             AuditHero("Rabbit Mage Tier 2", "Assets/Art/Sprites/Heroes/RabbitMage_T2.png", "Assets/ScriptableObjects/Units/SO_RabbitMage.asset", 2);
