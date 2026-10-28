@@ -192,36 +192,79 @@ namespace FantasyDefense.Combat
         {
             Vector3 anchorPos = GetAnchorPosition();
             Vector3 dir = (targetWorldPos - anchorPos).normalized;
+            if (dir == Vector3.zero) dir = Vector3.up;
+
+            Vector3 windupPos = anchorPos - dir * 0.08f;
             Vector3 lungePos = anchorPos + dir * attackLungeDistance;
 
-            float halfDur = attackDuration * 0.5f;
-            float elapsed = 0f;
-
-            // Orientasi serangan: Kemiringan hero condong ke arah monster yang diserang (ke atas & arah target)
-            // Jika target di utara (monster lane Y > anchorPos.Y), terjang lurus ke atas dengan sedikit tilt horizontal
-            float attackTilt = Mathf.Clamp(-dir.x * 20f, -25f, 25f);
+            // Orientasi serangan: Kemiringan hero condong halus ke arah lintasan tebasan monster
+            float attackTilt = Mathf.Clamp(-dir.x * 22f, -25f, 25f);
             Quaternion strikeRot = Quaternion.Euler(0f, 0f, attackTilt);
+            Quaternion windupRot = Quaternion.Euler(0f, 0f, -attackTilt * 0.35f);
 
-            // Fase 1: Menerjang maju menusuk ke arah monster
-            while (elapsed < halfDur)
+            float totalDur = Mathf.Max(0.24f, attackDuration);
+            float tWindup = totalDur * 0.18f;
+            float tLunge = totalDur * 0.32f;
+            float tFollow = totalDur * 0.12f;
+            float tReturn = totalDur * 0.38f;
+
+            // 1. Fase Windup / Tarikan Mundur (Mengumpulkan tenaga tebasan dengan squash halus)
+            float elapsed = 0f;
+            while (elapsed < tWindup)
             {
                 elapsed += Time.deltaTime;
-                float t = Mathf.Clamp01(elapsed / halfDur);
-                transform.position = Vector3.Lerp(anchorPos, lungePos, t);
-                transform.localScale = new Vector3(baseScale.x * 1.25f, baseScale.y * 0.85f, baseScale.z);
-                transform.localRotation = Quaternion.Slerp(Quaternion.identity, strikeRot, t);
+                float t = Mathf.Clamp01(elapsed / tWindup);
+                float ease = Mathf.SmoothStep(0f, 1f, t);
+                transform.position = Vector3.Lerp(anchorPos, windupPos, ease);
+                transform.localScale = new Vector3(baseScale.x * Mathf.Lerp(1.0f, 1.08f, ease),
+                                                   baseScale.y * Mathf.Lerp(1.0f, 0.92f, ease),
+                                                   baseScale.z);
+                transform.localRotation = Quaternion.Slerp(Quaternion.identity, windupRot, ease);
                 yield return null;
             }
 
-            // Fase 2: Kembali memantul elastis ke posisi petak
+            // 2. Fase Dynamic Slash Lunge (Terjangan tebasan maju bertenaga dengan akselerasi cubic out)
             elapsed = 0f;
-            while (elapsed < halfDur)
+            while (elapsed < tLunge)
             {
                 elapsed += Time.deltaTime;
-                float t = Mathf.Clamp01(elapsed / halfDur);
-                transform.position = Vector3.Lerp(lungePos, anchorPos, t);
-                transform.localScale = new Vector3(baseScale.x * 0.9f, baseScale.y * 1.15f, baseScale.z);
-                transform.localRotation = Quaternion.Slerp(strikeRot, Quaternion.identity, t);
+                float t = Mathf.Clamp01(elapsed / tLunge);
+                float ease = 1f - Mathf.Pow(1f - t, 3f); // Cubic ease-out
+                transform.position = Vector3.Lerp(windupPos, lungePos, ease);
+                transform.localScale = new Vector3(baseScale.x * Mathf.Lerp(1.08f, 0.92f, ease),
+                                                   baseScale.y * Mathf.Lerp(0.92f, 1.15f, ease),
+                                                   baseScale.z);
+                transform.localRotation = Quaternion.Slerp(windupRot, strikeRot, ease);
+                yield return null;
+            }
+
+            // 3. Fase Follow-Through Apex (Menahan sejenak di puncak tebasan saat proyektil tebasan meluncur)
+            elapsed = 0f;
+            while (elapsed < tFollow)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / tFollow);
+                transform.position = Vector3.Lerp(lungePos, lungePos + dir * 0.02f, t);
+                transform.localScale = Vector3.Lerp(new Vector3(baseScale.x * 0.92f, baseScale.y * 1.15f, baseScale.z), baseScale, t);
+                yield return null;
+            }
+
+            // 4. Fase Elastic Return & Settle (Kembali meluncur mulus ke tatakan plinth dengan pendaratan empuk)
+            elapsed = 0f;
+            Vector3 peakPos = transform.position;
+            Quaternion peakRot = transform.localRotation;
+            while (elapsed < tReturn)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / tReturn);
+                float ease = Mathf.SmoothStep(0f, 1f, t);
+                transform.position = Vector3.Lerp(peakPos, anchorPos, ease);
+
+                float bounceSquash = Mathf.Sin(t * Mathf.PI) * 0.05f;
+                transform.localScale = new Vector3(baseScale.x * (1f + bounceSquash),
+                                                   baseScale.y * (1f - bounceSquash),
+                                                   baseScale.z);
+                transform.localRotation = Quaternion.Slerp(peakRot, Quaternion.identity, ease);
                 yield return null;
             }
 

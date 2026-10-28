@@ -380,35 +380,37 @@ namespace FantasyDefense.Combat
             Quaternion targetAimRot = Quaternion.Euler(0f, 0f, aimTilt);
 
             // ==========================================
-            // FASE 1: ABA-ABA (Anticipation / Pullback) - 0.06s
+            // FASE 1: ABA-ABA (Anticipation / Pullback) - 0.08s
             // ==========================================
-            float durPhase1 = 0.06f;
+            float durPhase1 = 0.08f;
             float elapsed = 0f;
 
             while (elapsed < durPhase1)
             {
                 elapsed += Time.deltaTime;
                 float t = Mathf.Clamp01(elapsed / durPhase1);
+                float easeIn = Mathf.SmoothStep(0f, 1f, t);
 
-                // Tangan pedang ditarik ke belakang
+                // Tangan pedang ditarik ke belakang mengumpulkan tenaga tebasan
                 if (swordArmBone != null)
                 {
-                    swordArmBone.localRotation = Quaternion.Slerp(swordArmBaseRot, swordArmBaseRot * Quaternion.Euler(0f, 0f, attackPullbackAngle), t);
+                    swordArmBone.localRotation = Quaternion.Slerp(swordArmBaseRot, swordArmBaseRot * Quaternion.Euler(0f, 0f, attackPullbackAngle), easeIn);
                 }
 
-                // Tubuh merunduk sedikit
+                // Tubuh merunduk sedikit (Anticipation Squish)
                 if (torsoBone != null)
                 {
-                    torsoBone.localScale = Vector3.Lerp(Vector3.one, new Vector3(1.12f, 0.88f, 1f), t);
+                    torsoBone.localScale = Vector3.Lerp(Vector3.one, new Vector3(1.10f, 0.90f, 1f), easeIn);
+                    torsoBone.localPosition = Vector3.Lerp(torsoBasePos, torsoBasePos - new Vector3(0f, 0.03f, 0f), easeIn);
                 }
 
                 yield return null;
             }
 
             // ==========================================
-            // FASE 2: AYUNAN TEBASAN (Slash Strike) - 0.08s
+            // FASE 2: AYUNAN TEBASAN (Dynamic Slash Strike) - 0.10s
             // ==========================================
-            float durPhase2 = 0.08f;
+            float durPhase2 = 0.10f;
             elapsed = 0f;
 
             // Nyalakan Slash VFX Arc yang melengkung ke atas menyongsong monster di utara
@@ -418,8 +420,8 @@ namespace FantasyDefense.Combat
                 if (slashVfxBone != null)
                 {
                     // Rotasi -55 derajat memposisikan kepala busur api tebasan tepat di atas/utara (North upward strike)
-                    slashVfxBone.localRotation = Quaternion.Euler(0f, 0f, -55f + Random.Range(-10f, 10f));
-                    slashVfxBone.localScale = new Vector3(1.35f, 1.35f, 1f);
+                    slashVfxBone.localRotation = Quaternion.Euler(0f, 0f, -55f + Random.Range(-8f, 8f));
+                    slashVfxBone.localScale = new Vector3(1.40f, 1.40f, 1f);
                 }
             }
 
@@ -427,7 +429,7 @@ namespace FantasyDefense.Combat
             {
                 elapsed += Time.deltaTime;
                 float t = Mathf.Clamp01(elapsed / durPhase2);
-                float easeOut = Mathf.Sin(t * Mathf.PI * 0.5f);
+                float easeOut = 1f - Mathf.Pow(1f - t, 3f); // Cubic ease-out untuk ayunan tebasan kilat yang tajam
 
                 // Lengan mengayun ke atas (Northward slash) secara agresif
                 if (swordArmBone != null)
@@ -437,11 +439,11 @@ namespace FantasyDefense.Combat
                     swordArmBone.localRotation = Quaternion.Slerp(pullRot, slashRot, easeOut);
                 }
 
-                // Tubuh menerjang ke atas (ke arah monster di utara / Y positif)
+                // Tubuh menerjang ke atas (ke arah monster di utara / Y positif) dengan stretch dinamis
                 if (torsoBone != null)
                 {
-                    torsoBone.localPosition = Vector3.Lerp(torsoBasePos, torsoBasePos + attackLungeOffset, easeOut);
-                    torsoBone.localScale = Vector3.Lerp(new Vector3(1.12f, 0.88f, 1f), new Vector3(0.92f, 1.15f, 1f), easeOut);
+                    torsoBone.localPosition = Vector3.Lerp(torsoBasePos - new Vector3(0f, 0.03f, 0f), torsoBasePos + attackLungeOffset, easeOut);
+                    torsoBone.localScale = Vector3.Lerp(new Vector3(1.10f, 0.90f, 1f), new Vector3(0.92f, 1.15f, 1f), easeOut);
                 }
 
                 // Perisai menahan stabil
@@ -457,38 +459,42 @@ namespace FantasyDefense.Combat
             onSlashImpact?.Invoke();
 
             // ==========================================
-            // FASE 3: ELASTIC SETTLE & RESTORE - 0.12s
+            // FASE 3: ELASTIC SETTLE & RESTORE - 0.16s
             // ==========================================
-            float durPhase3 = 0.12f;
+            float durPhase3 = 0.16f;
             elapsed = 0f;
 
             while (elapsed < durPhase3)
             {
                 elapsed += Time.deltaTime;
                 float t = Mathf.Clamp01(elapsed / durPhase3);
+                float easeSettle = Mathf.SmoothStep(0f, 1f, t);
 
-                // Fade out Slash VFX
+                // Fade out Slash VFX halus
                 if (slashVfxSr != null)
                 {
-                    slashVfxSr.color = Color.Lerp(new Color(1f, 1f, 1f, 0.95f), new Color(1f, 1f, 1f, 0f), t);
+                    slashVfxSr.color = Color.Lerp(new Color(1f, 1f, 1f, 0.95f), new Color(1f, 1f, 1f, 0f), easeSettle);
                 }
 
-                // Lengan dan tubuh kembali membal elastis ke posisi awal
+                // Lengan dan tubuh kembali membal elastis ke posisi tatakan
                 if (swordArmBone != null)
                 {
                     Quaternion slashRot = swordArmBaseRot * Quaternion.Euler(0f, 0f, attackSlashAngle);
-                    swordArmBone.localRotation = Quaternion.Slerp(slashRot, swordArmBaseRot, t);
+                    swordArmBone.localRotation = Quaternion.Slerp(slashRot, swordArmBaseRot, easeSettle);
                 }
 
                 if (torsoBone != null)
                 {
-                    torsoBone.localScale = Vector3.Lerp(new Vector3(0.92f, 1.15f, 1f), Vector3.one, t);
-                    torsoBone.localPosition = Vector3.Lerp(torsoBasePos + attackLungeOffset, torsoBasePos, t);
+                    float settleBounce = Mathf.Sin(t * Mathf.PI) * 0.04f;
+                    torsoBone.localScale = new Vector3(Mathf.Lerp(0.92f, 1f, easeSettle) + settleBounce,
+                                                       Mathf.Lerp(1.15f, 1f, easeSettle) - settleBounce,
+                                                       1f);
+                    torsoBone.localPosition = Vector3.Lerp(torsoBasePos + attackLungeOffset, torsoBasePos, easeSettle);
                 }
 
                 if (shieldArmBone != null)
                 {
-                    shieldArmBone.localRotation = Quaternion.Slerp(shieldArmBone.localRotation, shieldArmBaseRot, t);
+                    shieldArmBone.localRotation = Quaternion.Slerp(shieldArmBone.localRotation, shieldArmBaseRot, easeSettle);
                 }
 
                 yield return null;
