@@ -29,9 +29,13 @@ MonoBehaviour:
   tier1Sprite: {fileID: 21300000, guid: 0d4d359f9d734bb1ad8399ca48b92233, type: 3}
   tier2Sprite: {fileID: 21300000, guid: 1a69f121ca4a49758e6062b99ef69ccd, type: 3}
   tier3Sprite: {fileID: 21300000, guid: 43090c84e6c34b9780db50205c24b168, type: 3}
+  tier4Sprite: {fileID: 21300000, guid: b96f115126f64207b6394842e9ee7cf7, type: 3}
+  tier5Sprite: {fileID: 0}
   preparationTokenSprite: {fileID: 21300000, guid: b56e0a0427ec4799b17dafeef32bbe09, type: 3}
   preparationTokenTier2Sprite: {fileID: 21300000, guid: 5ba4fc4e6cb6a8d525c2dd4b014f950e, type: 3}
   preparationTokenTier3Sprite: {fileID: 21300000, guid: 80d628c7be4659643490a5d86963a438, type: 3}
+  preparationTokenTier4Sprite: {fileID: 21300000, guid: 3809b7cf7c7f48a294583e3a66aa6401, type: 3}
+  preparationTokenTier5Sprite: {fileID: 0}
   skillName: Seismic Rose Crush
   skillDescription: Hentakan dahsyat palu godam ke bumi yang memicu gempa, menghasilkan damage fisik masif dan stun area pada musuh di sekitarnya.
   skillCooldown: 6
