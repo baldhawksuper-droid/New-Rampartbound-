@@ -141,16 +141,17 @@ Menampilkan 6 medali circular avatar badges berkualitas tinggi (gaya Chibi Guard
   Tingkatan token Cedric (Tier 1 Perunggu, Tier 2 Perak, Tier 3 Emas) diatur terpusat di lembar evolusi Bab 3.0 dan wajib konsisten menghadap sudut 3/4 kanan.
 * **Peran Tempur:** Frontline Spellblade Melee (42 DMG ganda, 0.65s). Menahan serbuan monster garis depan dengan tebasan cepat dan efek bakar (*Burn DoT*).
 
-### 3.3 COMMANDER ROSE, THE SUNFORGED AEGIS (Supreme Paladin & Grand Forgemaster)
+### 3.3 COMMANDER ROSE, THE SUNFORGED AEGIS (Heavy Melee Hammer Vanguard & Grand Forgemaster)
 * **Karya Seni Konsep 2D Penuh (`Rampartbound/Assets/Art/Characters/char_rose_concept.jpg`):**  
-  Ilustrasi studio beresolusi 896 &times; 1200 px: **100% Selaras dengan Main Lobby Terkunci!** Figur ksatria cilik wanita berproporsi Chibi ~2.8 kepala yang manis dan anggun, selaras sempurna dengan Pippin dan Cedric. Memiliki mata anime violet besar berbinar, **rambut merah muda (*bubblegum pink*) dikuncir kuda tinggi megah dengan poni pink imut (Bukan Pirang!)** serta tiara perak mini. Mengenakan zirah pelat baja perak-emas yang imut berukir lambang mawar surya di dada, jubah mini melambai, dan memegang Palu Perang Surya Emas raksasa (*Sunforged Warhammer*) bertatahkan kristal mawar bercahaya merah muda. Menghadap sudut 3/4 kanan.
+  Ilustrasi studio beresolusi 896 &times; 1200 px: **100% Selaras dengan Main Lobby Terkunci!** Figur ksatria cilik wanita berproporsi Chibi ~2.8 kepala yang manis dan berwibawa, selaras sempurna dengan Pippin dan Cedric. Memiliki mata anime violet besar berbinar, **rambut merah muda (*bubblegum pink*) dikuncir kuda tinggi megah dengan poni pink imut (Bukan Pirang!)** serta tiara perak mini. Mengenakan zirah pelat baja perak-emas yang kokoh berukir lambang mawar surya di dada, jubah mini melambai, dan memegang Palu Perang Surya Emas raksasa (*Sunforged Warhammer*) bertatahkan kristal mawar bercahaya merah muda. Menghadap sudut 3/4 kanan.
 * **In-Game HUD Avatar Badge (`Rampartbound/Assets/Art/Sprites/icon_rose_sunforged.png`):**  
   Medali perisai perak berukir bunga mawar emas dengan potret wajah ceria Rose berambut pink (transparan PNG).
 * **Token Papan Tempur 3D Timbul:**  
-  Tingkatan token Rose (Tier 1 Perunggu, Tier 2 Perak, Tier 3 Emas) diatur terpusat di lembar evolusi Bab 3.0 dan wajib konsisten menghadap sudut 3/4 kanan.
-* **Peran Tempur:** Supreme Paladin Tanker (55 DMG Area Splash, 0.85s). Berdiri kokoh di podium pusat tembok benteng dan memberikan buff +15% HP pertahanan benteng.
+  Tingkatan token Rose (Tier 1 Perunggu, Tier 2 Perak, Tier 3 Emas, Tier 4 Sunburst Ruby, Tier 5 Titan Celestial) diatur terpusat di lembar evolusi Bab 3.0 dan wajib konsisten menghadap sudut 3/4 kanan.
+* **Peran Tempur:** Heavy Frontline Melee Hammer DPS (38 Base DMG, 0.85s, Skala Hantaman Masif). Berdiri tangguh di garis pertahanan depan, menghantam musuh dengan palu godam berbobot berat, serta memicu skill **Seismic Rose Crush** yang menghasilkan gelombang kejut gempa dan stun area luas pada monster di sekitarnya.
 
-### 3.4 & 3.5 MASKOT & PENDUKUNG TIM (100% Karakter Orisinil Baru Pengganti Ayam & Kucing Generik)
+### 3.4 & 3.5 MASKOT & PENDUKUNG TIM (Companion Support Crew — Milestone Mendatang)
+> **Catatan Status Produksi:** Sistem Companion (Ignis & Barney) telah dirancang arsitekturnya, namun **disimpan / dinonaktifkan sementara** agar tim fokus penuh pada penyempurnaan fitur dan sensasi gameplay pertempuran utama.
 * **Lembar Desain Konsep 2D Asli (`Rampartbound/Assets/Art/Characters/char_companions_concept.jpg`):**  
   Ilustrasi studio beresolusi 1376 &times; 768 px menampilkan Ignis dan Barnaby berdampingan:
   - **3.4 IGNIS, THE PYRE OWL SENTINEL (`icon_ignis_owl.png`):** Burung hantu kerdil mekanik berbulu cokelat keemasan, berkacamata optik tembaga ganda (*brass goggles*), topi penerbang kulit mini, dan mencengkeram sangkar lentera yang menyimpan lidah api suci abadi (*Eternal Hearthfire*). Buff: +15% Kecepatan Tembak Meriam Palisade.
@@ -181,7 +182,11 @@ Menindaklanjuti instruksi resmi Pemilik Proyek untuk **menghapus Gambar 2A dan 2
    - **Cedric (Ksatria Bertudung Merah Title Screen):** Lencana info mengambang di bawahnya: `Lv.15 | CP 1,850`
    - **Commander Rose (Ksatria Putri Berambut Pink Kuncir Kuda):** Lencana info mengambang di bawahnya: `Lv.14 | CP 1,400`
 3. **Primary Action Zone (Y: 740–860 px):** Tombol merah besar 3D mengkilap **"⚔️ BATTLE (5 ⚡)"** dengan bingkai emas melengkung (*filigree gold trim*) yang memicu pemilihan babak (Level 1 / 2).
-4. **Bottom Navigation Tab Bar (Y: 860–960 px):** 4 Tab navigasi beraksen emas medieval: [🏰 Citadel] [🔨 Forge] [👥 Heroes] [🎒 Bag].
+4. **Bottom Navigation Tab Bar (Y: 860–960 px):** 4 Tab navigasi beraksen emas medieval baku: [🗺️ Peta] [🛡️ Hero] [🔮 Gacha] [💎 Toko].
+   - **🗺️ Peta:** Membuka pemilihan babak (Stage Map Campaign Chapter 1).
+   - **🛡️ Hero:** Membuka layar peningkatan pahlawan, evolusi zirah, dan perlengkapan relic.
+   - **🔮 Gacha:** Membuka Summons Hall (Banner pemanggilan pahlawan). *Kebijakan Resmi: Pity Counter di-reset setiap pergantian banner baru.*
+   - **💎 Toko:** Membuka kas kerajaan dan penukaran permata/emas.
 
 ### 4.3 Cetak Biru Medan Tempur & Antarmuka Gameplay: Level 1 vs Level 2
 
@@ -420,6 +425,16 @@ Menggantikan rancangan sprite tunggal lama, sistem pertahanan kini dibedakan sec
 | **Kapasitas Daya Tahan (HP)** | **1,000 HP** (Armor Ringan — Resistensi Fisik 10%) | **2,500 HP** (Armor Berat — Resistensi Fisik/Magis 25%) |
 | **Dinamika Kerusakan Bertahap** | • **HP > 60% (Utuh):** Kayu pasak kokoh, meriam siap siaga.<br>• **HP 25–60% (Retak):** Batang kayu terbelah, bendera sobek.<br>• **HP ≤ 25% (Kritis):** Kayu terbakar membara, pasak patah jebol. | • **HP > 60% (Utuh):** Granit utuh berkilau, obor menyala terang.<br>• **HP 25–60% (Retak):** Retakan batu bercabang, debu rontok.<br>• **HP ≤ 25% (Kritis):** Tembok runtuh menganga, api void berkobar. |
 | **Perlengkapan Senjata Tembok** | Menara meriam bola besi manual (Interval 2.0s, 60 DMG). | Podium komando Rose (+15% Max HP Tembok), ballista panah perak ganda, dan perisai cahaya suci. |
+
+### 7.2 Aturan Eliminasi Pahlawan per Gelombang (Hero Per-Wave Elimination on 0 HP)
+Sesuai arahan resmi Pemilik Proyek mengenai konsekuensi pertempuran di garis depan:
+* **Penahanan Fisik (*Body-Blocking*):** Pahlawan yang berdiri di papan arena bertindak sebagai barikade fisik yang menahan laju pergerakan monster (*sticky engagement*). Monster wajib menyerang dan menghabisi hero yang menghalangi jalurnya sebelum dapat merangsek maju ke arah tembok benteng.
+* **Hero Gugur saat HP 0:** Jika bar HP seorang pahlawan habis (0 HP) akibat serangan monster, pahlawan tersebut **langsung gugur dan menghilang dari papan pada gelombang (wave) tersebut** melalui animasi *dissolve/fade-out* (`DefeatedDisappearRoutine`).
+* **Jalur Terbuka:** Begitu pahlawan gugur, lajur tempur tersebut menjadi kosong dan tidak lagi memiliki penahan fisik, sehingga kawanan monster berikutnya dapat meluncur bebas langsung menghantam tembok benteng. Pahlawan baru dapat dipulihkan atau diganti pada gelombang/stage berikutnya.
+
+### 7.3 Sistem Pemanggilan Pahlawan (Gacha) & Kebijakan Reset Pity
+* **Summon Hall:** Pemain dapat memanggil pahlawan baru melalui layar Gacha menggunakan Koin Emas atau Permata Abyssal.
+* **Kebijakan Mutlak Reset Pity:** Sistem *pity counter* (jaminan pahlawan bintang tinggi/legendary) **wajib di-reset dari awal (kembali ke 0) setiap kali banner gacha berganti ke banner baru**. Pity tidak diakumulasikan antar-banner yang berbeda.
 
 ---
 
