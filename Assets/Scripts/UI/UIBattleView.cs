@@ -331,7 +331,7 @@ namespace FantasyDefense.UI
         {
             if (waveText != null)
             {
-                waveText.text = $"Wave {currentWave} / {totalWaves}";
+                waveText.text = $"<b>WAVE {currentWave}/{totalWaves}</b>";
             }
             if (waveProgressBarContainer != null)
             {
@@ -354,8 +354,8 @@ namespace FantasyDefense.UI
         {
             if (waveText != null)
             {
-                string completedLabel = CitadelLocalizationManager.Text("Selesai!", "Completed!");
-                waveText.text = $"Wave {completedWave} {completedLabel}";
+                string completedLabel = CitadelLocalizationManager.Text("CLEARED!", "CLEARED!");
+                waveText.text = $"<b>WAVE {completedWave} {completedLabel}</b>";
             }
             if (waveProgressBar != null)
             {
@@ -556,7 +556,7 @@ namespace FantasyDefense.UI
             int totalWaves = WaveSpawner.Instance != null ? WaveSpawner.Instance.TotalWaves : 3;
             if (waveText != null)
             {
-                waveText.text = $"Wave {nextWaveNumber} / {totalWaves}";
+                waveText.text = $"<b>WAVE {nextWaveNumber}/{totalWaves}</b>";
             }
             if (waveProgressBar != null)
             {
@@ -784,14 +784,14 @@ namespace FantasyDefense.UI
             if (castleHpText != null)
             {
                 float percent = (float)current / Mathf.Max(1, max) * 100f;
-                string castleLabel = CitadelLocalizationManager.Text("🛡️ Pertahanan Benteng", "🛡️ Castle Defense");
-                castleHpText.text = $"{castleLabel}: {current}/{max} ({Mathf.RoundToInt(percent)}%)";
                 if (percent <= 30f)
                 {
+                    castleHpText.text = $"<b><color=#FF4444>⚠️ {current:N0} / {max:N0}</color></b>";
                     castleHpText.color = new Color(1f, 0.35f, 0.35f);
                 }
                 else
                 {
+                    castleHpText.text = $"<b><color=#00FF66>💚 {current:N0} / {max:N0}</color></b>";
                     castleHpText.color = Color.white;
                 }
             }

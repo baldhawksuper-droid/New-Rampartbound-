@@ -157,38 +157,60 @@ namespace FantasyDefense.Combat
         }
 
         /// <summary>
-        /// Menghasilkan angka floating combat number dinamis dengan animasi lompatan parabolik (jump arc)
-        /// dan scale punch elastis yang memuaskan.
+        /// Menghasilkan angka floating combat number dinamis dengan animasi lompatan parabolik (jump arc),
+        /// gaya tipografi komik tebal (bold comic font) dengan bayangan tebal (drop shadow) kontras tinggi.
         /// </summary>
         public void SpawnFloatingCombatNumber(Vector3 worldPos, string content, Color textColor, float scale = 1.0f, bool isHighJump = false)
         {
-            GameObject textObj = new GameObject($"CombatNum_{content}");
-            textObj.transform.position = worldPos;
+            GameObject containerObj = new GameObject($"CombatNum_{content}");
+            containerObj.transform.position = worldPos;
 
-            TextMesh textMesh = textObj.AddComponent<TextMesh>();
+            // 1. Shadow TextMesh di belakang (Deep Comic Shadow)
+            GameObject shadowObj = new GameObject("Shadow");
+            shadowObj.transform.SetParent(containerObj.transform, false);
+            shadowObj.transform.localPosition = new Vector3(0.025f, -0.025f, 0.01f);
+            TextMesh shadowMesh = shadowObj.AddComponent<TextMesh>();
+            shadowMesh.text = content;
+            shadowMesh.fontStyle = FontStyle.Bold;
+            shadowMesh.fontSize = isHighJump ? 34 : 30;
+            shadowMesh.characterSize = 0.08f * scale;
+            shadowMesh.anchor = TextAnchor.MiddleCenter;
+            shadowMesh.alignment = TextAlignment.Center;
+            shadowMesh.color = new Color(0.04f, 0.04f, 0.06f, 0.85f);
+            MeshRenderer shadowMr = shadowObj.GetComponent<MeshRenderer>();
+            if (shadowMr != null)
+            {
+                shadowMr.sortingLayerName = "UI";
+                shadowMr.sortingOrder = 499;
+            }
+
+            // 2. Front TextMesh utama (Radiant Comic Text)
+            TextMesh textMesh = containerObj.AddComponent<TextMesh>();
             textMesh.text = content;
-            textMesh.fontSize = isHighJump ? 32 : 28;
+            textMesh.fontStyle = FontStyle.Bold;
+            textMesh.fontSize = isHighJump ? 34 : 30;
             textMesh.characterSize = 0.08f * scale;
             textMesh.anchor = TextAnchor.MiddleCenter;
             textMesh.alignment = TextAlignment.Center;
             textMesh.color = textColor;
 
-            MeshRenderer mr = textObj.GetComponent<MeshRenderer>();
+            MeshRenderer mr = containerObj.GetComponent<MeshRenderer>();
             if (mr != null)
             {
                 mr.sortingLayerName = "UI";
                 mr.sortingOrder = 500; // Prioritas mutlak di depan arena, grid, dan unit
             }
 
-            StartCoroutine(FloatingCombatNumberRoutine(textObj, textMesh, scale, isHighJump));
+            StartCoroutine(FloatingCombatNumberRoutine(containerObj, textMesh, shadowMesh, scale, isHighJump));
         }
 
-        private IEnumerator FloatingCombatNumberRoutine(GameObject obj, TextMesh textMesh, float baseScale, bool isCrit)
+        private IEnumerator FloatingCombatNumberRoutine(GameObject obj, TextMesh textMesh, TextMesh shadowMesh, float baseScale, bool isCrit)
         {
             float duration = isCrit ? 0.95f : 0.80f;
             float elapsed = 0f;
             Vector3 startPos = obj.transform.position;
             Color startColor = textMesh.color;
+            Color shadowColor = shadowMesh != null ? shadowMesh.color : Color.black;
             float horizontalDrift = Random.Range(-0.35f, 0.35f);
             float jumpHeight = isCrit ? 0.75f : 0.45f;
             float initialCharSize = 0.08f * baseScale;
@@ -210,10 +232,12 @@ namespace FantasyDefense.Combat
                         ? Mathf.Lerp(0.7f, 1.25f, progress / 0.20f)
                         : Mathf.Lerp(1.25f, 1.0f, (progress - 0.20f) / 0.30f);
                     textMesh.characterSize = initialCharSize * scaleMultiplier;
+                    if (shadowMesh != null) shadowMesh.characterSize = initialCharSize * scaleMultiplier;
 
                     // 3. Fading transparan halus pada separuh akhir durasi
                     float alpha = progress > 0.55f ? Mathf.Lerp(1f, 0f, (progress - 0.55f) / 0.45f) : 1f;
                     textMesh.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
+                    if (shadowMesh != null) shadowMesh.color = new Color(shadowColor.r, shadowColor.g, shadowColor.b, shadowColor.a * alpha);
                 }
 
                 yield return null;
@@ -405,6 +429,135 @@ namespace FantasyDefense.Combat
                     break;
             }
         }
+
+        #region Attack Elements Visual FX (Mockup Battle Alignment)
+
+        /// <summary>
+        /// Pippin / Rabbit Mage: Menembakkan berkas laser sihir safir kembar (Twin Sapphire Arcane Beams)
+        /// yang melesat lurus ke atas dari tongkat sihir ke monster sasaran.
+        /// </summary>
+        public void SpawnUpwardArcaneBeam(Vector3 startPos, Vector3 targetPos, UnitTier tier)
+        {
+            StartCoroutine(UpwardArcaneBeamRoutine(startPos, targetPos, tier));
+        }
+
+        private IEnumerator UpwardArcaneBeamRoutine(Vector3 startPos, Vector3 targetPos, UnitTier tier)
+        {
+            GameObject beamObj = new GameObject("VFX_Pippin_TwinLaserBeam");
+            LineRenderer lr = beamObj.AddComponent<LineRenderer>();
+
+            Shader shader = Shader.Find("Sprites/Default") ?? Shader.Find("Particles/Standard Unlit");
+            if (shader != null) lr.material = new Material(shader);
+
+            Color coreColor = tier >= UnitTier.Tier4 ? new Color(0.85f, 0.45f, 1f) : new Color(0.25f, 0.85f, 1f);
+            Color glowColor = tier >= UnitTier.Tier4 ? new Color(0.6f, 0.1f, 1f, 0.8f) : new Color(0.1f, 0.45f, 1f, 0.8f);
+
+            lr.startColor = coreColor;
+            lr.endColor = glowColor;
+            float lineWidth = tier >= UnitTier.Tier3 ? 0.22f : 0.14f;
+            lr.startWidth = lineWidth;
+            lr.endWidth = lineWidth * 0.75f;
+            lr.positionCount = 2;
+            lr.sortingOrder = 60;
+
+            Vector3 origin = startPos + new Vector3(0f, 0.35f, 0f);
+            lr.SetPosition(0, origin);
+            lr.SetPosition(1, targetPos);
+
+            // Muzzle spark di tongkat
+            SpawnProceduralParticleBurst(origin, coreColor, Color.white, 8, 2.0f);
+
+            float duration = 0.18f;
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float progress = elapsed / duration;
+                float alpha = 1f - progress;
+                lr.startColor = new Color(coreColor.r, coreColor.g, coreColor.b, alpha);
+                lr.endColor = new Color(glowColor.r, glowColor.g, glowColor.b, alpha * 0.7f);
+                yield return null;
+            }
+
+            // Impact burst di monster
+            SpawnProceduralParticleBurst(targetPos, coreColor, Color.cyan, tier >= UnitTier.Tier3 ? 16 : 10, 2.8f);
+            Destroy(beamObj);
+        }
+
+        /// <summary>
+        /// Cedric: Menghasilkan tebasan sabit api membara (Crescent Flame Slash)
+        /// yang melesat melengkung ke atas menyapu formasi monster musuh.
+        /// </summary>
+        public void SpawnUpwardCrescentSlash(Vector3 startPos, Vector3 targetPos, UnitTier tier)
+        {
+            StartCoroutine(UpwardCrescentSlashRoutine(startPos, targetPos, tier));
+        }
+
+        private IEnumerator UpwardCrescentSlashRoutine(Vector3 startPos, Vector3 targetPos, UnitTier tier)
+        {
+            GameObject slashObj = new GameObject("VFX_Cedric_FlameCrescent");
+            Vector3 spawnPos = startPos + new Vector3(0f, 0.40f, 0f);
+            slashObj.transform.position = spawnPos;
+
+            SpriteRenderer sr = slashObj.AddComponent<SpriteRenderer>();
+            Sprite slashSprite = Resources.Load<Sprite>("Sprites/VFX/VFX_Slash_Arc");
+            if (slashSprite != null) sr.sprite = slashSprite;
+
+            Color flameColor = tier >= UnitTier.Tier3 ? new Color(1f, 0.3f, 0.05f) : new Color(1f, 0.55f, 0.1f);
+            sr.color = flameColor;
+            sr.sortingOrder = 60;
+
+            Vector3 dir = (targetPos - startPos).normalized;
+            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+            slashObj.transform.rotation = Quaternion.Euler(0f, 0f, angle - 90f);
+
+            float scale = tier >= UnitTier.Tier3 ? 1.4f : 1.0f;
+            slashObj.transform.localScale = Vector3.one * (scale * 0.5f);
+
+            float duration = 0.22f;
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / duration;
+                slashObj.transform.position = Vector3.Lerp(spawnPos, targetPos, t);
+                slashObj.transform.localScale = Vector3.one * Mathf.Lerp(scale * 0.5f, scale * 1.25f, t);
+                sr.color = new Color(flameColor.r, flameColor.g, flameColor.b, 1f - t);
+                yield return null;
+            }
+
+            SpawnProceduralParticleBurst(targetPos, flameColor, Color.yellow, 14, 3.0f);
+            Destroy(slashObj);
+        }
+
+        /// <summary>
+        /// Rose Tanker: Menghasilkan pilar kejut suci keemasan (Radiant Hammer Shockwave)
+        /// yang meletup dan merambat ke atas saat palu godam menghantam tanah.
+        /// </summary>
+        public void SpawnUpwardRadiantShockwave(Vector3 startPos, Vector3 targetPos, UnitTier tier)
+        {
+            StartCoroutine(UpwardRadiantShockwaveRoutine(startPos, targetPos, tier));
+        }
+
+        private IEnumerator UpwardRadiantShockwaveRoutine(Vector3 startPos, Vector3 targetPos, UnitTier tier)
+        {
+            Vector3 origin = startPos + new Vector3(0f, -0.15f, 0f);
+
+            // 1. Cincin gelombang kejut di tanah tempat palu menghantam
+            Color roseGold = tier >= UnitTier.Tier4 ? new Color(1f, 0.30f, 0.60f) : new Color(1f, 0.85f, 0.25f);
+            StartCoroutine(SpawnShockwaveRingRoutine(origin, tier >= UnitTier.Tier3 ? 1.8f : 1.2f, roseGold));
+
+            // 2. Partikel seismik yang merambat ke atas menuju sasaran
+            int burstCount = tier >= UnitTier.Tier4 ? 24 : 14;
+            Vector3 midPoint = Vector3.Lerp(origin, targetPos, 0.5f);
+            SpawnProceduralParticleBurst(origin, roseGold, Color.white, burstCount / 2, 2.5f);
+            yield return new WaitForSeconds(0.06f);
+            SpawnProceduralParticleBurst(midPoint, roseGold, Color.yellow, burstCount / 2, 2.8f);
+            yield return new WaitForSeconds(0.06f);
+            SpawnProceduralParticleBurst(targetPos, roseGold, new Color(1f, 0.2f, 0.4f), burstCount, 3.2f);
+        }
+
+        #endregion
 
         /// <summary>
         /// Membuat objek ParticleSystem instan dan mandiri yang menyala sesaat lalu menghilang otomatis.

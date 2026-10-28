@@ -48,6 +48,11 @@ namespace FantasyDefense.Combat
         {
             if (target == null || target.IsDead) return;
 
+            if (SkillVfxManager.Instance != null)
+            {
+                SkillVfxManager.Instance.SpawnUpwardCrescentSlash(transform.position, target.transform.position, currentTier);
+            }
+
             if (currentTier == UnitTier.Tier1)
             {
                 // T1: Single Slash

@@ -184,13 +184,13 @@ namespace Rampartbound.Editor
                 apronSr.color = new Color(0.85f, 0.88f, 0.92f, 1f);
             }
 
-            // Menara Pertahanan Kiri: Meriam Pelontar Roket Benteng (Bastion Cannon Turret)
+            // Menara Pertahanan Kiri: Meriam Pelontar Roket Benteng (Bastion Cannon Turret - Modular)
             var cannonObj = new GameObject("Turret_Left_Cannon");
             cannonObj.transform.SetParent(barricadeObj.transform);
             cannonObj.transform.localPosition = new Vector3(-2.15f, 0.28f, 0);
             var cannonSr = cannonObj.AddComponent<SpriteRenderer>();
-            var cannonSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Combat/bastion_cannon_left.png");
-            if (cannonSprite == null) cannonSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Combat/cannon_turret.png");
+            var cannonSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Combat/cannon_turret.png");
+            if (cannonSprite == null) cannonSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Combat/bastion_cannon_left.png");
             if (cannonSprite != null) cannonSr.sprite = cannonSprite;
             cannonSr.sortingLayerName = "Board";
             cannonSr.sortingOrder = 15;
@@ -198,7 +198,7 @@ namespace Rampartbound.Editor
             var cannonTurret = cannonObj.AddComponent<CitadelDefenseTurret>();
             cannonTurret.Initialize(CitadelTurretType.Cannon, cannonSprite);
 
-            // Menara Pertahanan Kanan: Pemanah & Balista Sniper Benteng (Bastion Ballista / Archer Turret)
+            // Menara Pertahanan Kanan: Pemanah & Balista Sniper Benteng (Bastion Ballista Turret - Modular)
             var archerObj = new GameObject("Turret_Right_Archer");
             archerObj.transform.SetParent(barricadeObj.transform);
             archerObj.transform.localPosition = new Vector3(2.15f, 0.28f, 0);
@@ -211,7 +211,7 @@ namespace Rampartbound.Editor
             var archerTurret = archerObj.AddComponent<CitadelDefenseTurret>();
             archerTurret.Initialize(CitadelTurretType.Archer, archerSprite);
 
-            // Relik Inti Benteng / Turret Clutter ditiadakan agar arena bersih sesuai QA standard dan tidak menutupi barikade/grid.
+            // Tembok Benteng Granit: Golden Arcane Cube dihilangkan secara definitif sesuai instruksi desain (bersih, hanya Meriam kiri & Balista kanan).
 
             // Waypoints Lintasan Monster Adaptif (MonsterPathManager)
             // Membiarkan MonsterPathManager menghitung lintasan U-shape perimeter di sisi luar petak Grid
@@ -659,25 +659,27 @@ namespace Rampartbound.Editor
             var heroesContainer = CreatePanel(lobbyPanelObj.transform, "HeroCourtyardAssembly", new Color(0f, 0f, 0f, 0f));
             PositionUI(heroesContainer, 0.02f, 0.17f, 0.98f, 0.74f);
 
-            // Formasi Trio Hero V-Formation:
+            // Formasi 4 Slot Hero Courtyard Assembly:
             // Pippin (Slot 1, Kiri): Lv.12, CP 1,600
-            var rabbitCard = CreateButton(heroesContainer.transform, "RabbitCard", "Lv.12 | CP 1,600", new Color(0f, 0f, 0f, 0f), Color.white, 16, defaultFont);
-            PositionUI(rabbitCard, 0.04f, 0.05f, 0.36f, 0.92f);
+            var rabbitCard = CreateButton(heroesContainer.transform, "RabbitCard", "Lv.12 | CP 1,600", new Color(0f, 0f, 0f, 0f), Color.white, 15, defaultFont);
+            PositionUI(rabbitCard, 0.02f, 0.05f, 0.25f, 0.92f);
             SetupHeroCardPortrait(rabbitCard, _heroRabbitSprite, null);
 
-            // Cedric (Slot 2, Tengah Depan): Cedric, Lv.15, CP 1,850
-            var cedricCard = CreateButton(heroesContainer.transform, "CedricCard", "Lv.15 | CP 1,850", new Color(0f, 0f, 0f, 0f), Color.white, 16, defaultFont);
-            PositionUI(cedricCard, 0.34f, 0.01f, 0.66f, 0.96f);
-            SetupHeroCardPortrait(cedricCard, _heroCedricSprite, null); // Tidak membuat label teks nama terpisah agar tidak menduplikasi info badge
+            // Cedric (Slot 2, Tengah Kiri): Cedric, Lv.15, CP 1,850
+            var cedricCard = CreateButton(heroesContainer.transform, "CedricCard", "Lv.15 | CP 1,850", new Color(0f, 0f, 0f, 0f), Color.white, 15, defaultFont);
+            PositionUI(cedricCard, 0.26f, 0.01f, 0.49f, 0.96f);
+            SetupHeroCardPortrait(cedricCard, _heroCedricSprite, null);
 
-            // Rose (Slot 3, Kanan): Lv.14, CP 1,400 (Chibi Palu Emas Raksasa)
-            var roseCard = CreateButton(heroesContainer.transform, "RoseCard", "Lv.14 | CP 1,400", new Color(0f, 0f, 0f, 0f), Color.white, 16, defaultFont);
-            PositionUI(roseCard, 0.64f, 0.05f, 0.96f, 0.92f);
+            // Rose (Slot 3, Tengah Kanan): Lv.14, CP 1,400 (Chibi Palu Emas Raksasa)
+            var roseCard = CreateButton(heroesContainer.transform, "RoseCard", "Lv.14 | CP 1,400", new Color(0f, 0f, 0f, 0f), Color.white, 15, defaultFont);
+            PositionUI(roseCard, 0.50f, 0.05f, 0.73f, 0.92f);
             SetupHeroCardPortrait(roseCard, _heroRoseSprite, null);
 
-            // Slot Ke-4 (Wind Ranger - Expansion Slot)
-            var windCard = CreateButton(heroesContainer.transform, "WindCard", "", new Color(0f, 0f, 0f, 0f), Color.white, 14, defaultFont);
-            windCard.SetActive(false);
+            // Slot Ke-4 (Slot Fleksibel / Expansion Slot Terkunci - Bisa diklik untuk Gacha)
+            var windCard = CreateButton(heroesContainer.transform, "WindCard", "🔒 Gacha to Unlock", new Color(0f, 0f, 0f, 0f), Color.white, 14, defaultFont);
+            PositionUI(windCard, 0.74f, 0.05f, 0.97f, 0.92f);
+            SetupHeroCardPortrait(windCard, _heroWindSprite, null);
+            windCard.SetActive(true);
 
             // Core Battle Button (Crimson 3D Gold Frame with studs)
             var defendBtn = CreateButton(lobbyPanelObj.transform, "DefendCitadelButton", "⚔️ BATTLE (5 ⚡)", new Color(0.85f, 0.15f, 0.15f), Color.white, 32, defaultFont);

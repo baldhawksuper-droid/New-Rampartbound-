@@ -582,11 +582,9 @@ namespace FantasyDefense.Combat
 
         protected void UpdateGroundShadowVisibility(bool show)
         {
-            // Tatakan plinth kaku ditiadakan agar hero tampak alami dan menyatu langsung dengan petak arena
-            if (groundPlinthObj != null) groundPlinthObj.SetActive(false);
-
             if (currentTier == UnitTier.Tier0 || isPreparationToken)
             {
+                if (groundPlinthObj != null) groundPlinthObj.SetActive(false);
                 if (groundShadowObj != null) groundShadowObj.SetActive(false);
                 return;
             }
@@ -595,21 +593,55 @@ namespace FantasyDefense.Combat
             {
                 int sortOrder = Mathf.Max(15, normalSortingOrder - Mathf.RoundToInt(transform.position.y * 3));
 
-                // Soft contact shadow di bawah kaki hero (bayangan lembut alami menapak di tanah)
+                // 1. Tatakan Plinth Semi-3D terintegrasi sesuai Tier/Level Hero (T1 s/d T5)
+                if (groundPlinthObj == null)
+                {
+                    groundPlinthObj = new GameObject("GroundPlinth_Pedestal");
+                    groundPlinthObj.transform.SetParent(transform, false);
+                    groundPlinthObj.transform.localPosition = new Vector3(0f, -0.32f, 0.05f);
+                    groundPlinthSr = groundPlinthObj.AddComponent<SpriteRenderer>();
+                    groundPlinthSr.sortingLayerName = "Gem";
+                    groundPlinthObj.transform.localScale = new Vector3(0.85f, 0.44f, 1f);
+                }
+                else
+                {
+                    if (groundPlinthSr == null) groundPlinthSr = groundPlinthObj.GetComponent<SpriteRenderer>();
+                    groundPlinthObj.transform.localPosition = new Vector3(0f, -0.32f, 0.05f);
+                }
+
+                if (groundPlinthSr != null)
+                {
+                    int tierIndex = Mathf.Clamp((int)currentTier, 1, 5);
+                    Sprite plinthSprite = Resources.Load<Sprite>($"Sprites/Combat/Plinth_Hero_Base_T{tierIndex}");
+#if UNITY_EDITOR
+                    if (plinthSprite == null)
+                    {
+                        plinthSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Art/Sprites/Combat/Plinth_Hero_Base_T{tierIndex}.png");
+                    }
+#endif
+                    if (plinthSprite != null)
+                    {
+                        groundPlinthSr.sprite = plinthSprite;
+                    }
+                    groundPlinthSr.sortingOrder = sortOrder - 1;
+                }
+                groundPlinthObj.SetActive(true);
+
+                // 2. Soft contact shadow di bawah tatakan hero (bayangan lembut menapak di petak)
                 if (groundShadowObj == null)
                 {
                     groundShadowObj = new GameObject("GroundShadow_2.5D");
                     groundShadowObj.transform.SetParent(transform, false);
-                    groundShadowObj.transform.localPosition = new Vector3(0f, -0.28f, 0.08f);
+                    groundShadowObj.transform.localPosition = new Vector3(0f, -0.38f, 0.08f);
                     groundShadowSr = groundShadowObj.AddComponent<SpriteRenderer>();
                     groundShadowSr.sprite = Resources.Load<Sprite>("Sprites/UI/Shadow_Ground_Oval");
                     groundShadowSr.sortingLayerName = "Gem";
-                    groundShadowSr.color = new Color(0f, 0f, 0f, 0.42f);
-                    groundShadowObj.transform.localScale = new Vector3(0.95f, 0.45f, 1f);
+                    groundShadowSr.color = new Color(0f, 0f, 0f, 0.38f);
+                    groundShadowObj.transform.localScale = new Vector3(0.98f, 0.46f, 1f);
                 }
                 else
                 {
-                    groundShadowObj.transform.localPosition = new Vector3(0f, -0.28f, 0.08f);
+                    groundShadowObj.transform.localPosition = new Vector3(0f, -0.38f, 0.08f);
                 }
 
                 if (groundShadowSr != null)
@@ -620,6 +652,7 @@ namespace FantasyDefense.Combat
             }
             else
             {
+                if (groundPlinthObj != null) groundPlinthObj.SetActive(false);
                 if (groundShadowObj != null) groundShadowObj.SetActive(false);
             }
         }
@@ -642,13 +675,24 @@ namespace FantasyDefense.Combat
             }
             else
             {
-                // Prioritas sprite tempur menghadap ke atas / North jika tersedia
-                if (unitData.unitType == UnitType.Cedric && currentTier == UnitTier.Tier1)
+                // Prioritas sprite tempur menghadap ke atas / North (siaga menyerang musuh di utara)
+                if (currentTier == UnitTier.Tier1)
                 {
-                    targetSprite = Resources.Load<Sprite>("Sprites/Heroes/Cedric_T1_Combat_North")
-                                ?? unitData.GetSpriteForTier(currentTier);
+                    string northPath = unitData.unitType switch
+                    {
+                        UnitType.Cedric => "Sprites/Heroes/Cedric_T1_Combat_North",
+                        UnitType.RabbitMage => "Sprites/Heroes/RabbitMage_T1_Combat_North",
+                        UnitType.RoseTanker => "Sprites/Heroes/Rose_T1_Combat_North",
+                        _ => null
+                    };
+
+                    if (!string.IsNullOrEmpty(northPath))
+                    {
+                        targetSprite = Resources.Load<Sprite>(northPath);
+                    }
                 }
-                else
+
+                if (targetSprite == null)
                 {
                     targetSprite = unitData.GetSpriteForTier(currentTier);
                 }

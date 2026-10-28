@@ -21,6 +21,8 @@ namespace FantasyDefense.Combat
     {
         [Header("Turret Configuration")]
         [SerializeField] private CitadelTurretType turretType = CitadelTurretType.Cannon;
+        [SerializeField] private string turretId = "turret_standard";
+        [SerializeField] private int turretTier = 1;
         [SerializeField] private float attackRange = 8.5f;
         [SerializeField] private float attackInterval = 2.0f;
         [SerializeField] private float baseDamage = 50f;
@@ -35,9 +37,47 @@ namespace FantasyDefense.Combat
         private Coroutine recoilCoroutine;
 
         public CitadelTurretType TurretType => turretType;
+        public string TurretId => turretId;
+        public int TurretTier => turretTier;
         public float AttackRange => attackRange;
         public float AttackInterval => attackInterval;
         public float BaseDamage => baseDamage;
+
+        /// <summary>
+        /// Mengganti tampilan visual sprite meriam/balista secara modular saat runtime
+        /// (Mendukung upgrade model senjata, variasi tema, dan skin artileri benteng).
+        /// </summary>
+        public void SetTurretVisual(Sprite newSprite, Vector3? newScale = null)
+        {
+            if (turretRenderer == null)
+            {
+                turretRenderer = GetComponent<SpriteRenderer>();
+                if (turretRenderer == null) turretRenderer = gameObject.AddComponent<SpriteRenderer>();
+            }
+
+            if (newSprite != null)
+            {
+                turretRenderer.sprite = newSprite;
+            }
+
+            if (newScale.HasValue)
+            {
+                transform.localScale = newScale.Value;
+                originalLocalScale = newScale.Value;
+            }
+        }
+
+        /// <summary>
+        /// Meningkatkan tier/tipe artileri benteng dengan statistik dan sprite baru.
+        /// </summary>
+        public void UpgradeTurret(CitadelTurretType newType, Sprite newSprite, int newTier, float dmg, float interval)
+        {
+            turretType = newType;
+            turretTier = newTier;
+            baseDamage = dmg;
+            attackInterval = interval;
+            SetTurretVisual(newSprite);
+        }
 
         private void Awake()
         {

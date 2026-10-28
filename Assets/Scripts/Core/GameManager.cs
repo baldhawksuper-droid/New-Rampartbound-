@@ -217,12 +217,21 @@ namespace FantasyDefense.Core
                 CastleBarricade.Instance.Initialize(configToUse.castleMaxHealth);
             }
 
-            // 6. Daftarkan Roster Hero ke HeroSummoner
+            // 6. Daftarkan Roster Hero ke HeroSummoner dan sinkronkan dengan Deployed Formation dari Lobby
             if (HeroSummoner.Instance != null && starterHeroPool != null)
             {
                 foreach (var hero in starterHeroPool)
                 {
                     HeroSummoner.Instance.RegisterHeroData(hero);
+                }
+
+                if (FantasyDefense.Citadel.CitadelLobbyManager.Instance != null)
+                {
+                    var deployed = FantasyDefense.Citadel.CitadelLobbyManager.Instance.GetDeployedFormation();
+                    if (deployed != null && deployed.Count > 0)
+                    {
+                        HeroSummoner.Instance.SynchronizeWithFormation(deployed);
+                    }
                 }
             }
 

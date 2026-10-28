@@ -93,6 +93,11 @@ namespace FantasyDefense.Combat
             }
 
             SpawnAndFireProjectile(target);
+            if (SkillVfxManager.Instance != null)
+            {
+                SkillVfxManager.Instance.SpawnUpwardArcaneBeam(transform.position, target.transform.position, currentTier);
+            }
+
             if (visualAnimator != null)
             {
                 if (currentTier >= UnitTier.Tier2)

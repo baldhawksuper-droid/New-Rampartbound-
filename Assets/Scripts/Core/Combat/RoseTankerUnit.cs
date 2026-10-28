@@ -75,6 +75,11 @@ namespace FantasyDefense.Combat
                 ExecuteEarthshaker(target, damage);
             }
 
+            if (SkillVfxManager.Instance != null)
+            {
+                SkillVfxManager.Instance.SpawnUpwardRadiantShockwave(transform.position, target.transform.position, currentTier);
+            }
+
             if (visualAnimator != null)
             {
                 visualAnimator.PlayAttack(target.transform.position);
