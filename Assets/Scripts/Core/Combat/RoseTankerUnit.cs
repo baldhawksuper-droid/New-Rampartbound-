@@ -87,9 +87,16 @@ namespace FantasyDefense.Combat
 
         private void ExecuteEarthshaker(MonsterController primaryTarget, float damage)
         {
+            string skillTitle = currentTier >= UnitTier.Tier4 ? "Seismic Rose Crush" : "Earthshaker";
             if (visualAnimator != null)
             {
-                visualAnimator.PlaySkillCast("Earthshaker", new Color(1f, 0.45f, 0.75f));
+                visualAnimator.PlaySkillCast(skillTitle, new Color(1f, 0.35f, 0.65f));
+            }
+
+            // Trigger visual skill shockwave burst through SkillVfxManager
+            if (SkillVfxManager.Instance != null)
+            {
+                SkillVfxManager.Instance.SpawnSkillParticles(primaryTarget.transform.position, UnitType.RoseTanker, currentTier);
             }
 
             primaryTarget.TakeDamage(damage);
@@ -104,7 +111,8 @@ namespace FantasyDefense.Combat
                 {
                     if (Vector3.Distance(center, monster.transform.position) <= earthshakerRadius)
                     {
-                        monster.TakeDamage(damage * 0.6f);
+                        float splashRatio = currentTier >= UnitTier.Tier4 ? 0.85f : 0.60f;
+                        monster.TakeDamage(damage * splashRatio);
                         monster.ApplyStun(stunDurationT3);
                     }
                 }

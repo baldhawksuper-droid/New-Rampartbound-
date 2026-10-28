@@ -161,6 +161,10 @@ namespace Rampartbound.Editor
             AddResult(cat, "AutoMergeAssistant (QoL)", autoMerge != null ? QACheckStatus.Pass : QACheckStatus.Pass,
                 autoMerge != null ? "Auto-Merge Assistant siap fusi otomatis." : "Auto-Merge Assistant opsional belum terpasang.");
 
+            var companion = FindAnyObjectByType<CompanionManager>();
+            AddResult(cat, "CompanionManager (Ignis & Barney)", companion != null ? QACheckStatus.Pass : QACheckStatus.Pass,
+                companion != null ? "CompanionManager terpasang (Ignis +15% Turret Speed, Barney +10 HP Barricade Repair)." : "CompanionManager opsional belum terpasang.");
+
 #if UNITY_6000_0_OR_NEWER
             var turrets = FindObjectsByType<CitadelDefenseTurret>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 #else

@@ -106,7 +106,12 @@ namespace FantasyDefense.Combat
                 if (target != null)
                 {
                     FireAtTarget(target);
-                    cooldownTimer = attackInterval;
+                    float effectiveInterval = attackInterval;
+                    if (turretType == CitadelTurretType.Cannon && CompanionManager.Instance != null)
+                    {
+                        effectiveInterval = CompanionManager.Instance.GetAdjustedCannonInterval(attackInterval);
+                    }
+                    cooldownTimer = effectiveInterval;
                 }
             }
         }

@@ -380,11 +380,12 @@ namespace FantasyDefense.Combat
                     break;
 
                 case UnitType.RoseTanker:
-                    // Hantaman Palu & Gempa Mawar (Rose Gold & Cokelat Tanah)
-                    Color roseMain = tier >= UnitTier.Tier3 ? new Color(1f, 0.45f, 0.65f) : new Color(0.9f, 0.5f, 0.5f);
-                    Color roseSec = new Color(0.9f, 0.8f, 0.4f);
-                    int roseCount = tier >= UnitTier.Tier3 ? 26 : 15;
-                    SpawnProceduralParticleBurst(pos, roseMain, roseSec, roseCount, tier >= UnitTier.Tier3 ? 2.5f : 1.8f);
+                    // Hantaman Palu & Gempa Mawar (Rose Gold, Deep Crimson Ruby & Keemasan Seismik)
+                    Color roseMain = tier >= UnitTier.Tier4 ? new Color(1f, 0.25f, 0.55f) : (tier >= UnitTier.Tier3 ? new Color(1f, 0.45f, 0.65f) : new Color(0.9f, 0.5f, 0.5f));
+                    Color roseSec = tier >= UnitTier.Tier4 ? new Color(1f, 0.90f, 0.35f) : new Color(0.9f, 0.8f, 0.4f);
+                    int roseCount = tier >= UnitTier.Tier4 ? 38 : (tier >= UnitTier.Tier3 ? 26 : 15);
+                    float roseSpeed = tier >= UnitTier.Tier4 ? 3.6f : (tier >= UnitTier.Tier3 ? 2.5f : 1.8f);
+                    SpawnProceduralParticleBurst(pos, roseMain, roseSec, roseCount, roseSpeed);
                     break;
 
                 case UnitType.RabbitMage:

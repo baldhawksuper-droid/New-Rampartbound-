@@ -326,6 +326,9 @@ namespace Rampartbound.Editor
             var vfxObj = new GameObject("SkillVfxManager");
             vfxObj.AddComponent<SkillVfxManager>();
 
+            var companionObj = new GameObject("CompanionManager");
+            companionObj.AddComponent<CompanionManager>();
+
             var weatherObj = new GameObject("BattlefieldWeatherManager");
             weatherObj.AddComponent<BattlefieldWeatherManager>();
 

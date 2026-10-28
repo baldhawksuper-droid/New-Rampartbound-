@@ -50,16 +50,16 @@ namespace FantasyDefense.Metagame
         private void BuildDefaultChapterStages()
         {
             string[] titles = {
-                "Gerbang Luar Citadel",
-                "Hutan Kabut Berbisik",
-                "Perkemahan Goblin Liar",
+                "Outpost Meadow (Padang Rumput Depan)",
+                "Fortress Siege (Pengepungan Benteng Batu)",
+                "Perkemahan Mire Scrapper",
                 "Menara Pantau Runtuh",
-                "Lembah Bayangan Gelap",
+                "Lembah Obsidian Maw",
                 "Persimpangan Terkutuk",
                 "Reruntuhan Kuil Kuno",
                 "Punggungan Bukit Karang",
-                "Gerbang Benteng Abyssal",
-                "Sarang Naga Abyssal [BOSS]"
+                "Gerbang Benteng Kehampaan",
+                "Sarang Malakor Void Tyrant [BOSS]"
             };
 
             int[] recCPs = { 1200, 1500, 1850, 2200, 2600, 3100, 3650, 4200, 4800, 5500 };
@@ -77,11 +77,11 @@ namespace FantasyDefense.Metagame
                 stage.isBossStage = (i == 4 || i == 9);
                 if (i == 9)
                 {
-                    stage.bossName = "Abyssal Flame Drake (Raja Naga Api Purba)";
+                    stage.bossName = "Malakor, The Void Tyrant";
                 }
                 else if (i == 4)
                 {
-                    stage.bossName = "Orc Berserker (Panglima Orc Kegelapan)";
+                    stage.bossName = "Abyssal Obsidian Maw (Golek Magma Vulkanik)";
                 }
                 else
                 {

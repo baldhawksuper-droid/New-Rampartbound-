@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce8d817949794c2d94ba39bf6ba24109, type: 3}
   m_Name: SO_Monster_Boss
   monsterType: 2
-  monsterName: Citadel Crusher Boss
-  description: Pemimpin serbuan berbadan baja raksasa. Menghasilkan ancaman fatal jika berhasil menyentuh gerbang benteng.
+  monsterName: Malakor, The Void Tyrant
+  description: Penguasa kegelapan bermahkota tanduk kehampaan dan zirah void kosmik. Memimpin invasi ke gerbang benteng Aethelgard.
   moveSpeed: 0.7
   maxHealth: 2200
   castleDamage: 35

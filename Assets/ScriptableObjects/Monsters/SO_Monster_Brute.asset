@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce8d817949794c2d94ba39bf6ba24109, type: 3}
   m_Name: SO_Monster_Brute
   monsterType: 1
-  monsterName: Shielded Orc Brute
-  description: Raksasa perisai berzirah tebal. Lambat namun mampu menahan rentetan tebasan dan tembakan sihir.
+  monsterName: Abyssal Obsidian Maw
+  description: Monster batu magma vulkanik gempal dengan kapak lahar. Tebal dan tahan terhadap gempuran pertahanan.
   moveSpeed: 1.1
   maxHealth: 650
   castleDamage: 15

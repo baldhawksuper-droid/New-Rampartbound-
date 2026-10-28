@@ -84,10 +84,10 @@ namespace Rampartbound.Editor
             AuditHero("Wind Ranger Tier 2", "Assets/Art/Sprites/Heroes/WindRanger_T2.png", "Assets/ScriptableObjects/Units/SO_WindRanger.asset", 2);
             AuditHero("Wind Ranger Tier 3", "Assets/Art/Sprites/Heroes/WindRanger_T3.png", "Assets/ScriptableObjects/Units/SO_WindRanger.asset", 3);
 
-            // 2. Audit Monsters (Creep, Brute, Boss)
-            AuditMonster("Monster Creep (Goblin)", "Assets/Art/Sprites/Monsters/Monster_Creep.png", "Assets/ScriptableObjects/Monsters/SO_Monster_Creep.asset");
-            AuditMonster("Monster Brute (Orc)", "Assets/Art/Sprites/Monsters/Monster_Brute.png", "Assets/ScriptableObjects/Monsters/SO_Monster_Brute.asset");
-            AuditMonster("Monster Boss (Crusher)", "Assets/Art/Sprites/Monsters/Monster_Boss.png", "Assets/ScriptableObjects/Monsters/SO_Monster_Boss.asset");
+            // 2. Audit Monsters (Mire Horned Scrapper, Abyssal Obsidian Maw, Malakor Void Tyrant)
+            AuditMonster("Monster Creep (Mire Horned Scrapper)", "Assets/Art/Sprites/Monsters/Monster_Creep.png", "Assets/ScriptableObjects/Monsters/SO_Monster_Creep.asset");
+            AuditMonster("Monster Brute (Abyssal Obsidian Maw)", "Assets/Art/Sprites/Monsters/Monster_Brute.png", "Assets/ScriptableObjects/Monsters/SO_Monster_Brute.asset");
+            AuditMonster("Monster Boss (Malakor Void Tyrant)", "Assets/Art/Sprites/Monsters/Monster_Boss.png", "Assets/ScriptableObjects/Monsters/SO_Monster_Boss.asset");
 
             // 3. Audit Environment (Grid & Barricade)
             AuditEnvironment("Grid Tile (Empty)", "Assets/Art/Sprites/Grid/Tile_Empty.png");
