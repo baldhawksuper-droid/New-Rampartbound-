@@ -388,8 +388,10 @@ namespace Rampartbound.Editor
             if (autoStartProp != null) autoStartProp.boolValue = false;
             gmSO.ApplyModifiedProperties();
 
-            // 8. Master UI Canvas & Font
-            Font defaultFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            // 8. Master UI Canvas & Font (Menggunakan Arcade Comic Font: Lilita One)
+            Font defaultFont = AssetDatabase.LoadAssetAtPath<Font>("Assets/Resources/Fonts/LilitaOne-Regular.ttf");
+            if (defaultFont == null) defaultFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+            if (defaultFont == null) defaultFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             if (defaultFont == null) defaultFont = Resources.GetBuiltinResource<Font>("Arial.ttf");
 
             var canvasObj = new GameObject("UIBattleCanvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));

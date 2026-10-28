@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: a98827022f3f4f3f8bd5a8d7c49bc17c
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 32
+  includeFontData: 1
+  fontNames:
+  - Lilita One
+  fallbackFontReferences: []
+  customBorderColor: 0
+  colorMask: 0
+  characterSpacing: 0
+  characterPadding: 1
+  convertCase: 0
+  characterSet: 0
+  forceTextureAlpha: 0
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

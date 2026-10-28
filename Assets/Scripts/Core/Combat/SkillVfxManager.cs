@@ -172,11 +172,11 @@ namespace FantasyDefense.Combat
             TextMesh shadowMesh = shadowObj.AddComponent<TextMesh>();
             shadowMesh.text = content;
             shadowMesh.fontStyle = FontStyle.Bold;
-            shadowMesh.fontSize = isHighJump ? 34 : 30;
+            shadowMesh.fontSize = isHighJump ? 36 : 30;
             shadowMesh.characterSize = 0.08f * scale;
             shadowMesh.anchor = TextAnchor.MiddleCenter;
             shadowMesh.alignment = TextAlignment.Center;
-            shadowMesh.color = new Color(0.04f, 0.04f, 0.06f, 0.85f);
+            shadowMesh.color = new Color(0.04f, 0.04f, 0.06f, 0.90f);
             MeshRenderer shadowMr = shadowObj.GetComponent<MeshRenderer>();
             if (shadowMr != null)
             {
@@ -188,7 +188,7 @@ namespace FantasyDefense.Combat
             TextMesh textMesh = containerObj.AddComponent<TextMesh>();
             textMesh.text = content;
             textMesh.fontStyle = FontStyle.Bold;
-            textMesh.fontSize = isHighJump ? 34 : 30;
+            textMesh.fontSize = isHighJump ? 36 : 30;
             textMesh.characterSize = 0.08f * scale;
             textMesh.anchor = TextAnchor.MiddleCenter;
             textMesh.alignment = TextAlignment.Center;
@@ -199,6 +199,15 @@ namespace FantasyDefense.Combat
             {
                 mr.sortingLayerName = "UI";
                 mr.sortingOrder = 500; // Prioritas mutlak di depan arena, grid, dan unit
+            }
+
+            Font comicFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+            if (comicFont != null)
+            {
+                shadowMesh.font = comicFont;
+                if (shadowMr != null) shadowMr.sharedMaterial = comicFont.material;
+                textMesh.font = comicFont;
+                if (mr != null) mr.sharedMaterial = comicFont.material;
             }
 
             StartCoroutine(FloatingCombatNumberRoutine(containerObj, textMesh, shadowMesh, scale, isHighJump));
