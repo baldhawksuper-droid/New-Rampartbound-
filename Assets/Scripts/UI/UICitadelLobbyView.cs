@@ -433,11 +433,14 @@ namespace FantasyDefense.UI
                 UnitType.Cedric => "Cedric_T1",
                 UnitType.RoseTanker => "Rose_T1",
                 UnitType.RabbitMage => "Pippin_T1",
-                UnitType.WindRanger => "Wind_Ranger_T1",
+                UnitType.WindRanger => "WindRanger_T1",
                 _ => "Cedric_T1"
             };
 
-            var sp = Resources.Load<Sprite>($"Sprites/Heroes/{spriteName}") ?? Resources.Load<Sprite>($"Art/Sprites/Heroes/{spriteName}");
+            var sp = Resources.Load<Sprite>($"Sprites/Heroes/{spriteName}") 
+                  ?? Resources.Load<Sprite>($"Art/Sprites/Heroes/{spriteName}")
+                  ?? Resources.Load<Sprite>($"Sprites/Heroes/Wind_Ranger_T1")
+                  ?? Resources.Load<Sprite>($"Sprites/Heroes/RabbitMage_T1");
             return sp;
         }
 
