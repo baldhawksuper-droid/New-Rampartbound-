@@ -732,46 +732,36 @@ namespace FantasyDefense.Combat
             {
                 visualAnimator.SetBaseScale(transform.localScale);
 
-                // Modular 2.5D Rigging (Kepala Chibi, Dada/Jubah, Lengan Pedang, Lengan Perisai, dan Slash VFX)
+                // Modular 2.5D Rigging: Hanya aktif jika menggunakan aset modular terpisah dan tidak ada single-sprite combat kanonikal
                 if (visualAnimator is ModularHeroVisualAnimator modularAnim)
                 {
-                    if (!isPreparationToken && currentTier > UnitTier.Tier0 && unitData != null && unitData.unitType == UnitType.Cedric)
+                    bool hasDirectCombatSprite = targetSprite != null && (targetSprite.name.Contains("Combat") || targetSprite.name.Contains("Rose") || targetSprite.name.Contains("RabbitMage") || targetSprite.name.Contains("Cedric"));
+
+                    if (!isPreparationToken && currentTier > UnitTier.Tier0 && unitData != null && unitData.unitType == UnitType.Cedric && !hasDirectCombatSprite)
                     {
                         int tNum = Mathf.Clamp((int)currentTier, 1, 5);
-                        // Prioritas: Sprite Modular Combat North (menghadap utara / musuh yang datang dari atas layar)
                         Sprite torso = Resources.Load<Sprite>($"Sprites/Heroes/Modular/Cedric_T{tNum}_Torso_North")
-                                    ?? Resources.Load<Sprite>("Sprites/Heroes/Modular/Cedric_T1_Torso_North")
-                                    ?? Resources.Load<Sprite>($"Sprites/Heroes/Modular/Cedric_T{tNum}_Torso")
-                                    ?? Resources.Load<Sprite>("Sprites/Heroes/Modular/Cedric_T1_Torso");
+                                    ?? Resources.Load<Sprite>("Sprites/Heroes/Modular/Cedric_T1_Torso_North");
                         Sprite head = Resources.Load<Sprite>($"Sprites/Heroes/Modular/Cedric_T{tNum}_Head_North")
-                                   ?? Resources.Load<Sprite>("Sprites/Heroes/Modular/Cedric_T1_Head_North")
-                                   ?? Resources.Load<Sprite>($"Sprites/Heroes/Modular/Cedric_T{tNum}_Head")
-                                   ?? Resources.Load<Sprite>("Sprites/Heroes/Modular/Cedric_T1_Head");
+                                   ?? Resources.Load<Sprite>("Sprites/Heroes/Modular/Cedric_T1_Head_North");
                         Sprite sword = Resources.Load<Sprite>($"Sprites/Heroes/Modular/Cedric_T{tNum}_Arm_Sword_North")
-                                    ?? Resources.Load<Sprite>("Sprites/Heroes/Modular/Cedric_T1_Arm_Sword_North")
-                                    ?? Resources.Load<Sprite>($"Sprites/Heroes/Modular/Cedric_T{tNum}_Arm_Sword")
-                                    ?? Resources.Load<Sprite>("Sprites/Heroes/Modular/Cedric_T1_Arm_Sword");
+                                    ?? Resources.Load<Sprite>("Sprites/Heroes/Modular/Cedric_T1_Arm_Sword_North");
                         Sprite shield = Resources.Load<Sprite>($"Sprites/Heroes/Modular/Cedric_T{tNum}_Arm_Shield_North")
-                                     ?? Resources.Load<Sprite>("Sprites/Heroes/Modular/Cedric_T1_Arm_Shield_North")
-                                     ?? Resources.Load<Sprite>($"Sprites/Heroes/Modular/Cedric_T{tNum}_Arm_Shield")
-                                     ?? Resources.Load<Sprite>("Sprites/Heroes/Modular/Cedric_T1_Arm_Shield");
+                                     ?? Resources.Load<Sprite>("Sprites/Heroes/Modular/Cedric_T1_Arm_Shield_North");
                         Sprite slash = Resources.Load<Sprite>("Sprites/VFX/VFX_Slash_Arc");
 
                         if (torso != null && head != null)
                         {
                             modularAnim.ConfigureModularSprites(torso, head, sword, shield, slash);
                             modularAnim.SetModularRigActive(true);
-                            // Sembunyikan single-sprite bawaan agar tidak dobel/tumpang tindih
                             spriteRenderer.color = new Color(1f, 1f, 1f, 0f);
                         }
                     }
                     else
                     {
-                        // Sembunyikan rig modular tubuh saat mode token persiapan atau dragging
+                        // Pastikan rig modular nonaktif dan spriteRenderer utama terlihat 100% utuh
                         modularAnim.SetModularRigActive(false);
-
-                        // Pulihkan visual normal (koin token medallion utuh) saat mode persiapan
-                        if (spriteRenderer.color.a < 0.05f)
+                        if (spriteRenderer.color.a < 0.95f)
                         {
                             spriteRenderer.color = Color.white;
                         }

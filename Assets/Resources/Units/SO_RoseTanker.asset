@@ -13,15 +13,15 @@ MonoBehaviour:
   m_Name: SO_RoseTanker
   unitType: 1
   tier: 1
-  heroName: Rose Tanker
-  title: Ksatria Rambut Pink
-  description: Pelindung benteng dengan perisai mawar dan palu godam. Menahan gempuran monster dan memberikan efek stun.
-  baseDamage: 22
-  attackRate: 0.9
+  heroName: Rose
+  title: Ksatria Palu Godam Mawar
+  description: Ksatria palu berat dengan kekuatan hantam melee destruktif. Mengayunkan Palu Mawar raksasa yang meremukkan formasi monster terdepan.
+  baseDamage: 38
+  attackRate: 0.85
   attackRange: 1
-  maxHealth: 200
-  criticalChance: 0.05
-  defensePercent: 0.3
+  maxHealth: 220
+  criticalChance: 0.1
+  defensePercent: 0.25
   unitIcon: {fileID: 21300000, guid: 0d4d359f9d734bb1ad8399ca48b92233, type: 3}
   unitPrefab: {fileID: 0}
   themeColor: {r: 0.95, g: 0.4, b: 0.65, a: 1}
@@ -29,9 +29,13 @@ MonoBehaviour:
   tier1Sprite: {fileID: 21300000, guid: 0d4d359f9d734bb1ad8399ca48b92233, type: 3}
   tier2Sprite: {fileID: 21300000, guid: 1a69f121ca4a49758e6062b99ef69ccd, type: 3}
   tier3Sprite: {fileID: 21300000, guid: 43090c84e6c34b9780db50205c24b168, type: 3}
+  tier4Sprite: {fileID: 21300000, guid: b96f115126f64207b6394842e9ee7cf7, type: 3}
+  tier5Sprite: {fileID: 21300000, guid: 0f8dee74877144fc83262d4030b0e471, type: 3}
   preparationTokenSprite: {fileID: 21300000, guid: b56e0a0427ec4799b17dafeef32bbe09, type: 3}
   preparationTokenTier2Sprite: {fileID: 21300000, guid: 5ba4fc4e6cb6a8d525c2dd4b014f950e, type: 3}
   preparationTokenTier3Sprite: {fileID: 21300000, guid: 80d628c7be4659643490a5d86963a438, type: 3}
-  skillName: Earthshaker
-  skillDescription: Hentakan palu ke tanah yang memicu gempa, memberikan stun area dan memantulkan damage musuh.
+  preparationTokenTier4Sprite: {fileID: 21300000, guid: 3809b7cf7c7f48a294583e3a66aa6401, type: 3}
+  preparationTokenTier5Sprite: {fileID: 21300000, guid: 952928f93f08452eac72ce1bd324efd8, type: 3}
+  skillName: Seismic Rose Crush
+  skillDescription: Hentakan dahsyat palu godam ke bumi yang memicu gempa, menghasilkan damage fisik masif dan stun area pada musuh di sekitarnya.
   skillCooldown: 6
