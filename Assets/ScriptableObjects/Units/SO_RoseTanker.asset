@@ -13,15 +13,15 @@ MonoBehaviour:
   m_Name: SO_RoseTanker
   unitType: 1
   tier: 1
-  heroName: Rose Tanker
-  title: Ksatria Rambut Pink
-  description: Pelindung benteng dengan perisai mawar dan palu godam. Menahan gempuran monster dan memberikan efek stun.
-  baseDamage: 22
-  attackRate: 0.9
+  heroName: Rose
+  title: Ksatria Palu Godam Mawar
+  description: Ksatria palu berat dengan kekuatan hantam melee destruktif. Mengayunkan Palu Mawar raksasa yang meremukkan formasi monster terdepan.
+  baseDamage: 38
+  attackRate: 0.85
   attackRange: 1
-  maxHealth: 200
-  criticalChance: 0.05
-  defensePercent: 0.3
+  maxHealth: 220
+  criticalChance: 0.1
+  defensePercent: 0.25
   unitIcon: {fileID: 21300000, guid: 0d4d359f9d734bb1ad8399ca48b92233, type: 3}
   unitPrefab: {fileID: 0}
   themeColor: {r: 0.95, g: 0.4, b: 0.65, a: 1}
@@ -32,6 +32,6 @@ MonoBehaviour:
   preparationTokenSprite: {fileID: 21300000, guid: b56e0a0427ec4799b17dafeef32bbe09, type: 3}
   preparationTokenTier2Sprite: {fileID: 21300000, guid: 5ba4fc4e6cb6a8d525c2dd4b014f950e, type: 3}
   preparationTokenTier3Sprite: {fileID: 21300000, guid: 80d628c7be4659643490a5d86963a438, type: 3}
-  skillName: Earthshaker
-  skillDescription: Hentakan palu ke tanah yang memicu gempa, memberikan stun area dan memantulkan damage musuh.
+  skillName: Seismic Rose Crush
+  skillDescription: Hentakan dahsyat palu godam ke bumi yang memicu gempa, menghasilkan damage fisik masif dan stun area pada musuh di sekitarnya.
   skillCooldown: 6
