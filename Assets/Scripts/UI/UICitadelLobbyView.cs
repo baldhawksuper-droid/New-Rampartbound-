@@ -444,7 +444,8 @@ namespace FantasyDefense.UI
                 if (img != null)
                 {
                     img.color = Color.white;
-                    Sprite heroSprite = GetHeroSpriteForType(type);
+                    int heroTier = profile != null ? Mathf.Clamp(profile.starRank, 1, 5) : 1;
+                    Sprite heroSprite = GetHeroSpriteForType(type, heroTier);
                     if (heroSprite != null)
                     {
                         img.sprite = heroSprite;
@@ -453,21 +454,34 @@ namespace FantasyDefense.UI
             }
         }
 
-        private Sprite GetHeroSpriteForType(UnitType type)
+        private Sprite GetHeroSpriteForType(UnitType type, int tier = 1)
         {
-            string spriteName = type switch
+            tier = Mathf.Clamp(tier, 1, 5);
+            string baseName = type switch
             {
-                UnitType.Cedric => "Cedric_T1",
-                UnitType.RoseTanker => "Rose_T1",
-                UnitType.RabbitMage => "RabbitMage_T1",
-                UnitType.WindRanger => "WindRanger_T1",
-                _ => "Cedric_T1"
+                UnitType.Cedric => "Cedric",
+                UnitType.RoseTanker => "Rose",
+                UnitType.RabbitMage => "RabbitMage",
+                UnitType.WindRanger => "WindRanger",
+                _ => "Cedric"
             };
 
-            var sp = Resources.Load<Sprite>($"Sprites/Heroes/{spriteName}") 
-                  ?? Resources.Load<Sprite>($"Art/Sprites/Heroes/{spriteName}")
+            // Coba muat sprite sesuai tier aktif pahlawan (T1 hingga T5)
+            Sprite sp = null;
+            if (tier > 1)
+            {
+                sp = Resources.Load<Sprite>($"Sprites/Heroes/{baseName}_T{tier}")
+                  ?? Resources.Load<Sprite>($"Art/Sprites/Heroes/{baseName}_T{tier}");
+            }
+
+            // Fallback ke Tier 1 jika spesifik tier belum termuat
+            if (sp == null)
+            {
+                sp = Resources.Load<Sprite>($"Sprites/Heroes/{baseName}_T1") 
+                  ?? Resources.Load<Sprite>($"Art/Sprites/Heroes/{baseName}_T1")
                   ?? Resources.Load<Sprite>($"Sprites/Heroes/Wind_Ranger_T1")
                   ?? Resources.Load<Sprite>($"Sprites/Heroes/RabbitMage_T1");
+            }
             return sp;
         }
 

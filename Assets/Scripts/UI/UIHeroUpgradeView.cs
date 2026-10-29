@@ -695,18 +695,42 @@ namespace FantasyDefense.UI
 
         private Sprite GetHeroAvatarSprite(UnitType type)
         {
-            switch (type)
+            var lobby = Metagame.CitadelLobbyManager.Instance;
+            var profile = lobby != null ? lobby.GetHeroProfile(type) : null;
+            int tier = profile != null ? Mathf.Clamp(profile.starRank, 1, 5) : 1;
+
+            string baseName = type switch
             {
-                case UnitType.Cedric: 
-                    return cedricAvatar != null ? cedricAvatar : Resources.Load<Sprite>("Sprites/Heroes/Cedric_T1");
-                case UnitType.RoseTanker: 
-                    return roseAvatar != null ? roseAvatar : Resources.Load<Sprite>("Sprites/Heroes/Rose_T1");
-                case UnitType.RabbitMage: 
-                    return rabbitAvatar != null ? rabbitAvatar : Resources.Load<Sprite>("Sprites/Heroes/RabbitMage_T1");
-                case UnitType.WindRanger: 
-                    return windRangerAvatar != null ? windRangerAvatar : Resources.Load<Sprite>("Sprites/Heroes/WindRanger_T1");
-                default: return null;
+                UnitType.Cedric => "Cedric",
+                UnitType.RoseTanker => "Rose",
+                UnitType.RabbitMage => "RabbitMage",
+                UnitType.WindRanger => "WindRanger",
+                _ => "Cedric"
+            };
+
+            Sprite sp = null;
+            if (tier > 1)
+            {
+                sp = Resources.Load<Sprite>($"Sprites/Heroes/{baseName}_T{tier}")
+                  ?? Resources.Load<Sprite>($"Art/Sprites/Heroes/{baseName}_T{tier}");
             }
+
+            if (sp == null)
+            {
+                switch (type)
+                {
+                    case UnitType.Cedric: 
+                        return cedricAvatar != null ? cedricAvatar : Resources.Load<Sprite>("Sprites/Heroes/Cedric_T1");
+                    case UnitType.RoseTanker: 
+                        return roseAvatar != null ? roseAvatar : Resources.Load<Sprite>("Sprites/Heroes/Rose_T1");
+                    case UnitType.RabbitMage: 
+                        return rabbitAvatar != null ? rabbitAvatar : Resources.Load<Sprite>("Sprites/Heroes/RabbitMage_T1");
+                    case UnitType.WindRanger: 
+                        return windRangerAvatar != null ? windRangerAvatar : Resources.Load<Sprite>("Sprites/Heroes/WindRanger_T1");
+                    default: return null;
+                }
+            }
+            return sp;
         }
     }
 }
