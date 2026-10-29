@@ -83,6 +83,8 @@ namespace Rampartbound.Editor
             AuditHero("Wind Ranger Tier 1", "Assets/Art/Sprites/Heroes/WindRanger_T1.png", "Assets/ScriptableObjects/Units/SO_WindRanger.asset", 1);
             AuditHero("Wind Ranger Tier 2", "Assets/Art/Sprites/Heroes/WindRanger_T2.png", "Assets/ScriptableObjects/Units/SO_WindRanger.asset", 2);
             AuditHero("Wind Ranger Tier 3", "Assets/Art/Sprites/Heroes/WindRanger_T3.png", "Assets/ScriptableObjects/Units/SO_WindRanger.asset", 3);
+            AuditHero("Wind Ranger Tier 4", "Assets/Art/Sprites/Heroes/WindRanger_T4.png", "Assets/ScriptableObjects/Units/SO_WindRanger.asset", 4);
+            AuditHero("Wind Ranger Tier 5", "Assets/Art/Sprites/Heroes/WindRanger_T5.png", "Assets/ScriptableObjects/Units/SO_WindRanger.asset", 5);
 
             // 2. Audit Monsters (Mire Horned Scrapper, Abyssal Obsidian Maw, Malakor Void Tyrant)
             AuditMonster("Monster Creep (Mire Horned Scrapper)", "Assets/Art/Sprites/Monsters/Monster_Creep.png", "Assets/ScriptableObjects/Monsters/SO_Monster_Creep.asset");

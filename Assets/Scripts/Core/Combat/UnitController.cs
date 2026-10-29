@@ -681,6 +681,7 @@ namespace FantasyDefense.Combat
                     UnitType.Cedric => $"Sprites/Heroes/Cedric_T{(int)currentTier}_Combat",
                     UnitType.RabbitMage => $"Sprites/Heroes/RabbitMage_T{(int)currentTier}_Combat",
                     UnitType.RoseTanker => $"Sprites/Heroes/Rose_T{(int)currentTier}_Combat",
+                    UnitType.WindRanger => $"Sprites/Heroes/WindRanger_T{(int)currentTier}_Combat",
                     _ => null
                 };
 

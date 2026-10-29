@@ -245,7 +245,8 @@ namespace FantasyDefense.UI
             if (heroLevelText != null) heroLevelText.text = $"Level {profile.level}";
             if (heroCpText != null) heroCpText.text = $"Combat Power: {profile.combatPower:N0}";
 
-            // Update Avatar Sprite
+            // Update Visual Tab Navigation State
+            UpdateTabStates();
             if (heroAvatarImage != null)
             {
                 Sprite avatar = GetHeroAvatarSprite(selectedHeroType);
@@ -655,14 +656,55 @@ namespace FantasyDefense.UI
             }
         }
 
+        private void UpdateTabStates()
+        {
+            var tabActive = Resources.Load<Sprite>("Sprites/UI/UI_Tab_Hero_Active");
+            var tabInactive = Resources.Load<Sprite>("Sprites/UI/UI_Tab_Hero_Inactive");
+
+            SetTabSprite(cedricTabButton, selectedHeroType == UnitType.Cedric, tabActive, tabInactive);
+            SetTabSprite(roseTabButton, selectedHeroType == UnitType.RoseTanker, tabActive, tabInactive);
+            SetTabSprite(rabbitTabButton, selectedHeroType == UnitType.RabbitMage, tabActive, tabInactive);
+            SetTabSprite(windRangerTabButton, selectedHeroType == UnitType.WindRanger, tabActive, tabInactive);
+        }
+
+        private void SetTabSprite(Button btn, bool isActive, Sprite activeSprite, Sprite inactiveSprite)
+        {
+            if (btn == null) return;
+            var img = btn.GetComponent<Image>();
+            if (img != null)
+            {
+                if (isActive && activeSprite != null)
+                {
+                    img.sprite = activeSprite;
+                    img.color = Color.white;
+                }
+                else if (!isActive && inactiveSprite != null)
+                {
+                    img.sprite = inactiveSprite;
+                    img.color = new Color(0.85f, 0.85f, 0.85f, 1f);
+                }
+            }
+
+            var txt = btn.GetComponentInChildren<Text>();
+            if (txt != null)
+            {
+                txt.color = isActive ? new Color(1f, 0.92f, 0.4f) : new Color(0.7f, 0.75f, 0.8f);
+                txt.fontStyle = isActive ? FontStyle.Bold : FontStyle.Normal;
+            }
+        }
+
         private Sprite GetHeroAvatarSprite(UnitType type)
         {
             switch (type)
             {
-                case UnitType.Cedric: return cedricAvatar;
-                case UnitType.RoseTanker: return roseAvatar;
-                case UnitType.RabbitMage: return rabbitAvatar;
-                case UnitType.WindRanger: return windRangerAvatar;
+                case UnitType.Cedric: 
+                    return cedricAvatar != null ? cedricAvatar : Resources.Load<Sprite>("Sprites/Heroes/Cedric_T1");
+                case UnitType.RoseTanker: 
+                    return roseAvatar != null ? roseAvatar : Resources.Load<Sprite>("Sprites/Heroes/Rose_T1");
+                case UnitType.RabbitMage: 
+                    return rabbitAvatar != null ? rabbitAvatar : Resources.Load<Sprite>("Sprites/Heroes/RabbitMage_T1");
+                case UnitType.WindRanger: 
+                    return windRangerAvatar != null ? windRangerAvatar : Resources.Load<Sprite>("Sprites/Heroes/WindRanger_T1");
                 default: return null;
             }
         }

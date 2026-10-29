@@ -272,9 +272,23 @@ namespace FantasyDefense.Combat
             if (spriteRenderer != null)
             {
                 spriteRenderer.color = hitColor;
-                yield return new WaitForSeconds(0.12f);
-                UpdateDamageVisuals();
             }
+
+            // Punch shake halus pada barikade saat hantaman
+            Vector3 origPos = transform.position;
+            float duration = 0.16f;
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = elapsed / duration;
+                float offset = Mathf.Sin(t * Mathf.PI * 4f) * (1f - t) * 0.08f;
+                transform.position = origPos + new Vector3(offset, 0f, 0f);
+                yield return null;
+            }
+            transform.position = origPos;
+
+            UpdateDamageVisuals();
         }
 
         #region Cracked Barricade Multi-Tier Visual System (Point 2)
@@ -321,19 +335,22 @@ namespace FantasyDefense.Combat
             {
                 crackOverlayRenderer.gameObject.SetActive(true);
                 crackOverlayRenderer.sprite = GetOrCreateCrackSprite(3);
-                crackOverlayRenderer.color = new Color(1f, 0.35f, 0.25f, 0.95f); // Retakan parah kritis membara
+                crackOverlayRenderer.color = new Color(1f, 0.25f, 0.15f, 0.98f); // Retakan parah kritis membara
+                crackOverlayRenderer.transform.localScale = new Vector3(1.05f, 1.05f, 1f);
             }
             else if (pct <= 0.50f)
             {
                 crackOverlayRenderer.gameObject.SetActive(true);
                 crackOverlayRenderer.sprite = GetOrCreateCrackSprite(2);
-                crackOverlayRenderer.color = new Color(0.92f, 0.85f, 0.75f, 0.90f); // Retakan struktural menengah
+                crackOverlayRenderer.color = new Color(0.95f, 0.80f, 0.55f, 0.90f); // Retakan struktural menengah
+                crackOverlayRenderer.transform.localScale = Vector3.one;
             }
             else if (pct <= 0.75f)
             {
                 crackOverlayRenderer.gameObject.SetActive(true);
                 crackOverlayRenderer.sprite = GetOrCreateCrackSprite(1);
-                crackOverlayRenderer.color = new Color(0.85f, 0.85f, 0.85f, 0.75f); // Retakan halus awal
+                crackOverlayRenderer.color = new Color(0.85f, 0.85f, 0.90f, 0.75f); // Retakan halus awal
+                crackOverlayRenderer.transform.localScale = Vector3.one;
             }
             else
             {
