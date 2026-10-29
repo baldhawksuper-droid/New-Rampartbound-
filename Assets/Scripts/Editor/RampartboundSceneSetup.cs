@@ -1925,9 +1925,25 @@ namespace Rampartbound.Editor
             PositionUI(sfxMute, 0.80f, 0.63f, 0.98f, 0.71f);
 
             var fps30 = CreateButton(setContent, "Fps30Btn", "30 FPS", new Color(0.2f, 0.3f, 0.45f), Color.white, 20, defaultFont);
+            if (_btnSecondaryStone != null)
+            {
+                var f30Img = fps30.GetComponent<Image>();
+                f30Img.sprite = _btnSecondaryStone;
+                f30Img.type = Image.Type.Sliced;
+                f30Img.color = Color.white;
+            }
             PositionUI(fps30, 0.05f, 0.48f, 0.32f, 0.58f);
+
             var fps60 = CreateButton(setContent, "Fps60Btn", "60 FPS (Halus)", new Color(0.2f, 0.5f, 0.35f), Color.white, 20, defaultFont);
+            if (_btnPrimaryGold != null)
+            {
+                var f60Img = fps60.GetComponent<Image>();
+                f60Img.sprite = _btnPrimaryGold;
+                f60Img.type = Image.Type.Sliced;
+                f60Img.color = Color.white;
+            }
             PositionUI(fps60, 0.36f, 0.48f, 0.70f, 0.58f);
+
             var curFpsTxt = CreateText(setContent, "CurrentFpsText", "Target: 60 FPS", 20, FontStyle.Bold, TextAnchor.MiddleCenter, Color.white, defaultFont);
             PositionUI(curFpsTxt.gameObject, 0.72f, 0.48f, 0.98f, 0.58f);
 
@@ -1937,11 +1953,26 @@ namespace Rampartbound.Editor
             PositionUI(hapToggle, 0.52f, 0.37f, 0.95f, 0.45f);
 
             var langBtn = CreateButton(setContent, "LanguageSwitchBtn", "🌐 GANTI BAHASA (SWITCH)", new Color(0.2f, 0.45f, 0.55f), Color.white, 20, defaultFont);
+            if (_btnSecondaryStone != null)
+            {
+                var lImg = langBtn.GetComponent<Image>();
+                lImg.sprite = _btnSecondaryStone;
+                lImg.type = Image.Type.Sliced;
+                lImg.color = Color.white;
+            }
             PositionUI(langBtn, 0.05f, 0.26f, 0.52f, 0.35f);
+
             var langStatusTxt = CreateText(setContent, "LanguageStatusText", "Bahasa: [ ID ] (Indonesia)", 20, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(1f, 0.85f, 0.3f), defaultFont);
             PositionUI(langStatusTxt.gameObject, 0.55f, 0.26f, 0.95f, 0.35f);
 
             var testBtn = CreateButton(setContent, "TestSfxBtn", "🔊 UJI COBA SUARA EFEK (TEST SFX)", new Color(0.25f, 0.4f, 0.65f), Color.white, 22, defaultFont);
+            if (_btnBattleCrimson != null)
+            {
+                var tImg = testBtn.GetComponent<Image>();
+                tImg.sprite = _btnBattleCrimson;
+                tImg.type = Image.Type.Sliced;
+                tImg.color = Color.white;
+            }
             PositionUI(testBtn, 0.1f, 0.16f, 0.9f, 0.24f);
 
             var accountInfoTxt = CreateText(setContent, "AccountStatusText", "☁️ STATUS AKUN: MODE TAMU (GUEST) • AUTO-SAVE AKTIF\n<size=15><color=#AAAAAA>Progres tersimpan otomatis di perangkat secara aman. Hapus Cache / Data Aplikasi di Pengaturan Ponsel jika ingin memulai dari awal.</color></size>", 17, FontStyle.Normal, TextAnchor.MiddleCenter, new Color(0.85f, 0.95f, 1f), defaultFont);

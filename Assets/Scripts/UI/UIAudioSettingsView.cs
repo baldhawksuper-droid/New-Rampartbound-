@@ -271,14 +271,24 @@ namespace FantasyDefense.UI
 
         private void UpdatePercentLabels(float master, float bgm, float sfx)
         {
+            Font defaultFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+            if (defaultFont != null)
+            {
+                if (masterPercentText != null) masterPercentText.font = defaultFont;
+                if (bgmPercentText != null) bgmPercentText.font = defaultFont;
+                if (sfxPercentText != null) sfxPercentText.font = defaultFont;
+                if (currentFpsText != null) currentFpsText.font = defaultFont;
+                if (languageStatusText != null) languageStatusText.font = defaultFont;
+            }
+
             if (masterPercentText != null)
-                masterPercentText.text = $"{Mathf.RoundToInt(master * 100f)}%";
+                masterPercentText.text = $"MASTER: {Mathf.RoundToInt(master * 100f)}%";
 
             if (bgmPercentText != null)
-                bgmPercentText.text = $"{Mathf.RoundToInt(bgm * 100f)}%";
+                bgmPercentText.text = $"MUSIK BGM: {Mathf.RoundToInt(bgm * 100f)}%";
 
             if (sfxPercentText != null)
-                sfxPercentText.text = $"{Mathf.RoundToInt(sfx * 100f)}%";
+                sfxPercentText.text = $"EFEK SFX: {Mathf.RoundToInt(sfx * 100f)}%";
         }
 
         private void OnMasterSliderChanged(float value)
