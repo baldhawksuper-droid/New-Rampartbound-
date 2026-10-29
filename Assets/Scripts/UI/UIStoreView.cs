@@ -131,7 +131,37 @@ namespace FantasyDefense.UI
                 {
                     feedbackText.text = msg;
                 }
+
+                if (success)
+                {
+                    if (AudioManager.Instance != null)
+                    {
+                        AudioManager.Instance.PlaySound(Audio.SoundType.MergeSuccess);
+                    }
+
+                    // Tactile Purchase Punch on Feedback Text & Toast Notice
+                    if (feedbackText != null)
+                    {
+                        StartCoroutine(PunchScaleRoutine(feedbackText.transform, 1.25f, 0.25f));
+                    }
+                }
             }
+        }
+
+        private System.Collections.IEnumerator PunchScaleRoutine(Transform tr, float punchAmount, float duration)
+        {
+            if (tr == null) yield break;
+            Vector3 orig = Vector3.one;
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = elapsed / duration;
+                float scale = 1f + Mathf.Sin(t * Mathf.PI) * (punchAmount - 1f);
+                tr.localScale = orig * scale;
+                yield return null;
+            }
+            tr.localScale = orig;
         }
 
         private void HandleGoldChanged(int g) => RefreshUI();

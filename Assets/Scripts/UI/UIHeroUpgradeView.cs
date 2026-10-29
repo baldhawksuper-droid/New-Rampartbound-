@@ -541,12 +541,97 @@ namespace FantasyDefense.UI
                 feedbackMessageText.text = message;
             }
 
-            if (success && AudioManager.Instance != null)
+            if (success)
             {
-                AudioManager.Instance.PlaySound(SoundType.MergeSuccess);
+                if (AudioManager.Instance != null)
+                {
+                    AudioManager.Instance.PlaySound(SoundType.MergeSuccess);
+                }
+
+                // Tactile Level-Up Celebration: Punch Bounce & Floating Text
+                TriggerLevelUpCelebration();
             }
 
             RefreshDisplay();
+        }
+
+        private void TriggerLevelUpCelebration()
+        {
+            if (heroAvatarImage != null)
+            {
+                StartCoroutine(PunchAvatarScaleRoutine(heroAvatarImage.transform.parent != null ? heroAvatarImage.transform.parent : heroAvatarImage.transform));
+            }
+
+            // Spawn floating text level up
+            var lilitaFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+            var floatObj = new GameObject("LevelUpCelebrationNotice", typeof(RectTransform), typeof(Text));
+            floatObj.transform.SetParent(heroAvatarImage != null ? heroAvatarImage.transform.parent : transform, false);
+
+            var rt = floatObj.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0.5f, 0.75f);
+            rt.anchorMax = new Vector2(0.5f, 0.75f);
+            rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.sizeDelta = new Vector2(300, 60);
+
+            var txt = floatObj.GetComponent<Text>();
+            if (lilitaFont != null) txt.font = lilitaFont;
+            txt.alignment = TextAnchor.MiddleCenter;
+            txt.fontSize = 24;
+            txt.fontStyle = FontStyle.Bold;
+            txt.color = new Color(1f, 0.85f, 0.2f);
+            txt.text = "⭐ LEVEL UP! ⭐";
+
+            StartCoroutine(FloatLevelUpRoutine(floatObj));
+        }
+
+        private IEnumerator PunchAvatarScaleRoutine(Transform tr)
+        {
+            if (tr == null) yield break;
+            Vector3 originalScale = tr.localScale;
+            float duration = 0.35f;
+            float elapsed = 0f;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = elapsed / duration;
+                float punch = Mathf.Sin(t * Mathf.PI) * 0.18f;
+                tr.localScale = new Vector3(originalScale.x * (1f + punch * 0.7f), originalScale.y * (1f + punch), originalScale.z);
+                yield return null;
+            }
+
+            tr.localScale = originalScale;
+        }
+
+        private IEnumerator FloatLevelUpRoutine(GameObject obj)
+        {
+            if (obj == null) yield break;
+            var rt = obj.GetComponent<RectTransform>();
+            var txt = obj.GetComponent<Text>();
+            Vector2 startPos = rt.anchoredPosition;
+            float duration = 0.85f;
+            float elapsed = 0f;
+            Color origColor = txt.color;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+
+                rt.anchoredPosition = startPos + new Vector2(0f, Mathf.Sin(t * Mathf.PI * 0.5f) * 50f);
+                float bounce = Mathf.Sin(t * Mathf.PI) * 0.3f;
+                rt.localScale = Vector3.one * (1f + bounce);
+
+                if (t > 0.5f)
+                {
+                    float a = (1f - t) / 0.5f;
+                    txt.color = new Color(origColor.r, origColor.g, origColor.b, a);
+                }
+
+                yield return null;
+            }
+
+            Destroy(obj);
         }
 
         private void HandleGoldChanged(int newGold)

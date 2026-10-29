@@ -1306,9 +1306,12 @@ namespace FantasyDefense.UI
                 victoryPraise = CitadelLocalizationManager.Text("KEMENANGAN TELAK!", "DECISIVE VICTORY!");
             }
 
+            int starCount = (hpPercent >= 0.85f) ? 3 : ((hpPercent >= 0.45f) ? 2 : 1);
+
             if (victoryStarsText != null)
             {
-                victoryStarsText.text = stars;
+                StopCoroutine("AnimateVictoryStarsRoutine");
+                StartCoroutine(AnimateVictoryStarsRoutine(starCount));
             }
 
             var titleTxt = victoryPanel != null ? victoryPanel.transform.Find("Title")?.GetComponent<Text>() : null;
@@ -1362,6 +1365,52 @@ namespace FantasyDefense.UI
             }
 
             Debug.Log("[UIBattleView] Defeat Dialog Muncul! Pertahanan benteng gagal.");
+        }
+
+        private IEnumerator AnimateVictoryStarsRoutine(int starCount)
+        {
+            if (victoryStarsText == null) yield break;
+
+            victoryStarsText.text = "☆☆☆";
+            victoryStarsText.color = new Color(0.4f, 0.45f, 0.5f);
+
+            yield return new WaitForSecondsRealtime(0.25f);
+
+            for (int i = 1; i <= 3; i++)
+            {
+                string s = "";
+                for (int j = 1; j <= 3; j++)
+                {
+                    s += (j <= i && j <= starCount) ? "★" : "☆";
+                }
+
+                victoryStarsText.text = s;
+
+                if (i <= starCount)
+                {
+                    victoryStarsText.color = new Color(1f, 0.85f, 0.2f);
+                    if (AudioManager.Instance != null)
+                    {
+                        AudioManager.Instance.PlaySound(SoundType.MergeSuccess);
+                    }
+
+                    // Punch scale bintang saat dicap
+                    float punchDuration = 0.18f;
+                    float elapsed = 0f;
+                    Vector3 origScale = Vector3.one;
+                    while (elapsed < punchDuration)
+                    {
+                        elapsed += Time.unscaledDeltaTime;
+                        float t = elapsed / punchDuration;
+                        float scale = 1f + Mathf.Sin(t * Mathf.PI) * 0.35f;
+                        victoryStarsText.transform.localScale = origScale * scale;
+                        yield return null;
+                    }
+                    victoryStarsText.transform.localScale = origScale;
+                }
+
+                yield return new WaitForSecondsRealtime(0.20f);
+            }
         }
 
         private void HideAllModals()
