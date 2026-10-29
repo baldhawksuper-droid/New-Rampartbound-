@@ -84,11 +84,14 @@ namespace FantasyDefense.UI
             Instance = this;
 
             InitializeButtons();
+            ApplyLilitaOneFonts();
             ApplyResponsiveLayout();
         }
 
         public void ApplyResponsiveLayout()
         {
+            ApplyLilitaOneFonts();
+
             if (abyssalTrialButton != null)
                 abyssalTrialButton.gameObject.SetActive(showAbyssalTrial);
 
@@ -330,8 +333,25 @@ namespace FantasyDefense.UI
             }
         }
 
+        private void ApplyLilitaOneFonts()
+        {
+            Font lilitaFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+            if (lilitaFont == null) return;
+
+            Text[] allTexts = GetComponentsInChildren<Text>(true);
+            foreach (var t in allTexts)
+            {
+                if (t != null)
+                {
+                    t.font = lilitaFont;
+                }
+            }
+        }
+
         public void RefreshDisplays()
         {
+            ApplyLilitaOneFonts();
+
             var lobby = CitadelLobbyManager.Instance;
             if (lobby == null) return;
 

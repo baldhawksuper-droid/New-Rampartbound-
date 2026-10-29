@@ -249,6 +249,8 @@ namespace FantasyDefense.UI
 
         private void Start()
         {
+            ApplyLilitaOneFonts();
+
             // Sinkronisasi data awal jika komponen sudah tersedia
             if (EconomyManager.Instance != null)
             {
@@ -263,6 +265,21 @@ namespace FantasyDefense.UI
             UpdateAutoMergeDisplay(AutoMergeAssistant.Instance != null && AutoMergeAssistant.Instance.IsAutoMergeEnabled);
 
             HideAllModals();
+        }
+
+        private void ApplyLilitaOneFonts()
+        {
+            Font lilitaFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+            if (lilitaFont == null) return;
+
+            Text[] allTexts = GetComponentsInChildren<Text>(true);
+            foreach (var t in allTexts)
+            {
+                if (t != null)
+                {
+                    t.font = lilitaFont;
+                }
+            }
         }
 
         private void InitializeButtons()

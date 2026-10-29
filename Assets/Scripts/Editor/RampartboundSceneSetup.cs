@@ -953,7 +953,7 @@ namespace Rampartbound.Editor
 
             // Victory Modal
             var victoryPanel = CreatePanel(battleHudObj.transform, "VictoryModal", new Color(0.05f, 0.08f, 0.15f, 0.95f));
-            PositionUI(victoryPanel, 0.1f, 0.25f, 0.9f, 0.75f);
+            PositionUI(victoryPanel, 0.08f, 0.22f, 0.92f, 0.78f);
             if (_frameOrnateGold != null)
             {
                 var vicImg = victoryPanel.GetComponent<Image>();
@@ -962,18 +962,25 @@ namespace Rampartbound.Editor
                 vicImg.color = Color.white;
             }
             var vicTitle = CreateText(victoryPanel.transform, "Title", "KEMENANGAN TELAK!", 42, FontStyle.Bold, TextAnchor.MiddleCenter, new Color(1f, 0.85f, 0.2f), defaultFont);
-            PositionUI(vicTitle.gameObject, 0.05f, 0.75f, 0.95f, 0.92f);
-            var vicStars = CreateText(victoryPanel.transform, "StarsText", "★★★", 48, FontStyle.Bold, TextAnchor.MiddleCenter, new Color(1f, 0.85f, 0.2f), defaultFont);
-            PositionUI(vicStars.gameObject, 0.1f, 0.55f, 0.9f, 0.72f);
-            var vicRewards = CreateText(victoryPanel.transform, "RewardsText", "+150 Gold  |  +50 Citadel EXP  |  +30 Gems", 26, FontStyle.Normal, TextAnchor.MiddleCenter, Color.white, defaultFont);
-            PositionUI(vicRewards.gameObject, 0.05f, 0.35f, 0.95f, 0.5f);
-            var vicReturnBtn = CreateButton(victoryPanel.transform, "ReturnButton", "KEMBALI KE CITADEL", new Color(0.2f, 0.65f, 0.35f), Color.white, 30, defaultFont);
-            PositionUI(vicReturnBtn, 0.15f, 0.1f, 0.85f, 0.25f);
+            PositionUI(vicTitle.gameObject, 0.05f, 0.78f, 0.95f, 0.94f);
+            var vicStars = CreateText(victoryPanel.transform, "StarsText", "★★★", 52, FontStyle.Bold, TextAnchor.MiddleCenter, new Color(1f, 0.85f, 0.2f), defaultFont);
+            PositionUI(vicStars.gameObject, 0.1f, 0.58f, 0.9f, 0.76f);
+            var vicRewards = CreateText(victoryPanel.transform, "RewardsText", "🪙 +150 Gold  |  ⭐ +50 EXP  |  💎 +30 Gems", 24, FontStyle.Normal, TextAnchor.MiddleCenter, Color.white, defaultFont);
+            PositionUI(vicRewards.gameObject, 0.05f, 0.36f, 0.95f, 0.52f);
+            var vicReturnBtn = CreateButton(victoryPanel.transform, "ReturnButton", "KEMBALI KE CITADEL", new Color(0.2f, 0.65f, 0.35f), Color.white, 26, defaultFont);
+            if (_btnPrimaryGold != null)
+            {
+                var vrImg = vicReturnBtn.GetComponent<Image>();
+                vrImg.sprite = _btnPrimaryGold;
+                vrImg.type = Image.Type.Sliced;
+                vrImg.color = Color.white;
+            }
+            PositionUI(vicReturnBtn, 0.15f, 0.08f, 0.85f, 0.26f);
             victoryPanel.SetActive(false);
 
             // Defeat Modal
             var defeatPanel = CreatePanel(battleHudObj.transform, "DefeatModal", new Color(0.12f, 0.05f, 0.05f, 0.95f));
-            PositionUI(defeatPanel, 0.1f, 0.25f, 0.9f, 0.75f);
+            PositionUI(defeatPanel, 0.08f, 0.22f, 0.92f, 0.78f);
             if (_frameStoneBastion != null)
             {
                 var defImg = defeatPanel.GetComponent<Image>();
@@ -982,16 +989,30 @@ namespace Rampartbound.Editor
                 defImg.color = Color.white;
             }
             var defTitle = CreateText(defeatPanel.transform, "Title", "PERTAHANAN GAGAL!", 42, FontStyle.Bold, TextAnchor.MiddleCenter, new Color(1f, 0.35f, 0.35f), defaultFont);
-            PositionUI(defTitle.gameObject, 0.05f, 0.75f, 0.95f, 0.92f);
-            var defRetryBtn = CreateButton(defeatPanel.transform, "RetryButton", "COBA LAGI (RETRY)", new Color(0.85f, 0.35f, 0.2f), Color.white, 30, defaultFont);
-            PositionUI(defRetryBtn, 0.15f, 0.42f, 0.85f, 0.58f);
-            var defReturnBtn = CreateButton(defeatPanel.transform, "ReturnButton", "KEMBALI KE CITADEL", new Color(0.25f, 0.3f, 0.4f), Color.white, 28, defaultFont);
-            PositionUI(defReturnBtn, 0.15f, 0.2f, 0.85f, 0.36f);
+            PositionUI(defTitle.gameObject, 0.05f, 0.78f, 0.95f, 0.94f);
+            var defRetryBtn = CreateButton(defeatPanel.transform, "RetryButton", "COBA LAGI (RETRY)", new Color(0.85f, 0.35f, 0.2f), Color.white, 26, defaultFont);
+            if (_btnBattleCrimson != null)
+            {
+                var drImg = defRetryBtn.GetComponent<Image>();
+                drImg.sprite = _btnBattleCrimson;
+                drImg.type = Image.Type.Sliced;
+                drImg.color = Color.white;
+            }
+            PositionUI(defRetryBtn, 0.15f, 0.44f, 0.85f, 0.62f);
+            var defReturnBtn = CreateButton(defeatPanel.transform, "ReturnButton", "KEMBALI KE CITADEL", new Color(0.25f, 0.3f, 0.4f), Color.white, 24, defaultFont);
+            if (_btnSecondaryStone != null)
+            {
+                var drtImg = defReturnBtn.GetComponent<Image>();
+                drtImg.sprite = _btnSecondaryStone;
+                drtImg.type = Image.Type.Sliced;
+                drtImg.color = Color.white;
+            }
+            PositionUI(defReturnBtn, 0.15f, 0.18f, 0.85f, 0.36f);
             defeatPanel.SetActive(false);
 
             // Pause Modal
             var pausePanel = CreatePanel(battleHudObj.transform, "PauseModal", new Color(0.04f, 0.06f, 0.1f, 0.95f));
-            PositionUI(pausePanel, 0.15f, 0.3f, 0.85f, 0.7f);
+            PositionUI(pausePanel, 0.12f, 0.26f, 0.88f, 0.74f);
             if (_frameStoneBastion != null)
             {
                 var pauseImg = pausePanel.GetComponent<Image>();
@@ -1000,13 +1021,34 @@ namespace Rampartbound.Editor
                 pauseImg.color = Color.white;
             }
             var pauseTitle = CreateText(pausePanel.transform, "Title", "PERMAINAN DIHENTIKAN", 36, FontStyle.Bold, TextAnchor.MiddleCenter, Color.white, defaultFont);
-            PositionUI(pauseTitle.gameObject, 0.05f, 0.78f, 0.95f, 0.93f);
-            var pauseResumeBtn = CreateButton(pausePanel.transform, "ResumeButton", "LANJUTKAN (RESUME)", new Color(0.2f, 0.65f, 0.35f), Color.white, 26, defaultFont);
-            PositionUI(pauseResumeBtn, 0.12f, 0.58f, 0.88f, 0.73f);
+            PositionUI(pauseTitle.gameObject, 0.05f, 0.80f, 0.95f, 0.95f);
+            var pauseResumeBtn = CreateButton(pausePanel.transform, "ResumeButton", "LANJUTKAN (RESUME)", new Color(0.2f, 0.65f, 0.35f), Color.white, 24, defaultFont);
+            if (_btnPrimaryGold != null)
+            {
+                var prImg = pauseResumeBtn.GetComponent<Image>();
+                prImg.sprite = _btnPrimaryGold;
+                prImg.type = Image.Type.Sliced;
+                prImg.color = Color.white;
+            }
+            PositionUI(pauseResumeBtn, 0.12f, 0.58f, 0.88f, 0.74f);
             var pauseVibBtn = CreateButton(pausePanel.transform, "VibrationButton", "📳 GETARAN: AKTIF", new Color(0.20f, 0.40f, 0.60f), Color.white, 22, defaultFont);
-            PositionUI(pauseVibBtn, 0.12f, 0.38f, 0.88f, 0.53f);
-            var pauseSurrenderBtn = CreateButton(pausePanel.transform, "SurrenderButton", "MENYERAH & KEMBALI KE CITADEL", new Color(0.65f, 0.25f, 0.25f), Color.white, 22, defaultFont);
-            PositionUI(pauseSurrenderBtn, 0.12f, 0.18f, 0.88f, 0.33f);
+            if (_btnSecondaryStone != null)
+            {
+                var pvImg = pauseVibBtn.GetComponent<Image>();
+                pvImg.sprite = _btnSecondaryStone;
+                pvImg.type = Image.Type.Sliced;
+                pvImg.color = Color.white;
+            }
+            PositionUI(pauseVibBtn, 0.12f, 0.38f, 0.88f, 0.54f);
+            var pauseSurrenderBtn = CreateButton(pausePanel.transform, "SurrenderButton", "MENYERAH & KEMBALI", new Color(0.65f, 0.25f, 0.25f), Color.white, 22, defaultFont);
+            if (_btnBattleCrimson != null)
+            {
+                var psImg = pauseSurrenderBtn.GetComponent<Image>();
+                psImg.sprite = _btnBattleCrimson;
+                psImg.type = Image.Type.Sliced;
+                psImg.color = Color.white;
+            }
+            PositionUI(pauseSurrenderBtn, 0.12f, 0.16f, 0.88f, 0.32f);
             pausePanel.SetActive(false);
 
             // Bind UIBattleView
