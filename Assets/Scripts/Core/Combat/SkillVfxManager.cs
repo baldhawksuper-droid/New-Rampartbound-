@@ -520,22 +520,23 @@ namespace FantasyDefense.Combat
             float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
             slashObj.transform.rotation = Quaternion.Euler(0f, 0f, angle - 90f);
 
-            float scale = tier >= UnitTier.Tier3 ? 1.4f : 1.0f;
+            float scale = tier >= UnitTier.Tier3 ? 0.75f : 0.55f;
             slashObj.transform.localScale = Vector3.one * (scale * 0.5f);
 
-            float duration = 0.22f;
+            // Snappy compact duration agar tidak menumpuk saat banyak hero menyerang
+            float duration = 0.12f;
             float elapsed = 0f;
             while (elapsed < duration)
             {
                 elapsed += Time.deltaTime;
                 float t = elapsed / duration;
                 slashObj.transform.position = Vector3.Lerp(spawnPos, targetPos, t);
-                slashObj.transform.localScale = Vector3.one * Mathf.Lerp(scale * 0.5f, scale * 1.25f, t);
-                sr.color = new Color(flameColor.r, flameColor.g, flameColor.b, 1f - t);
+                slashObj.transform.localScale = Vector3.one * Mathf.Lerp(scale * 0.5f, scale * 1.05f, t);
+                sr.color = new Color(flameColor.r, flameColor.g, flameColor.b, (1f - t) * (1f - t));
                 yield return null;
             }
 
-            SpawnProceduralParticleBurst(targetPos, flameColor, Color.yellow, 14, 3.0f);
+            SpawnProceduralParticleBurst(targetPos, flameColor, Color.yellow, 6, 2.2f);
             Destroy(slashObj);
         }
 
@@ -552,18 +553,15 @@ namespace FantasyDefense.Combat
         {
             Vector3 origin = startPos + new Vector3(0f, -0.15f, 0f);
 
-            // 1. Cincin gelombang kejut di tanah tempat palu menghantam
+            // 1. Cincin gelombang kejut kompak di tanah tempat palu menghantam
             Color roseGold = tier >= UnitTier.Tier4 ? new Color(1f, 0.30f, 0.60f) : new Color(1f, 0.85f, 0.25f);
-            StartCoroutine(SpawnShockwaveRingRoutine(origin, tier >= UnitTier.Tier3 ? 1.8f : 1.2f, roseGold));
+            StartCoroutine(SpawnShockwaveRingRoutine(origin, tier >= UnitTier.Tier3 ? 0.9f : 0.65f, roseGold));
 
-            // 2. Partikel seismik yang merambat ke atas menuju sasaran
-            int burstCount = tier >= UnitTier.Tier4 ? 24 : 14;
-            Vector3 midPoint = Vector3.Lerp(origin, targetPos, 0.5f);
-            SpawnProceduralParticleBurst(origin, roseGold, Color.white, burstCount / 2, 2.5f);
-            yield return new WaitForSeconds(0.06f);
-            SpawnProceduralParticleBurst(midPoint, roseGold, Color.yellow, burstCount / 2, 2.8f);
-            yield return new WaitForSeconds(0.06f);
-            SpawnProceduralParticleBurst(targetPos, roseGold, new Color(1f, 0.2f, 0.4f), burstCount, 3.2f);
+            // 2. Partikel dampak mikro terfokus pada target (tidak menutupi seluruh jalur)
+            int burstCount = tier >= UnitTier.Tier4 ? 8 : 5;
+            SpawnProceduralParticleBurst(origin, roseGold, Color.white, burstCount, 2.0f);
+            yield return new WaitForSeconds(0.04f);
+            SpawnProceduralParticleBurst(targetPos, roseGold, new Color(1f, 0.2f, 0.4f), burstCount, 2.4f);
         }
 
         #endregion

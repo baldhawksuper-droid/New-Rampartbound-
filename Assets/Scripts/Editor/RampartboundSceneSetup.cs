@@ -1290,7 +1290,14 @@ namespace Rampartbound.Editor
             var heroContent = heroPanel.transform.Find("ContentContainer") ?? heroPanel.transform;
 
             var tabCedric = CreateButton(heroContent, "TabCedric", "⚔️ Cedric", new Color(0.45f, 0.15f, 0.15f), Color.white, 20, defaultFont);
-            if (_btnSecondaryStone != null)
+            if (_tabHeroActive != null)
+            {
+                var cImg = tabCedric.GetComponent<Image>();
+                cImg.sprite = _tabHeroActive;
+                cImg.type = Image.Type.Sliced;
+                cImg.color = Color.white;
+            }
+            else if (_btnSecondaryStone != null)
             {
                 var cImg = tabCedric.GetComponent<Image>();
                 cImg.sprite = _btnSecondaryStone;
@@ -1300,7 +1307,14 @@ namespace Rampartbound.Editor
             PositionUI(tabCedric, 0.02f, 0.90f, 0.25f, 0.98f);
 
             var tabRose = CreateButton(heroContent, "TabRose", "🛡️ Rose Tank", new Color(0.45f, 0.2f, 0.35f), Color.white, 20, defaultFont);
-            if (_btnSecondaryStone != null)
+            if (_tabHeroInactive != null)
+            {
+                var rImg = tabRose.GetComponent<Image>();
+                rImg.sprite = _tabHeroInactive;
+                rImg.type = Image.Type.Sliced;
+                rImg.color = Color.white;
+            }
+            else if (_btnSecondaryStone != null)
             {
                 var rImg = tabRose.GetComponent<Image>();
                 rImg.sprite = _btnSecondaryStone;
@@ -1310,7 +1324,14 @@ namespace Rampartbound.Editor
             PositionUI(tabRose, 0.27f, 0.90f, 0.50f, 0.98f);
 
             var tabRabbit = CreateButton(heroContent, "TabRabbit", "🔮 Rabbit Mage", new Color(0.15f, 0.25f, 0.5f), Color.white, 20, defaultFont);
-            if (_btnSecondaryStone != null)
+            if (_tabHeroInactive != null)
+            {
+                var mImg = tabRabbit.GetComponent<Image>();
+                mImg.sprite = _tabHeroInactive;
+                mImg.type = Image.Type.Sliced;
+                mImg.color = Color.white;
+            }
+            else if (_btnSecondaryStone != null)
             {
                 var mImg = tabRabbit.GetComponent<Image>();
                 mImg.sprite = _btnSecondaryStone;
@@ -1320,7 +1341,14 @@ namespace Rampartbound.Editor
             PositionUI(tabRabbit, 0.52f, 0.90f, 0.75f, 0.98f);
 
             var tabWind = CreateButton(heroContent, "TabWind", "🏹 Wind Ranger", new Color(0.15f, 0.4f, 0.25f), Color.white, 20, defaultFont);
-            if (_btnSecondaryStone != null)
+            if (_tabHeroInactive != null)
+            {
+                var wImg = tabWind.GetComponent<Image>();
+                wImg.sprite = _tabHeroInactive;
+                wImg.type = Image.Type.Sliced;
+                wImg.color = Color.white;
+            }
+            else if (_btnSecondaryStone != null)
             {
                 var wImg = tabWind.GetComponent<Image>();
                 wImg.sprite = _btnSecondaryStone;
@@ -1383,12 +1411,42 @@ namespace Rampartbound.Editor
                 eqImg.color = Color.white;
             }
             PositionUI(equipPanel, 0.04f, 0.07f, 0.96f, 0.23f);
+
+            // Tiga wadah slot perlengkapan dengan frame beveled stone & brass
+            for (int sIdx = 0; sIdx < 3; sIdx++)
+            {
+                float slotYMin = 0.68f - (sIdx * 0.32f);
+                float slotYMax = slotYMin + 0.28f;
+                var slotBg = CreatePanel(equipPanel.transform, $"SlotBg_{sIdx}", Color.white);
+                PositionUI(slotBg, 0.03f, slotYMin, 0.12f, slotYMax);
+                var sBgImg = slotBg.GetComponent<Image>();
+                if (_slotFrameEmpty != null)
+                {
+                    sBgImg.sprite = _slotFrameEmpty;
+                    sBgImg.type = Image.Type.Sliced;
+                    sBgImg.color = Color.white;
+                }
+
+                // Icon kecil di dalam slot
+                Sprite sIcon = (sIdx == 0) ? _slotIconWeapon : ((sIdx == 1) ? _slotIconArmor : _slotIconRelic);
+                if (sIcon != null)
+                {
+                    var iconObj = new GameObject("SlotTypeIcon", typeof(RectTransform), typeof(Image));
+                    iconObj.transform.SetParent(slotBg.transform, false);
+                    PositionUI(iconObj, 0.15f, 0.15f, 0.85f, 0.85f);
+                    var iImg = iconObj.GetComponent<Image>();
+                    iImg.sprite = sIcon;
+                    iImg.preserveAspect = true;
+                    iImg.raycastTarget = false;
+                }
+            }
+
             var wSlotTxt = CreateText(equipPanel.transform, "WeaponSlotText", "🗡️ Senjata: [Kosong]", 20, FontStyle.Normal, TextAnchor.MiddleLeft, Color.white, defaultFont);
-            PositionUI(wSlotTxt.gameObject, 0.05f, 0.68f, 0.65f, 0.96f);
+            PositionUI(wSlotTxt.gameObject, 0.15f, 0.68f, 0.65f, 0.96f);
             var aSlotTxt = CreateText(equipPanel.transform, "ArmorSlotText", "🛡️ Zirah: [Kosong]", 20, FontStyle.Normal, TextAnchor.MiddleLeft, Color.white, defaultFont);
-            PositionUI(aSlotTxt.gameObject, 0.05f, 0.36f, 0.65f, 0.64f);
+            PositionUI(aSlotTxt.gameObject, 0.15f, 0.36f, 0.65f, 0.64f);
             var rSlotTxt = CreateText(equipPanel.transform, "RelicSlotText", "✨ Relik: [Kosong]", 20, FontStyle.Normal, TextAnchor.MiddleLeft, Color.white, defaultFont);
-            PositionUI(rSlotTxt.gameObject, 0.05f, 0.04f, 0.65f, 0.32f);
+            PositionUI(rSlotTxt.gameObject, 0.15f, 0.04f, 0.65f, 0.32f);
             var autoEquipBtn = CreateButton(equipPanel.transform, "AutoEquipButton", "⚔️ PASANG TERBAIK", new Color(0.18f, 0.55f, 0.35f), Color.white, 18, defaultFont);
             if (_btnSecondaryStone != null)
             {
@@ -1481,11 +1539,33 @@ namespace Rampartbound.Editor
             PositionUI(banSub.gameObject, 0.05f, 0.35f, 0.95f, 0.60f);
 
             var s1Btn = CreateButton(bannerPanel.transform, "SingleSummonBtn", "PANGGIL 1x\n(100 Gems)", new Color(0.2f, 0.5f, 0.7f), Color.white, 22, defaultFont);
+            if (_btnSecondaryStone != null)
+            {
+                var s1Img = s1Btn.GetComponent<Image>();
+                s1Img.sprite = _btnSecondaryStone;
+                s1Img.type = Image.Type.Sliced;
+                s1Img.color = Color.white;
+            }
             PositionUI(s1Btn, 0.08f, 0.04f, 0.48f, 0.30f);
+
             var s10Btn = CreateButton(bannerPanel.transform, "MultiSummonBtn", "PANGGIL 10x\n(900 Gems)", new Color(0.85f, 0.6f, 0.15f), Color.white, 22, defaultFont);
+            if (_btnPrimaryGold != null)
+            {
+                var s10Img = s10Btn.GetComponent<Image>();
+                s10Img.sprite = _btnPrimaryGold;
+                s10Img.type = Image.Type.Sliced;
+                s10Img.color = Color.white;
+            }
             PositionUI(s10Btn, 0.52f, 0.04f, 0.92f, 0.30f);
 
             var promoPanel = CreatePanel(summonContent, "StarPromotionPanel", new Color(0.08f, 0.1f, 0.16f, 0.9f));
+            if (_frameStoneBastion != null)
+            {
+                var pImg = promoPanel.GetComponent<Image>();
+                pImg.sprite = _frameStoneBastion;
+                pImg.type = Image.Type.Sliced;
+                pImg.color = Color.white;
+            }
             PositionUI(promoPanel, 0.04f, 0.05f, 0.96f, 0.52f);
             var promoTitle = CreateText(promoPanel.transform, "PromoTitle", "PROMOSI BINTANG PAHLAWAN (SHARDS)", 24, FontStyle.Bold, TextAnchor.MiddleCenter, Color.white, defaultFont);
             PositionUI(promoTitle.gameObject, 0.05f, 0.85f, 0.95f, 0.96f);
@@ -1510,6 +1590,13 @@ namespace Rampartbound.Editor
             PositionUI(shardTxt.gameObject, 0.1f, 0.18f, 0.9f, 0.28f);
 
             var promoteBtn = CreateButton(promoPanel.transform, "PromoteStarBtn", "PROMOSI BINTANG ★", new Color(0.25f, 0.65f, 0.35f), Color.white, 22, defaultFont);
+            if (_btnPrimaryGold != null)
+            {
+                var prImg = promoteBtn.GetComponent<Image>();
+                prImg.sprite = _btnPrimaryGold;
+                prImg.type = Image.Type.Sliced;
+                prImg.color = Color.white;
+            }
             PositionUI(promoteBtn, 0.15f, 0.03f, 0.85f, 0.16f);
 
             var resModal = CreatePanel(summonPanel.transform, "ResultModalPanel", new Color(0.04f, 0.06f, 0.1f, 0.98f));
@@ -2280,6 +2367,12 @@ namespace Rampartbound.Editor
         private static Sprite _sliderHandleRuneGem;
         private static Sprite _toggleBaseSlot;
         private static Sprite _toggleKnobActive;
+        private static Sprite _slotFrameEmpty;
+        private static Sprite _slotIconWeapon;
+        private static Sprite _slotIconArmor;
+        private static Sprite _slotIconRelic;
+        private static Sprite _tabHeroActive;
+        private static Sprite _tabHeroInactive;
 
         private static void LoadUISprites()
         {
@@ -2324,6 +2417,12 @@ namespace Rampartbound.Editor
             if (_sliderHandleRuneGem == null) _sliderHandleRuneGem = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Slider_Handle_RuneGem.png");
             if (_toggleBaseSlot == null) _toggleBaseSlot = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Toggle_Base_Slot.png");
             if (_toggleKnobActive == null) _toggleKnobActive = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Toggle_Knob_Active.png");
+            if (_slotFrameEmpty == null) _slotFrameEmpty = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Slot_Frame_Empty.png");
+            if (_slotIconWeapon == null) _slotIconWeapon = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Slot_Icon_Weapon.png");
+            if (_slotIconArmor == null) _slotIconArmor = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Slot_Icon_Armor.png");
+            if (_slotIconRelic == null) _slotIconRelic = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Slot_Icon_Relic.png");
+            if (_tabHeroActive == null) _tabHeroActive = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Tab_Hero_Active.png");
+            if (_tabHeroInactive == null) _tabHeroInactive = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Tab_Hero_Inactive.png");
         }
 
         private static void AttachRarityBorder(Transform parentCard, Sprite borderSprite)

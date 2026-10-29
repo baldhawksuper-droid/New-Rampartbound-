@@ -162,16 +162,51 @@ namespace FantasyDefense.UI
 
         private void UpdateAllDisplays()
         {
+            Font defaultFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+            if (defaultFont != null)
+            {
+                if (gemsBalanceText != null) gemsBalanceText.font = defaultFont;
+                if (bannerTitleText != null) bannerTitleText.font = defaultFont;
+                if (bannerSubtitleText != null) bannerSubtitleText.font = defaultFont;
+                if (singleSummonCostText != null) singleSummonCostText.font = defaultFont;
+                if (multiSummonCostText != null) multiSummonCostText.font = defaultFont;
+                if (heroNameText != null) heroNameText.font = defaultFont;
+                if (heroStarRankText != null) heroStarRankText.font = defaultFont;
+                if (shardProgressText != null) shardProgressText.font = defaultFont;
+                if (promoteStatusText != null) promoteStatusText.font = defaultFont;
+                if (resultSummaryText != null) resultSummaryText.font = defaultFont;
+                if (singleSummonButton != null)
+                {
+                    var t = singleSummonButton.GetComponentInChildren<Text>();
+                    if (t != null) t.font = defaultFont;
+                }
+                if (multiSummonButton != null)
+                {
+                    var t = multiSummonButton.GetComponentInChildren<Text>();
+                    if (t != null) t.font = defaultFont;
+                }
+                if (promoteStarButton != null)
+                {
+                    var t = promoteStarButton.GetComponentInChildren<Text>();
+                    if (t != null) t.font = defaultFont;
+                }
+                if (closeResultButton != null)
+                {
+                    var t = closeResultButton.GetComponentInChildren<Text>();
+                    if (t != null) t.font = defaultFont;
+                }
+            }
+
             // 1. Saldo Gems
             if (gemsBalanceText != null && CitadelLobbyManager.Instance != null)
             {
-                gemsBalanceText.text = $"{CitadelLobbyManager.Instance.AccountGems} Gems";
+                gemsBalanceText.text = $"💎 {CitadelLobbyManager.Instance.AccountGems:N0} GEMS";
             }
 
             // 2. Banner Text
             if (bannerTitleText != null)
             {
-                bannerTitleText.text = "★ PANGGILAN BADAI PURBA ★";
+                bannerTitleText.text = "★ ALTAR PEMANGGILAN CITADEL ★";
             }
             if (bannerSubtitleText != null)
             {
@@ -179,8 +214,8 @@ namespace FantasyDefense.UI
             }
 
             // 3. Tombol Biaya
-            if (singleSummonCostText != null) singleSummonCostText.text = "100 Gems";
-            if (multiSummonCostText != null) multiSummonCostText.text = "900 Gems (Hemat 10%)";
+            if (singleSummonCostText != null) singleSummonCostText.text = "💎 100 GEMS";
+            if (multiSummonCostText != null) multiSummonCostText.text = "💎 900 GEMS (HEMAT 10%)";
 
             UpdateStarPromotionDisplay();
         }
