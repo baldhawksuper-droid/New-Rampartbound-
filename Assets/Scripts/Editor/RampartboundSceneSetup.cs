@@ -1968,15 +1968,45 @@ namespace Rampartbound.Editor
             var questContent = questPanel.transform.Find("ContentContainer") ?? questPanel.transform;
 
             var qDailyTab = CreateButton(questContent, "DailyTabBtn", "Misi Harian", new Color(0.2f, 0.45f, 0.65f), Color.white, 22, defaultFont);
+            if (_tabHeroActive != null)
+            {
+                var qdtImg = qDailyTab.GetComponent<Image>();
+                qdtImg.sprite = _tabHeroActive;
+                qdtImg.type = Image.Type.Sliced;
+                qdtImg.color = Color.white;
+            }
             PositionUI(qDailyTab, 0.04f, 0.88f, 0.48f, 0.97f);
+
             var qAchieveTab = CreateButton(questContent, "AchieveTabBtn", "Pencapaian Kerajaan", new Color(0.2f, 0.25f, 0.38f), Color.white, 22, defaultFont);
+            if (_tabHeroInactive != null)
+            {
+                var qatImg = qAchieveTab.GetComponent<Image>();
+                qatImg.sprite = _tabHeroInactive;
+                qatImg.type = Image.Type.Sliced;
+                qatImg.color = Color.white;
+            }
             PositionUI(qAchieveTab, 0.52f, 0.88f, 0.96f, 0.97f);
 
             var qResetTxt = CreateText(questContent, "ResetCountdownText", "Reset Misi Dalam: 23j 59m 59d", 20, FontStyle.Italic, TextAnchor.MiddleCenter, new Color(0.7f, 0.85f, 1f), defaultFont);
             PositionUI(qResetTxt.gameObject, 0.05f, 0.80f, 0.95f, 0.86f);
 
             var qContainer = CreatePanel(questContent, "QuestCardContainer", new Color(0.04f, 0.06f, 0.1f, 0.8f));
+            if (_frameStoneBastion != null)
+            {
+                var qcImg = qContainer.GetComponent<Image>();
+                qcImg.sprite = _frameStoneBastion;
+                qcImg.type = Image.Type.Sliced;
+                qcImg.color = Color.white;
+            }
             PositionUI(qContainer, 0.04f, 0.05f, 0.96f, 0.78f);
+            var qVlg = qContainer.AddComponent<VerticalLayoutGroup>();
+            qVlg.padding = new RectOffset(16, 16, 16, 16);
+            qVlg.spacing = 14f;
+            qVlg.childAlignment = TextAnchor.UpperCenter;
+            qVlg.childControlWidth = true;
+            qVlg.childControlHeight = false;
+            qVlg.childForceExpandWidth = true;
+            qVlg.childForceExpandHeight = false;
 
             var questSO = new SerializedObject(questView);
             questSO.FindProperty("questPanel").objectReferenceValue = questPanel;

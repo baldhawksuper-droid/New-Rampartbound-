@@ -150,6 +150,25 @@ namespace FantasyDefense.UI
 
         public void RefreshView()
         {
+            var lilitaFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+            if (lilitaFont != null)
+            {
+                if (resetCountdownText != null) resetCountdownText.font = lilitaFont;
+                if (dailyTabBadgeText != null) dailyTabBadgeText.font = lilitaFont;
+                if (achievementTabBadgeText != null) achievementTabBadgeText.font = lilitaFont;
+
+                if (dailyTabButton != null)
+                {
+                    var t = dailyTabButton.GetComponentInChildren<Text>();
+                    if (t != null) t.font = lilitaFont;
+                }
+                if (achievementTabButton != null)
+                {
+                    var t = achievementTabButton.GetComponentInChildren<Text>();
+                    if (t != null) t.font = lilitaFont;
+                }
+            }
+
             UpdateCountdownDisplay();
             UpdateTabBadges();
             PopulateQuestCards();
@@ -262,12 +281,12 @@ namespace FantasyDefense.UI
                 if (quest.isClaimed)
                 {
                     claimBtn.interactable = false;
-                    if (claimBtnText != null) claimBtnText.text = "SUDAH DIKLAIM";
+                    if (claimBtnText != null) claimBtnText.text = FantasyDefense.Localization.CitadelLocalizationManager.Text("SUDAH KLAIM", "CLAIMED");
                 }
                 else if (quest.IsCompleted)
                 {
                     claimBtn.interactable = true;
-                    if (claimBtnText != null) claimBtnText.text = "KLAIM!";
+                    if (claimBtnText != null) claimBtnText.text = FantasyDefense.Localization.CitadelLocalizationManager.Text("KLAIM!", "CLAIM!");
                     claimBtn.onClick.RemoveAllListeners();
                     claimBtn.onClick.AddListener(() =>
                     {
@@ -287,8 +306,200 @@ namespace FantasyDefense.UI
 
         private GameObject CreateProceduralCardObj(QuestItem quest)
         {
-            GameObject card = new GameObject($"QuestCard_{quest.questId}", typeof(RectTransform));
+            var lilitaFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+            var frameStone = Resources.Load<Sprite>("Sprites/UI/Frame_StoneBastion_9Slice")
+#if UNITY_EDITOR
+                          ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Frame_StoneBastion_9Slice.png")
+#endif
+                          ;
+            var sliderTrack = Resources.Load<Sprite>("Sprites/UI/UI_Slider_Track_Stone")
+#if UNITY_EDITOR
+                           ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Slider_Track_Stone.png")
+#endif
+                           ;
+            var sliderFill = Resources.Load<Sprite>("Sprites/UI/UI_Slider_Fill_Cyan")
+#if UNITY_EDITOR
+                          ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Slider_Fill_Cyan.png")
+#endif
+                          ;
+            var btnGold = Resources.Load<Sprite>("Sprites/UI/Btn_Primary_Gold")
+#if UNITY_EDITOR
+                       ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Btn_Primary_Gold.png")
+#endif
+                       ;
+            var btnStone = Resources.Load<Sprite>("Sprites/UI/Btn_Secondary_Stone")
+#if UNITY_EDITOR
+                        ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Btn_Secondary_Stone.png")
+#endif
+                        ;
+
+            GameObject card = new GameObject($"QuestCard_{quest.questId}", typeof(RectTransform), typeof(Image), typeof(LayoutElement));
             card.transform.SetParent(questCardContainer, false);
+
+            var le = card.GetComponent<LayoutElement>();
+            le.minHeight = 110;
+            le.preferredHeight = 110;
+
+            var cardImg = card.GetComponent<Image>();
+            cardImg.color = new Color(0.08f, 0.11f, 0.18f, 0.95f);
+            if (frameStone != null)
+            {
+                cardImg.sprite = frameStone;
+                cardImg.type = Image.Type.Sliced;
+                cardImg.color = Color.white;
+            }
+
+            // 1. Judul Misi
+            var titleObj = new GameObject("TitleText", typeof(RectTransform), typeof(Text));
+            titleObj.transform.SetParent(card.transform, false);
+            var titleTxt = titleObj.GetComponent<Text>();
+            if (lilitaFont != null) titleTxt.font = lilitaFont;
+            titleTxt.fontSize = 20;
+            titleTxt.fontStyle = FontStyle.Bold;
+            titleTxt.alignment = TextAnchor.MiddleLeft;
+            titleTxt.color = new Color(1f, 0.85f, 0.35f);
+            var tRt = titleObj.GetComponent<RectTransform>();
+            tRt.anchorMin = new Vector2(0.04f, 0.65f);
+            tRt.anchorMax = new Vector2(0.68f, 0.95f);
+            tRt.offsetMin = Vector2.zero;
+            tRt.offsetMax = Vector2.zero;
+
+            // 2. Deskripsi Misi
+            var descObj = new GameObject("DescText", typeof(RectTransform), typeof(Text));
+            descObj.transform.SetParent(card.transform, false);
+            var descTxt = descObj.GetComponent<Text>();
+            if (lilitaFont != null) descTxt.font = lilitaFont;
+            descTxt.fontSize = 16;
+            descTxt.fontStyle = FontStyle.Normal;
+            descTxt.alignment = TextAnchor.MiddleLeft;
+            descTxt.color = new Color(0.85f, 0.9f, 0.95f);
+            var dRt = descObj.GetComponent<RectTransform>();
+            dRt.anchorMin = new Vector2(0.04f, 0.36f);
+            dRt.anchorMax = new Vector2(0.68f, 0.65f);
+            dRt.offsetMin = Vector2.zero;
+            dRt.offsetMax = Vector2.zero;
+
+            // 3. Bilah Progres Energi Sian
+            var barObj = new GameObject("ProgressBar", typeof(RectTransform), typeof(Slider));
+            barObj.transform.SetParent(card.transform, false);
+            var barRt = barObj.GetComponent<RectTransform>();
+            barRt.anchorMin = new Vector2(0.04f, 0.10f);
+            barRt.anchorMax = new Vector2(0.48f, 0.32f);
+            barRt.offsetMin = Vector2.zero;
+            barRt.offsetMax = Vector2.zero;
+
+            var slider = barObj.GetComponent<Slider>();
+            slider.interactable = false;
+            slider.transition = Selectable.Transition.None;
+
+            var bgObj = new GameObject("Background", typeof(RectTransform), typeof(Image));
+            bgObj.transform.SetParent(barObj.transform, false);
+            var bgRt = bgObj.GetComponent<RectTransform>();
+            bgRt.anchorMin = Vector2.zero;
+            bgRt.anchorMax = Vector2.one;
+            bgRt.offsetMin = Vector2.zero;
+            bgRt.offsetMax = Vector2.zero;
+            var bgImg = bgObj.GetComponent<Image>();
+            bgImg.color = new Color(0.12f, 0.14f, 0.18f, 1f);
+            if (sliderTrack != null)
+            {
+                bgImg.sprite = sliderTrack;
+                bgImg.type = Image.Type.Sliced;
+                bgImg.color = Color.white;
+            }
+
+            var fillArea = new GameObject("Fill Area", typeof(RectTransform));
+            fillArea.transform.SetParent(barObj.transform, false);
+            var faRt = fillArea.GetComponent<RectTransform>();
+            faRt.anchorMin = new Vector2(0f, 0.15f);
+            faRt.anchorMax = new Vector2(1f, 0.85f);
+            faRt.offsetMin = Vector2.zero;
+            faRt.offsetMax = Vector2.zero;
+
+            var fillObj = new GameObject("Fill", typeof(RectTransform), typeof(Image));
+            fillObj.transform.SetParent(fillArea.transform, false);
+            var fRt = fillObj.GetComponent<RectTransform>();
+            fRt.anchorMin = Vector2.zero;
+            fRt.anchorMax = Vector2.one;
+            fRt.offsetMin = Vector2.zero;
+            fRt.offsetMax = Vector2.zero;
+            var fImg = fillObj.GetComponent<Image>();
+            fImg.color = new Color(0.2f, 0.85f, 0.95f);
+            if (sliderFill != null)
+            {
+                fImg.sprite = sliderFill;
+                fImg.type = Image.Type.Sliced;
+                fImg.color = Color.white;
+            }
+            slider.fillRect = fRt;
+
+            // Teks Progres Angka di atas Bar
+            var progTxtObj = new GameObject("ProgressText", typeof(RectTransform), typeof(Text));
+            progTxtObj.transform.SetParent(barObj.transform, false);
+            var pTxt = progTxtObj.GetComponent<Text>();
+            if (lilitaFont != null) pTxt.font = lilitaFont;
+            pTxt.fontSize = 14;
+            pTxt.fontStyle = FontStyle.Bold;
+            pTxt.alignment = TextAnchor.MiddleCenter;
+            pTxt.color = Color.white;
+            var ptRt = progTxtObj.GetComponent<RectTransform>();
+            ptRt.anchorMin = Vector2.zero;
+            ptRt.anchorMax = Vector2.one;
+            ptRt.offsetMin = Vector2.zero;
+            ptRt.offsetMax = Vector2.zero;
+
+            // 4. Label Hadiah
+            var rewObj = new GameObject("RewardText", typeof(RectTransform), typeof(Text));
+            rewObj.transform.SetParent(card.transform, false);
+            var rewTxt = rewObj.GetComponent<Text>();
+            if (lilitaFont != null) rewTxt.font = lilitaFont;
+            rewTxt.fontSize = 15;
+            rewTxt.fontStyle = FontStyle.Bold;
+            rewTxt.alignment = TextAnchor.MiddleLeft;
+            rewTxt.color = new Color(0.35f, 0.95f, 0.85f);
+            var rRt = rewObj.GetComponent<RectTransform>();
+            rRt.anchorMin = new Vector2(0.50f, 0.08f);
+            rRt.anchorMax = new Vector2(0.70f, 0.34f);
+            rRt.offsetMin = Vector2.zero;
+            rRt.offsetMax = Vector2.zero;
+
+            // 5. Tombol Klaim Bertekstur Emas / Batu
+            var btnObj = new GameObject("ClaimButton", typeof(RectTransform), typeof(Image), typeof(Button));
+            btnObj.transform.SetParent(card.transform, false);
+            var bRt = btnObj.GetComponent<RectTransform>();
+            bRt.anchorMin = new Vector2(0.72f, 0.20f);
+            bRt.anchorMax = new Vector2(0.96f, 0.80f);
+            bRt.offsetMin = Vector2.zero;
+            bRt.offsetMax = Vector2.zero;
+
+            var bImg = btnObj.GetComponent<Image>();
+            if (quest.IsCompleted && !quest.isClaimed && btnGold != null)
+            {
+                bImg.sprite = btnGold;
+                bImg.type = Image.Type.Sliced;
+                bImg.color = Color.white;
+            }
+            else if (btnStone != null)
+            {
+                bImg.sprite = btnStone;
+                bImg.type = Image.Type.Sliced;
+                bImg.color = Color.white;
+            }
+
+            var btnTxtObj = new GameObject("BtnText", typeof(RectTransform), typeof(Text));
+            btnTxtObj.transform.SetParent(btnObj.transform, false);
+            var bTxt = btnTxtObj.GetComponent<Text>();
+            if (lilitaFont != null) bTxt.font = lilitaFont;
+            bTxt.fontSize = 18;
+            bTxt.fontStyle = FontStyle.Bold;
+            bTxt.alignment = TextAnchor.MiddleCenter;
+            bTxt.color = Color.white;
+            var btRt = btnTxtObj.GetComponent<RectTransform>();
+            btRt.anchorMin = Vector2.zero;
+            btRt.anchorMax = Vector2.one;
+            btRt.offsetMin = Vector2.zero;
+            btRt.offsetMax = Vector2.zero;
+
             return card;
         }
 
