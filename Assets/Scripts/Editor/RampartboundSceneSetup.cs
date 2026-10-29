@@ -2209,6 +2209,11 @@ namespace Rampartbound.Editor
         private static Sprite _btnBattleCrimson;
         private static Sprite _bannerTeamCP;
         private static Sprite _badgeHeroPill;
+        private static Sprite _sliderTrackStone;
+        private static Sprite _sliderFillCyan;
+        private static Sprite _sliderHandleRuneGem;
+        private static Sprite _toggleBaseSlot;
+        private static Sprite _toggleKnobActive;
 
         private static void LoadUISprites()
         {
@@ -2248,6 +2253,11 @@ namespace Rampartbound.Editor
             if (_btnBattleCrimson == null) _btnBattleCrimson = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Btn_Battle_Crimson.png");
             if (_bannerTeamCP == null) _bannerTeamCP = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Banner_Team_CP.png");
             if (_badgeHeroPill == null) _badgeHeroPill = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Badge_Hero_Pill.png");
+            if (_sliderTrackStone == null) _sliderTrackStone = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Slider_Track_Stone.png");
+            if (_sliderFillCyan == null) _sliderFillCyan = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Slider_Fill_Cyan.png");
+            if (_sliderHandleRuneGem == null) _sliderHandleRuneGem = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Slider_Handle_RuneGem.png");
+            if (_toggleBaseSlot == null) _toggleBaseSlot = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Toggle_Base_Slot.png");
+            if (_toggleKnobActive == null) _toggleKnobActive = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Toggle_Knob_Active.png");
         }
 
         private static void AttachRarityBorder(Transform parentCard, Sprite borderSprite)
@@ -2705,6 +2715,7 @@ namespace Rampartbound.Editor
 
         private static GameObject CreateSlider(Transform parent, string name, float min, float max, float currentVal)
         {
+            LoadUISprites();
             var sliderObj = new GameObject(name, typeof(RectTransform), typeof(Slider));
             sliderObj.transform.SetParent(parent, false);
             var slider = sliderObj.GetComponent<Slider>();
@@ -2715,28 +2726,57 @@ namespace Rampartbound.Editor
 
             var bg = new GameObject("Background", typeof(RectTransform), typeof(Image));
             bg.transform.SetParent(sliderObj.transform, false);
-            PositionUI(bg, 0f, 0.25f, 1f, 0.75f);
-            bg.GetComponent<Image>().color = new Color(0.12f, 0.16f, 0.24f, 0.9f);
+            PositionUI(bg, 0f, 0.15f, 1f, 0.85f);
+            var bgImg = bg.GetComponent<Image>();
+            if (_sliderTrackStone != null)
+            {
+                bgImg.sprite = _sliderTrackStone;
+                bgImg.type = Image.Type.Sliced;
+                bgImg.color = Color.white;
+            }
+            else
+            {
+                bgImg.color = new Color(0.12f, 0.16f, 0.24f, 0.9f);
+            }
 
             var fillArea = new GameObject("Fill Area", typeof(RectTransform));
             fillArea.transform.SetParent(sliderObj.transform, false);
-            PositionUI(fillArea, 0f, 0.25f, 1f, 0.75f);
+            PositionUI(fillArea, 0.01f, 0.22f, 0.99f, 0.78f);
 
             var fill = new GameObject("Fill", typeof(RectTransform), typeof(Image));
             fill.transform.SetParent(fillArea.transform, false);
             PositionUI(fill, 0f, 0f, 1f, 1f);
-            fill.GetComponent<Image>().color = new Color(0.25f, 0.65f, 0.95f, 1f);
+            var fillImg = fill.GetComponent<Image>();
+            if (_sliderFillCyan != null)
+            {
+                fillImg.sprite = _sliderFillCyan;
+                fillImg.type = Image.Type.Sliced;
+                fillImg.color = Color.white;
+            }
+            else
+            {
+                fillImg.color = new Color(0.25f, 0.65f, 0.95f, 1f);
+            }
             slider.fillRect = fill.GetComponent<RectTransform>();
 
             var handleArea = new GameObject("Handle Slide Area", typeof(RectTransform));
             handleArea.transform.SetParent(sliderObj.transform, false);
-            PositionUI(handleArea, 0f, 0f, 1f, 1f);
+            PositionUI(handleArea, 0.02f, 0f, 0.98f, 1f);
 
             var handle = new GameObject("Handle", typeof(RectTransform), typeof(Image));
             handle.transform.SetParent(handleArea.transform, false);
             var hRect = handle.GetComponent<RectTransform>();
-            hRect.sizeDelta = new Vector2(26f, 26f);
-            handle.GetComponent<Image>().color = new Color(1f, 0.85f, 0.3f);
+            hRect.sizeDelta = new Vector2(36f, 36f);
+            var hImg = handle.GetComponent<Image>();
+            if (_sliderHandleRuneGem != null)
+            {
+                hImg.sprite = _sliderHandleRuneGem;
+                hImg.color = Color.white;
+            }
+            else
+            {
+                hImg.color = new Color(1f, 0.85f, 0.3f);
+            }
             slider.handleRect = hRect;
 
             return sliderObj;
@@ -2744,6 +2784,7 @@ namespace Rampartbound.Editor
 
         private static GameObject CreateToggle(Transform parent, string name, string label, bool isOn, Font font)
         {
+            LoadUISprites();
             var toggleObj = new GameObject(name, typeof(RectTransform), typeof(Toggle));
             toggleObj.transform.SetParent(parent, false);
             var toggle = toggleObj.GetComponent<Toggle>();
@@ -2751,17 +2792,36 @@ namespace Rampartbound.Editor
 
             var bg = new GameObject("Background", typeof(RectTransform), typeof(Image));
             bg.transform.SetParent(toggleObj.transform, false);
-            PositionUI(bg, 0f, 0.15f, 0.25f, 0.85f);
-            bg.GetComponent<Image>().color = new Color(0.15f, 0.2f, 0.32f);
+            PositionUI(bg, 0f, 0.10f, 0.22f, 0.90f);
+            var bgImg = bg.GetComponent<Image>();
+            if (_toggleBaseSlot != null)
+            {
+                bgImg.sprite = _toggleBaseSlot;
+                bgImg.type = Image.Type.Sliced;
+                bgImg.color = Color.white;
+            }
+            else
+            {
+                bgImg.color = new Color(0.15f, 0.2f, 0.32f);
+            }
 
             var check = new GameObject("Checkmark", typeof(RectTransform), typeof(Image));
             check.transform.SetParent(bg.transform, false);
-            PositionUI(check, 0.15f, 0.15f, 0.85f, 0.85f);
-            check.GetComponent<Image>().color = new Color(0.3f, 0.9f, 0.4f);
-            toggle.graphic = check.GetComponent<Image>();
+            PositionUI(check, 0.35f, 0.05f, 0.95f, 0.95f);
+            var cImg = check.GetComponent<Image>();
+            if (_toggleKnobActive != null)
+            {
+                cImg.sprite = _toggleKnobActive;
+                cImg.color = Color.white;
+            }
+            else
+            {
+                cImg.color = new Color(0.3f, 0.9f, 0.4f);
+            }
+            toggle.graphic = cImg;
 
             var lbl = CreateText(toggleObj.transform, "Label", label, 20, FontStyle.Normal, TextAnchor.MiddleLeft, Color.white, font);
-            PositionUI(lbl.gameObject, 0.28f, 0f, 1f, 1f);
+            PositionUI(lbl.gameObject, 0.25f, 0f, 1f, 1f);
 
             return toggleObj;
         }
