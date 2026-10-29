@@ -561,11 +561,90 @@ namespace FantasyDefense.UI
 
         private void HandleCascadeCombo(int comboChain)
         {
-            if (comboChain >= 2 && movesRemainingText != null)
+            if (comboChain >= 2)
             {
-                if (movePunchCoroutine != null) StopCoroutine(movePunchCoroutine);
-                movePunchCoroutine = StartCoroutine(PunchScaleRoutine(movesRemainingText.transform, 1.25f, 0.22f));
+                if (movesRemainingText != null)
+                {
+                    if (movePunchCoroutine != null) StopCoroutine(movePunchCoroutine);
+                    movePunchCoroutine = StartCoroutine(PunchScaleRoutine(movesRemainingText.transform, 1.25f, 0.22f));
+                }
+
+                ShowFloatingComboText(comboChain);
             }
+        }
+
+        private void ShowFloatingComboText(int comboChain)
+        {
+            var lilitaFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+            var floatingObj = new GameObject("FloatingComboNotice", typeof(RectTransform), typeof(Text));
+            floatingObj.transform.SetParent(transform, false);
+
+            var rt = floatingObj.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0.5f, 0.52f);
+            rt.anchorMax = new Vector2(0.5f, 0.52f);
+            rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.sizeDelta = new Vector2(500, 80);
+
+            var txt = floatingObj.GetComponent<Text>();
+            if (lilitaFont != null) txt.font = lilitaFont;
+            txt.alignment = TextAnchor.MiddleCenter;
+            txt.fontSize = comboChain >= 4 ? 38 : 32;
+            txt.fontStyle = FontStyle.Bold;
+
+            if (comboChain >= 4)
+            {
+                txt.text = $"🔥 MEGA CASCADE x{comboChain}! 🔥";
+                txt.color = new Color(1f, 0.35f, 0.15f);
+            }
+            else if (comboChain == 3)
+            {
+                txt.text = $"⚡ TRIPLE COMBO x3! ⚡";
+                txt.color = new Color(1f, 0.85f, 0.2f);
+            }
+            else
+            {
+                txt.text = $"✨ TACTICAL COMBO x2! ✨";
+                txt.color = new Color(0.35f, 0.95f, 0.85f);
+            }
+
+            StartCoroutine(FloatingComboRoutine(floatingObj));
+        }
+
+        private IEnumerator FloatingComboRoutine(GameObject obj)
+        {
+            if (obj == null) yield break;
+
+            var rt = obj.GetComponent<RectTransform>();
+            var txt = obj.GetComponent<Text>();
+            Vector2 startPos = rt.anchoredPosition;
+            Vector3 startScale = Vector3.one * 0.6f;
+            float duration = 0.85f;
+            float elapsed = 0f;
+            Color origColor = txt.color;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+
+                // Naiknya teks secara melayang ke atas
+                rt.anchoredPosition = startPos + new Vector2(0f, Mathf.Sin(t * Mathf.PI * 0.5f) * 65f);
+
+                // Bounce pembesar di awal
+                float bounce = Mathf.Sin(t * Mathf.PI) * 0.45f;
+                rt.localScale = startScale * (1f + bounce);
+
+                // Pudar transparan di akhir
+                if (t > 0.5f)
+                {
+                    float alpha = (1f - t) / 0.5f;
+                    txt.color = new Color(origColor.r, origColor.g, origColor.b, alpha);
+                }
+
+                yield return null;
+            }
+
+            Destroy(obj);
         }
 
         private void HandleInterWavePreparationStarted(int nextWaveNumber, int bonusMoves)

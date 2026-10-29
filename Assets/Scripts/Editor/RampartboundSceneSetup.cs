@@ -1465,9 +1465,37 @@ namespace Rampartbound.Editor
             var heroCardPanel = CreatePanel(heroContent, "SelectedHeroCard", new Color(0.08f, 0.12f, 0.2f, 0.9f));
             PositionUI(heroCardPanel, 0.04f, 0.65f, 0.96f, 0.88f);
 
-            var avatarObj = new GameObject("HeroAvatarImage", typeof(RectTransform), typeof(Image));
-            avatarObj.transform.SetParent(heroCardPanel.transform, false);
-            PositionUI(avatarObj, 0.03f, 0.06f, 0.26f, 0.94f);
+            // Avatar Stage dengan Plinth Semi-3D & Soft Contact Shadow
+            var avatarStage = CreatePanel(heroCardPanel.transform, "AvatarStage", new Color(0, 0, 0, 0));
+            PositionUI(avatarStage, 0.03f, 0.04f, 0.26f, 0.96f);
+
+            // 1. Soft Shadow
+            var shadowObj = new GameObject("AvatarShadow", typeof(RectTransform), typeof(Image));
+            shadowObj.transform.SetParent(avatarStage.transform, false);
+            PositionUI(shadowObj, 0.10f, 0.04f, 0.90f, 0.22f);
+            var shadowImg = shadowObj.GetComponent<Image>();
+            if (_shadowOval != null)
+            {
+                shadowImg.sprite = _shadowOval;
+                shadowImg.color = new Color(0f, 0f, 0f, 0.45f);
+            }
+
+            // 2. Plinth Base
+            var plinthObj = new GameObject("AvatarPlinth", typeof(RectTransform), typeof(Image));
+            plinthObj.transform.SetParent(avatarStage.transform, false);
+            PositionUI(plinthObj, 0.12f, 0.06f, 0.88f, 0.28f);
+            var plinthImg = plinthObj.GetComponent<Image>();
+            if (_plinthT1 != null)
+            {
+                plinthImg.sprite = _plinthT1;
+                plinthImg.preserveAspect = true;
+                plinthImg.color = Color.white;
+            }
+
+            // 3. Hero Avatar Chibi
+            var avatarObj = new GameObject("HeroAvatar", typeof(RectTransform), typeof(Image));
+            avatarObj.transform.SetParent(avatarStage.transform, false);
+            PositionUI(avatarObj, 0.02f, 0.20f, 0.98f, 0.98f);
             var avatarImg = avatarObj.GetComponent<Image>();
             avatarImg.sprite = _heroCedricSprite;
             avatarImg.preserveAspect = true;
