@@ -926,6 +926,50 @@ namespace Rampartbound.Editor
             startDefenseBtn.SetActive(true);
             puzzlePanel.SetActive(true);
 
+            // Boss Health Bar & Enrage Banner HUD
+            var bossBarCont = CreatePanel(battleHudObj.transform, "BossBarContainer", new Color(0.08f, 0.1f, 0.18f, 0.95f));
+            if (_frameStoneBastion != null)
+            {
+                var bcImg = bossBarCont.GetComponent<Image>();
+                bcImg.sprite = _frameStoneBastion;
+                bcImg.type = Image.Type.Sliced;
+                bcImg.color = Color.white;
+            }
+            PositionUI(bossBarCont, 0.10f, 0.84f, 0.90f, 0.94f);
+
+            var bName = CreateText(bossBarCont.transform, "BossNameText", "💀 RAJA TITAN ABYSSAL", 22, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(1f, 0.35f, 0.35f), defaultFont);
+            PositionUI(bName.gameObject, 0.04f, 0.55f, 0.50f, 0.95f);
+            var bTitleTxt = CreateText(bossBarCont.transform, "BossTitleText", "Penghancur Gerbang Benteng", 18, FontStyle.Italic, TextAnchor.MiddleLeft, new Color(0.9f, 0.85f, 0.7f), defaultFont);
+            PositionUI(bTitleTxt.gameObject, 0.52f, 0.55f, 0.96f, 0.95f);
+
+            var bHpSliderObj = CreateProgressBar(bossBarCont.transform, "BossHpSlider", 0, 10000, 10000, new Color(0.95f, 0.25f, 0.25f));
+            PositionUI(bHpSliderObj, 0.04f, 0.12f, 0.96f, 0.50f);
+            if (_sliderTrackStone != null)
+            {
+                var bg = bHpSliderObj.transform.Find("Background")?.GetComponent<Image>();
+                if (bg != null)
+                {
+                    bg.sprite = _sliderTrackStone;
+                    bg.type = Image.Type.Sliced;
+                }
+            }
+            var bHpTxt = CreateText(bossBarCont.transform, "BossHpText", "10,000 / 10,000 (100%)", 18, FontStyle.Bold, TextAnchor.MiddleCenter, Color.white, defaultFont);
+            PositionUI(bHpTxt.gameObject, 0.04f, 0.12f, 0.96f, 0.50f);
+
+            var bEnrageBanner = CreatePanel(battleHudObj.transform, "BossEnrageBanner", new Color(0.85f, 0.15f, 0.15f, 0.95f));
+            if (_bannerTacticalPhase != null)
+            {
+                var enrImg = bEnrageBanner.GetComponent<Image>();
+                enrImg.sprite = _bannerTacticalPhase;
+                enrImg.type = Image.Type.Sliced;
+                enrImg.color = new Color(1f, 0.3f, 0.3f);
+            }
+            PositionUI(bEnrageBanner, 0.15f, 0.76f, 0.85f, 0.83f);
+            var enrTxt = CreateText(bEnrageBanner.transform, "EnrageText", "⚠️ PERINGATAN: BOS MENGAMUK! (ENRAGED) ⚠️", 22, FontStyle.Bold, TextAnchor.MiddleCenter, Color.yellow, defaultFont);
+            PositionUI(enrTxt.gameObject, 0.05f, 0.1f, 0.95f, 0.9f);
+            bEnrageBanner.SetActive(false);
+            bossBarCont.SetActive(false);
+
             // Inter-Wave Tactical Phase Banner Announcement (Sprint 28)
             var interWaveBanner = CreatePanel(battleHudObj.transform, "InterWaveBannerPanel", new Color(0.08f, 0.1f, 0.18f, 0.95f));
             if (_bannerTacticalPhase != null)
@@ -1087,6 +1131,12 @@ namespace Rampartbound.Editor
             battleSO.FindProperty("midBossMarker").objectReferenceValue = midBossSkull;
             battleSO.FindProperty("finalBossMarker").objectReferenceValue = finalBossSkull;
             battleSO.FindProperty("waveProgressText").objectReferenceValue = waveProgressTxt;
+            battleSO.FindProperty("bossBarContainer").objectReferenceValue = bossBarCont;
+            battleSO.FindProperty("bossHpSlider").objectReferenceValue = bHpSliderObj.GetComponent<Slider>();
+            battleSO.FindProperty("bossNameText").objectReferenceValue = bName;
+            battleSO.FindProperty("bossTitleText").objectReferenceValue = bTitleTxt;
+            battleSO.FindProperty("bossHpText").objectReferenceValue = bHpTxt;
+            battleSO.FindProperty("bossEnrageBanner").objectReferenceValue = bEnrageBanner;
             battleSO.ApplyModifiedProperties();
 
             battleHudObj.SetActive(false);
@@ -1253,7 +1303,7 @@ namespace Rampartbound.Editor
                 stageNodeButtonsList.Add(sBtnObj.GetComponent<Button>());
             }
 
-            var detailPanel = CreatePanel(stageContent, "StageDetailPanel", new Color(0.07f, 0.1f, 0.16f, 0.95f));
+            var detailPanel = CreatePanel(stageContent, "StageDetailPanel", new Color(0.07f, 0.1f, 0.16f, 0.98f));
             if (_frameStoneBastion != null)
             {
                 var dImg = detailPanel.GetComponent<Image>();
@@ -1261,28 +1311,41 @@ namespace Rampartbound.Editor
                 dImg.type = Image.Type.Sliced;
                 dImg.color = Color.white;
             }
-            PositionUI(detailPanel, 0.02f, 0.02f, 0.98f, 0.44f);
+            PositionUI(detailPanel, 0.03f, 0.03f, 0.97f, 0.46f);
+
+            // Close button X di sudut kanan atas panel detail
+            var closeDetailBtn = CreateButton(detailPanel.transform, "CloseDetailButton", "✕", new Color(0.6f, 0.2f, 0.2f), Color.white, 20, defaultFont);
+            if (_btnCloseX != null)
+            {
+                var cbImg = closeDetailBtn.GetComponent<Image>();
+                cbImg.sprite = _btnCloseX;
+                cbImg.type = Image.Type.Sliced;
+                cbImg.color = Color.white;
+            }
+            PositionUI(closeDetailBtn, 0.90f, 0.86f, 0.97f, 0.96f);
+            closeDetailBtn.GetComponent<Button>().onClick.AddListener(() => detailPanel.SetActive(false));
+
             var codeTxt = CreateText(detailPanel.transform, "StageCodeText", "STAGE 1-1", 26, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(0.4f, 0.85f, 1f), defaultFont);
-            PositionUI(codeTxt.gameObject, 0.04f, 0.85f, 0.4f, 0.97f);
+            PositionUI(codeTxt.gameObject, 0.05f, 0.86f, 0.42f, 0.96f);
             var titleTxt = CreateText(detailPanel.transform, "StageTitleText", "Gerbang Pinggiran Kerajaan", 24, FontStyle.Bold, TextAnchor.MiddleLeft, Color.white, defaultFont);
-            PositionUI(titleTxt.gameObject, 0.42f, 0.85f, 0.96f, 0.97f);
+            PositionUI(titleTxt.gameObject, 0.44f, 0.86f, 0.88f, 0.96f);
 
             var modeTxt = CreateText(detailPanel.transform, "BattleModeText", "Mode: Real-Time Deploy", 20, FontStyle.Normal, TextAnchor.MiddleLeft, new Color(1f, 0.85f, 0.3f), defaultFont);
-            PositionUI(modeTxt.gameObject, 0.04f, 0.72f, 0.5f, 0.83f);
+            PositionUI(modeTxt.gameObject, 0.05f, 0.74f, 0.50f, 0.84f);
             var diffTxt = CreateText(detailPanel.transform, "DifficultyStatusText", "Status: Normal", 20, FontStyle.Bold, TextAnchor.MiddleRight, Color.green, defaultFont);
-            PositionUI(diffTxt.gameObject, 0.52f, 0.72f, 0.96f, 0.83f);
+            PositionUI(diffTxt.gameObject, 0.52f, 0.74f, 0.95f, 0.84f);
 
             var descTxt = CreateText(detailPanel.transform, "StageDescriptionText", "Hadapi gelombang monster Abyssal awal yang mengancam pinggiran benteng.", 19, FontStyle.Normal, TextAnchor.UpperLeft, new Color(0.85f, 0.9f, 0.95f), defaultFont);
-            PositionUI(descTxt.gameObject, 0.04f, 0.48f, 0.96f, 0.70f);
+            PositionUI(descTxt.gameObject, 0.05f, 0.50f, 0.95f, 0.72f);
 
             var recCpTxt = CreateText(detailPanel.transform, "RecommendedCpText", "Rekomendasi CP: 150 (Team CP Kamu: 500)", 20, FontStyle.Normal, TextAnchor.MiddleLeft, Color.white, defaultFont);
-            PositionUI(recCpTxt.gameObject, 0.04f, 0.36f, 0.96f, 0.46f);
+            PositionUI(recCpTxt.gameObject, 0.05f, 0.38f, 0.95f, 0.48f);
 
             var stageEnergyTxt = CreateText(detailPanel.transform, "EnergyCostText", "Biaya Stamina: ⚡ 5 (Stamina: 30/30)", 20, FontStyle.Normal, TextAnchor.MiddleLeft, new Color(0.3f, 0.9f, 1f), defaultFont);
-            PositionUI(stageEnergyTxt.gameObject, 0.04f, 0.26f, 0.96f, 0.35f);
+            PositionUI(stageEnergyTxt.gameObject, 0.05f, 0.27f, 0.95f, 0.37f);
 
             var firstRewardsTxt = CreateText(detailPanel.transform, "FirstClearRewardsText", "First-Clear: +150 Gold, +20 Gems [Tersedia]", 19, FontStyle.Normal, TextAnchor.MiddleLeft, new Color(1f, 0.84f, 0.2f), defaultFont);
-            PositionUI(firstRewardsTxt.gameObject, 0.04f, 0.16f, 0.96f, 0.25f);
+            PositionUI(firstRewardsTxt.gameObject, 0.05f, 0.16f, 0.95f, 0.26f);
 
             var startBattleBtn = CreateButton(detailPanel.transform, "StartBattleButton", "⚔️ MULAI PERTEMPURAN SEKARANG", new Color(0.92f, 0.35f, 0.18f), Color.white, 26, defaultFont);
             if (_btnBattleCrimson != null)
@@ -1292,7 +1355,7 @@ namespace Rampartbound.Editor
                 sBtnImg.type = Image.Type.Sliced;
                 sBtnImg.color = Color.white;
             }
-            PositionUI(startBattleBtn, 0.08f, 0.02f, 0.92f, 0.14f);
+            PositionUI(startBattleBtn, 0.06f, 0.02f, 0.94f, 0.14f);
 
             var stageSO = new SerializedObject(stageMapView);
             stageSO.FindProperty("rootPanel").objectReferenceValue = stageMapPanel;
