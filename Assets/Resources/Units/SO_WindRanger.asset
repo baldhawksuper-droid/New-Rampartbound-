@@ -29,6 +29,8 @@ MonoBehaviour:
   tier1Sprite: {fileID: 21300000, guid: 7f8e32da910444558e8a11bc32911001, type: 3}
   tier2Sprite: {fileID: 21300000, guid: 7f8e32da910444558e8a11bc32911002, type: 3}
   tier3Sprite: {fileID: 21300000, guid: 7f8e32da910444558e8a11bc32911003, type: 3}
+  tier4Sprite: {fileID: 21300000, guid: 7f8e32da910444558e8a11bc32911004, type: 3}
+  tier5Sprite: {fileID: 0}
   preparationTokenSprite: {fileID: 21300000, guid: a185d29303384dcbb8537f5699f5db19, type: 3}
   preparationTokenTier2Sprite: {fileID: 21300000, guid: 142b91eff133faff97b51427dff1232d, type: 3}
   preparationTokenTier3Sprite: {fileID: 21300000, guid: f626a9db376cd50548a17d2c5e6f54cb, type: 3}
