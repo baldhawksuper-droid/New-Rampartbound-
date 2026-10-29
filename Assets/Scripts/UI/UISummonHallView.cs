@@ -296,19 +296,131 @@ namespace FantasyDefense.UI
                 resultModalPanel.SetActive(true);
             }
 
-            if (resultSummaryText != null)
+            // Bersihkan kartu-kartu hasil sebelumnya di dalam container jika ada
+            if (resultCardsContainer != null)
             {
-                System.Text.StringBuilder sb = new System.Text.StringBuilder();
-                sb.AppendLine("=== HASIL PEMANGGILAN CITADEL ===");
+                for (int i = resultCardsContainer.childCount - 1; i >= 0; i--)
+                {
+                    Destroy(resultCardsContainer.GetChild(i).gameObject);
+                }
+
+                // Bangun kartu visual dinamis untuk setiap item hasil gacha
+                var lilitaFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
                 foreach (var item in results)
                 {
-                    string status = item.isNewUnlock ? "[HERO BARU DIBUKA!]" : $"(+{item.shardsGained} Shards)";
-                    sb.AppendLine($"• {item.heroName} [{item.rarityLabel}] {status}");
+                    CreateGachaResultCard(resultCardsContainer, item, lilitaFont);
                 }
-                resultSummaryText.text = sb.ToString();
+            }
+
+            if (resultSummaryText != null)
+            {
+                resultSummaryText.text = FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                    "✨ HASIL PEMANGGILAN CITADEL ✨",
+                    "✨ CITADEL SUMMON RESULTS ✨"
+                );
             }
 
             UpdateAllDisplays();
+        }
+
+        private void CreateGachaResultCard(Transform parent, GachaResultItem item, Font font)
+        {
+            var cardObj = new GameObject($"Card_{item.unitType}", typeof(RectTransform), typeof(Image));
+            cardObj.transform.SetParent(parent, false);
+
+            var img = cardObj.GetComponent<Image>();
+            img.color = new Color(0.08f, 0.10f, 0.16f, 0.95f);
+
+            // Tentukan sprite border & warna kelangkaan
+            string borderPath = "Border_Rarity_Common";
+            Color rarityColor = new Color(0.7f, 0.7f, 0.7f);
+            if (item.rarityLabel.Contains("Legendary") || item.unitType == UnitType.WindRanger)
+            {
+                borderPath = "Border_Rarity_Legendary";
+                rarityColor = new Color(1f, 0.85f, 0.2f);
+            }
+            else if (item.rarityLabel.Contains("Epic") || item.unitType == UnitType.RabbitMage)
+            {
+                borderPath = "Border_Rarity_Epic";
+                rarityColor = new Color(0.8f, 0.4f, 1f);
+            }
+            else
+            {
+                borderPath = "Border_Rarity_Rare";
+                rarityColor = new Color(0.25f, 0.75f, 1f);
+            }
+
+            var borderSprite = Resources.Load<Sprite>($"Sprites/UI/{borderPath}")
+#if UNITY_EDITOR
+                            ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Art/Sprites/UI/{borderPath}.png")
+#endif
+                            ;
+            if (borderSprite != null)
+            {
+                img.sprite = borderSprite;
+                img.type = Image.Type.Sliced;
+                img.color = Color.white;
+            }
+
+            // Portrait Hero
+            var portObj = new GameObject("HeroPortrait", typeof(RectTransform), typeof(Image));
+            portObj.transform.SetParent(cardObj.transform, false);
+            var portImg = portObj.GetComponent<Image>();
+            string sName = item.unitType switch
+            {
+                UnitType.Cedric => "Cedric_T1",
+                UnitType.RoseTanker => "Rose_T1",
+                UnitType.RabbitMage => "RabbitMage_T1",
+                UnitType.WindRanger => "WindRanger_T1",
+                _ => "Cedric_T1"
+            };
+            var hSprite = Resources.Load<Sprite>($"Sprites/Heroes/{sName}")
+#if UNITY_EDITOR
+                       ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Art/Sprites/Heroes/{sName}.png")
+#endif
+                       ;
+            if (hSprite != null)
+            {
+                portImg.sprite = hSprite;
+                portImg.preserveAspect = true;
+            }
+            var pRt = portObj.GetComponent<RectTransform>();
+            pRt.anchorMin = new Vector2(0.1f, 0.32f);
+            pRt.anchorMax = new Vector2(0.9f, 0.88f);
+            pRt.offsetMin = Vector2.zero;
+            pRt.offsetMax = Vector2.zero;
+
+            // Label Rarity & Nama
+            var nameObj = new GameObject("HeroName", typeof(RectTransform), typeof(Text));
+            nameObj.transform.SetParent(cardObj.transform, false);
+            var nameTxt = nameObj.GetComponent<Text>();
+            if (font != null) nameTxt.font = font;
+            nameTxt.text = item.heroName.Split('(')[0].Trim();
+            nameTxt.fontSize = 18;
+            nameTxt.fontStyle = FontStyle.Bold;
+            nameTxt.alignment = TextAnchor.MiddleCenter;
+            nameTxt.color = rarityColor;
+            var nRt = nameObj.GetComponent<RectTransform>();
+            nRt.anchorMin = new Vector2(0.05f, 0.16f);
+            nRt.anchorMax = new Vector2(0.95f, 0.32f);
+            nRt.offsetMin = Vector2.zero;
+            nRt.offsetMax = Vector2.zero;
+
+            // Status Duplikat / Unlock
+            var statObj = new GameObject("CardStatus", typeof(RectTransform), typeof(Text));
+            statObj.transform.SetParent(cardObj.transform, false);
+            var statTxt = statObj.GetComponent<Text>();
+            if (font != null) statTxt.font = font;
+            statTxt.text = item.isNewUnlock ? "★ UNLOCKED!" : $"+{item.shardsGained} Shards";
+            statTxt.fontSize = 16;
+            statTxt.fontStyle = FontStyle.Normal;
+            statTxt.alignment = TextAnchor.MiddleCenter;
+            statTxt.color = item.isNewUnlock ? new Color(1f, 0.95f, 0.3f) : new Color(0.75f, 0.95f, 0.85f);
+            var sRt = statObj.GetComponent<RectTransform>();
+            sRt.anchorMin = new Vector2(0.05f, 0.02f);
+            sRt.anchorMax = new Vector2(0.95f, 0.16f);
+            sRt.offsetMin = Vector2.zero;
+            sRt.offsetMax = Vector2.zero;
         }
 
         private void OnCloseResultsClicked()

@@ -232,7 +232,16 @@ namespace FantasyDefense.UI
 
             // Update Teks Informasi
             if (heroNameText != null) heroNameText.text = profile.heroName;
-            if (heroRoleText != null) heroRoleText.text = GetHeroRoleDescription(selectedHeroType);
+            if (heroRoleText != null)
+            {
+                string rarityTag = selectedHeroType switch
+                {
+                    UnitType.WindRanger => "<color=#FFD700>[LEGENDARY]</color> ",
+                    UnitType.RabbitMage => "<color=#C070FF>[EPIC]</color> ",
+                    _ => "<color=#40C0FF>[RARE]</color> "
+                };
+                heroRoleText.text = rarityTag + GetHeroRoleDescription(selectedHeroType);
+            }
             if (heroLevelText != null) heroLevelText.text = $"Level {profile.level}";
             if (heroCpText != null) heroCpText.text = $"Combat Power: {profile.combatPower:N0}";
 

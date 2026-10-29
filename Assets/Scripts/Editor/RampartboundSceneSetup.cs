@@ -1618,6 +1618,12 @@ namespace Rampartbound.Editor
             PositionUI(resSummary.gameObject, 0.05f, 0.85f, 0.95f, 0.97f);
             var resContainer = CreatePanel(resModal.transform, "ResultCardsContainer", new Color(0, 0, 0, 0));
             PositionUI(resContainer, 0.05f, 0.16f, 0.95f, 0.83f);
+            var grid = resContainer.AddComponent<GridLayoutGroup>();
+            grid.cellSize = new Vector2(160, 230);
+            grid.spacing = new Vector2(16, 16);
+            grid.childAlignment = TextAnchor.MiddleCenter;
+            grid.constraint = GridLayoutGroup.Constraint.FixedRowCount;
+            grid.constraintCount = 2;
             var closeResBtn = CreateButton(resModal.transform, "CloseResultBtn", "KEMBALI KE ALTAR", new Color(0.2f, 0.5f, 0.7f), Color.white, 24, defaultFont);
             if (_btnPrimaryGold != null)
             {
@@ -1668,6 +1674,13 @@ namespace Rampartbound.Editor
             var storeContent = storePanel.transform.Find("ContentContainer") ?? storePanel.transform;
 
             var storeCurPanel = CreatePanel(storeContent, "StoreCurrencies", new Color(0.06f, 0.08f, 0.14f, 0.9f));
+            if (_frameStoneBastion != null)
+            {
+                var scImg = storeCurPanel.GetComponent<Image>();
+                scImg.sprite = _frameStoneBastion;
+                scImg.type = Image.Type.Sliced;
+                scImg.color = Color.white;
+            }
             PositionUI(storeCurPanel, 0.03f, 0.88f, 0.97f, 0.98f);
             var stGoldTxt = CreateText(storeCurPanel.transform, "AccountGoldText", "🪙 Gold: 500", 22, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(1f, 0.85f, 0.2f), defaultFont);
             PositionUI(stGoldTxt.gameObject, 0.05f, 0.1f, 0.45f, 0.9f);
@@ -1675,23 +1688,75 @@ namespace Rampartbound.Editor
             PositionUI(stGemsTxt.gameObject, 0.55f, 0.1f, 0.95f, 0.9f);
 
             var starterBtn = CreateButton(storeContent, "BuyStarterPackBtn", "⭐ WELCOME STARTER PACK (500 Gems + 10k Gold)\nRp 15.000", new Color(0.85f, 0.55f, 0.15f), Color.white, 22, defaultFont);
+            if (_btnPrimaryGold != null)
+            {
+                var sbImg = starterBtn.GetComponent<Image>();
+                sbImg.sprite = _btnPrimaryGold;
+                sbImg.type = Image.Type.Sliced;
+                sbImg.color = Color.white;
+            }
             PositionUI(starterBtn, 0.05f, 0.72f, 0.95f, 0.85f);
             var starterStatus = CreateText(starterBtn.transform, "StarterStatusText", "Diskon 80% - Khusus Pemain Baru", 18, FontStyle.Italic, TextAnchor.LowerCenter, new Color(1f, 1f, 0.8f), defaultFont);
             PositionUI(starterStatus.gameObject, 0.05f, 0.02f, 0.95f, 0.35f);
 
             var g120Btn = CreateButton(storeContent, "BuyGems120Btn", "💎 120 GEMS\nRp 15.000", new Color(0.18f, 0.32f, 0.5f), Color.white, 20, defaultFont);
+            if (_btnSecondaryStone != null)
+            {
+                var g1Img = g120Btn.GetComponent<Image>();
+                g1Img.sprite = _btnSecondaryStone;
+                g1Img.type = Image.Type.Sliced;
+                g1Img.color = Color.white;
+            }
             PositionUI(g120Btn, 0.05f, 0.55f, 0.48f, 0.69f);
+
             var g650Btn = CreateButton(storeContent, "BuyGems650Btn", "💎 650 GEMS\nRp 75.000", new Color(0.18f, 0.35f, 0.55f), Color.white, 20, defaultFont);
+            if (_btnSecondaryStone != null)
+            {
+                var g6Img = g650Btn.GetComponent<Image>();
+                g6Img.sprite = _btnSecondaryStone;
+                g6Img.type = Image.Type.Sliced;
+                g6Img.color = Color.white;
+            }
             PositionUI(g650Btn, 0.52f, 0.55f, 0.95f, 0.69f);
+
             var g3500Btn = CreateButton(storeContent, "BuyGems3500Btn", "💎 3.500 GEMS (PETI ABYSSAL)\nRp 389.000", new Color(0.4f, 0.2f, 0.6f), Color.white, 22, defaultFont);
+            if (_btnPrimaryGold != null)
+            {
+                var g3Img = g3500Btn.GetComponent<Image>();
+                g3Img.sprite = _btnPrimaryGold;
+                g3Img.type = Image.Type.Sliced;
+                g3Img.color = Color.white;
+            }
             PositionUI(g3500Btn, 0.05f, 0.40f, 0.95f, 0.52f);
 
             var goldBundBtn = CreateButton(storeContent, "BuyGoldBundleBtn", "🪙 10.000 GOLD\n💎 50 Gems", new Color(0.55f, 0.45f, 0.15f), Color.white, 20, defaultFont);
+            if (_btnSecondaryStone != null)
+            {
+                var gbImg = goldBundBtn.GetComponent<Image>();
+                gbImg.sprite = _btnSecondaryStone;
+                gbImg.type = Image.Type.Sliced;
+                gbImg.color = Color.white;
+            }
             PositionUI(goldBundBtn, 0.05f, 0.25f, 0.48f, 0.37f);
+
             var energyFlaskBtn = CreateButton(storeContent, "BuyEnergyFlaskBtn", "⚡ +30 ENERGI (PENUH)\n💎 30 Gems", new Color(0.15f, 0.45f, 0.55f), Color.white, 20, defaultFont);
+            if (_btnSecondaryStone != null)
+            {
+                var efImg = energyFlaskBtn.GetComponent<Image>();
+                efImg.sprite = _btnSecondaryStone;
+                efImg.type = Image.Type.Sliced;
+                efImg.color = Color.white;
+            }
             PositionUI(energyFlaskBtn, 0.52f, 0.25f, 0.95f, 0.37f);
 
             var restoreBtn = CreateButton(storeContent, "RestorePurchasesBtn", "🔄 Pulihkan Pembelian (Restore Purchases)", new Color(0.2f, 0.25f, 0.35f), Color.white, 20, defaultFont);
+            if (_btnSecondaryStone != null)
+            {
+                var rbImg = restoreBtn.GetComponent<Image>();
+                rbImg.sprite = _btnSecondaryStone;
+                rbImg.type = Image.Type.Sliced;
+                rbImg.color = Color.white;
+            }
             PositionUI(restoreBtn, 0.1f, 0.12f, 0.9f, 0.21f);
 
             var storeFeedback = CreateText(storeContent, "StoreFeedbackText", "", 20, FontStyle.Italic, TextAnchor.MiddleCenter, Color.green, defaultFont);

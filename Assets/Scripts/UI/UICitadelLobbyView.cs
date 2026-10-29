@@ -402,13 +402,20 @@ namespace FantasyDefense.UI
 
             var lobby = CitadelLobbyManager.Instance;
             var profile = lobby != null ? lobby.GetHeroProfile(type) : null;
+            string rarityTag = type switch
+            {
+                UnitType.WindRanger => "<color=#FFD700>★ LEGENDARY</color>\n",
+                UnitType.RabbitMage => "<color=#C070FF>★ EPIC</color>\n",
+                _ => "<color=#40C0FF>★ RARE</color>\n"
+            };
+
             if (profile != null)
             {
-                infoText.text = $"<b>Lv.{profile.level} | CP {profile.CalculateHeroCP():N0}</b>";
+                infoText.text = $"{rarityTag}<b>Lv.{profile.level} | CP {profile.CalculateHeroCP():N0}</b>";
             }
             else
             {
-                infoText.text = $"<b>Lv.{defaultLvl} | CP 1,500</b>";
+                infoText.text = $"{rarityTag}<b>Lv.{defaultLvl} | CP 1,500</b>";
             }
 
             if (btn != null)

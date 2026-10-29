@@ -78,12 +78,31 @@ namespace FantasyDefense.UI
 
         public void RefreshUI()
         {
+            var lilitaFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+            if (lilitaFont != null)
+            {
+                if (accountGemsText != null) accountGemsText.font = lilitaFont;
+                if (accountGoldText != null) accountGoldText.font = lilitaFont;
+                if (starterPackStatusText != null) starterPackStatusText.font = lilitaFont;
+                if (feedbackText != null) feedbackText.font = lilitaFont;
+
+                Button[] storeBtns = { buyStarterPackButton, buyGems120Button, buyGems650Button, buyGems3500Button, buyGoldBundleButton, buyEnergyFlaskButton, restorePurchasesButton };
+                foreach (var b in storeBtns)
+                {
+                    if (b != null)
+                    {
+                        var t = b.GetComponentInChildren<Text>();
+                        if (t != null) t.font = lilitaFont;
+                    }
+                }
+            }
+
             // Update currency balances
             if (CitadelLobbyManager.Instance != null && CitadelLobbyManager.Instance.AccountData != null)
             {
                 var acc = CitadelLobbyManager.Instance.AccountData;
-                if (accountGemsText != null) accountGemsText.text = $"{acc.accountGems:N0} Gems";
-                if (accountGoldText != null) accountGoldText.text = $"{acc.goldCoins:N0} Gold";
+                if (accountGemsText != null) accountGemsText.text = $"💎 {acc.accountGems:N0} Gems";
+                if (accountGoldText != null) accountGoldText.text = $"🪙 {acc.goldCoins:N0} Gold";
             }
 
             // Update starter pack status
@@ -95,7 +114,9 @@ namespace FantasyDefense.UI
                     buyStarterPackButton.interactable = !starter.isPurchased;
                     if (starterPackStatusText != null)
                     {
-                        starterPackStatusText.text = starter.isPurchased ? "TERBELI (1x ONLY) ✔" : "BELI $1.99";
+                        starterPackStatusText.text = starter.isPurchased 
+                            ? FantasyDefense.Localization.CitadelLocalizationManager.Text("TERBELI (1x ONLY) ✔", "PURCHASED (1x ONLY) ✔")
+                            : FantasyDefense.Localization.CitadelLocalizationManager.Text("BELI Rp 15.000", "BUY $1.99");
                     }
                 }
             }
