@@ -80,20 +80,30 @@ namespace FantasyDefense.Data
 
         public string GetBattleModeLabel()
         {
-            return battleMode == BattleMode.PuzzlePreparation
-                ? $"Mode 1: Puzzle Preparation ({preparationMoves} Langkah)"
-                : "Mode 2: Real-time Deploy & Merge";
+            if (battleMode == BattleMode.PuzzlePreparation)
+            {
+                string movesText = FantasyDefense.Localization.CitadelLocalizationManager.Text($"{preparationMoves} Langkah", $"{preparationMoves} Moves");
+                return FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                    $"Mode 1: Puzzle Preparation ({movesText})",
+                    $"Mode 1: Puzzle Preparation ({movesText})");
+            }
+            return FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                "Mode 2: Real-time Deploy & Merge",
+                "Mode 2: Real-time Deploy & Merge");
         }
 
         /// <summary>
-        /// Mengembalikan status kesulitan berdasarkan Team CP pemain saat ini.
+        /// Mengembalikan status kesulitan berdasarkan Team CP pemain saat ini dengan dukungan bilingual.
         /// </summary>
         public string GetDifficultyLabel(int playerTeamCP)
         {
-            if (playerTeamCP >= recommendedCP * 1.15f) return "Aman (Mudah)";
-            if (playerTeamCP >= recommendedCP) return "Seimbang (Normal)";
-            if (playerTeamCP >= recommendedCP * 0.85f) return "Menantang (Keras)";
-            return "Sangat Berbahaya (Underleveled)";
+            if (playerTeamCP >= recommendedCP * 1.15f) 
+                return FantasyDefense.Localization.CitadelLocalizationManager.Text("Aman (Mudah)", "Safe (Easy)");
+            if (playerTeamCP >= recommendedCP) 
+                return FantasyDefense.Localization.CitadelLocalizationManager.Text("Seimbang (Normal)", "Balanced (Normal)");
+            if (playerTeamCP >= recommendedCP * 0.85f) 
+                return FantasyDefense.Localization.CitadelLocalizationManager.Text("Menantang (Keras)", "Challenging (Hard)");
+            return FantasyDefense.Localization.CitadelLocalizationManager.Text("Sangat Berbahaya (Underleveled)", "Very Dangerous (Underleveled)");
         }
 
         public Color GetDifficultyColor(int playerTeamCP)

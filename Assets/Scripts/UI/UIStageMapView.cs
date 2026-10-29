@@ -405,22 +405,30 @@ namespace FantasyDefense.UI
 
             if (recommendedCpText != null)
             {
+                string superiorTag = FantasyDefense.Localization.CitadelLocalizationManager.Text("UNGGUL!", "SUPERIOR!");
+                string alertTag = FantasyDefense.Localization.CitadelLocalizationManager.Text("WASPADA!", "WARNING!");
                 string cpComparison = playerCP >= stage.recommendedCP 
-                    ? $"<color=#00FF66><b>{playerCP:N0}</b> (UNGGUL!)</color>" 
-                    : $"<color=#FF7777><b>{playerCP:N0}</b> (WASPADA!)</color>";
-                recommendedCpText.text = $"🛡️ CP BENTENG: <b>{stage.recommendedCP:N0}</b>  |  TIM KAMU: {cpComparison}";
+                    ? $"<color=#00FF66><b>{playerCP:N0}</b> ({superiorTag})</color>" 
+                    : $"<color=#FF7777><b>{playerCP:N0}</b> ({alertTag})</color>";
+
+                string recLabel = FantasyDefense.Localization.CitadelLocalizationManager.Text("🛡️ CP BENTENG", "🛡️ CITADEL CP");
+                string teamLabel = FantasyDefense.Localization.CitadelLocalizationManager.Text("TIM KAMU", "YOUR TEAM");
+                recommendedCpText.text = $"{recLabel}: <b>{stage.recommendedCP:N0}</b>  |  {teamLabel}: {cpComparison}";
             }
 
             if (difficultyStatusText != null)
             {
                 string diffTag = stage.GetDifficultyLabel(playerCP).ToUpper();
-                difficultyStatusText.text = $"⚡ KESULITAN: <b>{diffTag}</b>";
+                string diffLabel = FantasyDefense.Localization.CitadelLocalizationManager.Text("⚡ KESULITAN", "⚡ DIFFICULTY");
+                difficultyStatusText.text = $"{diffLabel}: <b>{diffTag}</b>";
                 difficultyStatusText.color = stage.GetDifficultyColor(playerCP);
             }
 
             if (energyCostText != null)
             {
-                energyCostText.text = $"⚡ BIAYA ENERGI: <color=#00FFFF><b>{stage.staminaCost} STAMINA</b></color> (TERSEDIA: <b>{currentEnergy}/30</b>)";
+                string energyLabel = FantasyDefense.Localization.CitadelLocalizationManager.Text("⚡ BIAYA ENERGI", "⚡ ENERGY COST");
+                string availLabel = FantasyDefense.Localization.CitadelLocalizationManager.Text("TERSEDIA", "AVAILABLE");
+                energyCostText.text = $"{energyLabel}: <color=#00FFFF><b>{stage.staminaCost} STAMINA</b></color> ({availLabel}: <b>{currentEnergy}/30</b>)";
             }
 
             if (firstClearRewardsText != null)
@@ -430,17 +438,20 @@ namespace FantasyDefense.UI
 
                 if (isCleared)
                 {
-                    firstClearRewardsText.text = $"<color=#888888>🎁 HADIAH PERTAMA: [SUDAH DIKLAIM]</color>";
+                    string claimedLabel = FantasyDefense.Localization.CitadelLocalizationManager.Text("🎁 HADIAH PERTAMA: [SUDAH DIKLAIM]", "🎁 FIRST CLEAR REWARD: [CLAIMED]");
+                    firstClearRewardsText.text = $"<color=#888888>{claimedLabel}</color>";
                 }
                 else
                 {
-                    firstClearRewardsText.text = $"🎁 HADIAH PERTAMA: <color=#FFD700>🪙 +{stage.firstClearGoldReward:N0}</color>  |  <color=#00FFFF>💎 +{stage.firstClearGemReward:N0}</color>";
+                    string firstLabel = FantasyDefense.Localization.CitadelLocalizationManager.Text("🎁 HADIAH PERTAMA", "🎁 FIRST REWARD");
+                    firstClearRewardsText.text = $"{firstLabel}: <color=#FFD700>🪙 +{stage.firstClearGoldReward:N0}</color>  |  <color=#00FFFF>💎 +{stage.firstClearGemReward:N0}</color>";
                 }
             }
 
             if (repeatRewardsText != null)
             {
-                repeatRewardsText.text = $"REWARD GRINDING: 🪙 +{stage.repeatClearGold}  |  ⭐ +{stage.repeatClearExp} EXP  |  💎 +{stage.repeatClearGems}";
+                string repeatLabel = FantasyDefense.Localization.CitadelLocalizationManager.Text("REWARD GRINDING", "REPEAT REWARD");
+                repeatRewardsText.text = $"{repeatLabel}: 🪙 +{stage.repeatClearGold}  |  ⭐ +{stage.repeatClearExp} EXP  |  💎 +{stage.repeatClearGems}";
             }
 
             if (startBattleButton != null)
