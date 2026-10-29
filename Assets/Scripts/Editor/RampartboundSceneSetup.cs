@@ -1074,11 +1074,11 @@ namespace Rampartbound.Editor
             PositionUI(starsTxt.gameObject, 0.65f, 0.52f, 0.97f, 0.95f);
             var starSliderObj = CreateProgressBar(stageTop.transform, "ChapterStarSlider", 0, 30, 0, new Color(1f, 0.82f, 0.2f));
             PositionUI(starSliderObj, 0.03f, 0.1f, 0.5f, 0.45f);
-            var m10Btn = CreateButton(stageTop.transform, "Claim10StarBtn", "10★", Color.white, Color.white, 16, defaultFont);
+            var m10Btn = CreateButton(stageTop.transform, "Claim10StarBtn", "", Color.white, Color.white, 16, defaultFont);
             PositionUI(m10Btn, 0.53f, 0.05f, 0.67f, 0.52f);
-            var m20Btn = CreateButton(stageTop.transform, "Claim20StarBtn", "20★", Color.white, Color.white, 16, defaultFont);
+            var m20Btn = CreateButton(stageTop.transform, "Claim20StarBtn", "", Color.white, Color.white, 16, defaultFont);
             PositionUI(m20Btn, 0.69f, 0.05f, 0.83f, 0.52f);
-            var m30Btn = CreateButton(stageTop.transform, "Claim30StarBtn", "30★", Color.white, Color.white, 16, defaultFont);
+            var m30Btn = CreateButton(stageTop.transform, "Claim30StarBtn", "", Color.white, Color.white, 16, defaultFont);
             PositionUI(m30Btn, 0.85f, 0.05f, 0.98f, 0.52f);
 
             Sprite chest10Sp = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Chest_Bronze_Star_10.png");
@@ -1167,8 +1167,8 @@ namespace Rampartbound.Editor
 
             var stageNodeButtonsList = new List<Button>();
             string[] nodeTitles = new string[] {
-                "<b>1-1</b>", "<b>1-2</b>", "<b>1-3</b>", "<b>1-4</b>", "<b>👑 1-5</b>",
-                "<b>1-6</b>", "<b>1-7</b>", "<b>1-8</b>", "<b>1-9</b>", "<b>💀 1-10</b>"
+                "<b>1</b>", "<b>2</b>", "<b>3</b>", "<b>4</b>", "<b>👑 5</b>",
+                "<b>6</b>", "<b>7</b>", "<b>8</b>", "<b>9</b>", "<b>💀 10</b>"
             };
 
             Sprite nodeNormalSp = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_StageNode_Normal.png");
@@ -2368,10 +2368,18 @@ namespace Rampartbound.Editor
                 headerImg.color = Color.white;
             }
 
-            var titleTxt = CreateText(header.transform, "TitleText", headerTitle, 30, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(1f, 0.85f, 0.35f), font);
+            var titleTxt = CreateText(header.transform, "TitleText", headerTitle, 26, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(1f, 0.85f, 0.35f), font);
             PositionUI(titleTxt.gameObject, 0.04f, 0.1f, 0.80f, 0.9f);
 
             var closeBtn = CreateButton(header.transform, "CloseButton", "✕", new Color(0.85f, 0.25f, 0.25f), Color.white, 24, font);
+            if (_btnCloseX != null)
+            {
+                var cImg = closeBtn.GetComponent<Image>();
+                cImg.sprite = _btnCloseX;
+                cImg.color = Color.white;
+                var cTxt = closeBtn.GetComponentInChildren<Text>();
+                if (cTxt != null) cTxt.text = "";
+            }
             PositionUI(closeBtn, 0.84f, 0.05f, 0.98f, 0.95f);
 
             // Container Konten Sub-Panel

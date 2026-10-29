@@ -248,6 +248,7 @@ namespace FantasyDefense.UI
         {
             if (StageManager.Instance == null || CitadelLobbyManager.Instance == null) return;
             var accData = CitadelLobbyManager.Instance.AccountData;
+            Font defaultFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
 
             for (int i = 0; i < stageNodeButtons.Count; i++)
             {
@@ -293,7 +294,8 @@ namespace FantasyDefense.UI
                         starStr = "<color=#666666>🔒 LOCK</color>";
                     }
 
-                    string bossPrefix = (stageIdx == 5) ? "👑 1-5" : ((stageIdx == 10) ? "💀 1-10" : $"1-{stageIdx}");
+                    txt.font = defaultFont;
+                    string bossPrefix = (stageIdx == 5) ? "👑 1-5" : ((stageIdx == 10) ? "💀 1-10" : $"{stageIdx}");
                     txt.text = $"<b>{bossPrefix}</b>\n{starStr}";
                     txt.fontSize = (stageIdx == 5 || stageIdx == 10) ? 17 : 16;
                     txt.color = (stageIdx == 10) ? new Color(1f, 0.4f, 0.4f) : ((stageIdx == 5) ? new Color(1f, 0.85f, 0.3f) : Color.white);
@@ -365,12 +367,34 @@ namespace FantasyDefense.UI
             int playerCP = CitadelLobbyManager.Instance != null ? CitadelLobbyManager.Instance.TotalTeamCP : 0;
             int currentEnergy = CitadelLobbyManager.Instance != null ? CitadelLobbyManager.Instance.CurrentEnergy : 0;
 
-            if (stageCodeText != null) stageCodeText.text = $"<b>{stage.stageCode}</b>";
-            if (stageTitleText != null) stageTitleText.text = $"<b>{stage.stageTitle}</b>";
+            Font defaultFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+            if (defaultFont != null)
+            {
+                if (stageCodeText != null) stageCodeText.font = defaultFont;
+                if (stageTitleText != null) stageTitleText.font = defaultFont;
+                if (battleModeText != null) battleModeText.font = defaultFont;
+                if (stageDescriptionText != null) stageDescriptionText.font = defaultFont;
+                if (recommendedCpText != null) recommendedCpText.font = defaultFont;
+                if (difficultyStatusText != null) difficultyStatusText.font = defaultFont;
+                if (energyCostText != null) energyCostText.font = defaultFont;
+                if (firstClearRewardsText != null) firstClearRewardsText.font = defaultFont;
+                if (repeatRewardsText != null) repeatRewardsText.font = defaultFont;
+                if (chapterTitleText != null) chapterTitleText.font = defaultFont;
+                if (totalStarsText != null) totalStarsText.font = defaultFont;
+                if (startBattleButton != null)
+                {
+                    var bTxt = startBattleButton.GetComponentInChildren<Text>();
+                    if (bTxt != null) bTxt.font = defaultFont;
+                }
+            }
+
+            if (stageCodeText != null) stageCodeText.text = $"<b>STAGE {stage.stageCode}</b>";
+            if (stageTitleText != null) stageTitleText.text = $"<b>{stage.stageTitle.ToUpper()}</b>";
 
             if (battleModeText != null)
             {
-                battleModeText.text = $"<color=#00FFFF>⚔️ Mode:</color> <b>{stage.GetBattleModeLabel()}</b>";
+                string modeIcon = (stage.battleMode == BattleModeType.BossRush) ? "💀" : ((stage.battleMode == BattleModeType.PuzzleOnly) ? "🧩" : "⚔️");
+                battleModeText.text = $"{modeIcon} <color=#FFD700><b>{stage.GetBattleModeLabel().ToUpper()}</b></color>";
             }
 
             if (stageDescriptionText != null)
@@ -382,20 +406,21 @@ namespace FantasyDefense.UI
             if (recommendedCpText != null)
             {
                 string cpComparison = playerCP >= stage.recommendedCP 
-                    ? $"<color=#00FF66><b>{playerCP:N0}</b> (Unggul!)</color>" 
-                    : $"<color=#FF7777><b>{playerCP:N0}</b> (Waspada!)</color>";
-                recommendedCpText.text = $"Rekomendasi CP: <b>{stage.recommendedCP:N0}</b>  |  Team CP: {cpComparison}";
+                    ? $"<color=#00FF66><b>{playerCP:N0}</b> (UNGGUL!)</color>" 
+                    : $"<color=#FF7777><b>{playerCP:N0}</b> (WASPADA!)</color>";
+                recommendedCpText.text = $"🛡️ CP BENTENG: <b>{stage.recommendedCP:N0}</b>  |  TIM KAMU: {cpComparison}";
             }
 
             if (difficultyStatusText != null)
             {
-                difficultyStatusText.text = $"Tingkat: <b>{stage.GetDifficultyLabel(playerCP)}</b>";
+                string diffTag = stage.GetDifficultyLabel(playerCP).ToUpper();
+                difficultyStatusText.text = $"⚡ KESULITAN: <b>{diffTag}</b>";
                 difficultyStatusText.color = stage.GetDifficultyColor(playerCP);
             }
 
             if (energyCostText != null)
             {
-                energyCostText.text = $"Biaya Stamina: <color=#00FFFF>⚡ {stage.staminaCost}</color> (Tersedia: <b>{currentEnergy}/30</b>)";
+                energyCostText.text = $"⚡ BIAYA ENERGI: <color=#00FFFF><b>{stage.staminaCost} STAMINA</b></color> (TERSEDIA: <b>{currentEnergy}/30</b>)";
             }
 
             if (firstClearRewardsText != null)
@@ -405,17 +430,17 @@ namespace FantasyDefense.UI
 
                 if (isCleared)
                 {
-                    firstClearRewardsText.text = $"<color=#888888>Hadiah Pertama: [Sudah Diklaim]</color>";
+                    firstClearRewardsText.text = $"<color=#888888>🎁 HADIAH PERTAMA: [SUDAH DIKLAIM]</color>";
                 }
                 else
                 {
-                    firstClearRewardsText.text = $"🎁 Hadiah Pertama: <color=#FFD700>+{stage.firstClearGoldReward:N0} Gold</color>, <color=#00FFFF>+{stage.firstClearGemReward:N0} Gems</color> ✨";
+                    firstClearRewardsText.text = $"🎁 HADIAH PERTAMA: <color=#FFD700>🪙 +{stage.firstClearGoldReward:N0}</color>  |  <color=#00FFFF>💎 +{stage.firstClearGemReward:N0}</color>";
                 }
             }
 
             if (repeatRewardsText != null)
             {
-                repeatRewardsText.text = $"Reward Grinding: +{stage.repeatClearGold} Gold, +{stage.repeatClearExp} EXP, +{stage.repeatClearGems} Gems";
+                repeatRewardsText.text = $"REWARD GRINDING: 🪙 +{stage.repeatClearGold}  |  ⭐ +{stage.repeatClearExp} EXP  |  💎 +{stage.repeatClearGems}";
             }
 
             if (startBattleButton != null)
