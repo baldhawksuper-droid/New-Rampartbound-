@@ -913,6 +913,10 @@ namespace FantasyDefense.UI
                 hpBarOriginalScale = tr.localScale;
             }
 
+            // Kilatan merah pada fill slider saat terkena damage
+            Image fillImg = castleHpSlider.fillRect != null ? castleHpSlider.fillRect.GetComponent<Image>() : null;
+            Color origFillCol = fillImg != null ? fillImg.color : Color.green;
+
             float duration = 0.22f;
             float elapsed = 0f;
 
@@ -922,9 +926,17 @@ namespace FantasyDefense.UI
                 float t = elapsed / duration;
                 float punch = Mathf.Sin(t * Mathf.PI) * 0.18f;
                 tr.localScale = new Vector3(hpBarOriginalScale.x * (1f + punch), hpBarOriginalScale.y * (1f - punch * 0.5f), hpBarOriginalScale.z);
+
+                if (fillImg != null)
+                {
+                    float flash = Mathf.Sin(t * Mathf.PI);
+                    fillImg.color = Color.Lerp(origFillCol, Color.white, flash * 0.6f);
+                }
+
                 yield return null;
             }
 
+            if (fillImg != null) fillImg.color = origFillCol;
             tr.localScale = hpBarOriginalScale;
             hpBarShakeCoroutine = null;
         }

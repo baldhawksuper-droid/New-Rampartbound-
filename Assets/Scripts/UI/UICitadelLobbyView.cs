@@ -514,6 +514,9 @@ namespace FantasyDefense.UI
             float duration = 0.22f;
             float elapsed = 0f;
 
+            // Spawn micro sparkle burst
+            SpawnTapSparkleBurst(tr);
+
             while (elapsed < duration)
             {
                 elapsed += Time.unscaledDeltaTime;
@@ -524,6 +527,61 @@ namespace FantasyDefense.UI
             }
 
             tr.localScale = originalScale;
+        }
+
+        private void SpawnTapSparkleBurst(Transform targetTr)
+        {
+            if (targetTr == null) return;
+
+            var lilitaFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+            var sparkleObj = new GameObject("StandeeTapSparkle", typeof(RectTransform), typeof(Text));
+            sparkleObj.transform.SetParent(targetTr.parent != null ? targetTr.parent : targetTr, false);
+
+            var rt = sparkleObj.GetComponent<RectTransform>();
+            rt.position = targetTr.position + new Vector3(0f, 40f, 0f);
+            rt.sizeDelta = new Vector2(160, 60);
+
+            var txt = sparkleObj.GetComponent<Text>();
+            if (lilitaFont != null) txt.font = lilitaFont;
+            txt.text = "✨ ✦ ✨";
+            txt.alignment = TextAnchor.MiddleCenter;
+            txt.fontSize = 24;
+            txt.fontStyle = FontStyle.Bold;
+            txt.color = new Color(1f, 0.90f, 0.35f, 1f);
+
+            StartCoroutine(SparkleFloatRoutine(sparkleObj));
+        }
+
+        private IEnumerator SparkleFloatRoutine(GameObject obj)
+        {
+            if (obj == null) yield break;
+
+            var rt = obj.GetComponent<RectTransform>();
+            var txt = obj.GetComponent<Text>();
+            Vector3 startPos = rt.position;
+            float duration = 0.45f;
+            float elapsed = 0f;
+            Color origColor = txt.color;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+
+                rt.position = startPos + new Vector3(0f, Mathf.Sin(t * Mathf.PI * 0.5f) * 35f, 0f);
+                float scale = Mathf.Sin(t * Mathf.PI) * 1.35f;
+                rt.localScale = Vector3.one * Mathf.Max(0.1f, scale);
+
+                if (t > 0.4f)
+                {
+                    float a = (1f - t) / 0.6f;
+                    txt.color = new Color(origColor.r, origColor.g, origColor.b, a);
+                }
+
+                yield return null;
+            }
+
+            Destroy(obj);
         }
 
         private void OpenHeroUpgrade(UnitType heroType)
