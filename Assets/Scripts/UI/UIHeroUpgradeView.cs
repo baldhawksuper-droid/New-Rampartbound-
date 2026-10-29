@@ -192,6 +192,44 @@ namespace FantasyDefense.UI
             HeroLobbyProfile profile = CitadelLobbyManager.Instance.GetHeroProfile(selectedHeroType);
             if (profile == null) return;
 
+            Font defaultFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+            if (defaultFont != null)
+            {
+                if (heroNameText != null) heroNameText.font = defaultFont;
+                if (heroRoleText != null) heroRoleText.font = defaultFont;
+                if (heroLevelText != null) heroLevelText.font = defaultFont;
+                if (heroCpText != null) heroCpText.font = defaultFont;
+                if (attackStatText != null) attackStatText.font = defaultFont;
+                if (healthStatText != null) healthStatText.font = defaultFont;
+                if (critStatText != null) critStatText.font = defaultFont;
+                if (upgradeCostText != null) upgradeCostText.font = defaultFont;
+                if (upgradePreviewText != null) upgradePreviewText.font = defaultFont;
+                if (weaponSlotText != null) weaponSlotText.font = defaultFont;
+                if (armorSlotText != null) armorSlotText.font = defaultFont;
+                if (relicSlotText != null) relicSlotText.font = defaultFont;
+                if (feedbackMessageText != null) feedbackMessageText.font = defaultFont;
+                if (upgradeHeroButton != null)
+                {
+                    var uTxt = upgradeHeroButton.GetComponentInChildren<Text>();
+                    if (uTxt != null) uTxt.font = defaultFont;
+                }
+                if (autoEquipButton != null)
+                {
+                    var aeTxt = autoEquipButton.GetComponentInChildren<Text>();
+                    if (aeTxt != null) aeTxt.font = defaultFont;
+                }
+                if (unequipAllButton != null)
+                {
+                    var ueTxt = unequipAllButton.GetComponentInChildren<Text>();
+                    if (ueTxt != null) ueTxt.font = defaultFont;
+                }
+                if (deployToFormationButton != null)
+                {
+                    var dpTxt = deployToFormationButton.GetComponentInChildren<Text>();
+                    if (dpTxt != null) dpTxt.font = defaultFont;
+                }
+            }
+
             // Update Teks Informasi
             if (heroNameText != null) heroNameText.text = profile.heroName;
             if (heroRoleText != null) heroRoleText.text = GetHeroRoleDescription(selectedHeroType);

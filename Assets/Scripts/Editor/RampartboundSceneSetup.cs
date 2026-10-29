@@ -1290,12 +1290,43 @@ namespace Rampartbound.Editor
             var heroContent = heroPanel.transform.Find("ContentContainer") ?? heroPanel.transform;
 
             var tabCedric = CreateButton(heroContent, "TabCedric", "⚔️ Cedric", new Color(0.45f, 0.15f, 0.15f), Color.white, 20, defaultFont);
+            if (_btnSecondaryStone != null)
+            {
+                var cImg = tabCedric.GetComponent<Image>();
+                cImg.sprite = _btnSecondaryStone;
+                cImg.type = Image.Type.Sliced;
+                cImg.color = Color.white;
+            }
             PositionUI(tabCedric, 0.02f, 0.90f, 0.25f, 0.98f);
+
             var tabRose = CreateButton(heroContent, "TabRose", "🛡️ Rose Tank", new Color(0.45f, 0.2f, 0.35f), Color.white, 20, defaultFont);
+            if (_btnSecondaryStone != null)
+            {
+                var rImg = tabRose.GetComponent<Image>();
+                rImg.sprite = _btnSecondaryStone;
+                rImg.type = Image.Type.Sliced;
+                rImg.color = Color.white;
+            }
             PositionUI(tabRose, 0.27f, 0.90f, 0.50f, 0.98f);
+
             var tabRabbit = CreateButton(heroContent, "TabRabbit", "🔮 Rabbit Mage", new Color(0.15f, 0.25f, 0.5f), Color.white, 20, defaultFont);
+            if (_btnSecondaryStone != null)
+            {
+                var mImg = tabRabbit.GetComponent<Image>();
+                mImg.sprite = _btnSecondaryStone;
+                mImg.type = Image.Type.Sliced;
+                mImg.color = Color.white;
+            }
             PositionUI(tabRabbit, 0.52f, 0.90f, 0.75f, 0.98f);
+
             var tabWind = CreateButton(heroContent, "TabWind", "🏹 Wind Ranger", new Color(0.15f, 0.4f, 0.25f), Color.white, 20, defaultFont);
+            if (_btnSecondaryStone != null)
+            {
+                var wImg = tabWind.GetComponent<Image>();
+                wImg.sprite = _btnSecondaryStone;
+                wImg.type = Image.Type.Sliced;
+                wImg.color = Color.white;
+            }
             PositionUI(tabWind, 0.77f, 0.90f, 0.98f, 0.98f);
 
             var heroCardPanel = CreatePanel(heroContent, "SelectedHeroCard", new Color(0.08f, 0.12f, 0.2f, 0.9f));
@@ -1334,9 +1365,23 @@ namespace Rampartbound.Editor
             var upgPreviewTxt = CreateText(upgActionPanel.transform, "UpgradePreviewText", "Efek: Stat +7.5% per Level", 20, FontStyle.Normal, TextAnchor.MiddleLeft, new Color(0.7f, 0.9f, 1f), defaultFont);
             PositionUI(upgPreviewTxt.gameObject, 0.05f, 0.1f, 0.5f, 0.48f);
             var upgHeroBtn = CreateButton(upgActionPanel.transform, "UpgradeHeroButton", "TINGKATKAN LEVEL", new Color(0.95f, 0.72f, 0.16f), new Color(0.12f, 0.08f, 0.02f), 24, defaultFont);
+            if (_btnPrimaryGold != null)
+            {
+                var uImg = upgHeroBtn.GetComponent<Image>();
+                uImg.sprite = _btnPrimaryGold;
+                uImg.type = Image.Type.Sliced;
+                uImg.color = Color.white;
+            }
             PositionUI(upgHeroBtn, 0.53f, 0.15f, 0.96f, 0.85f);
 
             var equipPanel = CreatePanel(heroContent, "EquipmentSlotsPanel", new Color(0.06f, 0.08f, 0.14f, 0.85f));
+            if (_frameStoneBastion != null)
+            {
+                var eqImg = equipPanel.GetComponent<Image>();
+                eqImg.sprite = _frameStoneBastion;
+                eqImg.type = Image.Type.Sliced;
+                eqImg.color = Color.white;
+            }
             PositionUI(equipPanel, 0.04f, 0.07f, 0.96f, 0.23f);
             var wSlotTxt = CreateText(equipPanel.transform, "WeaponSlotText", "🗡️ Senjata: [Kosong]", 20, FontStyle.Normal, TextAnchor.MiddleLeft, Color.white, defaultFont);
             PositionUI(wSlotTxt.gameObject, 0.05f, 0.68f, 0.65f, 0.96f);
@@ -1345,12 +1390,33 @@ namespace Rampartbound.Editor
             var rSlotTxt = CreateText(equipPanel.transform, "RelicSlotText", "✨ Relik: [Kosong]", 20, FontStyle.Normal, TextAnchor.MiddleLeft, Color.white, defaultFont);
             PositionUI(rSlotTxt.gameObject, 0.05f, 0.04f, 0.65f, 0.32f);
             var autoEquipBtn = CreateButton(equipPanel.transform, "AutoEquipButton", "⚔️ PASANG TERBAIK", new Color(0.18f, 0.55f, 0.35f), Color.white, 18, defaultFont);
+            if (_btnSecondaryStone != null)
+            {
+                var aeImg = autoEquipBtn.GetComponent<Image>();
+                aeImg.sprite = _btnSecondaryStone;
+                aeImg.type = Image.Type.Sliced;
+                aeImg.color = Color.white;
+            }
             PositionUI(autoEquipBtn, 0.67f, 0.52f, 0.97f, 0.92f);
 
             var unequipBtn = CreateButton(equipPanel.transform, "UnequipAllButton", "📦 LEPAS SEMUA", new Color(0.35f, 0.38f, 0.45f), Color.white, 18, defaultFont);
+            if (_btnSecondaryStone != null)
+            {
+                var ueImg = unequipBtn.GetComponent<Image>();
+                ueImg.sprite = _btnSecondaryStone;
+                ueImg.type = Image.Type.Sliced;
+                ueImg.color = Color.white;
+            }
             PositionUI(unequipBtn, 0.67f, 0.08f, 0.97f, 0.48f);
 
             var deployBtn = CreateButton(heroContent, "DeployToFormationButton", "🛡️ PASANG KE FORMASI", new Color(0.18f, 0.5f, 0.75f), Color.white, 20, defaultFont);
+            if (_btnBattleCrimson != null)
+            {
+                var dpImg = deployBtn.GetComponent<Image>();
+                dpImg.sprite = _btnBattleCrimson;
+                dpImg.type = Image.Type.Sliced;
+                dpImg.color = Color.white;
+            }
             PositionUI(deployBtn, 0.04f, 0.02f, 0.96f, 0.065f);
 
             var forgeBtn = CreateButton(equipPanel.transform, "OpenForgeButton", "🔨 KE FORGE", new Color(0.2f, 0.35f, 0.55f), Color.white, 20, defaultFont);
