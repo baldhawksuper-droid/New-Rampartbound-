@@ -50,11 +50,19 @@ namespace FantasyDefense.Combat
 
             Vector3 pos = unit.transform.position;
 
-            // 1. Tampilkan teks nama skill di atas pahlawan
+            // 1. Tampilkan teks nama skill di atas pahlawan dengan banner perayaan taktil
             if (enableFloatingText)
             {
                 Color skillColor = unit.CurrentTier >= UnitTier.Tier3 ? new Color(1f, 0.85f, 0.2f) : new Color(0.4f, 0.9f, 1f);
-                SpawnFloatingText(pos + Vector3.up * 0.7f, skillName, skillColor, 1.2f);
+                string heroIcon = unit.UnitType switch
+                {
+                    UnitType.Cedric => "⚔️",
+                    UnitType.RoseTanker => "🛡️",
+                    UnitType.RabbitMage => "🔮",
+                    UnitType.WindRanger => "🏹",
+                    _ => "✨"
+                };
+                SpawnFloatingText(pos + Vector3.up * 0.7f, $"{heroIcon} {skillName.ToUpper()}!", skillColor, 1.35f, true);
             }
 
             // 2. Tampilkan efek cincin kejut (Shockwave) jika diaktifkan
