@@ -306,9 +306,15 @@ namespace FantasyDefense.UI
 
                 // Bangun kartu visual dinamis untuk setiap item hasil gacha
                 var lilitaFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+                int cardIndex = 0;
                 foreach (var item in results)
                 {
-                    CreateGachaResultCard(resultCardsContainer, item, lilitaFont);
+                    var card = CreateGachaResultCard(resultCardsContainer, item, lilitaFont);
+                    if (card != null && gameObject.activeInHierarchy)
+                    {
+                        StartCoroutine(AnimateCardRevealRoutine(card.transform, cardIndex * 0.06f, item.rarityLabel.Contains("Legendary")));
+                    }
+                    cardIndex++;
                 }
             }
 
@@ -323,7 +329,7 @@ namespace FantasyDefense.UI
             UpdateAllDisplays();
         }
 
-        private void CreateGachaResultCard(Transform parent, GachaResultItem item, Font font)
+        private GameObject CreateGachaResultCard(Transform parent, GachaResultItem item, Font font)
         {
             var cardObj = new GameObject($"Card_{item.unitType}", typeof(RectTransform), typeof(Image));
             cardObj.transform.SetParent(parent, false);
@@ -421,6 +427,42 @@ namespace FantasyDefense.UI
             sRt.anchorMax = new Vector2(0.95f, 0.16f);
             sRt.offsetMin = Vector2.zero;
             sRt.offsetMax = Vector2.zero;
+
+            return cardObj;
+        }
+
+        private System.Collections.IEnumerator AnimateCardRevealRoutine(Transform cardTr, float delay, bool isLegendary)
+        {
+            if (cardTr == null) yield break;
+
+            cardTr.localScale = Vector3.zero;
+            if (delay > 0f)
+            {
+                yield return new WaitForSeconds(delay);
+            }
+
+            float duration = 0.28f;
+            float elapsed = 0f;
+            Vector3 targetScale = Vector3.one;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+
+                // Efek membalik (Flip horizontal) dari 0 ke 1 + bounce
+                float scaleX = Mathf.Abs(Mathf.Sin(t * Mathf.PI * 0.5f));
+                float bounce = Mathf.Sin(t * Mathf.PI) * (isLegendary ? 0.35f : 0.18f);
+
+                cardTr.localScale = new Vector3(
+                    targetScale.x * (scaleX + bounce * 0.5f),
+                    targetScale.y * (1f + bounce),
+                    targetScale.z
+                );
+                yield return null;
+            }
+
+            cardTr.localScale = targetScale;
         }
 
         private void OnCloseResultsClicked()

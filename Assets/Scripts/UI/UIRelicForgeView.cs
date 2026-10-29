@@ -194,6 +194,32 @@ namespace FantasyDefense.UI
 
         public void RefreshDisplay()
         {
+            var lilitaFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+            if (lilitaFont != null)
+            {
+                if (forgeDustText != null) forgeDustText.font = lilitaFont;
+                if (refineStonesText != null) refineStonesText.font = lilitaFont;
+                if (goldText != null) goldText.font = lilitaFont;
+                if (itemNameText != null) itemNameText.font = lilitaFont;
+                if (itemSlotText != null) itemSlotText.font = lilitaFont;
+                if (itemRarityText != null) itemRarityText.font = lilitaFont;
+                if (currentStatText != null) currentStatText.font = lilitaFont;
+                if (upgradedStatPreviewText != null) upgradedStatPreviewText.font = lilitaFont;
+                if (actionCostText != null) actionCostText.font = lilitaFont;
+                if (actionButtonLabel != null) actionButtonLabel.font = lilitaFont;
+                if (feedbackMessageText != null) feedbackMessageText.font = lilitaFont;
+
+                Button[] tabs = { refineTabButton, rarityTabButton, salvageTabButton };
+                foreach (var b in tabs)
+                {
+                    if (b != null)
+                    {
+                        var t = b.GetComponentInChildren<Text>();
+                        if (t != null) t.font = lilitaFont;
+                    }
+                }
+            }
+
             RefreshMaterialCounters();
 
             if (selectedItem == null)
@@ -220,7 +246,10 @@ namespace FantasyDefense.UI
 
             if (itemRarityText != null)
             {
-                itemRarityText.text = $"Kualitas: {selectedItem.rarity}";
+                itemRarityText.text = FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                    $"Kualitas: {selectedItem.rarity}",
+                    $"Rarity: {selectedItem.rarity}"
+                );
                 itemRarityText.color = selectedItem.GetRarityColor();
             }
 

@@ -1785,6 +1785,13 @@ namespace Rampartbound.Editor
             var forgeContent = forgePanel.transform.Find("ContentContainer") ?? forgePanel.transform;
 
             var forgeCur = CreatePanel(forgeContent, "ForgeCurrencies", new Color(0.06f, 0.08f, 0.14f, 0.9f));
+            if (_frameStoneBastion != null)
+            {
+                var fcImg = forgeCur.GetComponent<Image>();
+                fcImg.sprite = _frameStoneBastion;
+                fcImg.type = Image.Type.Sliced;
+                fcImg.color = Color.white;
+            }
             PositionUI(forgeCur, 0.03f, 0.88f, 0.97f, 0.98f);
             var fDustTxt = CreateText(forgeCur.transform, "ForgeDustText", "✨ Dust: 0", 20, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(0.4f, 0.9f, 1f), defaultFont);
             PositionUI(fDustTxt.gameObject, 0.04f, 0.1f, 0.35f, 0.9f);
@@ -1794,29 +1801,78 @@ namespace Rampartbound.Editor
             PositionUI(fGoldTxt.gameObject, 0.66f, 0.1f, 0.96f, 0.9f);
 
             var fRefineTab = CreateButton(forgeContent, "RefineTab", "Tempa (+1)", new Color(0.2f, 0.4f, 0.6f), Color.white, 20, defaultFont);
+            if (_tabHeroActive != null)
+            {
+                var rtImg = fRefineTab.GetComponent<Image>();
+                rtImg.sprite = _tabHeroActive;
+                rtImg.type = Image.Type.Sliced;
+                rtImg.color = Color.white;
+            }
             PositionUI(fRefineTab, 0.04f, 0.77f, 0.33f, 0.86f);
+
             var fRarityTab = CreateButton(forgeContent, "RarityTab", "Promosi Rarity", new Color(0.2f, 0.25f, 0.38f), Color.white, 20, defaultFont);
+            if (_tabHeroInactive != null)
+            {
+                var rartImg = fRarityTab.GetComponent<Image>();
+                rartImg.sprite = _tabHeroInactive;
+                rartImg.type = Image.Type.Sliced;
+                rartImg.color = Color.white;
+            }
             PositionUI(fRarityTab, 0.36f, 0.77f, 0.65f, 0.86f);
+
             var fSalvageTab = CreateButton(forgeContent, "SalvageTab", "Peleburan (Salvage)", new Color(0.2f, 0.25f, 0.38f), Color.white, 20, defaultFont);
+            if (_tabHeroInactive != null)
+            {
+                var stImg = fSalvageTab.GetComponent<Image>();
+                stImg.sprite = _tabHeroInactive;
+                stImg.type = Image.Type.Sliced;
+                stImg.color = Color.white;
+            }
             PositionUI(fSalvageTab, 0.68f, 0.77f, 0.96f, 0.86f);
 
             var fItemPanel = CreatePanel(forgeContent, "SelectedItemPanel", new Color(0.08f, 0.11f, 0.18f, 0.9f));
+            if (_frameStoneBastion != null)
+            {
+                var fipImg = fItemPanel.GetComponent<Image>();
+                fipImg.sprite = _frameStoneBastion;
+                fipImg.type = Image.Type.Sliced;
+                fipImg.color = Color.white;
+            }
             PositionUI(fItemPanel, 0.04f, 0.26f, 0.96f, 0.74f);
+
+            // Wadah slot item landasan tempa semi-3D
+            var fSlotBg = CreatePanel(fItemPanel.transform, "ForgeAnvilSlotBg", Color.white);
+            PositionUI(fSlotBg, 0.05f, 0.58f, 0.24f, 0.92f);
+            if (_slotFrameEmpty != null)
+            {
+                var fsImg = fSlotBg.GetComponent<Image>();
+                fsImg.sprite = _slotFrameEmpty;
+                fsImg.type = Image.Type.Sliced;
+                fsImg.color = Color.white;
+            }
+
             var fItemName = CreateText(fItemPanel.transform, "ItemNameText", "Pedang Baja Ksatria (+0)", 26, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(1f, 0.85f, 0.3f), defaultFont);
-            PositionUI(fItemName.gameObject, 0.05f, 0.80f, 0.95f, 0.95f);
+            PositionUI(fItemName.gameObject, 0.28f, 0.78f, 0.95f, 0.95f);
             var fItemSlot = CreateText(fItemPanel.transform, "ItemSlotText", "Slot: Weapon (Senjata)", 20, FontStyle.Normal, TextAnchor.MiddleLeft, Color.white, defaultFont);
-            PositionUI(fItemSlot.gameObject, 0.05f, 0.65f, 0.50f, 0.78f);
+            PositionUI(fItemSlot.gameObject, 0.28f, 0.62f, 0.60f, 0.76f);
             var fItemRarity = CreateText(fItemPanel.transform, "ItemRarityText", "Kelangkaan: Rare (Langka)", 20, FontStyle.Bold, TextAnchor.MiddleRight, new Color(0.3f, 0.7f, 1f), defaultFont);
-            PositionUI(fItemRarity.gameObject, 0.50f, 0.65f, 0.95f, 0.78f);
+            PositionUI(fItemRarity.gameObject, 0.60f, 0.62f, 0.95f, 0.76f);
 
             var fCurStat = CreateText(fItemPanel.transform, "CurrentStatText", "Stat Saat Ini: Attack +12", 22, FontStyle.Normal, TextAnchor.MiddleLeft, Color.white, defaultFont);
-            PositionUI(fCurStat.gameObject, 0.05f, 0.45f, 0.95f, 0.60f);
+            PositionUI(fCurStat.gameObject, 0.05f, 0.42f, 0.95f, 0.56f);
             var fPreviewStat = CreateText(fItemPanel.transform, "PreviewStatText", "Prediksi Upgrade: Attack +15 (+25%)", 22, FontStyle.Bold, TextAnchor.MiddleLeft, Color.green, defaultFont);
-            PositionUI(fPreviewStat.gameObject, 0.05f, 0.28f, 0.95f, 0.42f);
+            PositionUI(fPreviewStat.gameObject, 0.05f, 0.26f, 0.95f, 0.40f);
             var fCostTxt = CreateText(fItemPanel.transform, "ActionCostText", "Biaya: 1 Refine Stone + 200 Gold", 20, FontStyle.Normal, TextAnchor.MiddleLeft, new Color(1f, 0.85f, 0.2f), defaultFont);
             PositionUI(fCostTxt.gameObject, 0.05f, 0.08f, 0.95f, 0.22f);
 
             var fActionBtn = CreateButton(forgeContent, "ForgeActionBtn", "TEMPA SEKARANG", new Color(0.95f, 0.72f, 0.16f), new Color(0.12f, 0.08f, 0.02f), 26, defaultFont);
+            if (_btnPrimaryGold != null)
+            {
+                var faImg = fActionBtn.GetComponent<Image>();
+                faImg.sprite = _btnPrimaryGold;
+                faImg.type = Image.Type.Sliced;
+                faImg.color = Color.white;
+            }
             PositionUI(fActionBtn, 0.15f, 0.12f, 0.85f, 0.23f);
 
             var fFeedback = CreateText(forgeContent, "ForgeFeedbackText", "", 20, FontStyle.Italic, TextAnchor.MiddleCenter, Color.green, defaultFont);
