@@ -34,6 +34,8 @@ MonoBehaviour:
   preparationTokenSprite: {fileID: 21300000, guid: a185d29303384dcbb8537f5699f5db19, type: 3}
   preparationTokenTier2Sprite: {fileID: 21300000, guid: 142b91eff133faff97b51427dff1232d, type: 3}
   preparationTokenTier3Sprite: {fileID: 21300000, guid: f626a9db376cd50548a17d2c5e6f54cb, type: 3}
+  preparationTokenTier4Sprite: {fileID: 21300000, guid: a185d29303384dcbb8537f5699f5db14, type: 3}
+  preparationTokenTier5Sprite: {fileID: 21300000, guid: a185d29303384dcbb8537f5699f5db15, type: 3}
   skillName: Zephyr Tornado
   skillDescription: Memanggil angin topan yang menyedot monster dan memperlambat pergerakan musuh.
   skillCooldown: 6
