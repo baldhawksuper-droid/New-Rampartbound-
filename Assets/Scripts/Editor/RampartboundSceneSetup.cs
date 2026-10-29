@@ -1074,12 +1074,35 @@ namespace Rampartbound.Editor
             PositionUI(starsTxt.gameObject, 0.65f, 0.52f, 0.97f, 0.95f);
             var starSliderObj = CreateProgressBar(stageTop.transform, "ChapterStarSlider", 0, 30, 0, new Color(1f, 0.82f, 0.2f));
             PositionUI(starSliderObj, 0.03f, 0.1f, 0.5f, 0.45f);
-            var m10Btn = CreateButton(stageTop.transform, "Claim10StarBtn", "🎁 10★", new Color(0.2f, 0.4f, 0.6f), Color.white, 18, defaultFont);
-            PositionUI(m10Btn, 0.53f, 0.08f, 0.67f, 0.48f);
-            var m20Btn = CreateButton(stageTop.transform, "Claim20StarBtn", "🎁 20★", new Color(0.2f, 0.4f, 0.6f), Color.white, 18, defaultFont);
-            PositionUI(m20Btn, 0.69f, 0.08f, 0.83f, 0.48f);
-            var m30Btn = CreateButton(stageTop.transform, "Claim30StarBtn", "👑 30★", new Color(0.5f, 0.35f, 0.1f), new Color(1f, 0.85f, 0.3f), 18, defaultFont);
-            PositionUI(m30Btn, 0.85f, 0.08f, 0.98f, 0.48f);
+            var m10Btn = CreateButton(stageTop.transform, "Claim10StarBtn", "10★", Color.white, Color.white, 16, defaultFont);
+            PositionUI(m10Btn, 0.53f, 0.05f, 0.67f, 0.52f);
+            var m20Btn = CreateButton(stageTop.transform, "Claim20StarBtn", "20★", Color.white, Color.white, 16, defaultFont);
+            PositionUI(m20Btn, 0.69f, 0.05f, 0.83f, 0.52f);
+            var m30Btn = CreateButton(stageTop.transform, "Claim30StarBtn", "30★", Color.white, Color.white, 16, defaultFont);
+            PositionUI(m30Btn, 0.85f, 0.05f, 0.98f, 0.52f);
+
+            Sprite chest10Sp = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Chest_Bronze_Star_10.png");
+            Sprite chest20Sp = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Chest_Silver_Star_20.png");
+            Sprite chest30Sp = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Chest_RoyalGold_Star_30.png");
+
+            if (chest10Sp != null)
+            {
+                var img10 = m10Btn.GetComponent<Image>();
+                img10.sprite = chest10Sp;
+                img10.color = Color.white;
+            }
+            if (chest20Sp != null)
+            {
+                var img20 = m20Btn.GetComponent<Image>();
+                img20.sprite = chest20Sp;
+                img20.color = Color.white;
+            }
+            if (chest30Sp != null)
+            {
+                var img30 = m30Btn.GetComponent<Image>();
+                img30.sprite = chest30Sp;
+                img30.color = Color.white;
+            }
 
             // =========================================================================
             // PETUALANGAN PETA DUNIA (Expedition Adventure Trail Progression Map)

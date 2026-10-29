@@ -303,9 +303,33 @@ namespace FantasyDefense.UI
 
         private void UpdateMilestoneButtons(int currentStars)
         {
-            if (claim10StarButton != null) claim10StarButton.interactable = currentStars >= 10;
-            if (claim20StarButton != null) claim20StarButton.interactable = currentStars >= 20;
-            if (claim30StarButton != null) claim30StarButton.interactable = currentStars >= 30;
+            if (claim10StarButton != null)
+            {
+                claim10StarButton.interactable = currentStars >= 10;
+                var img = claim10StarButton.GetComponent<Image>();
+                if (img != null && img.sprite != null)
+                {
+                    img.color = currentStars >= 10 ? Color.white : new Color(0.6f, 0.6f, 0.6f, 0.85f);
+                }
+            }
+            if (claim20StarButton != null)
+            {
+                claim20StarButton.interactable = currentStars >= 20;
+                var img = claim20StarButton.GetComponent<Image>();
+                if (img != null && img.sprite != null)
+                {
+                    img.color = currentStars >= 20 ? Color.white : new Color(0.6f, 0.6f, 0.6f, 0.85f);
+                }
+            }
+            if (claim30StarButton != null)
+            {
+                claim30StarButton.interactable = currentStars >= 30;
+                var img = claim30StarButton.GetComponent<Image>();
+                if (img != null && img.sprite != null)
+                {
+                    img.color = currentStars >= 30 ? Color.white : new Color(0.6f, 0.6f, 0.6f, 0.85f);
+                }
+            }
         }
 
         public void OnStageNodeClicked(int stageId)
