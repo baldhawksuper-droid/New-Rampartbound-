@@ -1144,17 +1144,47 @@ namespace Rampartbound.Editor
 
             var stageNodeButtonsList = new List<Button>();
             string[] nodeTitles = new string[] {
-                "<b>1-1</b>\nGerbang", "<b>1-2</b>\nLembah", "<b>1-3</b>\nHutan", "<b>1-4</b>\nSungai", "<b>👑 1-5</b>\n<color=#FFD700>Mini-Boss</color>",
-                "<b>1-6</b>\nRawa", "<b>1-7</b>\nJembatan", "<b>1-8</b>\nLereng", "<b>1-9</b>\nKawah", "<b>💀 1-10</b>\n<color=#FF4444>DRAKE BOSS</color>"
+                "<b>1-1</b>", "<b>1-2</b>", "<b>1-3</b>", "<b>1-4</b>", "<b>👑 1-5</b>",
+                "<b>1-6</b>", "<b>1-7</b>", "<b>1-8</b>", "<b>1-9</b>", "<b>💀 1-10</b>"
             };
+
+            Sprite nodeNormalSp = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_StageNode_Normal.png");
+            Sprite nodeMiniBossSp = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_StageNode_MiniBoss.png");
+            Sprite nodeFinalBossSp = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_StageNode_FinalBoss.png");
 
             for (int i = 0; i < 10; i++)
             {
-                Color bColor = (i == 9) ? new Color(0.7f, 0.15f, 0.15f) : ((i == 4) ? new Color(0.65f, 0.45f, 0.15f) : new Color(0.16f, 0.22f, 0.35f));
-                var sBtnObj = CreateButton(stageTrailPanel.transform, $"StageNode_{i + 1}", nodeTitles[i], bColor, Color.white, (i == 4 || i == 9) ? 17 : 16, defaultFont);
+                var sBtnObj = CreateButton(stageTrailPanel.transform, $"StageNode_{i + 1}", nodeTitles[i], Color.white, Color.white, (i == 4 || i == 9) ? 18 : 16, defaultFont);
                 PositionUI(sBtnObj, nodeRects[i].x, nodeRects[i].y, nodeRects[i].z, nodeRects[i].w);
 
-                // Hilangkan border kotak debug kaku yang merusak visual map
+                // Pasang sprite 3D medallion artistik menggantikan kotak oranye kaku
+                var btnImg = sBtnObj.GetComponent<Image>();
+                if (btnImg != null)
+                {
+                    if (i == 9 && nodeFinalBossSp != null)
+                    {
+                        btnImg.sprite = nodeFinalBossSp;
+                        btnImg.color = Color.white;
+                    }
+                    else if (i == 4 && nodeMiniBossSp != null)
+                    {
+                        btnImg.sprite = nodeMiniBossSp;
+                        btnImg.color = Color.white;
+                    }
+                    else if (nodeNormalSp != null)
+                    {
+                        btnImg.sprite = nodeNormalSp;
+                        btnImg.color = Color.white;
+                    }
+                }
+
+                // Format teks label angka stage di dalam node
+                var btnTxt = sBtnObj.GetComponentInChildren<Text>();
+                if (btnTxt != null)
+                {
+                    btnTxt.color = (i == 9) ? new Color(1f, 0.35f, 0.35f) : ((i == 4) ? new Color(1f, 0.85f, 0.25f) : new Color(0.95f, 0.95f, 1f));
+                }
+
                 stageNodeButtonsList.Add(sBtnObj.GetComponent<Button>());
             }
 

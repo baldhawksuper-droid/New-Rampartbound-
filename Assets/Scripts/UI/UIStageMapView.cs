@@ -295,6 +295,8 @@ namespace FantasyDefense.UI
 
                     string bossPrefix = (stageIdx == 5) ? "👑 1-5" : ((stageIdx == 10) ? "💀 1-10" : $"1-{stageIdx}");
                     txt.text = $"<b>{bossPrefix}</b>\n{starStr}";
+                    txt.fontSize = (stageIdx == 5 || stageIdx == 10) ? 17 : 16;
+                    txt.color = (stageIdx == 10) ? new Color(1f, 0.4f, 0.4f) : ((stageIdx == 5) ? new Color(1f, 0.85f, 0.3f) : Color.white);
                 }
             }
         }
