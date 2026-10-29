@@ -581,7 +581,7 @@ namespace FantasyDefense.UI
                 if (allFonts != null && allFonts.Length > 0) defaultFont = allFonts[0];
             }
 
-            // 2. Tombol Melayang (Floating Toggle Button di Pojok Kanan Bawah, bebas benturan dari tombol Exit / Pause di atas)
+            // 2. Tombol Melayang (Floating Toggle Button di Pojok Kanan Bawah, default disembunyikan di production build agar tidak mengganggu UI)
             floatingButtonObj = new GameObject("FloatingLogButton");
             floatingButtonObj.transform.SetParent(canvasObj.transform, false);
 
@@ -612,6 +612,9 @@ namespace FantasyDefense.UI
             floatingButtonText.alignment = TextAnchor.MiddleCenter;
             floatingButtonText.color = Color.white;
             floatingButtonText.text = "🐞 LOG:0";
+
+            // Sembunyikan tombol debug log melayang secara default agar antarmuka bersih dan imersif
+            floatingButtonObj.SetActive(false);
 
             // 3. Jendela Utama Log (Window Panel)
             windowPanel = new GameObject("LogWindowPanel");

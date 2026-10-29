@@ -1059,7 +1059,14 @@ namespace Rampartbound.Editor
             var stageMapView = stageMapPanel.AddComponent<UIStageMapView>();
             var stageContent = stageMapPanel.transform.Find("ContentContainer") ?? stageMapPanel.transform;
 
-            var stageTop = CreatePanel(stageContent, "StageTopHeader", new Color(0.06f, 0.09f, 0.16f, 0.9f));
+            var stageTop = CreatePanel(stageContent, "StageTopHeader", new Color(0.06f, 0.09f, 0.16f, 0.95f));
+            if (_frameStoneBastion != null)
+            {
+                var topImg = stageTop.GetComponent<Image>();
+                topImg.sprite = _frameStoneBastion;
+                topImg.type = Image.Type.Sliced;
+                topImg.color = Color.white;
+            }
             PositionUI(stageTop, 0.02f, 0.85f, 0.98f, 0.98f);
             var chapterTxt = CreateText(stageTop.transform, "ChapterTitle", "Chapter 1: Pertahanan Pinggiran Kerajaan", 24, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(1f, 0.85f, 0.3f), defaultFont);
             PositionUI(chapterTxt.gameObject, 0.03f, 0.52f, 0.65f, 0.95f);
@@ -1067,11 +1074,11 @@ namespace Rampartbound.Editor
             PositionUI(starsTxt.gameObject, 0.65f, 0.52f, 0.97f, 0.95f);
             var starSliderObj = CreateProgressBar(stageTop.transform, "ChapterStarSlider", 0, 30, 0, new Color(1f, 0.82f, 0.2f));
             PositionUI(starSliderObj, 0.03f, 0.1f, 0.5f, 0.45f);
-            var m10Btn = CreateButton(stageTop.transform, "Claim10StarBtn", "10★", new Color(0.2f, 0.4f, 0.6f), Color.white, 18, defaultFont);
+            var m10Btn = CreateButton(stageTop.transform, "Claim10StarBtn", "🎁 10★", new Color(0.2f, 0.4f, 0.6f), Color.white, 18, defaultFont);
             PositionUI(m10Btn, 0.53f, 0.08f, 0.67f, 0.48f);
-            var m20Btn = CreateButton(stageTop.transform, "Claim20StarBtn", "20★", new Color(0.2f, 0.4f, 0.6f), Color.white, 18, defaultFont);
+            var m20Btn = CreateButton(stageTop.transform, "Claim20StarBtn", "🎁 20★", new Color(0.2f, 0.4f, 0.6f), Color.white, 18, defaultFont);
             PositionUI(m20Btn, 0.69f, 0.08f, 0.83f, 0.48f);
-            var m30Btn = CreateButton(stageTop.transform, "Claim30StarBtn", "30★", new Color(0.5f, 0.35f, 0.1f), new Color(1f, 0.85f, 0.3f), 18, defaultFont);
+            var m30Btn = CreateButton(stageTop.transform, "Claim30StarBtn", "👑 30★", new Color(0.5f, 0.35f, 0.1f), new Color(1f, 0.85f, 0.3f), 18, defaultFont);
             PositionUI(m30Btn, 0.85f, 0.08f, 0.98f, 0.48f);
 
             // =========================================================================
@@ -1079,7 +1086,15 @@ namespace Rampartbound.Editor
             // Lintasan jalur dinamis S-Curve dari Gerbang 1-1 hingga Sarang Naga 1-10
             // =========================================================================
             var stageTrailPanel = CreatePanel(stageContent, "StageMapTrailPanel", new Color(0.04f, 0.06f, 0.1f, 0.95f));
-            if (_frameStoneBastion != null)
+            Sprite mapBackdrop = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/WorldMap_Chapter1_Backdrop.png") 
+                              ?? Resources.Load<Sprite>("Sprites/UI/WorldMap_Chapter1_Backdrop");
+            if (mapBackdrop != null)
+            {
+                var trailImg = stageTrailPanel.GetComponent<Image>();
+                trailImg.sprite = mapBackdrop;
+                trailImg.color = Color.white;
+            }
+            else if (_frameStoneBastion != null)
             {
                 var trailImg = stageTrailPanel.GetComponent<Image>();
                 trailImg.sprite = _frameStoneBastion;
@@ -1139,14 +1154,18 @@ namespace Rampartbound.Editor
                 var sBtnObj = CreateButton(stageTrailPanel.transform, $"StageNode_{i + 1}", nodeTitles[i], bColor, Color.white, (i == 4 || i == 9) ? 17 : 16, defaultFont);
                 PositionUI(sBtnObj, nodeRects[i].x, nodeRects[i].y, nodeRects[i].z, nodeRects[i].w);
 
-                if (i == 9) AttachRarityBorder(sBtnObj.transform, _borderLegendary);
-                else if (i == 4) AttachRarityBorder(sBtnObj.transform, _borderEpic);
-                else AttachRarityBorder(sBtnObj.transform, _borderRare ?? _borderCommon);
-
+                // Hilangkan border kotak debug kaku yang merusak visual map
                 stageNodeButtonsList.Add(sBtnObj.GetComponent<Button>());
             }
 
             var detailPanel = CreatePanel(stageContent, "StageDetailPanel", new Color(0.07f, 0.1f, 0.16f, 0.95f));
+            if (_frameStoneBastion != null)
+            {
+                var dImg = detailPanel.GetComponent<Image>();
+                dImg.sprite = _frameStoneBastion;
+                dImg.type = Image.Type.Sliced;
+                dImg.color = Color.white;
+            }
             PositionUI(detailPanel, 0.02f, 0.02f, 0.98f, 0.44f);
             var codeTxt = CreateText(detailPanel.transform, "StageCodeText", "STAGE 1-1", 26, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(0.4f, 0.85f, 1f), defaultFont);
             PositionUI(codeTxt.gameObject, 0.04f, 0.85f, 0.4f, 0.97f);
@@ -1171,6 +1190,13 @@ namespace Rampartbound.Editor
             PositionUI(firstRewardsTxt.gameObject, 0.04f, 0.16f, 0.96f, 0.25f);
 
             var startBattleBtn = CreateButton(detailPanel.transform, "StartBattleButton", "⚔️ MULAI PERTEMPURAN SEKARANG", new Color(0.92f, 0.35f, 0.18f), Color.white, 26, defaultFont);
+            if (_btnBattleCrimson != null)
+            {
+                var sBtnImg = startBattleBtn.GetComponent<Image>();
+                sBtnImg.sprite = _btnBattleCrimson;
+                sBtnImg.type = Image.Type.Sliced;
+                sBtnImg.color = Color.white;
+            }
             PositionUI(startBattleBtn, 0.08f, 0.02f, 0.92f, 0.14f);
 
             var stageSO = new SerializedObject(stageMapView);

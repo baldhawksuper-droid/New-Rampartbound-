@@ -339,12 +339,12 @@ namespace FantasyDefense.UI
             int playerCP = CitadelLobbyManager.Instance != null ? CitadelLobbyManager.Instance.TotalTeamCP : 0;
             int currentEnergy = CitadelLobbyManager.Instance != null ? CitadelLobbyManager.Instance.CurrentEnergy : 0;
 
-            if (stageCodeText != null) stageCodeText.text = stage.stageCode;
-            if (stageTitleText != null) stageTitleText.text = stage.stageTitle;
+            if (stageCodeText != null) stageCodeText.text = $"<b>{stage.stageCode}</b>";
+            if (stageTitleText != null) stageTitleText.text = $"<b>{stage.stageTitle}</b>";
 
             if (battleModeText != null)
             {
-                battleModeText.text = $"Mode Tempur: {stage.GetBattleModeLabel()}";
+                battleModeText.text = $"<color=#00FFFF>⚔️ Mode:</color> <b>{stage.GetBattleModeLabel()}</b>";
             }
 
             if (stageDescriptionText != null)
@@ -355,33 +355,36 @@ namespace FantasyDefense.UI
 
             if (recommendedCpText != null)
             {
-                recommendedCpText.text = $"Rekomendasi CP: {stage.recommendedCP:N0} (Team CP Kamu: {playerCP:N0})";
+                string cpComparison = playerCP >= stage.recommendedCP 
+                    ? $"<color=#00FF66><b>{playerCP:N0}</b> (Unggul!)</color>" 
+                    : $"<color=#FF7777><b>{playerCP:N0}</b> (Waspada!)</color>";
+                recommendedCpText.text = $"Rekomendasi CP: <b>{stage.recommendedCP:N0}</b>  |  Team CP: {cpComparison}";
             }
 
             if (difficultyStatusText != null)
             {
-                difficultyStatusText.text = $"Status: {stage.GetDifficultyLabel(playerCP)}";
+                difficultyStatusText.text = $"Tingkat: <b>{stage.GetDifficultyLabel(playerCP)}</b>";
                 difficultyStatusText.color = stage.GetDifficultyColor(playerCP);
             }
 
             if (energyCostText != null)
             {
-                energyCostText.text = $"Biaya Energi: ⚡ {stage.staminaCost} (Stamina: {currentEnergy}/30)";
-            }
-
-            // Preview Hadiah
-            bool isFirstClear = true;
-            if (CitadelLobbyManager.Instance != null)
-            {
-                var record = CitadelLobbyManager.Instance.AccountData.GetStageRecord(stage.stageId);
-                isFirstClear = !record.isCleared;
+                energyCostText.text = $"Biaya Stamina: <color=#00FFFF>⚡ {stage.staminaCost}</color> (Tersedia: <b>{currentEnergy}/30</b>)";
             }
 
             if (firstClearRewardsText != null)
             {
-                string gearInfo = stage.firstClearGear != null ? $" + {stage.firstClearGear.itemName} ({stage.firstClearGear.rarity})" : "";
-                string tag = isFirstClear ? "<color=#FFD700>[Tersedia]</color>" : "<color=#888888>[Sudah Diklaim]</color>";
-                firstClearRewardsText.text = $"First-Clear: +{stage.firstClearGold} Gold, +{stage.firstClearGems} Gems{gearInfo} {tag}";
+                var accData = CitadelLobbyManager.Instance != null ? CitadelLobbyManager.Instance.AccountData : null;
+                bool isCleared = accData != null && accData.GetStageRecord(stage.stageId)?.isCleared == true;
+
+                if (isCleared)
+                {
+                    firstClearRewardsText.text = $"<color=#888888>Hadiah Pertama: [Sudah Diklaim]</color>";
+                }
+                else
+                {
+                    firstClearRewardsText.text = $"🎁 Hadiah Pertama: <color=#FFD700>+{stage.firstClearGoldReward:N0} Gold</color>, <color=#00FFFF>+{stage.firstClearGemReward:N0} Gems</color> ✨";
+                }
             }
 
             if (repeatRewardsText != null)
