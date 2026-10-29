@@ -1525,9 +1525,15 @@ namespace Rampartbound.Editor
             var sGemsTxt = CreateText(summonContent, "GemsBalanceText", "💎 Saldo Gems: 50", 24, FontStyle.Bold, TextAnchor.MiddleRight, new Color(0.35f, 0.95f, 0.85f), defaultFont);
             PositionUI(sGemsTxt.gameObject, 0.5f, 0.92f, 0.96f, 0.98f);
 
-            var bannerPanel = CreatePanel(summonContent, "FeaturedBanner", new Color(0.12f, 0.2f, 0.32f, 0.9f));
-            PositionUI(bannerPanel, 0.04f, 0.56f, 0.96f, 0.90f);
-            if (_keyVisualBanner != null)
+            var bannerPanel = CreatePanel(summonContent, "AltarBannerPanel", new Color(0.12f, 0.15f, 0.22f, 0.95f));
+            PositionUI(bannerPanel, 0.04f, 0.54f, 0.96f, 0.96f);
+            if (_gachaAltarBackdrop != null)
+            {
+                var banImg = bannerPanel.GetComponent<Image>();
+                banImg.sprite = _gachaAltarBackdrop;
+                banImg.color = Color.white;
+            }
+            else if (_keyVisualBanner != null)
             {
                 var banImg = bannerPanel.GetComponent<Image>();
                 banImg.sprite = _keyVisualBanner;
@@ -1600,13 +1606,27 @@ namespace Rampartbound.Editor
             PositionUI(promoteBtn, 0.15f, 0.03f, 0.85f, 0.16f);
 
             var resModal = CreatePanel(summonPanel.transform, "ResultModalPanel", new Color(0.04f, 0.06f, 0.1f, 0.98f));
-            PositionUI(resModal, 0.05f, 0.15f, 0.95f, 0.85f);
+            if (_frameStoneBastion != null)
+            {
+                var rmImg = resModal.GetComponent<Image>();
+                rmImg.sprite = _frameStoneBastion;
+                rmImg.type = Image.Type.Sliced;
+                rmImg.color = Color.white;
+            }
+            PositionUI(resModal, 0.05f, 0.12f, 0.95f, 0.88f);
             var resSummary = CreateText(resModal.transform, "ResultSummaryText", "Hasil Pemanggilan Pahlawan", 26, FontStyle.Bold, TextAnchor.MiddleCenter, new Color(1f, 0.85f, 0.3f), defaultFont);
-            PositionUI(resSummary.gameObject, 0.05f, 0.82f, 0.95f, 0.96f);
+            PositionUI(resSummary.gameObject, 0.05f, 0.85f, 0.95f, 0.97f);
             var resContainer = CreatePanel(resModal.transform, "ResultCardsContainer", new Color(0, 0, 0, 0));
-            PositionUI(resContainer, 0.05f, 0.18f, 0.95f, 0.80f);
-            var closeResBtn = CreateButton(resModal.transform, "CloseResultBtn", "KEMBALI", new Color(0.2f, 0.5f, 0.7f), Color.white, 24, defaultFont);
-            PositionUI(closeResBtn, 0.25f, 0.04f, 0.75f, 0.14f);
+            PositionUI(resContainer, 0.05f, 0.16f, 0.95f, 0.83f);
+            var closeResBtn = CreateButton(resModal.transform, "CloseResultBtn", "KEMBALI KE ALTAR", new Color(0.2f, 0.5f, 0.7f), Color.white, 24, defaultFont);
+            if (_btnPrimaryGold != null)
+            {
+                var crImg = closeResBtn.GetComponent<Image>();
+                crImg.sprite = _btnPrimaryGold;
+                crImg.type = Image.Type.Sliced;
+                crImg.color = Color.white;
+            }
+            PositionUI(closeResBtn, 0.20f, 0.03f, 0.80f, 0.13f);
             resModal.SetActive(false);
 
             var summonHallSO = new SerializedObject(summonView);
@@ -2353,6 +2373,7 @@ namespace Rampartbound.Editor
         private static Sprite _plinthT1;
         private static Sprite _lobbyBackdrop;
         private static Sprite _keyVisualBanner;
+        private static Sprite _gachaAltarBackdrop;
         private static Sprite _heroCedricSprite;
         private static Sprite _heroRoseSprite;
         private static Sprite _heroRabbitSprite;
@@ -2405,6 +2426,7 @@ namespace Rampartbound.Editor
             if (_plinthT1 == null) _plinthT1 = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Combat/Plinth_Hero_Base_T1.png");
             if (_lobbyBackdrop == null) _lobbyBackdrop = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Citadel_Lobby_Backdrop.png") ?? _titleBackdrop;
             if (_keyVisualBanner == null) _keyVisualBanner = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Rampartbound_KeyVisual_Banner.jpg");
+            if (_gachaAltarBackdrop == null) _gachaAltarBackdrop = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Summon_Altar_Backdrop.png") ?? _keyVisualBanner;
             if (_heroCedricSprite == null) _heroCedricSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Heroes/Cedric_T1.png");
             if (_heroRoseSprite == null) _heroRoseSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Heroes/Rose_T1.png");
             if (_heroRabbitSprite == null) _heroRabbitSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Heroes/RabbitMage_T1.png");
