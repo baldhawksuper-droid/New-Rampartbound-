@@ -229,6 +229,18 @@ namespace FantasyDefense.Summon
             {
                 Debug.LogWarning("[HeroSummoner] Seluruh petak arena penuh! Tidak dapat memanggil hero baru.");
                 OnSummonFailed?.Invoke(SummonFailureReason.GridFull);
+                if (SkillVfxManager.Instance != null)
+                {
+                    Vector3 originPos = (FantasyDefense.UI.SummonButtonUI.Instance != null)
+                        ? FantasyDefense.UI.SummonButtonUI.Instance.transform.position
+                        : Vector3.zero;
+                    SkillVfxManager.Instance.SpawnFloatingText(
+                        originPos,
+                        "⚠️ ARENA PENUH! GABUNGKAN UNIT! ⚠️",
+                        new Color(1f, 0.35f, 0.35f),
+                        1.8f
+                    );
+                }
                 return false;
             }
 
@@ -345,6 +357,20 @@ namespace FantasyDefense.Summon
 
             if (candidateCells.Count == 0)
             {
+                Debug.LogWarning("[HeroSummoner] Seluruh token papan telah mencapai Tier 5! Tidak ada kandidat evolusi lagi.");
+                OnSummonFailed?.Invoke(SummonFailureReason.GridFull);
+                if (SkillVfxManager.Instance != null)
+                {
+                    Vector3 originPos = (FantasyDefense.UI.SummonButtonUI.Instance != null)
+                        ? FantasyDefense.UI.SummonButtonUI.Instance.transform.position
+                        : Vector3.zero;
+                    SkillVfxManager.Instance.SpawnFloatingText(
+                        originPos,
+                        "⭐ SEMUA TOKEN TELAH TIER 5 (MAX)! ⭐",
+                        new Color(1f, 0.85f, 0.2f),
+                        2.0f
+                    );
+                }
                 return false;
             }
 
@@ -414,6 +440,28 @@ namespace FantasyDefense.Summon
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Mengecek apakah ada unit di papan catur yang masih dapat ditingkatkan via Katalis (Tier < Tier 5).
+        /// </summary>
+        public bool HasCatalystCandidate()
+        {
+            if (GridManager.Instance == null || !GridManager.Instance.IsInitialized) return false;
+            int w = GridManager.Instance.GridWidth;
+            int h = GridManager.Instance.GridHeight;
+            for (int x = 0; x < w; x++)
+            {
+                for (int y = 0; y < h; y++)
+                {
+                    var cell = GridManager.Instance.GetCell(x, y);
+                    if (cell != null && cell.IsOccupied && cell.CurrentUnit != null && cell.CurrentUnit.CurrentTier < UnitTier.Tier5)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         /// <summary>

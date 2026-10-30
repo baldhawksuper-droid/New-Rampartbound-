@@ -129,20 +129,35 @@ namespace FantasyDefense.UI
                     UnitType.WindRanger => new Color(0.35f, 0.95f, 0.55f, 0.95f),// Emerald Gale
                     _ => Color.white
                 };
-                StartCoroutine(CardGlowFlashRoutine(widgets.glowOverlayImg, elemColor, 0.38f));
-                StartCoroutine(PunchScaleRoutine(widgets.rootObj.transform, 1.18f, 0.20f));
+                StartCoroutine(CardGlowFlashRoutine(widgets.glowOverlayImg, elemColor, isMax ? 0.65f : 0.38f));
+                StartCoroutine(PunchScaleRoutine(widgets.rootObj.transform, isMax ? 1.28f : 1.18f, 0.22f));
 
-                // Audio denting koin emas khusus pembelian upgrade pertempuran
+                // Audio denting koin emas dan lonceng kristal max level
                 if (Audio.AudioManager.Instance != null)
                 {
                     Audio.AudioManager.Instance.PlaySound(Audio.SoundType.GoldCoinSpend);
+                    if (isMax)
+                    {
+                        Audio.AudioManager.Instance.PlaySound(Audio.SoundType.ArchetypeMaxChime, 1.15f);
+                    }
                 }
 
                 // Respons Haptic Getaran Taktil (Hanya aktif jika pemain menyalakan getaran di pengaturan)
                 if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
                     FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
                 {
-                    FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Light);
+                    var haptic = isMax ? FantasyDefense.Mobile.HapticFeedbackType.Success : FantasyDefense.Mobile.HapticFeedbackType.Light;
+                    FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(haptic);
+                }
+
+                if (isMax && SkillVfxManager.Instance != null)
+                {
+                    SkillVfxManager.Instance.SpawnFloatingText(
+                        widgets.rootObj.transform.position,
+                        "⭐ Lv.5 MAX! ⭐",
+                        new Color(0.95f, 0.98f, 1f),
+                        1.5f
+                    );
                 }
 
                 // Pemicu pendaran cincin aura buff di bawah kaki semua hero bertipe ini di arena

@@ -39,7 +39,8 @@ namespace FantasyDefense.Audio
         BarricadeRepair,
         CatalystThunderZap,
         GoldCoinSpend,
-        ModeSwitchWhoosh
+        ModeSwitchWhoosh,
+        ArchetypeMaxChime
     }
 
     public enum AudioSfxType
@@ -627,6 +628,7 @@ namespace FantasyDefense.Audio
             proceduralClipCache[SoundType.CatalystThunderZap] = CreateToneClip("CatalystThunderZap", 0.36f, 1250f, 85f);
             proceduralClipCache[SoundType.GoldCoinSpend] = CreateArpeggioClip("GoldCoinSpend", new float[] { 1760f, 2637f, 3520f }, 0.045f);
             proceduralClipCache[SoundType.ModeSwitchWhoosh] = CreateToneClip("ModeSwitchWhoosh", 0.42f, 280f, 620f);
+            proceduralClipCache[SoundType.ArchetypeMaxChime] = CreateArpeggioClip("ArchetypeMaxChime", new float[] { 1046.50f, 1318.51f, 1567.98f, 2093.00f, 2637.02f }, 0.055f);
         }
 
         private AudioClip CreateToneClip(string name, float duration, float startFreq, float endFreq)

@@ -1257,7 +1257,7 @@ namespace FantasyDefense.Combat
                 AudioManager.Instance.PlaySound(SoundType.MergeSuccess);
             }
 
-            if (DevicePerformanceManager.Instance != null)
+            if (DevicePerformanceManager.Instance != null && DevicePerformanceManager.Instance.IsHapticsEnabled)
             {
                 var haptic = nextTier >= UnitTier.Tier4 ? HapticFeedbackType.Heavy :
                              (nextTier == UnitTier.Tier3 ? HapticFeedbackType.Medium : HapticFeedbackType.Light);

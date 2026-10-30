@@ -281,7 +281,9 @@ namespace FantasyDefense.UI
                             FantasyDefense.Core.GameManager.Instance.CurrentBattleMode == BattleMode.PuzzlePreparation;
 
             bool canAfford = currentGems >= currentCost;
-            bool gridHasSpace = isPuzzle || (GridManager.Instance == null || !GridManager.Instance.IsGridFull());
+            bool gridHasSpace = isPuzzle
+                ? (HeroSummoner.Instance == null || HeroSummoner.Instance.HasCatalystCandidate())
+                : (GridManager.Instance == null || !GridManager.Instance.IsGridFull());
 
             bool isInteractable = canAfford && gridHasSpace;
 
@@ -302,8 +304,16 @@ namespace FantasyDefense.UI
 
                 if (isPuzzle)
                 {
-                    string label = CitadelLocalizationManager.Text("KATALIS SUMMON", "SUMMON CUBE");
-                    costText.text = $"✦ {label} ✦\n({cost} GEMS)";
+                    bool hasCandidates = (HeroSummoner.Instance == null || HeroSummoner.Instance.HasCatalystCandidate());
+                    if (!hasCandidates)
+                    {
+                        costText.text = CitadelLocalizationManager.Text("⭐ TOKEN MAX", "⭐ MAX TIER");
+                    }
+                    else
+                    {
+                        string label = CitadelLocalizationManager.Text("KATALIS SUMMON", "SUMMON CUBE");
+                        costText.text = $"✦ {label} ✦\n({cost} GEMS)";
+                    }
                 }
                 else if (GridManager.Instance != null && GridManager.Instance.IsGridFull())
                 {
