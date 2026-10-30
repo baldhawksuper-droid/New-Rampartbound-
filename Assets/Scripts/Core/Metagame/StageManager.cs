@@ -225,6 +225,38 @@ namespace FantasyDefense.Metagame
             }
         }
 
+        private MonsterDataSO CreateMonsterData(
+            MonsterType type,
+            string name,
+            float maxHealth,
+            float speed,
+            int castleDamage,
+            int gemsReward,
+            Color themeColor,
+            float visualScale)
+        {
+            var data = ScriptableObject.CreateInstance<MonsterDataSO>();
+            data.monsterType = type;
+            data.monsterName = name;
+            data.maxHealth = maxHealth;
+            data.moveSpeed = speed;
+            data.castleDamage = castleDamage;
+            data.gemsReward = gemsReward;
+            data.themeColor = themeColor;
+            data.visualScale = visualScale;
+
+            string spriteName = type switch
+            {
+                MonsterType.Boss => "Monster_Boss",
+                MonsterType.Brute => "Monster_Brute",
+                _ => "Monster_Creep"
+            };
+
+            data.monsterSprite = Resources.Load<Sprite>($"Sprites/Monsters/{spriteName}");
+            data.monsterWalkSprite = Resources.Load<Sprite>($"Sprites/Monsters/{spriteName}_Walk");
+            return data;
+        }
+
         private List<WaveDataSO> GenerateDefaultWavesForStage(int stageNum, bool isBossStage, string bossName)
         {
             var list = new List<WaveDataSO>();
@@ -234,78 +266,272 @@ namespace FantasyDefense.Metagame
             {
                 var wave = ScriptableObject.CreateInstance<WaveDataSO>();
                 wave.waveNumber = w;
-                wave.bonusGemsOnClear = 20 + (stageNum * 2);
-                wave.restTimeAfterWave = 4.0f;
-
+                wave.bonusGemsOnClear = 25 + (stageNum * 3);
+                wave.restTimeAfterWave = 3.5f;
                 bool isFinalWave = (w == waveCount);
-                if (isFinalWave && isBossStage)
+
+                // Konfigurasi variasi monster spesifik dan unik per Stage (Anti-Membosankan)
+                switch (stageNum)
                 {
-                    wave.waveTitle = $"Wave {w}: BOSS - {bossName}";
+                    case 1: // Stage 1-1: Outpost Meadow (Padang Rumput Depan) - Mode 1 Tutorial
+                        {
+                            var oozeColor = new Color(0.12f, 0.78f, 0.48f); // Hijau Zamrud Slime
+                            wave.waveTitle = w switch {
+                                1 => "Wave 1: Tetesan Awal Gemetite Ooze",
+                                2 => "Wave 2: Serbuan Koloni Slime Meadow",
+                                _ => "Wave 3: Kawanan Gemetite & Pemimpin Slime"
+                            };
 
-                    var minionData = ScriptableObject.CreateInstance<MonsterDataSO>();
-                    minionData.monsterType = MonsterType.Brute;
-                    minionData.monsterName = "Pengawal Abyssal";
-                    minionData.maxHealth = 480f + (stageNum * 45f);
-                    minionData.moveSpeed = 1.15f;
-                    minionData.castleDamage = 12;
-                    minionData.gemsReward = 8;
-                    minionData.monsterSprite = Resources.Load<Sprite>("Sprites/Monsters/Monster_Brute");
-                    minionData.visualScale = 0.28f;
-                    minionData.themeColor = Color.white;
+                            var ooze = CreateMonsterData(MonsterType.Creep, "Gemetite Scout Ooze", 150f, 1.35f, 6, 4, oozeColor, 0.19f);
+                            wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = ooze, count = 4 + (w * 2), spawnInterval = 0.85f, initialDelay = 0.2f });
 
-                    var group1 = new WaveSpawnGroup { monsterData = minionData, count = 4, spawnInterval = 0.9f, initialDelay = 0.2f };
+                            if (isFinalWave)
+                            {
+                                var leader = CreateMonsterData(MonsterType.Brute, "Gemetite Swarm Leader", 360f, 1.15f, 10, 8, new Color(0.06f, 0.65f, 0.38f), 0.26f);
+                                wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = leader, count = 1, spawnInterval = 1.0f, initialDelay = 2.0f });
+                            }
+                        }
+                        break;
 
-                    var bossData = ScriptableObject.CreateInstance<MonsterDataSO>();
-                    bossData.monsterType = MonsterType.Boss;
-                    bossData.monsterName = bossName;
-                    bossData.maxHealth = stageNum == 10 ? 2800f : (1100f + stageNum * 120f);
-                    bossData.moveSpeed = stageNum == 10 ? 0.85f : 1.05f;
-                    bossData.castleDamage = stageNum == 10 ? 35 : 22;
-                    bossData.gemsReward = stageNum == 10 ? 60 : 30;
-                    bossData.visualScale = 0.42f;
-                    bossData.themeColor = Color.white;
-                    bossData.monsterSprite = Resources.Load<Sprite>("Sprites/Monsters/Monster_Boss");
+                    case 2: // Stage 1-2: Fortress Siege (Pengepungan Benteng Batu) - Mode 1 Fusi T2
+                        {
+                            var crystalOozeColor = new Color(0.08f, 0.65f, 0.42f);
+                            wave.waveTitle = w switch {
+                                1 => "Wave 1: Perayap Kristal Gemetite",
+                                2 => "Wave 2: Serbuan Ooze Berzirah Kristal",
+                                _ => "Wave 3: Pasukan Hardened Gemetite Cluster"
+                            };
 
-                    var groupBoss = new WaveSpawnGroup { monsterData = bossData, count = 1, spawnInterval = 1.0f, initialDelay = 2.0f };
+                            var crystalOoze = CreateMonsterData(MonsterType.Creep, "Gemetite Crystal Ooze", 210f, 1.30f, 8, 5, crystalOozeColor, 0.20f);
+                            wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = crystalOoze, count = 5 + (w * 2), spawnInterval = 0.80f, initialDelay = 0.2f });
 
-                    wave.spawnGroups.Add(group1);
-                    wave.spawnGroups.Add(groupBoss);
-                }
-                else
-                {
-                    wave.waveTitle = $"Wave {w}: Serbuan Musuh Wilayah {stageNum}";
-                    var creepData = ScriptableObject.CreateInstance<MonsterDataSO>();
-                    creepData.monsterType = MonsterType.Creep;
-                    creepData.monsterName = $"Serangga Abyssal Lv.{stageNum}";
-                    creepData.maxHealth = 240f + (stageNum * 35f);
-                    creepData.moveSpeed = 1.45f;
-                    creepData.castleDamage = 8;
-                    creepData.gemsReward = 5;
-                    creepData.monsterSprite = Resources.Load<Sprite>("Sprites/Monsters/Monster_Creep");
-                    creepData.visualScale = 0.20f;
-                    creepData.themeColor = Color.white;
+                            if (w >= 2)
+                            {
+                                var cluster = CreateMonsterData(MonsterType.Brute, "Hardened Gemetite Cluster", 480f, 0.95f, 12, 10, new Color(0.04f, 0.52f, 0.32f), 0.27f);
+                                wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = cluster, count = w - 1, spawnInterval = 1.3f, initialDelay = 1.8f });
+                            }
+                        }
+                        break;
 
-                    // Squad rombongan Creep awal
-                    var groupCreeps = new WaveSpawnGroup { monsterData = creepData, count = 6 + (w * 2), spawnInterval = 0.75f, initialDelay = 0.2f };
-                    wave.spawnGroups.Add(groupCreeps);
+                    case 3: // Stage 1-3: Perkemahan Mire Scrapper - Mode 2 Pengenalan Deploy Cepat!
+                        {
+                            var mireColor = new Color(0.55f, 0.78f, 0.18f); // Hijau Lumut / Olive
+                            wave.waveTitle = w switch {
+                                1 => "Wave 1: Pelari Cepat Mire Scrapper",
+                                2 => "Wave 2: Barisan Pengintai Bertameng Kayu",
+                                _ => "Wave 3: Penggempur Mire Chieftain"
+                            };
 
-                    // Sesuai Poin 2: Pada penanda tengkorak (Wave 2+ atau akhir gelombang), musuh lebih kuat (Brute) tiba!
-                    if (w >= 2)
-                    {
-                        var bruteData = ScriptableObject.CreateInstance<MonsterDataSO>();
-                        bruteData.monsterType = MonsterType.Brute;
-                        bruteData.monsterName = $"Panglima Brute Wilayah {stageNum}";
-                        bruteData.maxHealth = 620f + (stageNum * 55f);
-                        bruteData.moveSpeed = 1.15f;
-                        bruteData.castleDamage = 14;
-                        bruteData.gemsReward = 12;
-                        bruteData.monsterSprite = Resources.Load<Sprite>("Sprites/Monsters/Monster_Brute");
-                        bruteData.visualScale = 0.28f;
-                        bruteData.themeColor = Color.white;
+                            var runner = CreateMonsterData(MonsterType.Creep, "Mire Runner Scrapper", 230f, 1.55f, 8, 5, mireColor, 0.21f);
+                            wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = runner, count = 6 + (w * 2), spawnInterval = 0.75f, initialDelay = 0.2f });
 
-                        var groupBrute = new WaveSpawnGroup { monsterData = bruteData, count = w, spawnInterval = 1.4f, initialDelay = 2.0f };
-                        wave.spawnGroups.Add(groupBrute);
-                    }
+                            if (w >= 2)
+                            {
+                                var chief = CreateMonsterData(MonsterType.Brute, "Mire Chieftain", 680f, 1.10f, 14, 12, new Color(0.42f, 0.62f, 0.12f), 0.28f);
+                                wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = chief, count = w - 1, spawnInterval = 1.2f, initialDelay = 2.0f });
+                            }
+                        }
+                        break;
+
+                    case 4: // Stage 1-4: Menara Pantau Runtuh - Mode 2 Rawa Berat & Jangkar
+                        {
+                            var swampColor = new Color(0.38f, 0.58f, 0.12f);
+                            wave.waveTitle = w switch {
+                                1 => "Wave 1: Sergapan Kilat Penyusup Rawa",
+                                2 => "Wave 2: Regu Penghancur Berpelindung",
+                                _ => "Wave 3: Barisan Algojo Mire Anchor Flailer"
+                            };
+
+                            var horned = CreateMonsterData(MonsterType.Creep, "Mire Horned Scrapper", 270f, 1.45f, 9, 6, swampColor, 0.21f);
+                            wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = horned, count = 7 + (w * 2), spawnInterval = 0.75f, initialDelay = 0.2f });
+
+                            if (w >= 2)
+                            {
+                                var flailer = CreateMonsterData(MonsterType.Brute, "Mire Anchor Flailer", 780f, 1.05f, 16, 14, new Color(0.30f, 0.48f, 0.08f), 0.29f);
+                                wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = flailer, count = w, spawnInterval = 1.3f, initialDelay = 1.8f });
+                            }
+                        }
+                        break;
+
+                    case 5: // Stage 1-5: Lembah Obsidian Maw [MINI-BOSS CHECKPOINT] - 4 Wave Magma!
+                        {
+                            var lavaColor = new Color(0.98f, 0.45f, 0.12f); // Oranye Magma Panas
+                            if (isFinalWave)
+                            {
+                                wave.waveTitle = $"Wave 4: MINI-BOSS - {bossName}";
+                                var brawler = CreateMonsterData(MonsterType.Brute, "Obsidian Maw Brawler", 880f, 1.00f, 16, 14, lavaColor, 0.29f);
+                                wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = brawler, count = 3, spawnInterval = 1.0f, initialDelay = 0.2f });
+
+                                var miniBoss = CreateMonsterData(MonsterType.Boss, bossName, 2200f, 0.90f, 26, 35, new Color(0.92f, 0.35f, 0.08f), 0.46f);
+                                wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = miniBoss, count = 1, spawnInterval = 1.0f, initialDelay = 2.2f });
+                            }
+                            else
+                            {
+                                wave.waveTitle = w switch {
+                                    1 => "Wave 1: Bara Pasukan Obsidian Lava Imp",
+                                    2 => "Wave 2: Semburan Lahar Lembah Magma",
+                                    _ => "Wave 3: Garda Pertahanan Brawler Obsidian"
+                                };
+
+                                var imp = CreateMonsterData(MonsterType.Creep, "Obsidian Lava Imp", 290f, 1.60f, 10, 6, lavaColor, 0.21f);
+                                wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = imp, count = 8 + (w * 2), spawnInterval = 0.70f, initialDelay = 0.2f });
+
+                                if (w >= 2)
+                                {
+                                    var brawler = CreateMonsterData(MonsterType.Brute, "Obsidian Maw Brawler", 820f, 1.00f, 15, 12, new Color(0.85f, 0.38f, 0.10f), 0.28f);
+                                    wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = brawler, count = w - 1, spawnInterval = 1.4f, initialDelay = 2.0f });
+                                }
+                            }
+                        }
+                        break;
+
+                    case 6: // Stage 1-6: Persimpangan Terkutuk - Mode 2 Bayangan Cepat Astral
+                        {
+                            var shadowColor = new Color(0.62f, 0.42f, 0.95f); // Ungu Violet Astral
+                            wave.waveTitle = w switch {
+                                1 => "Wave 1: Sergapan Kilat Shadow Wisp Scout",
+                                2 => "Wave 2: Badai Bayangan Abyssal Wisp",
+                                _ => "Wave 3: Gelombang Teror Greater Shadow Strider"
+                            };
+
+                            var wisp = CreateMonsterData(MonsterType.Creep, "Shadow Wisp Scout", 280f, 1.80f, 9, 6, shadowColor, 0.21f);
+                            wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = wisp, count = 9 + (w * 2), spawnInterval = 0.65f, initialDelay = 0.2f });
+
+                            if (w >= 2)
+                            {
+                                var strider = CreateMonsterData(MonsterType.Brute, "Greater Shadow Strider", 920f, 1.15f, 16, 14, new Color(0.48f, 0.28f, 0.82f), 0.29f);
+                                wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = strider, count = w, spawnInterval = 1.2f, initialDelay = 1.8f });
+                            }
+                        }
+                        break;
+
+                    case 7: // Stage 1-7: Reruntuhan Kuil Kuno - Mode 1 Puzzle Kuil Berbatu
+                        {
+                            var templeColor = new Color(0.22f, 0.72f, 0.92f); // Biru Safir Kuno
+                            wave.waveTitle = w switch {
+                                1 => "Wave 1: Penjaga Sprites Kuil Kuno",
+                                2 => "Wave 2: Rombongan Pengawal Kuil Runtuh",
+                                _ => "Wave 3: Golem Batu Rune Golem Guardian"
+                            };
+
+                            var sprite = CreateMonsterData(MonsterType.Creep, "Ancient Temple Sprite", 320f, 1.45f, 10, 7, templeColor, 0.22f);
+                            wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = sprite, count = 8 + (w * 2), spawnInterval = 0.75f, initialDelay = 0.2f });
+
+                            if (w >= 2)
+                            {
+                                var golem = CreateMonsterData(MonsterType.Brute, "Rune Golem Guardian", 1020f, 0.95f, 18, 15, new Color(0.15f, 0.55f, 0.78f), 0.30f);
+                                wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = golem, count = w, spawnInterval = 1.3f, initialDelay = 2.0f });
+                            }
+                        }
+                        break;
+
+                    case 8: // Stage 1-8: Punggungan Bukit Karang - Mode 2 Swarm + Brute Campuran
+                        {
+                            var cragColor = new Color(0.85f, 0.52f, 0.12f); // Kuning Amber / Perunggu Karang
+                            wave.waveTitle = w switch {
+                                1 => "Wave 1: Perayap Karang Crag Skitterer",
+                                2 => "Wave 2: Serbuan Serempak Karang Terjal",
+                                _ => "Wave 3: Benteng Hidup Cragridge Brute"
+                            };
+
+                            var skitterer = CreateMonsterData(MonsterType.Creep, "Crag Skitterer", 350f, 1.60f, 11, 7, cragColor, 0.22f);
+                            wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = skitterer, count = 9 + (w * 2), spawnInterval = 0.70f, initialDelay = 0.2f });
+
+                            if (w >= 2)
+                            {
+                                var brute = CreateMonsterData(MonsterType.Brute, "Cragridge Brute", 1120f, 1.05f, 18, 15, new Color(0.70f, 0.40f, 0.08f), 0.30f);
+                                wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = brute, count = w, spawnInterval = 1.2f, initialDelay = 1.8f });
+                            }
+                        }
+                        break;
+
+                    case 9: // Stage 1-9: Gerbang Benteng Kehampaan - Mode 2 Garda Elit Sebelum Bos
+                        {
+                            var voidColor = new Color(0.35f, 0.32f, 0.88f); // Indigo Kehampaan
+                            wave.waveTitle = w switch {
+                                1 => "Wave 1: Pasukan Penyusup Void Infiltrator",
+                                2 => "Wave 2: Barisan Pelindung Gerbang Kehampaan",
+                                _ => "Wave 3: Pengawal Setia Abyssal Void Guard"
+                            };
+
+                            var infiltrator = CreateMonsterData(MonsterType.Creep, "Void Gate Infiltrator", 380f, 1.55f, 12, 8, voidColor, 0.23f);
+                            wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = infiltrator, count = 10 + (w * 2), spawnInterval = 0.70f, initialDelay = 0.2f });
+
+                            if (w >= 2)
+                            {
+                                var guard = CreateMonsterData(MonsterType.Brute, "Abyssal Void Guard", 1250f, 1.10f, 20, 16, new Color(0.25f, 0.22f, 0.75f), 0.31f);
+                                wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = guard, count = w, spawnInterval = 1.2f, initialDelay = 1.8f });
+                            }
+                        }
+                        break;
+
+                    case 10: // Stage 1-10: Sarang Malakor [FINAL BOSS CHAPTER 1] - 5 Gelombang Puncak!
+                        {
+                            var bossTheme = new Color(0.32f, 0.22f, 0.72f);
+                            if (isFinalWave)
+                            {
+                                wave.waveTitle = $"Wave 5: FINAL CLIMAX - {bossName}";
+                                var eliteGuard = CreateMonsterData(MonsterType.Brute, "Abyssal Void Guard", 1380f, 1.05f, 20, 18, new Color(0.25f, 0.22f, 0.75f), 0.32f);
+                                wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = eliteGuard, count = 4, spawnInterval = 0.9f, initialDelay = 0.2f });
+
+                                var finalBoss = CreateMonsterData(MonsterType.Boss, bossName, 3200f, 0.78f, 40, 80, bossTheme, 0.52f);
+                                wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = finalBoss, count = 1, spawnInterval = 1.0f, initialDelay = 2.5f });
+                            }
+                            else
+                            {
+                                wave.waveTitle = w switch {
+                                    1 => "Wave 1: Garda Depan Gabungan Slime & Goblin",
+                                    2 => "Wave 2: Badai Bayangan & Api Kehampaan",
+                                    3 => "Wave 3: Pasukan Inti Void Infiltrator",
+                                    _ => "Wave 4: Benteng Besi Obsidian Juggernaut"
+                                };
+
+                                if (w == 1)
+                                {
+                                    var ooze = CreateMonsterData(MonsterType.Creep, "Gemetite Crystal Ooze", 340f, 1.45f, 10, 6, new Color(0.08f, 0.65f, 0.42f), 0.22f);
+                                    wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = ooze, count = 8, spawnInterval = 0.75f, initialDelay = 0.2f });
+                                    var horned = CreateMonsterData(MonsterType.Creep, "Mire Horned Scrapper", 360f, 1.40f, 11, 7, new Color(0.55f, 0.78f, 0.18f), 0.22f);
+                                    wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = horned, count = 4, spawnInterval = 0.85f, initialDelay = 1.5f });
+                                }
+                                else if (w == 2)
+                                {
+                                    var wisp = CreateMonsterData(MonsterType.Creep, "Shadow Wisp Scout", 360f, 1.70f, 11, 7, new Color(0.62f, 0.42f, 0.95f), 0.22f);
+                                    wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = wisp, count = 10, spawnInterval = 0.65f, initialDelay = 0.2f });
+                                    var imp = CreateMonsterData(MonsterType.Creep, "Obsidian Lava Imp", 380f, 1.60f, 12, 7, new Color(0.98f, 0.45f, 0.12f), 0.22f);
+                                    wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = imp, count = 4, spawnInterval = 0.75f, initialDelay = 1.6f });
+                                }
+                                else if (w == 3)
+                                {
+                                    var inf = CreateMonsterData(MonsterType.Creep, "Void Gate Infiltrator", 410f, 1.55f, 13, 8, new Color(0.35f, 0.32f, 0.88f), 0.23f);
+                                    wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = inf, count = 12, spawnInterval = 0.68f, initialDelay = 0.2f });
+                                    var guard = CreateMonsterData(MonsterType.Brute, "Abyssal Void Guard", 1250f, 1.10f, 18, 16, new Color(0.25f, 0.22f, 0.75f), 0.31f);
+                                    wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = guard, count = 3, spawnInterval = 1.2f, initialDelay = 2.0f });
+                                }
+                                else // w == 4
+                                {
+                                    var inf = CreateMonsterData(MonsterType.Creep, "Void Gate Infiltrator", 440f, 1.50f, 14, 8, new Color(0.35f, 0.32f, 0.88f), 0.23f);
+                                    wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = inf, count = 12, spawnInterval = 0.65f, initialDelay = 0.2f });
+                                    var juggernaut = CreateMonsterData(MonsterType.Brute, "Obsidian Juggernaut", 1450f, 1.00f, 22, 20, new Color(0.85f, 0.32f, 0.08f), 0.33f);
+                                    wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = juggernaut, count = 4, spawnInterval = 1.3f, initialDelay = 2.0f });
+                                }
+                            }
+                        }
+                        break;
+
+                    default: // Fallback prosedur jika ada stage tambahan
+                        {
+                            var defColor = Color.white;
+                            wave.waveTitle = $"Wave {w}: Serbuan Wilayah {stageNum}";
+                            var creep = CreateMonsterData(MonsterType.Creep, $"Penyusup Wilayah {stageNum}", 240f + (stageNum * 35f), 1.45f, 8, 5, defColor, 0.20f);
+                            wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = creep, count = 6 + (w * 2), spawnInterval = 0.75f, initialDelay = 0.2f });
+
+                            if (w >= 2)
+                            {
+                                var brute = CreateMonsterData(MonsterType.Brute, $"Pengawal Wilayah {stageNum}", 620f + (stageNum * 55f), 1.15f, 14, 12, defColor, 0.28f);
+                                wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = brute, count = w, spawnInterval = 1.4f, initialDelay = 2.0f });
+                            }
+                        }
+                        break;
                 }
 
                 list.Add(wave);
