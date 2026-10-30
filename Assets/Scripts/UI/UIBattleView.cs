@@ -479,7 +479,7 @@ namespace FantasyDefense.UI
 
             if (bottomDockView != null)
             {
-                bottomDockView.gameObject.SetActive(true);
+                bottomDockView.AnimateSlideIn(0.35f);
                 bottomDockView.RefreshAllCards();
             }
         }
@@ -1428,6 +1428,11 @@ namespace FantasyDefense.UI
                 victoryPanel.SetActive(true);
             }
 
+            if (bottomDockView != null)
+            {
+                bottomDockView.AnimateSlideOut(0.35f);
+            }
+
             // Hitung rating bintang berdasarkan sisa persentase HP benteng
             int currentHp = CastleBarricade.Instance != null ? CastleBarricade.Instance.CurrentHealth : 100;
             int maxHp = CastleBarricade.Instance != null ? CastleBarricade.Instance.MaxHealth : 100;
@@ -1502,6 +1507,11 @@ namespace FantasyDefense.UI
             if (defeatPanel != null)
             {
                 defeatPanel.SetActive(true);
+            }
+
+            if (bottomDockView != null)
+            {
+                bottomDockView.AnimateSlideOut(0.35f);
             }
 
             Debug.Log("[UIBattleView] Defeat Dialog Muncul! Pertahanan benteng gagal.");

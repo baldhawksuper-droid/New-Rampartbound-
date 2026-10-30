@@ -56,9 +56,10 @@ namespace FantasyDefense.UI
 
         private void OnEnable()
         {
+            hasTriggeredAllMaxHarmony = false;
             EconomyManager.OnBattleGoldChanged += HandleBattleGoldChanged;
             BattleArchetypeManager.OnArchetypeUpgraded += HandleArchetypeUpgraded;
-            BattleArchetypeManager.OnArchetypesReset += RefreshAllCards;
+            BattleArchetypeManager.OnArchetypesReset += HandleArchetypesReset;
             CitadelLocalizationManager.OnLanguageChanged += HandleLanguageChanged;
 
             RefreshAllCards();
@@ -68,8 +69,14 @@ namespace FantasyDefense.UI
         {
             EconomyManager.OnBattleGoldChanged -= HandleBattleGoldChanged;
             BattleArchetypeManager.OnArchetypeUpgraded -= HandleArchetypeUpgraded;
-            BattleArchetypeManager.OnArchetypesReset -= RefreshAllCards;
+            BattleArchetypeManager.OnArchetypesReset -= HandleArchetypesReset;
             CitadelLocalizationManager.OnLanguageChanged -= HandleLanguageChanged;
+        }
+
+        private void HandleArchetypesReset()
+        {
+            hasTriggeredAllMaxHarmony = false;
+            RefreshAllCards();
         }
 
         private void HandleLanguageChanged(AppLanguage lang)
@@ -153,6 +160,7 @@ namespace FantasyDefense.UI
             }
 
             UpdateCardButtonStates();
+            CheckAllMaxHarmony();
         }
 
         public void RefreshAllCards()
@@ -728,5 +736,122 @@ namespace FantasyDefense.UI
                 if (activeTooltipObj == tooltip) activeTooltipObj = null;
             }
         }
+
+        #region Dock Slide In / Out (Point 2)
+
+        private Coroutine slideCoroutine;
+
+        public void AnimateSlideOut(float duration = 0.35f)
+        {
+            if (dockRoot == null) dockRoot = GetComponent<RectTransform>();
+            if (slideCoroutine != null) StopCoroutine(slideCoroutine);
+            slideCoroutine = StartCoroutine(SlideDockRoutine(dockRoot.anchoredPosition, new Vector2(0f, -180f), duration, false));
+        }
+
+        public void AnimateSlideIn(float duration = 0.35f)
+        {
+            if (dockRoot == null) dockRoot = GetComponent<RectTransform>();
+            if (slideCoroutine != null) StopCoroutine(slideCoroutine);
+            gameObject.SetActive(true);
+            slideCoroutine = StartCoroutine(SlideDockRoutine(dockRoot.anchoredPosition, Vector2.zero, duration, true));
+        }
+
+        private System.Collections.IEnumerator SlideDockRoutine(Vector2 startPos, Vector2 targetPos, float duration, bool activateAtEnd)
+        {
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+                float smoothT = Mathf.SmoothStep(0f, 1f, t);
+                if (dockRoot != null)
+                {
+                    dockRoot.anchoredPosition = Vector2.Lerp(startPos, targetPos, smoothT);
+                }
+                yield return null;
+            }
+            if (dockRoot != null) dockRoot.anchoredPosition = targetPos;
+            if (!activateAtEnd)
+            {
+                gameObject.SetActive(false);
+            }
+        }
+
+        #endregion
+
+        #region All 4 Classes Max Bastion Harmony (Point 3)
+
+        private bool hasTriggeredAllMaxHarmony = false;
+
+        private void CheckAllMaxHarmony()
+        {
+            if (hasTriggeredAllMaxHarmony || BattleArchetypeManager.Instance == null) return;
+
+            UnitType[] types = { UnitType.RabbitMage, UnitType.Cedric, UnitType.RoseTanker, UnitType.WindRanger };
+            foreach (var type in types)
+            {
+                if (!BattleArchetypeManager.Instance.IsMaxLevel(type))
+                {
+                    return;
+                }
+            }
+
+            hasTriggeredAllMaxHarmony = true;
+            StartCoroutine(AllMaxHarmonyCelebrationRoutine());
+        }
+
+        private System.Collections.IEnumerator AllMaxHarmonyCelebrationRoutine()
+        {
+            if (Audio.AudioManager.Instance != null)
+            {
+                Audio.AudioManager.Instance.PlaySound(Audio.SoundType.GachaLegendary, 1.20f);
+            }
+
+            // Prismatic rainbow shimmer on all cards
+            Color[] rainbowColors = {
+                new Color(0.35f, 0.95f, 1f, 0.95f),   // Cyan
+                new Color(1f, 0.45f, 0.25f, 0.95f),   // Crimson
+                new Color(1f, 0.85f, 0.20f, 0.95f),   // Amber Gold
+                new Color(0.40f, 0.95f, 0.60f, 0.95f) // Emerald
+            };
+
+            int cIdx = 0;
+            foreach (var kvp in heroCards)
+            {
+                if (kvp.Value != null)
+                {
+                    Color rColor = rainbowColors[cIdx % rainbowColors.Length];
+                    if (kvp.Value.glowOverlayImg != null)
+                    {
+                        StartCoroutine(CardGlowFlashRoutine(kvp.Value.glowOverlayImg, rColor, 0.85f));
+                    }
+                    if (kvp.Value.rootObj != null)
+                    {
+                        StartCoroutine(PunchScaleRoutine(kvp.Value.rootObj.transform, 1.25f, 0.30f));
+                    }
+                    cIdx++;
+                }
+            }
+
+            if (SkillVfxManager.Instance != null)
+            {
+                SkillVfxManager.Instance.SpawnFloatingText(
+                    Vector3.zero,
+                    "🌟 HARMONI BASTION PURNA: SEMUA KELAS MAX! 🌟",
+                    new Color(1f, 0.92f, 0.35f),
+                    2.2f
+                );
+            }
+
+            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+            {
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Success);
+            }
+
+            yield return null;
+        }
+
+        #endregion
     }
 }

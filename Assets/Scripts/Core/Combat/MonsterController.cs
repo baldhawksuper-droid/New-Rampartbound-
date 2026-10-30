@@ -112,11 +112,18 @@ namespace FantasyDefense.Combat
         {
             if (!ActiveMonsters.Contains(this))
                 ActiveMonsters.Add(this);
+
+            EconomyManager.OnBattleGoldChanged += UpdateBountyHint;
+            if (EconomyManager.Instance != null)
+            {
+                UpdateBountyHint(EconomyManager.Instance.CurrentBattleGold);
+            }
         }
 
         protected virtual void OnDisable()
         {
             ActiveMonsters.Remove(this);
+            EconomyManager.OnBattleGoldChanged -= UpdateBountyHint;
         }
 
         [Header("Formation Spread & Depth Sorting")]
@@ -616,6 +623,11 @@ namespace FantasyDefense.Combat
                 Destroy(miniHpBarRoot);
             }
 
+            if (bountyHintObj != null)
+            {
+                Destroy(bountyHintObj);
+            }
+
             // Segera hapus dari daftar monster aktif agar sinkronisasi jumlah musuh akurat seketika
             ActiveMonsters.Remove(this);
 
@@ -879,6 +891,63 @@ namespace FantasyDefense.Combat
             {
                 miniHpBarFillRenderer.color = new Color(0.95f, 0.22f, 0.22f, 1f);
             }
+        }
+
+        #endregion
+
+        #region Low Gold Bounty Indicator (Point 1)
+
+        protected GameObject bountyHintObj;
+
+        protected virtual void UpdateBountyHint(int currentGold)
+        {
+            if (isDead) return;
+
+            bool isHighBounty = (this is BossMonsterController) || (eliteAffix != null);
+            bool shouldShow = isHighBounty && (currentGold < 50);
+
+            if (!shouldShow)
+            {
+                if (bountyHintObj != null && bountyHintObj.activeSelf)
+                {
+                    bountyHintObj.SetActive(false);
+                }
+                return;
+            }
+
+            if (bountyHintObj == null)
+            {
+                bountyHintObj = new GameObject("BountyGoldHint");
+                bountyHintObj.transform.SetParent(transform, false);
+
+                float invScaleX = 1f / Mathf.Max(0.01f, baseScale.x);
+                float invScaleY = 1f / Mathf.Max(0.01f, baseScale.y);
+                bountyHintObj.transform.localScale = new Vector3(invScaleX, invScaleY, 1f);
+
+                float headOffset = (spriteRenderer != null && spriteRenderer.sprite != null)
+                    ? (spriteRenderer.sprite.bounds.extents.y * baseScale.y + 0.35f)
+                    : 0.65f;
+                bountyHintObj.transform.localPosition = new Vector3(0f, headOffset * invScaleY, 0f);
+
+                var txtMesh = bountyHintObj.AddComponent<TextMesh>();
+                txtMesh.fontSize = 24;
+                txtMesh.characterSize = 0.055f;
+                txtMesh.anchor = TextAnchor.MiddleCenter;
+                txtMesh.alignment = TextAlignment.Center;
+                txtMesh.fontStyle = FontStyle.Bold;
+                txtMesh.color = new Color(1f, 0.88f, 0.25f, 0.95f);
+                int rewardAmt = (this is BossMonsterController) ? 120 : 35;
+                txtMesh.text = $"💰 +{rewardAmt}G";
+
+                var mr = bountyHintObj.GetComponent<MeshRenderer>();
+                if (mr != null)
+                {
+                    mr.sortingLayerName = "UI";
+                    mr.sortingOrder = 360;
+                }
+            }
+
+            bountyHintObj.SetActive(true);
         }
 
         #endregion
