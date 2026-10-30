@@ -635,6 +635,8 @@ namespace FantasyDefense.Combat
             if (EconomyManager.Instance != null && reward > 0)
             {
                 EconomyManager.Instance.AddGems(reward);
+                int goldReward = (this is BossMonsterController) ? 120 : (eliteAffix != null ? 35 : 15);
+                EconomyManager.Instance.AddBattleGold(goldReward);
             }
 
             OnMonsterKilled?.Invoke(this);

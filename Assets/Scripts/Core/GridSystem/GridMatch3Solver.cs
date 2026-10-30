@@ -980,6 +980,8 @@ namespace FantasyDefense.GridSystem
             if (EconomyManager.Instance != null && awardedGems > 0)
             {
                 EconomyManager.Instance.AddGems(awardedGems);
+                int awardedGold = 10 * Mathf.Max(1, comboChain) * sizeMultiplier;
+                EconomyManager.Instance.AddBattleGold(awardedGold);
             }
 
             string shapeDesc = cluster.isIntersection ? "Bentuk L/T/+" : $"{matchCount}-sebaris";

@@ -87,8 +87,11 @@ namespace FantasyDefense.UI
             int currentCost = EconomyManager.Instance.GetCurrentSummonCost();
             int currentGems = EconomyManager.Instance.CurrentGems;
 
+            bool isPuzzle = FantasyDefense.Core.GameManager.Instance != null &&
+                            FantasyDefense.Core.GameManager.Instance.CurrentBattleMode == BattleMode.PuzzlePreparation;
+
             bool canAfford = currentGems >= currentCost;
-            bool gridHasSpace = GridManager.Instance == null || !GridManager.Instance.IsGridFull();
+            bool gridHasSpace = isPuzzle || (GridManager.Instance == null || !GridManager.Instance.IsGridFull());
 
             bool isInteractable = canAfford && gridHasSpace;
 
@@ -104,14 +107,22 @@ namespace FantasyDefense.UI
         {
             if (costText != null)
             {
-                if (GridManager.Instance != null && GridManager.Instance.IsGridFull())
+                bool isPuzzle = FantasyDefense.Core.GameManager.Instance != null &&
+                                FantasyDefense.Core.GameManager.Instance.CurrentBattleMode == BattleMode.PuzzlePreparation;
+
+                if (isPuzzle)
+                {
+                    string label = CitadelLocalizationManager.Text("KATALIS SUMMON", "SUMMON CUBE");
+                    costText.text = $"✦ {label} ✦\n({cost} GEMS)";
+                }
+                else if (GridManager.Instance != null && GridManager.Instance.IsGridFull())
                 {
                     costText.text = CitadelLocalizationManager.Text("GRID PENUH", "GRID FULL");
                 }
                 else
                 {
                     string summonLabel = CitadelLocalizationManager.Text("PANGGIL HERO", "SUMMON HERO");
-                    costText.text = $"{summonLabel}\n({cost} GEMS)";
+                    costText.text = $"✦ {summonLabel} ✦\n({cost} GEMS)";
                 }
             }
         }

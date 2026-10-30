@@ -18,12 +18,15 @@ namespace FantasyDefense.Economy
         [Header("Runtime State")]
         [SerializeField] private int currentGems = 100;
         [SerializeField] private int totalSummonsCount = 0;
+        [SerializeField] private int currentBattleGold = 500;
 
         public int CurrentGems => currentGems;
         public int TotalSummonsCount => totalSummonsCount;
+        public int CurrentBattleGold => currentBattleGold;
 
         public static event Action<int> OnGemsChanged;
         public static event Action<int> OnSummonCostChanged;
+        public static event Action<int> OnBattleGoldChanged;
 
         private void Awake()
         {
@@ -53,9 +56,15 @@ namespace FantasyDefense.Economy
             }
             currentGems = config.startingGems + startingBonus;
             totalSummonsCount = 0;
+            currentBattleGold = 500;
 
             OnGemsChanged?.Invoke(currentGems);
             OnSummonCostChanged?.Invoke(GetCurrentSummonCost());
+            OnBattleGoldChanged?.Invoke(currentBattleGold);
+            if (Combat.BattleArchetypeManager.Instance != null)
+            {
+                Combat.BattleArchetypeManager.Instance.ResetAllArchetypes();
+            }
         }
 
         /// <summary>
@@ -112,10 +121,27 @@ namespace FantasyDefense.Economy
         public void AddGold(int amount)
         {
             if (amount <= 0) return;
+            AddBattleGold(amount);
             if (FantasyDefense.Metagame.CitadelLobbyManager.Instance != null)
             {
                 FantasyDefense.Metagame.CitadelLobbyManager.Instance.AddGold(amount);
             }
+        }
+
+        public void AddBattleGold(int amount)
+        {
+            if (amount <= 0) return;
+            currentBattleGold += amount;
+            OnBattleGoldChanged?.Invoke(currentBattleGold);
+        }
+
+        public bool SpendBattleGold(int amount)
+        {
+            if (amount <= 0) return true;
+            if (currentBattleGold < amount) return false;
+            currentBattleGold -= amount;
+            OnBattleGoldChanged?.Invoke(currentBattleGold);
+            return true;
         }
 
         public void DeductGems(int amount)

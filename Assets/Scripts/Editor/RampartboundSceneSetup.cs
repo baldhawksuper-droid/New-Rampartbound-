@@ -387,6 +387,9 @@ namespace Rampartbound.Editor
             if (autoStartProp != null) autoStartProp.boolValue = false;
             gmSO.ApplyModifiedProperties();
 
+            // In-Battle Archetype Upgrade Manager (Opsi B: Sinergis)
+            gmObj.AddComponent<FantasyDefense.Combat.BattleArchetypeManager>();
+
             // 8. Master UI Canvas & Font (Menggunakan Arcade Comic Font: Lilita One)
             Font defaultFont = AssetDatabase.LoadAssetAtPath<Font>("Assets/Resources/Fonts/LilitaOne-Regular.ttf");
             if (defaultFont == null) defaultFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
@@ -860,8 +863,8 @@ namespace Rampartbound.Editor
             bbRect.anchorMin = new Vector2(0f, 0f);
             bbRect.anchorMax = new Vector2(1f, 0f);
             bbRect.pivot = new Vector2(0.5f, 0f);
-            bbRect.anchoredPosition = new Vector2(0, 18);
-            bbRect.sizeDelta = new Vector2(-40, 56);
+            bbRect.anchoredPosition = new Vector2(0, 142);
+            bbRect.sizeDelta = new Vector2(-40, 44);
 
             // Castle Barricade HP Slider di Bawah dengan Visual Jelas (Background, Fill & Label HP)
             var hpSliderObj = CreateProgressBar(bottomBarricadeObj.transform, "CastleHpSlider", 0, 100, 100, new Color(0.22f, 0.85f, 0.38f));
@@ -871,20 +874,30 @@ namespace Rampartbound.Editor
             PositionUI(castleHpTxt.gameObject, 0.05f, 0.05f, 0.95f, 0.95f);
             castleHpTxt.horizontalOverflow = HorizontalWrapMode.Overflow;
 
-            // Summon Button di Bawah Layar
-            var summonBtnObj = CreateButton(battleHudObj.transform, "SummonButton", "SUMMON (40)", new Color(0.96f, 0.72f, 0.16f), new Color(0.12f, 0.1f, 0.05f), 36, defaultFont);
+            // Battle Bottom Action Dock (Thumb Zone - Opsi B Sinergis)
+            var bottomDockObj = new GameObject("BattleBottomDock", typeof(RectTransform), typeof(UIBattleBottomDockView));
+            bottomDockObj.transform.SetParent(battleHudObj.transform, false);
+            var dockRect = bottomDockObj.GetComponent<RectTransform>();
+            dockRect.anchorMin = new Vector2(0f, 0f);
+            dockRect.anchorMax = new Vector2(1f, 0f);
+            dockRect.pivot = new Vector2(0.5f, 0f);
+            dockRect.anchoredPosition = new Vector2(0, 0);
+            dockRect.sizeDelta = new Vector2(0, 136);
+
+            // Summon Button / Kubus Emas di Sisi Kanan Dock
+            var summonBtnObj = CreateButton(bottomDockObj.transform, "SummonButton", "✦ SUMMON ✦\n(40 GEMS)", new Color(0.96f, 0.72f, 0.16f), new Color(0.12f, 0.1f, 0.05f), 20, defaultFont);
             var summonRect = summonBtnObj.GetComponent<RectTransform>();
-            summonRect.anchorMin = new Vector2(0.5f, 0.05f);
-            summonRect.anchorMax = new Vector2(0.5f, 0.05f);
-            summonRect.pivot = new Vector2(0.5f, 0f);
-            summonRect.sizeDelta = new Vector2(440, 110);
+            summonRect.anchorMin = new Vector2(0.74f, 0.06f);
+            summonRect.anchorMax = new Vector2(0.98f, 0.94f);
+            summonRect.offsetMin = Vector2.zero;
+            summonRect.offsetMax = Vector2.zero;
             var summonBtnUI = summonBtnObj.AddComponent<SummonButtonUI>();
 
             var summonSO = new SerializedObject(summonBtnUI);
             summonSO.FindProperty("button").objectReferenceValue = summonBtnObj.GetComponent<Button>();
             summonSO.FindProperty("costText").objectReferenceValue = summonBtnObj.GetComponentInChildren<Text>();
             summonSO.ApplyModifiedProperties();
-            summonBtnObj.SetActive(false); // Mode 1 Puzzle Merge tidak membutuhkan tombol Summon manual
+            summonBtnObj.SetActive(true); // Opsi B: Aktif adaptif di kedua mode!
 
             // Dynamic Battle Mode: Puzzle Preparation Panel (Mode 1 & Inter-Wave Tactical Phase)
             var puzzlePanel = CreatePanel(battleHudObj.transform, "PuzzlePreparationPanel", new Color(0.1f, 0.12f, 0.2f, 0.92f));
@@ -1131,6 +1144,8 @@ namespace Rampartbound.Editor
             if (threatProp != null) threatProp.objectReferenceValue = threatTxt;
             battleSO.FindProperty("startDefenseNowButton").objectReferenceValue = startDefenseBtn.GetComponent<Button>();
             battleSO.FindProperty("summonButtonContainer").objectReferenceValue = summonBtnObj;
+            var dockViewProp = battleSO.FindProperty("bottomDockView");
+            if (dockViewProp != null) dockViewProp.objectReferenceValue = bottomDockObj.GetComponent<UIBattleBottomDockView>();
             battleSO.FindProperty("interWaveBannerPanel").objectReferenceValue = interWaveBanner;
             battleSO.FindProperty("interWaveTitleText").objectReferenceValue = bTitle;
             battleSO.FindProperty("interWaveSubText").objectReferenceValue = bSub;

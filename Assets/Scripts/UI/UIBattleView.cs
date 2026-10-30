@@ -56,6 +56,7 @@ namespace FantasyDefense.UI
 
         [SerializeField] private Text upcomingThreatText;
         [SerializeField] private GameObject summonButtonContainer;
+        [SerializeField] private UIBattleBottomDockView bottomDockView;
 
         [Header("Inter-Wave Tactical Phase HUD (Sprint 28)")]
         [SerializeField] private GameObject interWaveBannerPanel;
@@ -251,6 +252,15 @@ namespace FantasyDefense.UI
         {
             ApplyLilitaOneFonts();
 
+            if (bottomDockView == null)
+            {
+                bottomDockView = GetComponentInChildren<UIBattleBottomDockView>(true);
+            }
+            if (bottomDockView != null)
+            {
+                bottomDockView.RefreshAllCards();
+            }
+
             // Sinkronisasi data awal jika komponen sudah tersedia
             if (EconomyManager.Instance != null)
             {
@@ -433,7 +443,13 @@ namespace FantasyDefense.UI
 
             if (summonButtonContainer != null)
             {
-                summonButtonContainer.SetActive(mode == BattleMode.RealTimeDeploy);
+                summonButtonContainer.SetActive(true); // Opsi B: Aktif adaptif di kedua mode
+            }
+
+            if (bottomDockView != null)
+            {
+                bottomDockView.gameObject.SetActive(true);
+                bottomDockView.RefreshAllCards();
             }
         }
 
@@ -801,7 +817,12 @@ namespace FantasyDefense.UI
                     }
                     if (summonButtonContainer != null)
                     {
-                        summonButtonContainer.SetActive(!isPuzzleMode);
+                        summonButtonContainer.SetActive(true); // Opsi B: Aktif adaptif di kedua mode
+                    }
+                    if (bottomDockView != null)
+                    {
+                        bottomDockView.gameObject.SetActive(true);
+                        bottomDockView.RefreshAllCards();
                     }
                     break;
                 case BattleState.WaveActive:
@@ -813,9 +834,13 @@ namespace FantasyDefense.UI
                     {
                         interWaveBannerPanel.SetActive(false);
                     }
-                    if (summonButtonContainer != null && GameManager.Instance != null)
+                    if (summonButtonContainer != null)
                     {
-                        summonButtonContainer.SetActive(GameManager.Instance.CurrentBattleMode == BattleMode.RealTimeDeploy);
+                        summonButtonContainer.SetActive(true); // Opsi B: Tetap aktif saat wave berlangsung
+                    }
+                    if (bottomDockView != null)
+                    {
+                        bottomDockView.gameObject.SetActive(true);
                     }
                     break;
                 case BattleState.Victory:

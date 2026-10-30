@@ -203,7 +203,9 @@ namespace FantasyDefense.Summon
 
         /// <summary>
         /// Mencoba melakukan pemanggilan hero (Summon) ke arena grid.
-        /// Dipanggil dari tombol UI Summon di Mobile HUD.
+        /// Beroperasi adaptif:
+        /// - Pada Mode 1 (Swap & Merge): Berfungsi sebagai Katalis Papan Taktis (Transmutasi / Peningkatan Tier Bidak)
+        /// - Pada Mode 2 (Real-Time Deploy): Memanggil unit baru ke petak kosong
         /// </summary>
         public bool TrySummonHero()
         {
@@ -215,7 +217,14 @@ namespace FantasyDefense.Summon
                 return false;
             }
 
-            // 2. Cek apakah seluruh petak arena sudah penuh
+            // Adaptif: Mode 1 (Swap & Merge) -> Katalis Transmutasi Papan Taktis
+            if (FantasyDefense.Core.GameManager.Instance != null &&
+                FantasyDefense.Core.GameManager.Instance.CurrentBattleMode == BattleMode.PuzzlePreparation)
+            {
+                return TryExecuteSwapMergeCatalyst();
+            }
+
+            // 2. Cek apakah seluruh petak arena sudah penuh (Mode 2 Deploy)
             if (GridManager.Instance.IsGridFull())
             {
                 Debug.LogWarning("[HeroSummoner] Seluruh petak arena penuh! Tidak dapat memanggil hero baru.");
@@ -276,6 +285,118 @@ namespace FantasyDefense.Summon
             if (GridMatch3Solver.Instance != null)
             {
                 GridMatch3Solver.Instance.CheckAndResolveMatches();
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Menjalankan intervensi taktis pada Mode 1 (Swap & Merge).
+        /// Karena seluruh petak terisi penuh, penekanan tombol Summon memicu katalis peningkatan
+        /// (Transcendence Catalyst): mempromosikan 1 unit acak ber-tier rendah ke tier berikutnya
+        /// dan mengecek kombo berantai otomatis!
+        /// </summary>
+        public bool TryExecuteSwapMergeCatalyst()
+        {
+            if (EconomyManager.Instance != null && !EconomyManager.Instance.CanAffordSummon())
+            {
+                Debug.LogWarning("[HeroSummoner] Gems/Mana tidak cukup untuk memicu Katalis Papan.");
+                OnSummonFailed?.Invoke(SummonFailureReason.NotEnoughGems);
+                return false;
+            }
+
+            if (GridManager.Instance == null || !GridManager.Instance.IsInitialized) return false;
+
+            int w = GridManager.Instance.GridWidth;
+            int h = GridManager.Instance.GridHeight;
+            List<TileCell> candidateCells = new List<TileCell>();
+
+            // Cari unit Tier-0 (Permata mentah) atau Tier-1
+            for (int x = 0; x < w; x++)
+            {
+                for (int y = 0; y < h; y++)
+                {
+                    var cell = GridManager.Instance.GetCell(x, y);
+                    if (cell != null && cell.IsOccupied && cell.CurrentUnit != null)
+                    {
+                        if (cell.CurrentUnit.CurrentTier <= UnitTier.Tier1)
+                        {
+                            candidateCells.Add(cell);
+                        }
+                    }
+                }
+            }
+
+            // Jika semua sudah T2+, ambil sembarang unit yang belum T5
+            if (candidateCells.Count == 0)
+            {
+                for (int x = 0; x < w; x++)
+                {
+                    for (int y = 0; y < h; y++)
+                    {
+                        var cell = GridManager.Instance.GetCell(x, y);
+                        if (cell != null && cell.IsOccupied && cell.CurrentUnit != null && cell.CurrentUnit.CurrentTier < UnitTier.Tier5)
+                        {
+                            candidateCells.Add(cell);
+                        }
+                    }
+                }
+            }
+
+            if (candidateCells.Count == 0)
+            {
+                return false;
+            }
+
+            if (EconomyManager.Instance != null)
+            {
+                bool spent = EconomyManager.Instance.SpendGemsForSummon();
+                if (!spent)
+                {
+                    OnSummonFailed?.Invoke(SummonFailureReason.NotEnoughGems);
+                    return false;
+                }
+            }
+
+            var chosenCell = candidateCells[UnityEngine.Random.Range(0, candidateCells.Count)];
+            var targetUnit = chosenCell.CurrentUnit;
+            UnitTier nextTier = (targetUnit.CurrentTier == UnitTier.Tier0) ? UnitTier.Tier1 :
+                               (targetUnit.CurrentTier == UnitTier.Tier1) ? UnitTier.Tier2 :
+                               (targetUnit.CurrentTier == UnitTier.Tier2) ? UnitTier.Tier3 :
+                               (targetUnit.CurrentTier == UnitTier.Tier3) ? UnitTier.Tier4 : UnitTier.Tier5;
+
+            targetUnit.UpgradeTier(nextTier);
+
+            // Audio & Partikel Spektakuler
+            if (Audio.AudioManager.Instance != null)
+            {
+                Audio.AudioManager.Instance.PlaySound(Audio.SoundType.MergeSuccess, 1.40f);
+            }
+
+            if (SkillVfxManager.Instance != null)
+            {
+                SkillVfxManager.Instance.SpawnProceduralParticleBurst(
+                    chosenCell.transform.position,
+                    new Color(1f, 0.85f, 0.2f),
+                    Color.white,
+                    24,
+                    2.2f
+                );
+                SkillVfxManager.Instance.SpawnFloatingText(
+                    chosenCell.transform.position,
+                    $"✨ KATALIS EVOLUSI {nextTier}! ✨",
+                    new Color(1f, 0.9f, 0.3f),
+                    1.8f
+                );
+            }
+
+            // Siarkan event summon/katalis sukses
+            OnHeroSummoned?.Invoke(targetUnit, chosenCell);
+
+            // Cek kecocokan baris setelah evolusi
+            if (GridMatch3Solver.Instance != null)
+            {
+                GridMatch3Solver.Instance.CheckAndResolveMatches(chosenCell);
             }
 
             return true;

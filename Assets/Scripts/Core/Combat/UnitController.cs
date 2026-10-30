@@ -1568,6 +1568,10 @@ namespace FantasyDefense.Combat
             {
                 totalDamage *= BattleBlessingManager.Instance.HeroDamageMultiplier;
             }
+            if (BattleArchetypeManager.Instance != null)
+            {
+                totalDamage *= BattleArchetypeManager.Instance.GetDamageMultiplier(UnitType);
+            }
             return totalDamage;
         }
 
