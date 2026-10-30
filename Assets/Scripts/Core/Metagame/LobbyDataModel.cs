@@ -293,6 +293,10 @@ namespace FantasyDefense.Metagame
         public int forgeDust = 0;
         public int refineStones = 0;
 
+        // Gacha Banner Pity Tracking (Sprint 52)
+        public int currentBannerPity = 0; // Pity counter (0-100), reset per banner baru / saat legendary didapat
+        public string currentBannerId = "BANNER_WIND_RANGER_01";
+
         // Citadel Talents & Blessings Tree (Sprint 12)
         public int citadelCrests = 0;
         public List<CitadelTalentProgress> talentProgressList = new List<CitadelTalentProgress>();

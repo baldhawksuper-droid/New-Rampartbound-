@@ -38,6 +38,8 @@ namespace FantasyDefense.Metagame
         [Header("Gacha Costs")]
         [SerializeField] private int singlePullCost = 100;
         [SerializeField] private int multiPullCost = 900; // 10x summon discount
+        public const int PITY_GUARANTEE_THRESHOLD = 100; // Standar 100x tarikan jaminan Legendary
+        public const string ACTIVE_BANNER_ID = "BANNER_WIND_RANGER_01";
 
         [Header("Drop Rates (Summon Weight)")]
         [Tooltip("Bobot kemungkinan per hero: Cedric (25%), Rose (25%), Rabbit (25%), Wind Ranger Rate-Up (25%)")]
@@ -51,6 +53,25 @@ namespace FantasyDefense.Metagame
 
         public static event Action<List<GachaResultItem>> OnGachaPullsCompleted;
         public static event Action<string> OnGachaFailed;
+        public static event Action<int> OnPityCounterChanged;
+
+        public int CurrentPityCount => (CitadelLobbyManager.Instance != null && CitadelLobbyManager.Instance.AccountData != null)
+            ? CitadelLobbyManager.Instance.AccountData.currentBannerPity
+            : 0;
+
+        public void CheckAndResetBannerPity(string newBannerId)
+        {
+            if (CitadelLobbyManager.Instance != null && CitadelLobbyManager.Instance.AccountData != null)
+            {
+                var data = CitadelLobbyManager.Instance.AccountData;
+                if (data.currentBannerId != newBannerId)
+                {
+                    data.currentBannerId = newBannerId;
+                    data.currentBannerPity = 0;
+                    OnPityCounterChanged?.Invoke(0);
+                }
+            }
+        }
 
         [Header("Daily Free Summon")]
         [SerializeField] private bool hasUsedDailyFreeSummon = false;
@@ -137,6 +158,15 @@ namespace FantasyDefense.Metagame
 
         private GachaResultItem PerformSinglePull()
         {
+            var accData = CitadelLobbyManager.Instance != null ? CitadelLobbyManager.Instance.AccountData : null;
+            if (accData != null)
+            {
+                accData.currentBannerPity++;
+            }
+
+            int currentPity = accData != null ? accData.currentBannerPity : 1;
+            bool forceLegendary = currentPity >= PITY_GUARANTEE_THRESHOLD;
+
             int totalWeight = cedricWeight + roseWeight + rabbitWeight + windRangerWeight;
             int roll = UnityEngine.Random.Range(0, totalWeight);
 
@@ -145,7 +175,21 @@ namespace FantasyDefense.Metagame
             string rarity;
             int shardsBonus;
 
-            if (roll < cedricWeight)
+            if (forceLegendary || roll >= (cedricWeight + roseWeight + rabbitWeight))
+            {
+                // Featured Rate-Up: Wind Ranger (Atau Garansi Pity 100x)
+                pickedType = UnitType.WindRanger;
+                heroName = "Wind Ranger (Pemanah Angin)";
+                rarity = forceLegendary ? "Legendary [GUARANTEED PITY]" : "Legendary [RATE-UP]";
+                shardsBonus = 30;
+
+                // Reset pity saat legendary didapatkan
+                if (accData != null)
+                {
+                    accData.currentBannerPity = 0;
+                }
+            }
+            else if (roll < cedricWeight)
             {
                 pickedType = UnitType.Cedric;
                 heroName = "Cedric (Ksatria Merah)";
@@ -159,20 +203,17 @@ namespace FantasyDefense.Metagame
                 rarity = "Rare";
                 shardsBonus = 20;
             }
-            else if (roll < cedricWeight + roseWeight + rabbitWeight)
+            else
             {
                 pickedType = UnitType.RabbitMage;
                 heroName = "Rabbit Mage (Penyihir Kelinci)";
                 rarity = "Epic";
                 shardsBonus = 25;
             }
-            else
+
+            if (accData != null)
             {
-                // Featured Rate-Up: Wind Ranger
-                pickedType = UnitType.WindRanger;
-                heroName = "Wind Ranger (Pemanah Angin)";
-                rarity = "Legendary [RATE-UP]";
-                shardsBonus = 30;
+                OnPityCounterChanged?.Invoke(accData.currentBannerPity);
             }
 
             // Integrasi ke Roster & Shards

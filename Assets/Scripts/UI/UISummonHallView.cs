@@ -30,6 +30,8 @@ namespace FantasyDefense.UI
         [SerializeField] private Text bannerTitleText;
         [SerializeField] private Text bannerSubtitleText;
         [SerializeField] private Image featuredHeroImage;
+        [SerializeField] private Text pityProgressText;
+        [SerializeField] private Button gachaRateInfoButton;
 
         [Header("Summon Action Buttons")]
         [SerializeField] private Button singleSummonButton;
@@ -51,8 +53,15 @@ namespace FantasyDefense.UI
         [SerializeField] private Transform resultCardsContainer;
         [SerializeField] private Text resultSummaryText;
         [SerializeField] private Button closeResultButton;
+        [SerializeField] private Button skipAnimationButton;
+
+        [Header("Gacha Drop Rate Modal")]
+        [SerializeField] private GameObject rateModalPanel;
 
         private UnitType currentSelectedHero = UnitType.WindRanger;
+        private bool isSkippingRevealAnimation = false;
+        private List<Coroutine> activeRevealCoroutines = new List<Coroutine>();
+        private List<System.Action> cardInstantRevealers = new List<System.Action>();
 
         private void Awake()
         {
@@ -71,6 +80,7 @@ namespace FantasyDefense.UI
             CitadelLobbyManager.OnAccountGemsChanged += HandleGemsChanged;
             CitadelLobbyManager.OnHeroStarPromoted += HandleHeroStarPromoted;
             CitadelSummonManager.OnGachaPullsCompleted += ShowGachaResults;
+            CitadelSummonManager.OnPityCounterChanged += HandlePityCounterChanged;
 
             UpdateAllDisplays();
         }
@@ -80,6 +90,7 @@ namespace FantasyDefense.UI
             CitadelLobbyManager.OnAccountGemsChanged -= HandleGemsChanged;
             CitadelLobbyManager.OnHeroStarPromoted -= HandleHeroStarPromoted;
             CitadelSummonManager.OnGachaPullsCompleted -= ShowGachaResults;
+            CitadelSummonManager.OnPityCounterChanged -= HandlePityCounterChanged;
         }
 
         private void Start()
@@ -107,6 +118,12 @@ namespace FantasyDefense.UI
 
             if (closeResultButton != null)
                 closeResultButton.onClick.AddListener(OnCloseResultsClicked);
+
+            if (skipAnimationButton != null)
+                skipAnimationButton.onClick.AddListener(OnSkipRevealClicked);
+
+            if (gachaRateInfoButton != null)
+                gachaRateInfoButton.onClick.AddListener(ToggleRateModal);
         }
 
         public void OpenView()
@@ -214,11 +231,33 @@ namespace FantasyDefense.UI
                 bannerSubtitleText.text = "Rate-Up Pahlawan Baru: Wind Ranger (Pemanah Angin)!";
             }
 
+            // 2b. Pity Counter Display
+            UpdatePityDisplay();
+
             // 3. Tombol Biaya
             if (singleSummonCostText != null) singleSummonCostText.text = "💎 100 GEMS";
             if (multiSummonCostText != null) multiSummonCostText.text = "💎 900 GEMS (HEMAT 10%)";
 
             UpdateStarPromotionDisplay();
+        }
+
+        private void UpdatePityDisplay()
+        {
+            if (pityProgressText == null) return;
+
+            int currentPity = CitadelSummonManager.Instance != null ? CitadelSummonManager.Instance.CurrentPityCount : 0;
+            int threshold = CitadelSummonManager.PITY_GUARANTEE_THRESHOLD;
+            int remaining = Mathf.Max(0, threshold - currentPity);
+
+            pityProgressText.text = FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                $"🛡️ Jaminan Legendary: {remaining} tarikan lagi ({currentPity}/{threshold})",
+                $"🛡️ Guaranteed Legendary in: {remaining} pulls ({currentPity}/{threshold})"
+            );
+        }
+
+        private void HandlePityCounterChanged(int newPity)
+        {
+            UpdatePityDisplay();
         }
 
         private void UpdateStarPromotionDisplay()
@@ -292,9 +331,24 @@ namespace FantasyDefense.UI
 
         private void ShowGachaResults(List<GachaResultItem> results)
         {
+            EnsureResultsModalComponents();
+
+            isSkippingRevealAnimation = false;
+            foreach (var c in activeRevealCoroutines)
+            {
+                if (c != null) StopCoroutine(c);
+            }
+            activeRevealCoroutines.Clear();
+            cardInstantRevealers.Clear();
+
             if (resultModalPanel != null)
             {
                 resultModalPanel.SetActive(true);
+            }
+
+            if (skipAnimationButton != null)
+            {
+                skipAnimationButton.gameObject.SetActive(results.Count > 1);
             }
 
             // Bersihkan kartu-kartu hasil sebelumnya di dalam container jika ada
@@ -305,6 +359,24 @@ namespace FantasyDefense.UI
                     Destroy(resultCardsContainer.GetChild(i).gameObject);
                 }
 
+                // Penyesuaian grid responsif
+                var gridLayout = resultCardsContainer.GetComponent<GridLayoutGroup>();
+                if (gridLayout != null)
+                {
+                    if (results.Count == 1)
+                    {
+                        gridLayout.constraint = GridLayoutGroup.Constraint.FixedRowCount;
+                        gridLayout.constraintCount = 1;
+                        gridLayout.cellSize = new Vector2(240, 340);
+                    }
+                    else
+                    {
+                        gridLayout.constraint = GridLayoutGroup.Constraint.FixedRowCount;
+                        gridLayout.constraintCount = 2;
+                        gridLayout.cellSize = new Vector2(160, 230);
+                    }
+                }
+
                 // Bangun kartu visual dinamis untuk setiap item hasil gacha
                 var lilitaFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
                 int cardIndex = 0;
@@ -313,7 +385,8 @@ namespace FantasyDefense.UI
                     var card = CreateGachaResultCard(resultCardsContainer, item, lilitaFont, out var frontObj, out var backObj);
                     if (card != null && gameObject.activeInHierarchy)
                     {
-                        StartCoroutine(AnimateCardRevealRoutine(card.transform, cardIndex * 0.10f, item, frontObj, backObj));
+                        var coroutine = StartCoroutine(AnimateCardRevealRoutine(card.transform, cardIndex * 0.12f, item, frontObj, backObj));
+                        activeRevealCoroutines.Add(coroutine);
                     }
                     cardIndex++;
                 }
@@ -328,6 +401,34 @@ namespace FantasyDefense.UI
             }
 
             UpdateAllDisplays();
+        }
+
+        private void OnSkipRevealClicked()
+        {
+            if (isSkippingRevealAnimation) return;
+            isSkippingRevealAnimation = true;
+
+            foreach (var c in activeRevealCoroutines)
+            {
+                if (c != null) StopCoroutine(c);
+            }
+            activeRevealCoroutines.Clear();
+
+            foreach (var revealer in cardInstantRevealers)
+            {
+                revealer?.Invoke();
+            }
+            cardInstantRevealers.Clear();
+
+            if (skipAnimationButton != null)
+            {
+                skipAnimationButton.gameObject.SetActive(false);
+            }
+
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySound(SoundType.ButtonClick, 1.2f);
+            }
         }
 
         private GameObject CreateGachaResultCard(Transform parent, GachaResultItem item, Font font, out GameObject frontObj, out GameObject backObj)
@@ -483,6 +584,17 @@ namespace FantasyDefense.UI
             frontObj.SetActive(false);
             backObj.SetActive(true);
 
+            // Daftarkan aksi instant reveal jika tombol Skip ditekan
+            cardInstantRevealers.Add(() =>
+            {
+                if (cardObj != null)
+                {
+                    cardObj.transform.localScale = Vector3.one;
+                    if (backObj != null) backObj.SetActive(false);
+                    if (frontObj != null) frontObj.SetActive(true);
+                }
+            });
+
             return cardObj;
         }
 
@@ -570,6 +682,216 @@ namespace FantasyDefense.UI
             if (AudioManager.Instance != null)
             {
                 AudioManager.Instance.PlaySound(SoundType.ButtonClick);
+            }
+        }
+
+        public void ToggleRateModal()
+        {
+            EnsureRateModalBuilt();
+            if (rateModalPanel != null)
+            {
+                bool nextState = !rateModalPanel.activeSelf;
+                rateModalPanel.SetActive(nextState);
+                if (nextState) rateModalPanel.transform.SetAsLastSibling();
+            }
+
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySound(SoundType.ButtonClick);
+            }
+        }
+
+        private void EnsureRateModalBuilt()
+        {
+            if (rateModalPanel != null) return;
+
+            var lilitaFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+            var parentCanvas = transform.Find("ContentContainer") ?? transform;
+
+            rateModalPanel = new GameObject("GachaRateModalPanel", typeof(RectTransform), typeof(Image));
+            rateModalPanel.transform.SetParent(parentCanvas, false);
+
+            var rt = rateModalPanel.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0.08f, 0.18f);
+            rt.anchorMax = new Vector2(0.92f, 0.82f);
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+
+            var img = rateModalPanel.GetComponent<Image>();
+            var stoneFrame = Resources.Load<Sprite>("Sprites/UI/Frame_StoneBastion_9Slice")
+#if UNITY_EDITOR
+                          ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Frame_StoneBastion_9Slice.png")
+#endif
+                          ;
+            if (stoneFrame != null)
+            {
+                img.sprite = stoneFrame;
+                img.type = Image.Type.Sliced;
+                img.color = new Color(0.95f, 0.95f, 1f, 1f);
+            }
+            else
+            {
+                img.color = new Color(0.08f, 0.11f, 0.18f, 0.98f);
+            }
+
+            // Header Title
+            var titleObj = new GameObject("RateModalTitle", typeof(RectTransform), typeof(Text));
+            titleObj.transform.SetParent(rateModalPanel.transform, false);
+            var tRt = titleObj.GetComponent<RectTransform>();
+            tRt.anchorMin = new Vector2(0.05f, 0.84f);
+            tRt.anchorMax = new Vector2(0.95f, 0.96f);
+            tRt.offsetMin = Vector2.zero;
+            tRt.offsetMax = Vector2.zero;
+            var tTxt = titleObj.GetComponent<Text>();
+            if (lilitaFont != null) tTxt.font = lilitaFont;
+            tTxt.text = FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                "📜 PELUANG PEMANGGILAN CITADEL",
+                "📜 CITADEL SUMMON PROBABILITIES"
+            );
+            tTxt.fontSize = 24;
+            tTxt.fontStyle = FontStyle.Bold;
+            tTxt.alignment = TextAnchor.MiddleCenter;
+            tTxt.color = new Color(1f, 0.85f, 0.35f);
+
+            // Rate Details Body
+            var bodyObj = new GameObject("RateModalBody", typeof(RectTransform), typeof(Text));
+            bodyObj.transform.SetParent(rateModalPanel.transform, false);
+            var bRt = bodyObj.GetComponent<RectTransform>();
+            bRt.anchorMin = new Vector2(0.08f, 0.18f);
+            bRt.anchorMax = new Vector2(0.92f, 0.82f);
+            bRt.offsetMin = Vector2.zero;
+            bRt.offsetMax = Vector2.zero;
+            var bTxt = bodyObj.GetComponent<Text>();
+            if (lilitaFont != null) bTxt.font = lilitaFont;
+            bTxt.text = FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                "• Wind Ranger [Legendary Rate-Up] : 25.0%\n" +
+                "• Rabbit Mage [Epic Class] : 25.0%\n" +
+                "• Rose Tanker [Rare Class] : 25.0%\n" +
+                "• Cedric Knight [Rare Class] : 25.0%\n\n" +
+                "🛡️ ATURAN JAMINAN (PITY SYSTEM):\n" +
+                "- Pemain DIJAMIN memperoleh hero Legendary pada tarikan ke-100 jika belum mendapatkannya.\n" +
+                "- Penghitung Pity direset kembali ke 0 setiap kali hero Legendary didapatkan atau saat Altar berganti Banner baru.\n" +
+                "- Duplikat pahlawan otomatis dikonversi menjadi Shards untuk promosi bintang.",
+
+                "• Wind Ranger [Legendary Rate-Up] : 25.0%\n" +
+                "• Rabbit Mage [Epic Class] : 25.0%\n" +
+                "• Rose Tanker [Rare Class] : 25.0%\n" +
+                "• Cedric Knight [Rare Class] : 25.0%\n\n" +
+                "🛡️ GUARANTEE RULES (PITY SYSTEM):\n" +
+                "- Players are GUARANTEED to receive a Legendary hero on their 100th pull if not acquired earlier.\n" +
+                "- Pity counter resets back to 0 whenever a Legendary hero is obtained or when a new Banner begins.\n" +
+                "- Duplicate heroes automatically convert into Shards for star promotions."
+            );
+            bTxt.fontSize = 17;
+            bTxt.lineSpacing = 1.18f;
+            bTxt.alignment = TextAnchor.UpperLeft;
+            bTxt.color = new Color(0.92f, 0.94f, 0.98f);
+
+            // Close Rate Modal Button
+            var closeBtnObj = new GameObject("CloseRateBtn", typeof(RectTransform), typeof(Image), typeof(Button));
+            closeBtnObj.transform.SetParent(rateModalPanel.transform, false);
+            var cRt = closeBtnObj.GetComponent<RectTransform>();
+            cRt.anchorMin = new Vector2(0.28f, 0.04f);
+            cRt.anchorMax = new Vector2(0.72f, 0.15f);
+            cRt.offsetMin = Vector2.zero;
+            cRt.offsetMax = Vector2.zero;
+
+            var cImg = closeBtnObj.GetComponent<Image>();
+            cImg.color = new Color(0.22f, 0.55f, 0.85f);
+            var btnSprite = Resources.Load<Sprite>("Sprites/UI/Btn_Primary_Gold")
+#if UNITY_EDITOR
+                          ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Btn_Primary_Gold.png")
+#endif
+                          ;
+            if (btnSprite != null)
+            {
+                cImg.sprite = btnSprite;
+                cImg.type = Image.Type.Sliced;
+                cImg.color = Color.white;
+            }
+
+            var btnTxtObj = new GameObject("BtnText", typeof(RectTransform), typeof(Text));
+            btnTxtObj.transform.SetParent(closeBtnObj.transform, false);
+            var btRt = btnTxtObj.GetComponent<RectTransform>();
+            btRt.anchorMin = Vector2.zero;
+            btRt.anchorMax = Vector2.one;
+            btRt.offsetMin = Vector2.zero;
+            btRt.offsetMax = Vector2.zero;
+            var btTxt = btnTxtObj.GetComponent<Text>();
+            if (lilitaFont != null) btTxt.font = lilitaFont;
+            btTxt.text = "MENGERTI";
+            btTxt.fontSize = 20;
+            btTxt.fontStyle = FontStyle.Bold;
+            btTxt.alignment = TextAnchor.MiddleCenter;
+            btTxt.color = Color.white;
+
+            var cBtn = closeBtnObj.GetComponent<Button>();
+            cBtn.onClick.AddListener(() => ToggleRateModal());
+
+            rateModalPanel.SetActive(false);
+        }
+
+        private void EnsureResultsModalComponents()
+        {
+            if (resultModalPanel == null) return;
+
+            var lilitaFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+
+            // Pastikan tombol Skip Animation tersedia di pojok kanan atas modal hasil
+            if (skipAnimationButton == null)
+            {
+                var existingSkip = resultModalPanel.transform.Find("SkipAnimationBtn");
+                if (existingSkip != null)
+                {
+                    skipAnimationButton = existingSkip.GetComponent<Button>();
+                }
+                else
+                {
+                    var skipObj = new GameObject("SkipAnimationBtn", typeof(RectTransform), typeof(Image), typeof(Button));
+                    skipObj.transform.SetParent(resultModalPanel.transform, false);
+
+                    var rt = skipObj.GetComponent<RectTransform>();
+                    rt.anchorMin = new Vector2(0.72f, 0.87f);
+                    rt.anchorMax = new Vector2(0.95f, 0.95f);
+                    rt.offsetMin = Vector2.zero;
+                    rt.offsetMax = Vector2.zero;
+
+                    var img = skipObj.GetComponent<Image>();
+                    var stoneBtn = Resources.Load<Sprite>("Sprites/UI/Btn_Secondary_Stone")
+#if UNITY_EDITOR
+                                  ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Btn_Secondary_Stone.png")
+#endif
+                                  ;
+                    if (stoneBtn != null)
+                    {
+                        img.sprite = stoneBtn;
+                        img.type = Image.Type.Sliced;
+                        img.color = Color.white;
+                    }
+                    else
+                    {
+                        img.color = new Color(0.25f, 0.28f, 0.38f, 0.95f);
+                    }
+
+                    var txtObj = new GameObject("Text", typeof(RectTransform), typeof(Text));
+                    txtObj.transform.SetParent(skipObj.transform, false);
+                    var tRt = txtObj.GetComponent<RectTransform>();
+                    tRt.anchorMin = Vector2.zero;
+                    tRt.anchorMax = Vector2.one;
+                    tRt.offsetMin = Vector2.zero;
+                    tRt.offsetMax = Vector2.zero;
+
+                    var txt = txtObj.GetComponent<Text>();
+                    if (lilitaFont != null) txt.font = lilitaFont;
+                    txt.text = "⏩ LEWATI";
+                    txt.fontSize = 18;
+                    txt.fontStyle = FontStyle.Bold;
+                    txt.alignment = TextAnchor.MiddleCenter;
+                    txt.color = new Color(1f, 0.92f, 0.45f);
+
+                    skipAnimationButton = skipObj.GetComponent<Button>();
+                    skipAnimationButton.onClick.AddListener(OnSkipRevealClicked);
+                }
             }
         }
 

@@ -1699,7 +1699,13 @@ namespace Rampartbound.Editor
             var banTitle = CreateText(bannerPanel.transform, "BannerTitle", "PEMANGGILAN KHUSUS PAHLAWAN", 28, FontStyle.Bold, TextAnchor.MiddleCenter, new Color(1f, 0.85f, 0.35f), defaultFont);
             PositionUI(banTitle.gameObject, 0.05f, 0.65f, 0.95f, 0.92f);
             var banSub = CreateText(bannerPanel.transform, "BannerSubtitle", "Rate-Up 50%: Wind Ranger (Pemanah Angin)", 22, FontStyle.Normal, TextAnchor.MiddleCenter, new Color(0.7f, 0.95f, 0.8f), defaultFont);
-            PositionUI(banSub.gameObject, 0.05f, 0.35f, 0.95f, 0.60f);
+            PositionUI(banSub.gameObject, 0.05f, 0.46f, 0.95f, 0.64f);
+
+            var pityTxt = CreateText(bannerPanel.transform, "PityProgressText", "🛡️ Jaminan Legendary: 100 tarikan lagi (0/100)", 18, FontStyle.Bold, TextAnchor.MiddleCenter, new Color(1f, 0.88f, 0.35f), defaultFont);
+            PositionUI(pityTxt.gameObject, 0.05f, 0.30f, 0.82f, 0.44f);
+
+            var rateInfoBtn = CreateButton(bannerPanel.transform, "RateInfoBtn", "❓", new Color(0.2f, 0.4f, 0.6f), Color.white, 20, defaultFont);
+            PositionUI(rateInfoBtn, 0.84f, 0.30f, 0.95f, 0.44f);
 
             var s1Btn = CreateButton(bannerPanel.transform, "SingleSummonBtn", "PANGGIL 1x\n(100 Gems)", new Color(0.2f, 0.5f, 0.7f), Color.white, 22, defaultFont);
             if (_btnSecondaryStone != null)
@@ -1798,6 +1804,8 @@ namespace Rampartbound.Editor
             summonHallSO.FindProperty("gemsBalanceText").objectReferenceValue = sGemsTxt;
             summonHallSO.FindProperty("bannerTitleText").objectReferenceValue = banTitle;
             summonHallSO.FindProperty("bannerSubtitleText").objectReferenceValue = banSub;
+            summonHallSO.FindProperty("pityProgressText").objectReferenceValue = pityTxt;
+            summonHallSO.FindProperty("gachaRateInfoButton").objectReferenceValue = rateInfoBtn.GetComponent<Button>();
             summonHallSO.FindProperty("singleSummonButton").objectReferenceValue = s1Btn.GetComponent<Button>();
             summonHallSO.FindProperty("singleSummonCostText").objectReferenceValue = s1Btn.GetComponentInChildren<Text>();
             summonHallSO.FindProperty("multiSummonButton").objectReferenceValue = s10Btn.GetComponent<Button>();
