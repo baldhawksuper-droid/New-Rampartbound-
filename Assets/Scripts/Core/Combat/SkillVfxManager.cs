@@ -35,6 +35,7 @@ namespace FantasyDefense.Combat
             UnitController.OnUnitSkillTriggered += HandleUnitSkillTriggered;
             UnitController.OnUnitMerged += HandleUnitMerged;
             MonsterController.OnMonsterDamaged += HandleMonsterDamaged;
+            MonsterController.OnMonsterKilled += HandleMonsterKilled;
         }
 
         private void OnDisable()
@@ -42,6 +43,16 @@ namespace FantasyDefense.Combat
             UnitController.OnUnitSkillTriggered -= HandleUnitSkillTriggered;
             UnitController.OnUnitMerged -= HandleUnitMerged;
             MonsterController.OnMonsterDamaged -= HandleMonsterDamaged;
+            MonsterController.OnMonsterKilled -= HandleMonsterKilled;
+        }
+
+        private void HandleMonsterKilled(MonsterController monster)
+        {
+            if (monster == null) return;
+            Vector3 pos = monster.transform.position;
+            MonsterType mType = monster.MonsterData != null ? monster.MonsterData.monsterType : MonsterType.Creep;
+            Color theme = monster.MonsterData != null ? monster.MonsterData.themeColor : Color.white;
+            SpawnMonsterDeathPoof(pos, mType, theme);
         }
 
         private void HandleUnitSkillTriggered(UnitController unit, string skillName)
@@ -593,6 +604,57 @@ namespace FantasyDefense.Combat
         }
 
         #endregion
+
+        /// <summary>
+        /// Efek visual partikel hancur (Death Poof) spesifik arketipe monster canonical:
+        /// - Chibi Slime (Gemetite Ooze): Percikan jeli zamrud translusen (Emerald Jelly Splat).
+        /// - Chibi Goblin (Mire Scrapper): Serpihan kayu buckler & serpihan besi tameng (Oak & Steel Splinters).
+        /// - Boss / Elit: Ledakan kejut kosmik magma / void.
+        /// </summary>
+        public void SpawnMonsterDeathPoof(Vector3 worldPos, MonsterType monsterType, Color themeColor)
+        {
+            if (!enableParticleEffects) return;
+
+            switch (monsterType)
+            {
+                case MonsterType.Creep:
+                    // Slime: Emerald & Mint Green jelly splat droplets
+                    Color slimeJelly = new Color(0.12f, 0.85f, 0.45f, 0.95f);
+                    Color slimeLime = new Color(0.68f, 0.98f, 0.38f, 0.85f);
+                    SpawnProceduralParticleBurst(worldPos, slimeJelly, slimeLime, 24, 2.8f);
+                    if (enableShockwaves)
+                    {
+                        StartCoroutine(SpawnShockwaveRingRoutine(worldPos, 0.85f, new Color(0.15f, 0.85f, 0.45f, 0.6f)));
+                    }
+                    break;
+
+                case MonsterType.Brute:
+                    // Goblin: Oak Wood amber & steel metal splinters
+                    Color woodAmber = new Color(0.72f, 0.48f, 0.22f, 0.95f);
+                    Color steelRim = new Color(0.85f, 0.88f, 0.92f, 0.95f);
+                    SpawnProceduralParticleBurst(worldPos, woodAmber, steelRim, 20, 2.5f);
+                    if (enableShockwaves)
+                    {
+                        StartCoroutine(SpawnShockwaveRingRoutine(worldPos, 1.05f, new Color(0.55f, 0.48f, 0.38f, 0.5f)));
+                    }
+                    break;
+
+                case MonsterType.Boss:
+                    // Boss: Abyssal Magma & Void explosion
+                    Color bossDark = new Color(0.95f, 0.25f, 0.1f, 0.95f);
+                    Color bossGold = new Color(1.0f, 0.85f, 0.25f, 0.95f);
+                    SpawnProceduralParticleBurst(worldPos, bossDark, bossGold, 38, 3.8f);
+                    if (enableShockwaves)
+                    {
+                        StartCoroutine(SpawnShockwaveRingRoutine(worldPos, 2.4f, new Color(1.0f, 0.45f, 0.1f, 0.8f)));
+                    }
+                    break;
+
+                default:
+                    SpawnProceduralParticleBurst(worldPos, themeColor, Color.white, 16, 2.2f);
+                    break;
+            }
+        }
 
         /// <summary>
         /// Membuat objek ParticleSystem instan dan mandiri yang menyala sesaat lalu menghilang otomatis.
