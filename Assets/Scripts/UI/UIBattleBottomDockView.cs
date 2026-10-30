@@ -368,6 +368,11 @@ namespace FantasyDefense.UI
                 widgets.portraitImg.preserveAspect = true;
             }
 
+            // Portrait Tap Button for Stat Tooltip
+            var portBtn = portObj.AddComponent<Button>();
+            portBtn.transition = Selectable.Transition.None;
+            portBtn.onClick.AddListener(() => ToggleHeroStatTooltip(type, widgets));
+
             // Star Badges Container (Pojok Kiri Atas Kartu)
             var starsObj = new GameObject("StarsContainer", typeof(RectTransform), typeof(HorizontalLayoutGroup));
             starsObj.transform.SetParent(cardObj.transform, false);
@@ -454,7 +459,19 @@ namespace FantasyDefense.UI
         {
             if (BattleArchetypeManager.Instance != null)
             {
-                BattleArchetypeManager.Instance.TryUpgradeArchetype(type);
+                bool success = BattleArchetypeManager.Instance.TryUpgradeArchetype(type);
+                if (!success && heroCards.TryGetValue(type, out var widgets))
+                {
+                    // Insufficient Gold / Locked feedback: Wiggle & Red Text Flash
+                    StartCoroutine(CardWiggleRoutine(widgets.rootObj.transform, 5.5f, 0.24f));
+                    StartCoroutine(CostTextFlashRedRoutine(widgets.costText, 0.40f));
+
+                    if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
+                        FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+                    {
+                        FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Warning);
+                    }
+                }
             }
         }
 
@@ -568,6 +585,148 @@ namespace FantasyDefense.UI
                 yield return null;
             }
             if (obj != null) Destroy(obj);
+        }
+
+        private System.Collections.IEnumerator CardWiggleRoutine(Transform tr, float magnitude, float duration)
+        {
+            if (tr == null) yield break;
+            Vector3 origPos = tr.localPosition;
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float progress = elapsed / duration;
+                float offset = Mathf.Sin(progress * Mathf.PI * 6f) * magnitude * (1f - progress);
+                tr.localPosition = origPos + new Vector3(offset, 0f, 0f);
+                yield return null;
+            }
+            tr.localPosition = origPos;
+        }
+
+        private System.Collections.IEnumerator CostTextFlashRedRoutine(Text txt, float duration)
+        {
+            if (txt == null) yield break;
+            Color origColor = txt.color;
+            Color redColor = new Color(1f, 0.35f, 0.35f, 1f);
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float progress = elapsed / duration;
+                txt.color = Color.Lerp(redColor, origColor, progress);
+                yield return null;
+            }
+            txt.color = origColor;
+        }
+
+        private GameObject activeTooltipObj;
+        private UnitType activeTooltipType;
+        private Coroutine tooltipCloseCoroutine;
+
+        private void ToggleHeroStatTooltip(UnitType type, HeroCardWidgets widgets)
+        {
+            if (activeTooltipObj != null)
+            {
+                bool isSame = (activeTooltipType == type);
+                Destroy(activeTooltipObj);
+                activeTooltipObj = null;
+                if (tooltipCloseCoroutine != null) StopCoroutine(tooltipCloseCoroutine);
+                if (isSame) return;
+            }
+
+            activeTooltipType = type;
+            var tooltip = new GameObject("HeroStatTooltip", typeof(RectTransform), typeof(Image));
+            tooltip.transform.SetParent(widgets.rootObj.transform, false);
+            var rt = tooltip.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0.5f, 1f);
+            rt.anchorMax = new Vector2(0.5f, 1f);
+            rt.pivot = new Vector2(0.5f, 0f);
+            rt.anchoredPosition = new Vector2(0f, 6f);
+            rt.sizeDelta = new Vector2(130f, 88f);
+
+            var img = tooltip.GetComponent<Image>();
+            var frameSprite = Resources.Load<Sprite>("Sprites/UI/Frame_StoneBastion_9Slice")
+#if UNITY_EDITOR
+                           ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Frame_StoneBastion_9Slice.png")
+#endif
+                           ;
+            if (frameSprite != null)
+            {
+                img.sprite = frameSprite;
+                img.type = Image.Type.Sliced;
+            }
+            img.color = new Color(0.07f, 0.11f, 0.17f, 0.98f);
+
+            var contentObj = new GameObject("Content", typeof(RectTransform), typeof(Text));
+            contentObj.transform.SetParent(tooltip.transform, false);
+            var cRt = contentObj.GetComponent<RectTransform>();
+            cRt.anchorMin = Vector2.zero;
+            cRt.anchorMax = Vector2.one;
+            cRt.offsetMin = new Vector2(6f, 6f);
+            cRt.offsetMax = new Vector2(-6f, -6f);
+
+            var txt = contentObj.GetComponent<Text>();
+            var font = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+            if (font != null) txt.font = font;
+            txt.alignment = TextAnchor.UpperLeft;
+            txt.fontSize = 11;
+            txt.lineSpacing = 1.05f;
+
+            string heroName = type switch
+            {
+                UnitType.Cedric => "<color=#FFA233>⚔️ Cedric</color>",
+                UnitType.RabbitMage => "<color=#59E0FF>🔮 Rabbit</color>",
+                UnitType.RoseTanker => "<color=#FFDD44>🛡️ Rose</color>",
+                UnitType.WindRanger => "<color=#59F28F>🏹 Wind</color>",
+                _ => type.ToString()
+            };
+
+            string role = type switch
+            {
+                UnitType.Cedric => "Vanguard Melee",
+                UnitType.RabbitMage => "Arcane Artillery",
+                UnitType.RoseTanker => "Bastion Defender",
+                UnitType.WindRanger => "Piercing CC",
+                _ => "Hero"
+            };
+
+            float mult = BattleArchetypeManager.Instance != null ? BattleArchetypeManager.Instance.GetDamageMultiplier(type) : 1f;
+            int bonus = Mathf.RoundToInt((mult - 1f) * 100f);
+
+            string skill = type switch
+            {
+                UnitType.Cedric => "Dual Slash",
+                UnitType.RabbitMage => "Mystic Burst",
+                UnitType.RoseTanker => "Shield Slam",
+                UnitType.WindRanger => "Piercing Gale",
+                _ => "Active Skill"
+            };
+
+            txt.text = $"{heroName}\n<color=#B3BFCC>{role}</color>\n<color=#FFE659>DPS: +{bonus}%</color>\n<color=#FFFFFF>Skill: {skill}</color>";
+
+            StartCoroutine(PunchScaleRoutine(tooltip.transform, 1.15f, 0.18f));
+            activeTooltipObj = tooltip;
+
+            var dismissBtn = tooltip.AddComponent<Button>();
+            dismissBtn.transition = Selectable.Transition.None;
+            dismissBtn.onClick.AddListener(() =>
+            {
+                if (activeTooltipObj != null) Destroy(activeTooltipObj);
+                activeTooltipObj = null;
+            });
+
+            if (tooltipCloseCoroutine != null) StopCoroutine(tooltipCloseCoroutine);
+            tooltipCloseCoroutine = StartCoroutine(AutoDismissTooltipRoutine(tooltip, 3.2f));
+        }
+
+        private System.Collections.IEnumerator AutoDismissTooltipRoutine(GameObject tooltip, float delay)
+        {
+            yield return new WaitForSecondsRealtime(delay);
+            if (tooltip != null)
+            {
+                Destroy(tooltip);
+                if (activeTooltipObj == tooltip) activeTooltipObj = null;
+            }
         }
     }
 }

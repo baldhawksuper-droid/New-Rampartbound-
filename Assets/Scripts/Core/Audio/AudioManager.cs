@@ -38,7 +38,8 @@ namespace FantasyDefense.Audio
         WaveIncoming,
         BarricadeRepair,
         CatalystThunderZap,
-        GoldCoinSpend
+        GoldCoinSpend,
+        ModeSwitchWhoosh
     }
 
     public enum AudioSfxType
@@ -625,6 +626,7 @@ namespace FantasyDefense.Audio
             proceduralClipCache[SoundType.BarricadeRepair] = CreateArpeggioClip("BarricadeRepair", new float[] { 523.25f, 659.25f, 783.99f, 1046.50f, 1318.5f }, 0.05f);
             proceduralClipCache[SoundType.CatalystThunderZap] = CreateToneClip("CatalystThunderZap", 0.36f, 1250f, 85f);
             proceduralClipCache[SoundType.GoldCoinSpend] = CreateArpeggioClip("GoldCoinSpend", new float[] { 1760f, 2637f, 3520f }, 0.045f);
+            proceduralClipCache[SoundType.ModeSwitchWhoosh] = CreateToneClip("ModeSwitchWhoosh", 0.42f, 280f, 620f);
         }
 
         private AudioClip CreateToneClip(string name, float duration, float startFreq, float endFreq)
@@ -637,6 +639,7 @@ namespace FantasyDefense.Audio
             bool isBlade = name.Contains("Slash") || name.Contains("Arrow");
             bool isImpact = name.Contains("Hit") || name.Contains("Cannon") || name.Contains("Earthshaker") || name.Contains("Shield") || name.Contains("Meteor");
             bool isZap = name == "CatalystThunderZap";
+            bool isWhoosh = name == "ModeSwitchWhoosh";
 
             float filterNoise = 0f;
 
@@ -651,6 +654,15 @@ namespace FantasyDefense.Audio
                     float env = Mathf.Exp(-75f * progress);
                     float tone = Mathf.Sin(2 * Mathf.PI * 820f * t) * 0.65f + Mathf.Sin(2 * Mathf.PI * 260f * t) * 0.35f;
                     samples[i] = tone * env * 0.5f;
+                }
+                else if (isWhoosh)
+                {
+                    // Aerodynamic phase whoosh: parabolic bell envelope with smooth low-pass wind resonance
+                    float env = Mathf.Sin(progress * Mathf.PI);
+                    filterNoise += 0.20f * (Random.Range(-1f, 1f) - filterNoise);
+                    float windFreq = Mathf.Lerp(startFreq, endFreq, progress);
+                    float wind = Mathf.Sin(2 * Mathf.PI * windFreq * t) * 0.40f;
+                    samples[i] = (filterNoise * 0.55f + wind) * env * 0.45f;
                 }
                 else if (isZap)
                 {

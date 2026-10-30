@@ -454,6 +454,12 @@ namespace FantasyDefense.UI
             {
                 StartCoroutine(PunchScaleRoutine(modeBadgeContainer.transform, 1.10f, 0.22f));
                 StartCoroutine(ModeBadgeSheenRoutine(modeBadgeContainer.transform));
+
+                // Audio desau angin magis transisi mode
+                if (FantasyDefense.Audio.AudioManager.Instance != null)
+                {
+                    FantasyDefense.Audio.AudioManager.Instance.PlaySound(FantasyDefense.Audio.SoundType.ModeSwitchWhoosh);
+                }
             }
 
             if (puzzlePreparationPanel != null)
