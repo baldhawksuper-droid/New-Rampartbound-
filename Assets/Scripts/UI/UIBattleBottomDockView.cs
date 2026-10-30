@@ -645,9 +645,36 @@ namespace FantasyDefense.UI
         private GameObject activeTooltipObj;
         private UnitType activeTooltipType;
         private Coroutine tooltipCloseCoroutine;
+        private float lastPortraitTapTime = 0f;
+        private UnitType lastPortraitTapType;
 
         private void ToggleHeroStatTooltip(UnitType type, HeroCardWidgets widgets)
         {
+            float now = Time.unscaledTime;
+            bool isDoubleTap = (lastPortraitTapType == type && (now - lastPortraitTapTime) < 0.35f);
+            lastPortraitTapTime = now;
+            lastPortraitTapType = type;
+
+            bool isRealTimeDeploy = FantasyDefense.Core.GameManager.Instance != null &&
+                                    FantasyDefense.Core.GameManager.Instance.CurrentBattleMode == FantasyDefense.Data.BattleMode.RealTimeDeploy;
+
+            // Jika double-tap di Mode 2 (Real-Time Deploy), lakukan fast-deploy pahlawan spesifik langsung ke arena!
+            if (isDoubleTap && isRealTimeDeploy)
+            {
+                if (activeTooltipObj != null) Destroy(activeTooltipObj);
+                activeTooltipObj = null;
+
+                if (Summon.HeroSummoner.Instance != null)
+                {
+                    bool spawned = Summon.HeroSummoner.Instance.TrySummonSpecificHero(type);
+                    if (spawned)
+                    {
+                        StartCoroutine(PunchScaleRoutine(widgets.rootObj.transform, 1.25f, 0.18f));
+                    }
+                }
+                return;
+            }
+
             if (activeTooltipObj != null)
             {
                 bool isSame = (activeTooltipType == type);
@@ -665,7 +692,7 @@ namespace FantasyDefense.UI
             rt.anchorMax = new Vector2(0.5f, 1f);
             rt.pivot = new Vector2(0.5f, 0f);
             rt.anchoredPosition = new Vector2(0f, 6f);
-            rt.sizeDelta = new Vector2(130f, 88f);
+            rt.sizeDelta = isRealTimeDeploy ? new Vector2(138f, 116f) : new Vector2(130f, 88f);
 
             var img = tooltip.GetComponent<Image>();
             var frameSprite = Resources.Load<Sprite>("Sprites/UI/Frame_StoneBastion_9Slice")
@@ -683,10 +710,10 @@ namespace FantasyDefense.UI
             var contentObj = new GameObject("Content", typeof(RectTransform), typeof(Text));
             contentObj.transform.SetParent(tooltip.transform, false);
             var cRt = contentObj.GetComponent<RectTransform>();
-            cRt.anchorMin = Vector2.zero;
+            cRt.anchorMin = new Vector2(0f, isRealTimeDeploy ? 0.26f : 0f);
             cRt.anchorMax = Vector2.one;
-            cRt.offsetMin = new Vector2(6f, 6f);
-            cRt.offsetMax = new Vector2(-6f, -6f);
+            cRt.offsetMin = new Vector2(6f, 2f);
+            cRt.offsetMax = new Vector2(-6f, -4f);
 
             var txt = contentObj.GetComponent<Text>();
             var font = Resources.Load<Font>("Fonts/LilitaOne-Regular");
@@ -727,19 +754,63 @@ namespace FantasyDefense.UI
 
             txt.text = $"{heroName}\n<color=#B3BFCC>{role}</color>\n<color=#FFE659>DPS: +{bonus}%</color>\n<color=#FFFFFF>Skill: {skill}</color>";
 
+            // Tombol Targeted Summon di Mode 2 (Real-Time Deploy)
+            if (isRealTimeDeploy)
+            {
+                var deployBtnObj = new GameObject("DeployHeroBtn", typeof(RectTransform), typeof(Image), typeof(Button));
+                deployBtnObj.transform.SetParent(tooltip.transform, false);
+                var dRt = deployBtnObj.GetComponent<RectTransform>();
+                dRt.anchorMin = new Vector2(0.08f, 0.05f);
+                dRt.anchorMax = new Vector2(0.92f, 0.28f);
+                dRt.offsetMin = Vector2.zero;
+                dRt.offsetMax = Vector2.zero;
+
+                var dImg = deployBtnObj.GetComponent<Image>();
+                var btnSprite = Resources.Load<Sprite>("Sprites/UI/Btn_Primary_Gold");
+                if (btnSprite != null)
+                {
+                    dImg.sprite = btnSprite;
+                    dImg.type = Image.Type.Sliced;
+                }
+                dImg.color = new Color(0.25f, 0.65f, 0.35f, 0.95f);
+
+                var dTxtObj = new GameObject("Text", typeof(RectTransform), typeof(Text));
+                dTxtObj.transform.SetParent(deployBtnObj.transform, false);
+                var dtRt = dTxtObj.GetComponent<RectTransform>();
+                dtRt.anchorMin = Vector2.zero;
+                dtRt.anchorMax = Vector2.one;
+                dtRt.offsetMin = Vector2.zero;
+                dtRt.offsetMax = Vector2.zero;
+
+                var dTxt = dTxtObj.GetComponent<Text>();
+                if (font != null) dTxt.font = font;
+                dTxt.text = "⚔️ PANGGIL HERO";
+                dTxt.fontSize = 11;
+                dTxt.fontStyle = FontStyle.Bold;
+                dTxt.alignment = TextAnchor.MiddleCenter;
+                dTxt.color = Color.white;
+
+                var dBtn = deployBtnObj.GetComponent<Button>();
+                dBtn.onClick.AddListener(() =>
+                {
+                    if (Summon.HeroSummoner.Instance != null)
+                    {
+                        bool ok = Summon.HeroSummoner.Instance.TrySummonSpecificHero(type);
+                        if (ok)
+                        {
+                            StartCoroutine(PunchScaleRoutine(widgets.rootObj.transform, 1.25f, 0.18f));
+                        }
+                    }
+                    if (activeTooltipObj != null) Destroy(activeTooltipObj);
+                    activeTooltipObj = null;
+                });
+            }
+
             StartCoroutine(PunchScaleRoutine(tooltip.transform, 1.15f, 0.18f));
             activeTooltipObj = tooltip;
 
-            var dismissBtn = tooltip.AddComponent<Button>();
-            dismissBtn.transition = Selectable.Transition.None;
-            dismissBtn.onClick.AddListener(() =>
-            {
-                if (activeTooltipObj != null) Destroy(activeTooltipObj);
-                activeTooltipObj = null;
-            });
-
             if (tooltipCloseCoroutine != null) StopCoroutine(tooltipCloseCoroutine);
-            tooltipCloseCoroutine = StartCoroutine(AutoDismissTooltipRoutine(tooltip, 3.2f));
+            tooltipCloseCoroutine = StartCoroutine(AutoDismissTooltipRoutine(tooltip, isRealTimeDeploy ? 4.5f : 3.2f));
         }
 
         private System.Collections.IEnumerator AutoDismissTooltipRoutine(GameObject tooltip, float delay)

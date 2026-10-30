@@ -293,7 +293,119 @@ namespace FantasyDefense.Summon
             // 8. Siarkan event keberhasilan
             OnHeroSummoned?.Invoke(spawnedUnit, emptyCell);
 
+            // Respons getaran taktil mobile berproteksi status pengaturan
+            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+            {
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Light);
+            }
+
             // 9. Cek apakah penempatan unit baru ini memicu Match-3
+            if (GridMatch3Solver.Instance != null)
+            {
+                GridMatch3Solver.Instance.CheckAndResolveMatches();
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Memanggil pahlawan dengan tipe spesifik ke petak arena kosong (Mode 2 Real-Time Deploy).
+        /// Memenuhi spesifikasi kanonikal Master Game Spec di mana pemain dapat memilih pahlawan
+        /// tertentu dari deck bawah untuk strategi formasi terarah.
+        /// </summary>
+        public bool TrySummonSpecificHero(UnitType targetType)
+        {
+            if (GridManager.Instance == null || !GridManager.Instance.IsInitialized)
+            {
+                OnSummonFailed?.Invoke(SummonFailureReason.ManagerNotReady);
+                return false;
+            }
+
+            // Pada Mode 1 (Swap & Merge), seluruh papan penuh, picu katalis transmutasi papan
+            if (FantasyDefense.Core.GameManager.Instance != null &&
+                FantasyDefense.Core.GameManager.Instance.CurrentBattleMode == BattleMode.PuzzlePreparation)
+            {
+                return TryExecuteSwapMergeCatalyst();
+            }
+
+            if (GridManager.Instance.IsGridFull())
+            {
+                OnSummonFailed?.Invoke(SummonFailureReason.GridFull);
+                if (SkillVfxManager.Instance != null)
+                {
+                    Vector3 originPos = (FantasyDefense.UI.SummonButtonUI.Instance != null)
+                        ? FantasyDefense.UI.SummonButtonUI.Instance.transform.position
+                        : Vector3.zero;
+                    SkillVfxManager.Instance.SpawnFloatingText(
+                        originPos,
+                        "⚠️ ARENA PENUH! GABUNGKAN UNIT! ⚠️",
+                        new Color(1f, 0.35f, 0.35f),
+                        1.8f
+                    );
+                }
+                return false;
+            }
+
+            if (EconomyManager.Instance != null && !EconomyManager.Instance.CanAffordSummon())
+            {
+                OnSummonFailed?.Invoke(SummonFailureReason.NotEnoughGems);
+                return false;
+            }
+
+            if (EconomyManager.Instance != null)
+            {
+                bool spendSuccess = EconomyManager.Instance.SpendGemsForSummon();
+                if (!spendSuccess)
+                {
+                    OnSummonFailed?.Invoke(SummonFailureReason.NotEnoughGems);
+                    return false;
+                }
+            }
+
+            TileCell emptyCell = GridManager.Instance.GetRandomEmptyCell();
+            if (emptyCell == null)
+            {
+                OnSummonFailed?.Invoke(SummonFailureReason.GridFull);
+                return false;
+            }
+
+            // Temukan UnitDataSO yang sesuai dengan targetType
+            EnsureHeroPoolLoaded();
+            UnitDataSO chosenHero = null;
+            foreach (var h in activeHeroPool)
+            {
+                if (h != null && h.unitType == targetType)
+                {
+                    chosenHero = h;
+                    break;
+                }
+            }
+
+            if (chosenHero == null)
+            {
+                chosenHero = GetRandomHeroFromPool();
+            }
+
+            if (chosenHero == null) return false;
+
+            UnitController spawnedUnit = SpawnUnitAtCell(chosenHero, emptyCell, UnitTier.Tier1);
+
+            if (FantasyDefense.Analytics.CitadelTelemetryManager.Instance != null)
+            {
+                int cost = EconomyManager.Instance != null ? EconomyManager.Instance.GetCurrentSummonCost() : 40;
+                int occupied = GridManager.Instance != null ? GridManager.Instance.GetOccupiedCount() : 1;
+                FantasyDefense.Analytics.CitadelTelemetryManager.Instance.TrackHeroSummon(chosenHero.heroName, cost, occupied);
+            }
+
+            OnHeroSummoned?.Invoke(spawnedUnit, emptyCell);
+
+            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+            {
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Light);
+            }
+
             if (GridMatch3Solver.Instance != null)
             {
                 GridMatch3Solver.Instance.CheckAndResolveMatches();
