@@ -83,6 +83,8 @@ namespace FantasyDefense.UI
         [Header("Auto-Merge Assistant HUD (Sprint 14)")]
         [SerializeField] private Button autoMergeToggleButton;
         [SerializeField] private Text autoMergeStatusText;
+        [SerializeField] private Button autoSummonToggleButton;
+        [SerializeField] private Text autoSummonStatusText;
 
         [Header("Victory Modal")]
         [SerializeField] private GameObject victoryPanel;
@@ -129,6 +131,7 @@ namespace FantasyDefense.UI
 
             BattlefieldWeatherManager.OnWeatherChanged += HandleWeatherChanged;
             AutoMergeAssistant.OnAutoMergeToggled += HandleAutoMergeToggled;
+            AutoSummonAssistant.OnAutoSummonToggled += HandleAutoSummonToggled;
             CitadelLocalizationManager.OnLanguageChanged += HandleLanguageChanged;
             GameManager.OnInterWavePreparationStarted += HandleInterWavePreparationStarted;
             WaveSpawner.OnWaveMonsterProgressChanged += HandleWaveMonsterProgressChanged;
@@ -159,6 +162,7 @@ namespace FantasyDefense.UI
 
             BattlefieldWeatherManager.OnWeatherChanged -= HandleWeatherChanged;
             AutoMergeAssistant.OnAutoMergeToggled -= HandleAutoMergeToggled;
+            AutoSummonAssistant.OnAutoSummonToggled -= HandleAutoSummonToggled;
             CitadelLocalizationManager.OnLanguageChanged -= HandleLanguageChanged;
             GameManager.OnInterWavePreparationStarted -= HandleInterWavePreparationStarted;
             WaveSpawner.OnWaveMonsterProgressChanged -= HandleWaveMonsterProgressChanged;
@@ -322,6 +326,11 @@ namespace FantasyDefense.UI
             if (autoMergeToggleButton != null)
             {
                 autoMergeToggleButton.onClick.AddListener(ToggleAutoMerge);
+            }
+
+            if (autoSummonToggleButton != null)
+            {
+                autoSummonToggleButton.onClick.AddListener(ToggleAutoSummon);
             }
 
             if (victoryReturnButton != null)
@@ -1532,6 +1541,34 @@ namespace FantasyDefense.UI
                 string offTxt = CitadelLocalizationManager.Text("Auto-Merge: NONAKTIF (OFF)", "Auto-Merge: INACTIVE (OFF)");
                 autoMergeStatusText.text = isEnabled ? onTxt : offTxt;
                 autoMergeStatusText.color = isEnabled ? new Color(0.25f, 1f, 0.45f) : Color.white;
+            }
+        }
+
+        public void ToggleAutoSummon()
+        {
+            if (Combat.AutoSummonAssistant.Instance != null)
+            {
+                Combat.AutoSummonAssistant.Instance.ToggleAutoSummon();
+            }
+            else
+            {
+                Debug.LogWarning("[UIBattleView] AutoSummonAssistant belum terpasang di Scene!");
+            }
+        }
+
+        private void HandleAutoSummonToggled(bool isEnabled)
+        {
+            UpdateAutoSummonDisplay(isEnabled);
+        }
+
+        private void UpdateAutoSummonDisplay(bool isEnabled)
+        {
+            if (autoSummonStatusText != null)
+            {
+                string onTxt = CitadelLocalizationManager.Text("Auto-Summon: AKTIF (ON)", "Auto-Summon: ACTIVE (ON)");
+                string offTxt = CitadelLocalizationManager.Text("Auto-Summon: NONAKTIF (OFF)", "Auto-Summon: INACTIVE (OFF)");
+                autoSummonStatusText.text = isEnabled ? onTxt : offTxt;
+                autoSummonStatusText.color = isEnabled ? new Color(1f, 0.85f, 0.35f) : Color.white;
             }
         }
 

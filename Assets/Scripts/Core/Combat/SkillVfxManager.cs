@@ -724,6 +724,56 @@ namespace FantasyDefense.Combat
         }
 
         /// <summary>
+        /// Menampilkan efek visual portal pemanggilan (Runic Summoning Portal) di koordinat petak arena.
+        /// Meliputi lingkaran sihir mistis, pilar pendaran cahaya vertikal, dan partikel starlight melayang.
+        /// </summary>
+        public void SpawnSummonPortalVfx(Vector3 cellPos, Color portalColor)
+        {
+            if (!enableParticleEffects) return;
+            StartCoroutine(SummonPortalRoutine(cellPos, portalColor));
+        }
+
+        private IEnumerator SummonPortalRoutine(Vector3 cellPos, Color portalColor)
+        {
+            // 1. Cincin lantai portal mistis berputar & membesar
+            if (enableShockwaves)
+            {
+                StartCoroutine(SpawnShockwaveRingRoutine(cellPos, 0.95f, portalColor));
+            }
+
+            // 2. Partikel mistis starlight berhamburan ke atas
+            SpawnProceduralParticleBurst(cellPos, portalColor, Color.white, 16, 2.2f);
+
+            // 3. Pilar pendaran cahaya vertikal temporer
+            var beamObj = new GameObject("SummonLightPillar");
+            beamObj.transform.position = cellPos;
+            var lr = beamObj.AddComponent<LineRenderer>();
+            lr.sortingOrder = 25;
+            lr.material = new Material(Shader.Find("Sprites/Default"));
+            lr.startColor = new Color(portalColor.r, portalColor.g, portalColor.b, 0.85f);
+            lr.endColor = new Color(1f, 1f, 1f, 0.0f);
+            lr.startWidth = 0.65f;
+            lr.endWidth = 0.25f;
+            lr.positionCount = 2;
+            lr.SetPosition(0, cellPos + Vector3.down * 0.15f);
+            lr.SetPosition(1, cellPos + Vector3.up * 2.8f);
+
+            float duration = 0.30f;
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+                float alpha = (1f - t);
+                lr.startColor = new Color(portalColor.r, portalColor.g, portalColor.b, 0.85f * alpha);
+                lr.startWidth = 0.65f * (1f - t * 0.4f);
+                yield return null;
+            }
+
+            Destroy(beamObj);
+        }
+
+        /// <summary>
         /// Menampilkan letupan angin partikel zamrud saat panah Wind Ranger menembus musuh.
         /// </summary>
         public void SpawnArrowImpactVfx(Vector3 impactPos, bool isCrit)

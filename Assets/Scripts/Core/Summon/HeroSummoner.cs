@@ -497,7 +497,8 @@ namespace FantasyDefense.Summon
         }
 
         /// <summary>
-        /// Mengambil data hero acak dari roster aktif Trio Hero.
+        /// Mengambil data hero acak yang terikat pada 4 Slot Formasi Aktif Akun Pemain.
+        /// Menghindari dilusi taktis dengan hanya memanggil pahlawan dari formasi terpilih.
         /// </summary>
         public UnitDataSO GetRandomHeroFromPool()
         {
@@ -507,8 +508,41 @@ namespace FantasyDefense.Summon
             }
 
             if (activeHeroPool == null || activeHeroPool.Count == 0) return null;
+
+            // Prioritaskan pahlawan yang terdaftar dalam formasi 4 slot lobi pemain
+            var formationHeroes = GetFormationBoundHeroes();
+            if (formationHeroes != null && formationHeroes.Count > 0)
+            {
+                int rIdx = UnityEngine.Random.Range(0, formationHeroes.Count);
+                return formationHeroes[rIdx];
+            }
+
             int randomIndex = UnityEngine.Random.Range(0, activeHeroPool.Count);
             return activeHeroPool[randomIndex];
+        }
+
+        /// <summary>
+        /// Mengambil daftar ScriptableObject pahlawan yang sesuai dengan formasi 4 pahlawan aktif.
+        /// </summary>
+        public List<UnitDataSO> GetFormationBoundHeroes()
+        {
+            if (FantasyDefense.Metagame.CitadelLobbyManager.Instance != null &&
+                FantasyDefense.Metagame.CitadelLobbyManager.Instance.AccountData != null &&
+                FantasyDefense.Metagame.CitadelLobbyManager.Instance.AccountData.deployedFormation != null &&
+                FantasyDefense.Metagame.CitadelLobbyManager.Instance.AccountData.deployedFormation.Count > 0)
+            {
+                var formationTypes = FantasyDefense.Metagame.CitadelLobbyManager.Instance.AccountData.deployedFormation;
+                var list = new List<UnitDataSO>();
+                foreach (var h in activeHeroPool)
+                {
+                    if (h != null && formationTypes.Contains(h.unitType))
+                    {
+                        list.Add(h);
+                    }
+                }
+                if (list.Count > 0) return list;
+            }
+            return activeHeroPool;
         }
 
         /// <summary>
@@ -524,8 +558,9 @@ namespace FantasyDefense.Summon
 
             if (activeHeroPool == null || activeHeroPool.Count == 0) return null;
 
+            var basePool = GetFormationBoundHeroes() ?? activeHeroPool;
             var candidates = new System.Collections.Generic.List<UnitDataSO>();
-            foreach (var h in activeHeroPool)
+            foreach (var h in basePool)
             {
                 if (h != null && (excludedTypes == null || !excludedTypes.Contains(h.unitType)))
                 {
@@ -607,6 +642,28 @@ namespace FantasyDefense.Summon
             if (isPreparationToken)
             {
                 controller.SetAsPreparationToken(true);
+            }
+            else
+            {
+                // Efek visual portal pemanggilan dan audio resonansi mistis
+                Color portalCol = heroData.unitType switch
+                {
+                    UnitType.Cedric => new Color(1f, 0.40f, 0.25f),
+                    UnitType.RoseTanker => new Color(1f, 0.45f, 0.75f),
+                    UnitType.RabbitMage => new Color(0.35f, 0.65f, 1f),
+                    UnitType.WindRanger => new Color(0.25f, 0.95f, 0.55f),
+                    _ => new Color(1f, 0.85f, 0.35f)
+                };
+
+                if (SkillVfxManager.Instance != null)
+                {
+                    SkillVfxManager.Instance.SpawnSummonPortalVfx(cell.transform.position, portalCol);
+                }
+
+                if (Audio.AudioManager.Instance != null)
+                {
+                    Audio.AudioManager.Instance.PlaySound(Audio.SoundType.SummonHero);
+                }
             }
 
             // Animasi bounce kemunculan hanya berlaku untuk mode pemanggilan biasa (bukan token puzzle persiapan)

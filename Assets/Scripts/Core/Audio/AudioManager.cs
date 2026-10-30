@@ -606,7 +606,7 @@ namespace FantasyDefense.Audio
             proceduralClipCache[SoundType.MeteorImpact] = CreateToneClip("MeteorImpact", 0.45f, 240f, 45f);
 
             proceduralClipCache[SoundType.MergeSuccess] = CreateArpeggioClip("MergeSuccess", new float[] { 523.25f, 659.25f, 783.99f, 1046.50f }, 0.06f);
-            proceduralClipCache[SoundType.SummonHero] = CreateToneClip("SummonHero", 0.18f, 440f, 660f);
+            proceduralClipCache[SoundType.SummonHero] = CreateArpeggioClip("SummonHero", new float[] { 587.33f, 880f, 1174.66f, 1760f }, 0.055f);
             proceduralClipCache[SoundType.CastleHit] = CreateToneClip("CastleHit", 0.25f, 120f, 50f);
             proceduralClipCache[SoundType.CastleHitCreep] = CreateToneClip("CastleHitCreep", 0.12f, 220f, 130f); // Pukulan gesit cakar goblin
             proceduralClipCache[SoundType.CastleHitBrute] = CreateToneClip("CastleHitBrute", 0.30f, 110f, 40f); // Dentuman berat godam orc

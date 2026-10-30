@@ -334,6 +334,9 @@ namespace Rampartbound.Editor
             var autoMergeObj = new GameObject("AutoMergeAssistant");
             autoMergeObj.AddComponent<AutoMergeAssistant>();
 
+            var autoSummonObj = new GameObject("AutoSummonAssistant");
+            autoSummonObj.AddComponent<AutoSummonAssistant>();
+
             var perfObj = new GameObject("DevicePerformanceManager");
             perfObj.AddComponent<FantasyDefense.Mobile.DevicePerformanceManager>();
 

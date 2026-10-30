@@ -24,6 +24,11 @@ namespace FantasyDefense.UI
         [SerializeField] private Image glowOutlineImage;
         private readonly List<RectTransform> orbitMotes = new List<RectTransform>();
 
+        [Header("Auto-Summon Badge")]
+        [SerializeField] private Button autoSummonBadgeButton;
+        [SerializeField] private Text autoSummonBadgeText;
+        [SerializeField] private Image autoSummonBadgeBg;
+
         [Header("Visual Feedback")]
         [SerializeField] private Color normalColor = Color.white;
         [SerializeField] private Color disabledColor = new Color(0.6f, 0.6f, 0.6f, 0.7f);
@@ -137,6 +142,88 @@ namespace FantasyDefense.UI
                     orbitMotes.Add(mRt);
                 }
             }
+
+            EnsureAutoSummonBadge();
+        }
+
+        private void EnsureAutoSummonBadge()
+        {
+            if (autoSummonBadgeButton != null) return;
+
+            var existing = transform.Find("AutoSummonBadge");
+            if (existing != null)
+            {
+                autoSummonBadgeButton = existing.GetComponent<Button>();
+                autoSummonBadgeBg = existing.GetComponent<Image>();
+                autoSummonBadgeText = existing.GetComponentInChildren<Text>();
+                return;
+            }
+
+            var badgeObj = new GameObject("AutoSummonBadge", typeof(RectTransform), typeof(Image), typeof(Button));
+            badgeObj.transform.SetParent(transform, false);
+
+            var rt = badgeObj.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0.55f, 0.72f);
+            rt.anchorMax = new Vector2(1.08f, 1.04f);
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+
+            autoSummonBadgeBg = badgeObj.GetComponent<Image>();
+            var pillSprite = Resources.Load<Sprite>("Sprites/UI/Btn_Secondary_Stone");
+            if (pillSprite != null)
+            {
+                autoSummonBadgeBg.sprite = pillSprite;
+                autoSummonBadgeBg.type = Image.Type.Sliced;
+            }
+            autoSummonBadgeBg.color = new Color(0.18f, 0.22f, 0.32f, 0.95f);
+
+            var txtObj = new GameObject("Label", typeof(RectTransform), typeof(Text));
+            txtObj.transform.SetParent(badgeObj.transform, false);
+            var tRt = txtObj.GetComponent<RectTransform>();
+            tRt.anchorMin = Vector2.zero;
+            tRt.anchorMax = Vector2.one;
+            tRt.offsetMin = Vector2.zero;
+            tRt.offsetMax = Vector2.zero;
+
+            autoSummonBadgeText = txtObj.GetComponent<Text>();
+            var lilita = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+            if (lilita != null) autoSummonBadgeText.font = lilita;
+            autoSummonBadgeText.fontSize = 13;
+            autoSummonBadgeText.fontStyle = FontStyle.Bold;
+            autoSummonBadgeText.alignment = TextAnchor.MiddleCenter;
+            autoSummonBadgeText.text = "AUTO";
+            autoSummonBadgeText.color = Color.white;
+
+            autoSummonBadgeButton = badgeObj.GetComponent<Button>();
+            autoSummonBadgeButton.onClick.AddListener(OnAutoSummonBadgeClicked);
+
+            UpdateAutoSummonBadgeVisual(Combat.AutoSummonAssistant.Instance != null && Combat.AutoSummonAssistant.Instance.IsAutoSummonEnabled);
+        }
+
+        private void OnAutoSummonBadgeClicked()
+        {
+            if (Combat.AutoSummonAssistant.Instance != null)
+            {
+                Combat.AutoSummonAssistant.Instance.ToggleAutoSummon();
+            }
+        }
+
+        private void HandleAutoSummonToggled(bool isEnabled)
+        {
+            UpdateAutoSummonBadgeVisual(isEnabled);
+        }
+
+        private void UpdateAutoSummonBadgeVisual(bool isEnabled)
+        {
+            if (autoSummonBadgeText != null)
+            {
+                autoSummonBadgeText.text = isEnabled ? "AUTO ON" : "AUTO";
+                autoSummonBadgeText.color = isEnabled ? new Color(0.2f, 1f, 0.5f) : new Color(0.85f, 0.9f, 0.98f);
+            }
+            if (autoSummonBadgeBg != null)
+            {
+                autoSummonBadgeBg.color = isEnabled ? new Color(0.12f, 0.45f, 0.25f, 0.98f) : new Color(0.18f, 0.22f, 0.32f, 0.95f);
+            }
         }
 
         private void OnEnable()
@@ -146,8 +233,10 @@ namespace FantasyDefense.UI
             HeroSummoner.OnHeroSummoned += HandleHeroSummoned;
             GridManager.OnGridGenerated += UpdateButtonState;
             CitadelLocalizationManager.OnLanguageChanged += HandleLanguageChanged;
+            Combat.AutoSummonAssistant.OnAutoSummonToggled += HandleAutoSummonToggled;
 
             UpdateButtonState();
+            UpdateAutoSummonBadgeVisual(Combat.AutoSummonAssistant.Instance != null && Combat.AutoSummonAssistant.Instance.IsAutoSummonEnabled);
             if (pulseCoroutine != null) StopCoroutine(pulseCoroutine);
             pulseCoroutine = StartCoroutine(PulseGlowRoutine());
         }
@@ -159,6 +248,7 @@ namespace FantasyDefense.UI
             HeroSummoner.OnHeroSummoned -= HandleHeroSummoned;
             GridManager.OnGridGenerated -= UpdateButtonState;
             CitadelLocalizationManager.OnLanguageChanged -= HandleLanguageChanged;
+            Combat.AutoSummonAssistant.OnAutoSummonToggled -= HandleAutoSummonToggled;
 
             if (pulseCoroutine != null) StopCoroutine(pulseCoroutine);
         }
