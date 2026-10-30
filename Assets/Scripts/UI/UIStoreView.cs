@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 using FantasyDefense.Audio;
+using FantasyDefense.Combat;
 using FantasyDefense.Metagame;
 
 namespace FantasyDefense.UI
@@ -124,6 +125,22 @@ namespace FantasyDefense.UI
 
         private void OnBuyClicked(string productId)
         {
+            Button targetBtn = productId switch
+            {
+                "starter_pack" => buyStarterPackButton,
+                "pack_gems_120" => buyGems120Button,
+                "pack_gems_650" => buyGems650Button,
+                "pack_gems_3500" => buyGems3500Button,
+                "bundle_gold_5k" => buyGoldBundleButton,
+                "flask_energy_50" => buyEnergyFlaskButton,
+                _ => null
+            };
+
+            if (targetBtn != null)
+            {
+                StartCoroutine(PunchScaleRoutine(targetBtn.transform, 1.15f, 0.18f));
+            }
+
             if (CitadelStoreManager.Instance != null)
             {
                 bool success = CitadelStoreManager.Instance.PurchaseProduct(productId, out string msg);
@@ -134,15 +151,39 @@ namespace FantasyDefense.UI
 
                 if (success)
                 {
-                    if (AudioManager.Instance != null)
-                    {
-                        AudioManager.Instance.PlaySound(Audio.SoundType.MergeSuccess);
-                    }
-
-                    // Tactile Purchase Punch on Feedback Text & Toast Notice
                     if (feedbackText != null)
                     {
-                        StartCoroutine(PunchScaleRoutine(feedbackText.transform, 1.25f, 0.25f));
+                        feedbackText.color = new Color(0.35f, 0.95f, 0.55f);
+                        StartCoroutine(PunchScaleRoutine(feedbackText.transform, 1.35f, 0.25f));
+                    }
+
+                    if (AudioManager.Instance != null)
+                    {
+                        AudioManager.Instance.PlaySound(Audio.SoundType.MergeSuccess, 1.20f);
+                    }
+
+                    if (targetBtn != null && SkillVfxManager.Instance != null)
+                    {
+                        SkillVfxManager.Instance.SpawnProceduralParticleBurst(
+                            targetBtn.transform.position,
+                            new Color(1f, 0.85f, 0.2f),
+                            Color.white,
+                            14,
+                            1.6f
+                        );
+                    }
+                }
+                else
+                {
+                    if (feedbackText != null)
+                    {
+                        feedbackText.color = new Color(1f, 0.45f, 0.4f);
+                        StartCoroutine(PunchScaleRoutine(feedbackText.transform, 1.15f, 0.20f));
+                    }
+
+                    if (AudioManager.Instance != null)
+                    {
+                        AudioManager.Instance.PlaySound(Audio.SoundType.ButtonClick, 0.85f);
                     }
                 }
             }

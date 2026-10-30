@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using FantasyDefense.Audio;
+using FantasyDefense.Combat;
 using FantasyDefense.Data;
 using FantasyDefense.Metagame;
 
@@ -309,10 +310,10 @@ namespace FantasyDefense.UI
                 int cardIndex = 0;
                 foreach (var item in results)
                 {
-                    var card = CreateGachaResultCard(resultCardsContainer, item, lilitaFont);
+                    var card = CreateGachaResultCard(resultCardsContainer, item, lilitaFont, out var frontObj, out var backObj);
                     if (card != null && gameObject.activeInHierarchy)
                     {
-                        StartCoroutine(AnimateCardRevealRoutine(card.transform, cardIndex * 0.06f, item.rarityLabel.Contains("Legendary")));
+                        StartCoroutine(AnimateCardRevealRoutine(card.transform, cardIndex * 0.10f, item, frontObj, backObj));
                     }
                     cardIndex++;
                 }
@@ -329,12 +330,62 @@ namespace FantasyDefense.UI
             UpdateAllDisplays();
         }
 
-        private GameObject CreateGachaResultCard(Transform parent, GachaResultItem item, Font font)
+        private GameObject CreateGachaResultCard(Transform parent, GachaResultItem item, Font font, out GameObject frontObj, out GameObject backObj)
         {
-            var cardObj = new GameObject($"Card_{item.unitType}", typeof(RectTransform), typeof(Image));
+            var cardObj = new GameObject($"Card_{item.unitType}", typeof(RectTransform));
             cardObj.transform.SetParent(parent, false);
 
-            var img = cardObj.GetComponent<Image>();
+            // 1. Tampilan Kartu Belakang (Card Back - Misterius Runic)
+            backObj = new GameObject("CardBack", typeof(RectTransform), typeof(Image));
+            backObj.transform.SetParent(cardObj.transform, false);
+            var backRt = backObj.GetComponent<RectTransform>();
+            backRt.anchorMin = Vector2.zero;
+            backRt.anchorMax = Vector2.one;
+            backRt.offsetMin = Vector2.zero;
+            backRt.offsetMax = Vector2.zero;
+
+            var backImg = backObj.GetComponent<Image>();
+            var stoneFrame = Resources.Load<Sprite>("Sprites/UI/Frame_StoneBastion_9Slice")
+#if UNITY_EDITOR
+                          ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Frame_StoneBastion_9Slice.png")
+#endif
+                          ;
+            if (stoneFrame != null)
+            {
+                backImg.sprite = stoneFrame;
+                backImg.type = Image.Type.Sliced;
+                backImg.color = new Color(0.85f, 0.90f, 1f, 1f);
+            }
+            else
+            {
+                backImg.color = new Color(0.12f, 0.16f, 0.24f, 0.98f);
+            }
+
+            // Simbol runik misterius di bagian belakang kartu
+            var runeObj = new GameObject("RuneGlyph", typeof(RectTransform), typeof(Text));
+            runeObj.transform.SetParent(backObj.transform, false);
+            var runeTxt = runeObj.GetComponent<Text>();
+            if (font != null) runeTxt.font = font;
+            runeTxt.text = "◈\n✦";
+            runeTxt.fontSize = 28;
+            runeTxt.alignment = TextAnchor.MiddleCenter;
+            runeTxt.color = new Color(1f, 0.85f, 0.35f, 0.85f);
+            var runeRt = runeObj.GetComponent<RectTransform>();
+            runeRt.anchorMin = Vector2.zero;
+            runeRt.anchorMax = Vector2.one;
+            runeRt.offsetMin = Vector2.zero;
+            runeRt.offsetMax = Vector2.zero;
+
+            // 2. Tampilan Kartu Depan (Card Front)
+            frontObj = new GameObject("CardFront", typeof(RectTransform), typeof(Image));
+            frontObj.transform.SetParent(cardObj.transform, false);
+            var frontRt = frontObj.GetComponent<RectTransform>();
+            frontRt.anchorMin = Vector2.zero;
+            frontRt.anchorMax = Vector2.one;
+            frontRt.offsetMin = Vector2.zero;
+            frontRt.offsetMax = Vector2.zero;
+
+            var img = frontObj.GetComponent<Image>();
             img.color = new Color(0.08f, 0.10f, 0.16f, 0.95f);
 
             // Tentukan sprite border & warna kelangkaan
@@ -370,7 +421,7 @@ namespace FantasyDefense.UI
 
             // Portrait Hero
             var portObj = new GameObject("HeroPortrait", typeof(RectTransform), typeof(Image));
-            portObj.transform.SetParent(cardObj.transform, false);
+            portObj.transform.SetParent(frontObj.transform, false);
             var portImg = portObj.GetComponent<Image>();
             string sName = item.unitType switch
             {
@@ -398,7 +449,7 @@ namespace FantasyDefense.UI
 
             // Label Rarity & Nama
             var nameObj = new GameObject("HeroName", typeof(RectTransform), typeof(Text));
-            nameObj.transform.SetParent(cardObj.transform, false);
+            nameObj.transform.SetParent(frontObj.transform, false);
             var nameTxt = nameObj.GetComponent<Text>();
             if (font != null) nameTxt.font = font;
             nameTxt.text = item.heroName.Split('(')[0].Trim();
@@ -414,7 +465,7 @@ namespace FantasyDefense.UI
 
             // Status Duplikat / Unlock
             var statObj = new GameObject("CardStatus", typeof(RectTransform), typeof(Text));
-            statObj.transform.SetParent(cardObj.transform, false);
+            statObj.transform.SetParent(frontObj.transform, false);
             var statTxt = statObj.GetComponent<Text>();
             if (font != null) statTxt.font = font;
             statTxt.text = item.isNewUnlock ? "★ UNLOCKED!" : $"+{item.shardsGained} Shards";
@@ -428,41 +479,85 @@ namespace FantasyDefense.UI
             sRt.offsetMin = Vector2.zero;
             sRt.offsetMax = Vector2.zero;
 
+            // Di awal, kartu depan disembunyikan agar yang tampil kartu belakang
+            frontObj.SetActive(false);
+            backObj.SetActive(true);
+
             return cardObj;
         }
 
-        private System.Collections.IEnumerator AnimateCardRevealRoutine(Transform cardTr, float delay, bool isLegendary)
+        private System.Collections.IEnumerator AnimateCardRevealRoutine(Transform cardTr, float delay, GachaResultItem item, GameObject frontObj, GameObject backObj)
         {
             if (cardTr == null) yield break;
 
-            cardTr.localScale = Vector3.zero;
+            cardTr.localScale = Vector3.one;
+            if (frontObj != null) frontObj.SetActive(false);
+            if (backObj != null) backObj.SetActive(true);
+
             if (delay > 0f)
             {
-                yield return new WaitForSeconds(delay);
+                yield return new WaitForSecondsRealtime(delay);
             }
 
-            float duration = 0.28f;
-            float elapsed = 0f;
-            Vector3 targetScale = Vector3.one;
+            bool isLegendary = item.rarityLabel.Contains("Legendary") || item.unitType == UnitType.WindRanger;
+            bool isEpic = item.rarityLabel.Contains("Epic") || item.unitType == UnitType.RabbitMage;
 
-            while (elapsed < duration)
+            // Fase 1: Membalik kartu belakang horizontal ke tengah (1.0 -> 0.0)
+            float halfDuration = 0.16f;
+            float elapsed = 0f;
+            while (elapsed < halfDuration)
             {
                 elapsed += Time.unscaledDeltaTime;
-                float t = Mathf.Clamp01(elapsed / duration);
-
-                // Efek membalik (Flip horizontal) dari 0 ke 1 + bounce
-                float scaleX = Mathf.Abs(Mathf.Sin(t * Mathf.PI * 0.5f));
-                float bounce = Mathf.Sin(t * Mathf.PI) * (isLegendary ? 0.35f : 0.18f);
-
-                cardTr.localScale = new Vector3(
-                    targetScale.x * (scaleX + bounce * 0.5f),
-                    targetScale.y * (1f + bounce),
-                    targetScale.z
-                );
+                float t = Mathf.Clamp01(elapsed / halfDuration);
+                float scaleX = Mathf.Cos(t * Mathf.PI * 0.5f);
+                cardTr.localScale = new Vector3(scaleX, 1f, 1f);
                 yield return null;
             }
 
-            cardTr.localScale = targetScale;
+            // Titik balik: Tukar kartu belakang menjadi kartu depan yang terungkap
+            if (backObj != null) backObj.SetActive(false);
+            if (frontObj != null) frontObj.SetActive(true);
+
+            // Umpan balik audio & partikel kilau sesuai kelangkaan
+            if (AudioManager.Instance != null)
+            {
+                if (isLegendary)
+                {
+                    AudioManager.Instance.PlaySound(SoundType.VictoryFanfare);
+                }
+                else if (isEpic)
+                {
+                    AudioManager.Instance.PlaySound(SoundType.MergeSuccess, 1.35f);
+                }
+                else
+                {
+                    AudioManager.Instance.PlaySound(SoundType.ButtonClick, 1.25f);
+                }
+            }
+
+            if (SkillVfxManager.Instance != null)
+            {
+                Color burstColor = isLegendary ? new Color(1f, 0.85f, 0.2f) : (isEpic ? new Color(0.8f, 0.4f, 1f) : new Color(0.25f, 0.75f, 1f));
+                int particleCount = isLegendary ? 22 : (isEpic ? 16 : 10);
+                SkillVfxManager.Instance.SpawnProceduralParticleBurst(cardTr.position, burstColor, Color.white, particleCount, 1.8f);
+            }
+
+            // Fase 2: Membuka kartu depan dari 0.0 -> 1.0 dengan pantulan elastis (overshoot bounce)
+            float revealDuration = 0.22f;
+            elapsed = 0f;
+            float overshoot = isLegendary ? 0.35f : (isEpic ? 0.22f : 0.12f);
+            while (elapsed < revealDuration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = Mathf.Clamp01(elapsed / revealDuration);
+                float scaleX = Mathf.Sin(t * Mathf.PI * 0.5f);
+                float bounce = Mathf.Sin(t * Mathf.PI) * overshoot;
+
+                cardTr.localScale = new Vector3(scaleX + bounce * 0.4f, 1f + bounce, 1f);
+                yield return null;
+            }
+
+            cardTr.localScale = Vector3.one;
         }
 
         private void OnCloseResultsClicked()
