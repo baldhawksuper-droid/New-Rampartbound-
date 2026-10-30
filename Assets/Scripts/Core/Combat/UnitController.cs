@@ -183,6 +183,10 @@ namespace FantasyDefense.Combat
         public static event Action<UnitController> OnUnitDragEnded;
         public static event Action<UnitController, string> OnUnitSkillTriggered; // (unit, skillName)
 
+        private Coroutine mergeCandidatePulseRoutine;
+        private Vector3 basePulseScale = Vector3.one;
+        private Color baseSpriteColor = Color.white;
+
         protected virtual void OnEnable()
         {
             if (!ActiveUnits.Contains(this))
@@ -946,6 +950,9 @@ namespace FantasyDefense.Combat
             // Visual feedback: Token terangkat sedikit membesar saat disentuh/diseret
             transform.localScale = transform.localScale * 1.15f;
 
+            // Highlight seluruh kandidat fusi sejenis & setier di papan arena (Golden Pulse Glow)
+            HighlightMergeCandidates(true);
+
             OnUnitDragStarted?.Invoke(this);
         }
 
@@ -1015,6 +1022,9 @@ namespace FantasyDefense.Combat
 
             if (spriteRenderer != null)
                 spriteRenderer.sortingOrder = normalSortingOrder;
+
+            // Matikan seluruh efek pulsasi kandidat fusi di papan arena
+            HighlightMergeCandidates(false);
 
             UpdateVisualAppearance(); // Kembalikan skala normal tier
 
@@ -1241,6 +1251,105 @@ namespace FantasyDefense.Combat
                 GridMatch3Solver.Instance.TriggerCascadeRefill();
             }
         }
+
+        #region Mobile Tactile Merge Candidate Highlight (Golden Pulse Glow)
+
+        /// <summary>
+        /// Mengatur penyorotan seluruh hero sejenis & setier di papan arena saat aksi seret (drag) berlangsung.
+        /// Memberikan panduan visual intuitif pada perangkat mobile agar pemain langsung tahu pasangan fusi yang valid.
+        /// </summary>
+        private void HighlightMergeCandidates(bool active)
+        {
+            if (GridManager.Instance == null) return;
+
+            var activeUnits = GridManager.Instance.GetAllActiveUnits();
+            if (activeUnits == null) return;
+
+            foreach (var other in activeUnits)
+            {
+                if (other != null && other != this)
+                {
+                    if (active)
+                    {
+                        if (CanMergeWith(other))
+                        {
+                            other.SetMergeCandidateGlow(true);
+                            if (other.currentCell != null)
+                            {
+                                other.currentCell.SetHighlightState(TileHighlightState.ValidMerge);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        other.SetMergeCandidateGlow(false);
+                        if (other.currentCell != null)
+                        {
+                            other.currentCell.SetHighlightState(TileHighlightState.None);
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Mengaktifkan atau mematikan efek pulsasi napas dan aura cahaya emas (Golden Glow Pulse)
+        /// pada unit hero yang menjadi target fusi valid.
+        /// </summary>
+        public void SetMergeCandidateGlow(bool active)
+        {
+            if (active)
+            {
+                if (mergeCandidatePulseRoutine == null && gameObject.activeInHierarchy)
+                {
+                    basePulseScale = transform.localScale;
+                    if (spriteRenderer != null)
+                    {
+                        baseSpriteColor = spriteRenderer.color;
+                    }
+                    mergeCandidatePulseRoutine = StartCoroutine(MergeCandidatePulseRoutine());
+                }
+            }
+            else
+            {
+                if (mergeCandidatePulseRoutine != null)
+                {
+                    StopCoroutine(mergeCandidatePulseRoutine);
+                    mergeCandidatePulseRoutine = null;
+                }
+                if (spriteRenderer != null)
+                {
+                    spriteRenderer.color = baseSpriteColor;
+                }
+                UpdateVisualAppearance();
+            }
+        }
+
+        private System.Collections.IEnumerator MergeCandidatePulseRoutine()
+        {
+            float timer = 0f;
+            Color goldenGlow = new Color(1.0f, 0.90f, 0.40f, 1.0f);
+
+            while (true)
+            {
+                timer += Time.deltaTime * 5.0f;
+                float sinVal = (Mathf.Sin(timer) + 1f) * 0.5f; // 0.0 s/d 1.0
+
+                // Efek denyut napas taktil (Breathing scale 1.0x -> 1.12x)
+                float scaleFactor = Mathf.Lerp(1.0f, 1.12f, sinVal);
+                transform.localScale = basePulseScale * scaleFactor;
+
+                // Transisi warna aura emas menyala
+                if (spriteRenderer != null)
+                {
+                    spriteRenderer.color = Color.Lerp(baseSpriteColor, goldenGlow, sinVal * 0.75f);
+                }
+
+                yield return null;
+            }
+        }
+
+        #endregion
 
         public virtual void UpgradeTier(UnitTier nextTier)
         {

@@ -389,6 +389,28 @@ namespace FantasyDefense.GridSystem
         }
 
         /// <summary>
+        /// Mengambil seluruh unit hero aktif yang sedang menempati petak arena grid.
+        /// Digunakan untuk evaluasi formasi taktis, auto-merge, dan highlight visual kandidat fusi.
+        /// </summary>
+        public List<UnitController> GetAllActiveUnits()
+        {
+            var units = new List<UnitController>();
+            if (gridMatrix == null) return units;
+
+            for (int x = 0; x < currentWidth; x++)
+            {
+                for (int y = 0; y < currentHeight; y++)
+                {
+                    if (gridMatrix[x, y] != null && gridMatrix[x, y].IsOccupied && gridMatrix[x, y].CurrentUnit != null)
+                    {
+                        units.Add(gridMatrix[x, y].CurrentUnit);
+                    }
+                }
+            }
+            return units;
+        }
+
+        /// <summary>
         /// Mengembalikan jumlah petak yang sedang terisi oleh unit hero.
         /// </summary>
         public int GetOccupiedCount()
