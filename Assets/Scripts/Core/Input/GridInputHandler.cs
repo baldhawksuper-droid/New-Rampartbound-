@@ -303,6 +303,12 @@ namespace FantasyDefense.GridSystem
                 Vector3 posA = cellA.transform.position;
                 Vector3 posB = cellB.transform.position;
 
+                // Audio desau pergeseran ubin taktil di atas papan (Tile Slide Swish)
+                if (AudioManager.Instance != null)
+                {
+                    AudioManager.Instance.PlaySound(SoundType.TileSlideSwish, 1.0f);
+                }
+
                 // Animasi pertukaran posisi secara halus (Lerp + Ease-Out Quad)
                 float elapsed = 0f;
                 while (elapsed < duration)
@@ -358,7 +364,7 @@ namespace FantasyDefense.GridSystem
                         AudioManager.Instance.PlaySound(SoundType.ButtonClick, 0.65f);
                     }
 
-                    if (DevicePerformanceManager.Instance != null)
+                    if (DevicePerformanceManager.Instance != null && DevicePerformanceManager.Instance.IsHapticsEnabled)
                     {
                         DevicePerformanceManager.Instance.TriggerHaptic(HapticFeedbackType.Warning);
                     }
@@ -422,7 +428,7 @@ namespace FantasyDefense.GridSystem
                     AudioManager.Instance.PlaySound(SoundType.ButtonClick, 1.15f);
                 }
 
-                if (DevicePerformanceManager.Instance != null)
+                if (DevicePerformanceManager.Instance != null && DevicePerformanceManager.Instance.IsHapticsEnabled)
                 {
                     DevicePerformanceManager.Instance.TriggerHaptic(HapticFeedbackType.Light);
                 }

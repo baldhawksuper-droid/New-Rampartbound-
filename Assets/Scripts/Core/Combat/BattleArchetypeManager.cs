@@ -73,6 +73,41 @@ namespace FantasyDefense.Combat
             return 1.0f + (currentLvl - 1) * perLevelBonus;
         }
 
+        /// <summary>
+        /// Menghitung akumulasi Combat Power (CP) real-time seluruh pahlawan di arena
+        /// yang diperkuat oleh level arketipe deck bawah (Point 3).
+        /// </summary>
+        public int CalculateLiveTeamCombatPower()
+        {
+            int baseTeamCP = (CitadelLobbyManager.Instance != null)
+                ? CitadelLobbyManager.Instance.TotalTeamCP
+                : 1500;
+            if (baseTeamCP <= 0) baseTeamCP = 1500;
+
+            // Rata-rata pengali serangan arketipe 4 kelas
+            float totalMult = GetDamageMultiplier(UnitType.Cedric) +
+                              GetDamageMultiplier(UnitType.RabbitMage) +
+                              GetDamageMultiplier(UnitType.RoseTanker) +
+                              GetDamageMultiplier(UnitType.WindRanger);
+            float avgMult = totalMult / 4.0f;
+
+            // Bonus tambahan tier unit yang sedang aktif di arena
+            int tierBonus = 0;
+            var activeUnits = UnitController.GetActiveUnitsSnapshot();
+            for (int i = 0; i < activeUnits.Count; i++)
+            {
+                var u = activeUnits[i];
+                if (u != null)
+                {
+                    int tVal = (int)u.CurrentTier;
+                    tierBonus += tVal * 85;
+                }
+            }
+
+            int finalCP = Mathf.RoundToInt(baseTeamCP * avgMult) + tierBonus;
+            return finalCP;
+        }
+
         public bool TryUpgradeArchetype(UnitType type)
         {
             if (IsMaxLevel(type))

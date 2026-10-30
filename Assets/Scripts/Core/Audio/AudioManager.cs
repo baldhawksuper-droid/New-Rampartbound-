@@ -40,7 +40,8 @@ namespace FantasyDefense.Audio
         CatalystThunderZap,
         GoldCoinSpend,
         ModeSwitchWhoosh,
-        ArchetypeMaxChime
+        ArchetypeMaxChime,
+        TileSlideSwish
     }
 
     public enum AudioSfxType
@@ -629,6 +630,7 @@ namespace FantasyDefense.Audio
             proceduralClipCache[SoundType.GoldCoinSpend] = CreateArpeggioClip("GoldCoinSpend", new float[] { 1760f, 2637f, 3520f }, 0.045f);
             proceduralClipCache[SoundType.ModeSwitchWhoosh] = CreateToneClip("ModeSwitchWhoosh", 0.42f, 280f, 620f);
             proceduralClipCache[SoundType.ArchetypeMaxChime] = CreateArpeggioClip("ArchetypeMaxChime", new float[] { 1046.50f, 1318.51f, 1567.98f, 2093.00f, 2637.02f }, 0.055f);
+            proceduralClipCache[SoundType.TileSlideSwish] = CreateToneClip("TileSlideSwish", 0.16f, 480f, 210f);
         }
 
         private AudioClip CreateToneClip(string name, float duration, float startFreq, float endFreq)
@@ -642,6 +644,7 @@ namespace FantasyDefense.Audio
             bool isImpact = name.Contains("Hit") || name.Contains("Cannon") || name.Contains("Earthshaker") || name.Contains("Shield") || name.Contains("Meteor");
             bool isZap = name == "CatalystThunderZap";
             bool isWhoosh = name == "ModeSwitchWhoosh";
+            bool isTileSwish = name == "TileSlideSwish";
 
             float filterNoise = 0f;
 
@@ -665,6 +668,16 @@ namespace FantasyDefense.Audio
                     float windFreq = Mathf.Lerp(startFreq, endFreq, progress);
                     float wind = Mathf.Sin(2 * Mathf.PI * windFreq * t) * 0.40f;
                     samples[i] = (filterNoise * 0.55f + wind) * env * 0.45f;
+                }
+                else if (isTileSwish)
+                {
+                    // Tactile stone tile sliding on board: textured friction noise with low ceramic/stone body
+                    float env = Mathf.Sin(progress * Mathf.PI);
+                    filterNoise += 0.42f * (Random.Range(-1f, 1f) - filterNoise);
+                    float frictionFreq = Mathf.Lerp(startFreq, endFreq, Mathf.SmoothStep(0f, 1f, progress));
+                    float stoneBody = Mathf.Sin(2 * Mathf.PI * frictionFreq * t) * 0.35f +
+                                      Mathf.Sin(4 * Mathf.PI * frictionFreq * t) * 0.15f;
+                    samples[i] = (filterNoise * 0.50f + stoneBody) * env * 0.38f;
                 }
                 else if (isZap)
                 {

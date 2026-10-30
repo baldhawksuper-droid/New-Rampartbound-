@@ -50,6 +50,10 @@ namespace FantasyDefense.UI
         [Header("Dynamic Battle Mode HUD (Sprint 8)")]
         [SerializeField] private GameObject modeBadgeContainer;
         [SerializeField] private Text modeBadgeText;
+        [SerializeField] private GameObject teamCpBadgeContainer;
+        [SerializeField] private Text teamCpBadgeText;
+        private int displayedTeamCp = 0;
+        private Coroutine teamCpRollRoutine = null;
         [SerializeField] private GameObject puzzlePreparationPanel;
         [SerializeField] private Text movesRemainingText;
         [SerializeField] private Button startDefenseNowButton;
@@ -130,6 +134,10 @@ namespace FantasyDefense.UI
             WaveSpawner.OnWaveMonsterProgressChanged += HandleWaveMonsterProgressChanged;
             FantasyDefense.GridSystem.GridMatch3Solver.OnCascadeCombo += HandleCascadeCombo;
             FantasyDefense.Mobile.DevicePerformanceManager.OnHapticsToggled += HandleHapticsToggled;
+            BattleArchetypeManager.OnArchetypeUpgraded += HandleLiveArchetypeUpgraded;
+            BattleArchetypeManager.OnArchetypesReset += HandleLiveArchetypesReset;
+            HeroSummoner.OnHeroSummoned += HandleLiveHeroSummoned;
+            UnitController.OnUnitMerged += HandleLiveUnitMerged;
         }
 
         private void OnDisable()
@@ -156,6 +164,10 @@ namespace FantasyDefense.UI
             WaveSpawner.OnWaveMonsterProgressChanged -= HandleWaveMonsterProgressChanged;
             FantasyDefense.GridSystem.GridMatch3Solver.OnCascadeCombo -= HandleCascadeCombo;
             FantasyDefense.Mobile.DevicePerformanceManager.OnHapticsToggled -= HandleHapticsToggled;
+            BattleArchetypeManager.OnArchetypeUpgraded -= HandleLiveArchetypeUpgraded;
+            BattleArchetypeManager.OnArchetypesReset -= HandleLiveArchetypesReset;
+            HeroSummoner.OnHeroSummoned -= HandleLiveHeroSummoned;
+            UnitController.OnUnitMerged -= HandleLiveUnitMerged;
             StopLowHpDangerAlert();
         }
 
@@ -273,6 +285,9 @@ namespace FantasyDefense.UI
             }
 
             UpdateAutoMergeDisplay(AutoMergeAssistant.Instance != null && AutoMergeAssistant.Instance.IsAutoMergeEnabled);
+
+            EnsureTeamCpBadgeBuilt();
+            UpdateLiveTeamCpDisplay(false);
 
             HideAllModals();
         }
@@ -526,6 +541,109 @@ namespace FantasyDefense.UI
 
             modeBadgeContainer = badgeObj;
             modeBadgeText = txt;
+
+            EnsureTeamCpBadgeBuilt();
+        }
+
+        private void EnsureTeamCpBadgeBuilt()
+        {
+            if (teamCpBadgeContainer != null) return;
+
+            var cpBadge = new GameObject("BattleLiveTeamCpBadge", typeof(RectTransform), typeof(Image));
+            cpBadge.transform.SetParent(transform, false);
+            var rt = cpBadge.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0.25f, 0.908f);
+            rt.anchorMax = new Vector2(0.75f, 0.938f);
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+
+            var img = cpBadge.GetComponent<Image>();
+            var frameSprite = Resources.Load<Sprite>("Sprites/UI/Frame_StoneBastion_9Slice")
+#if UNITY_EDITOR
+                           ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Frame_StoneBastion_9Slice.png")
+#endif
+                           ;
+            if (frameSprite != null)
+            {
+                img.sprite = frameSprite;
+                img.type = Image.Type.Sliced;
+            }
+            img.color = new Color(0.06f, 0.10f, 0.16f, 0.92f);
+
+            var textObj = new GameObject("LiveTeamCpText", typeof(RectTransform), typeof(Text));
+            textObj.transform.SetParent(cpBadge.transform, false);
+            var tRt = textObj.GetComponent<RectTransform>();
+            tRt.anchorMin = Vector2.zero;
+            tRt.anchorMax = Vector2.one;
+            tRt.offsetMin = new Vector2(4, 1);
+            tRt.offsetMax = new Vector2(-4, -1);
+
+            var txt = textObj.GetComponent<Text>();
+            var font = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+            if (font != null) txt.font = font;
+            txt.alignment = TextAnchor.MiddleCenter;
+            txt.fontSize = 11;
+            txt.fontStyle = FontStyle.Bold;
+            txt.color = new Color(1f, 0.88f, 0.35f, 1f);
+
+            teamCpBadgeContainer = cpBadge;
+            teamCpBadgeText = txt;
+        }
+
+        private void HandleLiveArchetypeUpgraded(UnitType type, int lvl, float mult) => UpdateLiveTeamCpDisplay(true);
+        private void HandleLiveArchetypesReset() => UpdateLiveTeamCpDisplay(false);
+        private void HandleLiveHeroSummoned(UnitController u, TileCell c) => UpdateLiveTeamCpDisplay(true);
+        private void HandleLiveUnitMerged(UnitController s, UnitController t, UnitTier n) => UpdateLiveTeamCpDisplay(true);
+
+        public void UpdateLiveTeamCpDisplay(bool animateRoll)
+        {
+            EnsureTeamCpBadgeBuilt();
+            if (teamCpBadgeText == null) return;
+
+            int targetCP = BattleArchetypeManager.Instance != null
+                ? BattleArchetypeManager.Instance.CalculateLiveTeamCombatPower()
+                : (CitadelLobbyManager.Instance != null ? CitadelLobbyManager.Instance.TotalTeamCP : 1500);
+
+            if (displayedTeamCp == 0 || !animateRoll)
+            {
+                displayedTeamCp = targetCP;
+                teamCpBadgeText.text = $"⚔️ TEAM CP: {displayedTeamCp:N0}";
+                return;
+            }
+
+            if (teamCpRollRoutine != null) StopCoroutine(teamCpRollRoutine);
+            teamCpRollRoutine = StartCoroutine(TeamCpNumberRollRoutine(displayedTeamCp, targetCP, 0.38f));
+        }
+
+        private IEnumerator TeamCpNumberRollRoutine(int startVal, int endVal, float duration)
+        {
+            if (teamCpBadgeContainer != null)
+            {
+                StartCoroutine(PunchScaleRoutine(teamCpBadgeContainer.transform, 1.12f, 0.20f));
+            }
+
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+                float easeOut = Mathf.Sin(t * Mathf.PI * 0.5f);
+                displayedTeamCp = Mathf.RoundToInt(Mathf.Lerp(startVal, endVal, easeOut));
+                if (teamCpBadgeText != null)
+                {
+                    teamCpBadgeText.text = $"⚔️ TEAM CP: {displayedTeamCp:N0}";
+                    teamCpBadgeText.color = new Color(1f, 0.95f, 0.50f, 1f); // Kilau keemasan saat naik
+                }
+                yield return null;
+            }
+
+            displayedTeamCp = endVal;
+            if (teamCpBadgeText != null)
+            {
+                teamCpBadgeText.text = $"⚔️ TEAM CP: {displayedTeamCp:N0}";
+                teamCpBadgeText.color = new Color(1f, 0.88f, 0.35f, 1f);
+            }
+            teamCpRollRoutine = null;
         }
 
         private IEnumerator ModeBadgeSheenRoutine(Transform badgeTr)
