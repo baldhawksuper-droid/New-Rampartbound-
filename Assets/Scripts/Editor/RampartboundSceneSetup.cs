@@ -184,22 +184,21 @@ namespace Rampartbound.Editor
                 apronSr.color = new Color(0.85f, 0.88f, 0.92f, 1f);
             }
 
-            // Menara Pertahanan Kiri: Meriam Pelontar Roket Benteng (Bastion Cannon Turret - Modular)
-            var cannonObj = new GameObject("Turret_Left_Cannon");
+            // Menara Pertahanan Kiri: Balista Sniper Benteng (Setup Ganda Balista - Meriam tersimpan di database aset untuk fitur penukaran & peningkatan masa depan)
+            var cannonObj = new GameObject("Turret_Left_Defense");
             cannonObj.transform.SetParent(barricadeObj.transform);
             cannonObj.transform.localPosition = new Vector3(-2.15f, 0.28f, 0);
             var cannonSr = cannonObj.AddComponent<SpriteRenderer>();
-            var cannonSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Combat/cannon_turret.png");
-            if (cannonSprite == null) cannonSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Combat/bastion_cannon_left.png");
-            if (cannonSprite != null) cannonSr.sprite = cannonSprite;
+            var leftBallistaSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Combat/ballista_turret.png");
+            if (leftBallistaSprite != null) cannonSr.sprite = leftBallistaSprite;
             cannonSr.sortingLayerName = "Board";
             cannonSr.sortingOrder = 15;
             cannonObj.transform.localScale = Vector3.one * 0.70f;
             var cannonTurret = cannonObj.AddComponent<CitadelDefenseTurret>();
-            cannonTurret.Initialize(CitadelTurretType.Cannon, cannonSprite);
+            cannonTurret.Initialize(CitadelTurretType.Archer, leftBallistaSprite);
 
-            // Menara Pertahanan Kanan: Pemanah & Balista Sniper Benteng (Bastion Ballista Turret - Modular)
-            var archerObj = new GameObject("Turret_Right_Archer");
+            // Menara Pertahanan Kanan: Balista Sniper Benteng (Bastion Ballista Turret - Modular)
+            var archerObj = new GameObject("Turret_Right_Defense");
             archerObj.transform.SetParent(barricadeObj.transform);
             archerObj.transform.localPosition = new Vector3(2.15f, 0.28f, 0);
             var archerSr = archerObj.AddComponent<SpriteRenderer>();
@@ -588,6 +587,7 @@ namespace Rampartbound.Editor
             titleSO.FindProperty("versionText").objectReferenceValue = versionTxt;
             titleSO.FindProperty("pulsingHintText").objectReferenceValue = pulseTxt;
             titleSO.FindProperty("enterCitadelButton").objectReferenceValue = startBtnObj.GetComponent<Button>();
+            titleSO.FindProperty("enterCitadelButtonImage").objectReferenceValue = startBtnObj.GetComponent<Image>();
             titleSO.FindProperty("enterCitadelButtonText").objectReferenceValue = startBtnObj.GetComponentInChildren<Text>();
             titleSO.FindProperty("handCursorRt").objectReferenceValue = handRt;
             titleSO.FindProperty("handCursorImage").objectReferenceValue = handImg;
@@ -596,6 +596,10 @@ namespace Rampartbound.Editor
             titleSO.FindProperty("cedricHeroImage").objectReferenceValue = cedricImg;
             titleSO.FindProperty("pippinHeroRt").objectReferenceValue = pippinSpriteRt;
             titleSO.FindProperty("cedricHeroRt").objectReferenceValue = cedricSpriteRt;
+            titleSO.FindProperty("pippinShadowRt").objectReferenceValue = pippinShadowRt;
+            titleSO.FindProperty("cedricShadowRt").objectReferenceValue = cedricShadowRt;
+            titleSO.FindProperty("pippinShadowImage").objectReferenceValue = pippinShadowImg;
+            titleSO.FindProperty("cedricShadowImage").objectReferenceValue = cedricShadowImg;
             titleSO.ApplyModifiedProperties();
 
             // ==========================================

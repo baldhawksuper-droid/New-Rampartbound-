@@ -40,6 +40,10 @@ namespace FantasyDefense.UI
         [SerializeField] private Image cedricHeroImage;
         [SerializeField] private RectTransform pippinHeroRt;
         [SerializeField] private RectTransform cedricHeroRt;
+        [SerializeField] private RectTransform pippinShadowRt;
+        [SerializeField] private RectTransform cedricShadowRt;
+        [SerializeField] private Image pippinShadowImage;
+        [SerializeField] private Image cedricShadowImage;
 
         [Header("Interactive Hand Cursor")]
         [SerializeField] private RectTransform handCursorRt;
@@ -74,6 +78,32 @@ namespace FantasyDefense.UI
             if (enterCitadelButtonText == null && enterCitadelButton != null)
             {
                 enterCitadelButtonText = enterCitadelButton.GetComponentInChildren<Text>();
+            }
+
+            if (enterCitadelButtonImage == null && enterCitadelButton != null)
+            {
+                enterCitadelButtonImage = enterCitadelButton.GetComponent<Image>();
+            }
+
+            // Temukan bayangan kontak tanah secara otomatis jika belum diatur di inspector
+            if (pippinShadowRt == null && pippinHeroRt != null && pippinHeroRt.parent != null)
+            {
+                var shadow = pippinHeroRt.parent.Find("Pippin_Ground_Shadow");
+                if (shadow != null)
+                {
+                    pippinShadowRt = shadow.GetComponent<RectTransform>();
+                    pippinShadowImage = shadow.GetComponent<Image>();
+                }
+            }
+
+            if (cedricShadowRt == null && cedricHeroRt != null && cedricHeroRt.parent != null)
+            {
+                var shadow = cedricHeroRt.parent.Find("Cedric_Ground_Shadow");
+                if (shadow != null)
+                {
+                    cedricShadowRt = shadow.GetComponent<RectTransform>();
+                    cedricShadowImage = shadow.GetComponent<Image>();
+                }
             }
 
             if (handCursorRt != null)
@@ -237,20 +267,34 @@ namespace FantasyDefense.UI
 
         private void Update()
         {
+            pulseTimer += Time.unscaledDeltaTime * 3f;
+
             // 1. Text hint pulse
             if (pulsingHintText != null && pulsingHintText.gameObject.activeInHierarchy)
             {
-                pulseTimer += Time.unscaledDeltaTime * 3f;
                 float alpha = 0.5f + (Mathf.Sin(pulseTimer) * 0.5f);
                 Color c = pulsingHintText.color;
                 c.a = alpha;
                 pulsingHintText.color = c;
             }
 
-            // 2. Interactive Hand Cursor Draggable Logic
+            // 2. Denyut lembut & pendaran emas pada tombol masuk Citadel
+            if (enterCitadelButton != null)
+            {
+                float btnPulse = 1f + (Mathf.Sin(pulseTimer * 0.8f) * 0.025f);
+                enterCitadelButton.transform.localScale = new Vector3(btnPulse, btnPulse, 1f);
+            }
+
+            if (enterCitadelButtonImage != null)
+            {
+                float glowAlpha = 0.90f + (Mathf.Sin(pulseTimer * 0.8f) * 0.10f);
+                enterCitadelButtonImage.color = new Color(1f, 1f, 1f, glowAlpha);
+            }
+
+            // 3. Interactive Hand Cursor Draggable Logic
             UpdateHandCursorInteraction();
 
-            // 3. Dual Heroes Gentle Breathing Idle Animation on Title Screen
+            // 4. Dual Heroes Gentle Breathing Idle Animation on Title Screen
             UpdateDualHeroesIdleAnimation();
         }
 
@@ -264,15 +308,37 @@ namespace FantasyDefense.UI
                 float pippinScaleY = 1f + (Mathf.Sin(idleTime * 2.2f) * 0.02f);
                 pippinHeroRt.anchoredPosition = new Vector2(pippinHeroRt.anchoredPosition.x, -20f + pippinOffsetY);
                 pippinHeroRt.localScale = new Vector3(1f, pippinScaleY, 1f);
+
+                if (pippinShadowRt != null)
+                {
+                    float shadowScale = 1f - (pippinOffsetY * 0.012f);
+                    pippinShadowRt.localScale = new Vector3(shadowScale, shadowScale, 1f);
+                    if (pippinShadowImage != null)
+                    {
+                        float shadowAlpha = 0.55f - (pippinOffsetY * 0.015f);
+                        pippinShadowImage.color = new Color(0f, 0f, 0f, Mathf.Clamp(shadowAlpha, 0.42f, 0.65f));
+                    }
+                }
             }
 
             if (cedricHeroRt != null)
             {
-                // Cedric grounded rhythmic breathing with slight phase delay
+                // Cedric grounded rhythmic breathing with slight phase delay (menghadap ke kiri ke arah Pippin: X = -1)
                 float cedricOffsetY = Mathf.Sin((idleTime * 2.0f) + 0.8f) * 5f;
                 float cedricScaleY = 1f + (Mathf.Sin((idleTime * 2.0f) + 0.8f) * 0.02f);
                 cedricHeroRt.anchoredPosition = new Vector2(cedricHeroRt.anchoredPosition.x, -20f + cedricOffsetY);
-                cedricHeroRt.localScale = new Vector3(1f, cedricScaleY, 1f);
+                cedricHeroRt.localScale = new Vector3(-1f, cedricScaleY, 1f); // Tetap mirrored horizontal!
+
+                if (cedricShadowRt != null)
+                {
+                    float shadowScale = 1f - (cedricOffsetY * 0.012f);
+                    cedricShadowRt.localScale = new Vector3(shadowScale, shadowScale, 1f);
+                    if (cedricShadowImage != null)
+                    {
+                        float shadowAlpha = 0.55f - (cedricOffsetY * 0.015f);
+                        cedricShadowImage.color = new Color(0f, 0f, 0f, Mathf.Clamp(shadowAlpha, 0.42f, 0.65f));
+                    }
+                }
             }
         }
 

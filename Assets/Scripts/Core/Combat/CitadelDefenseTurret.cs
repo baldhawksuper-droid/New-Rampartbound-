@@ -34,6 +34,7 @@ namespace FantasyDefense.Combat
 
         private float cooldownTimer = 0f;
         private Vector3 originalLocalScale;
+        private Vector3 originalLocalPos;
         private Coroutine recoilCoroutine;
 
         public CitadelTurretType TurretType => turretType;
@@ -91,6 +92,7 @@ namespace FantasyDefense.Combat
             {
                 originalLocalScale = Vector3.one;
             }
+            originalLocalPos = transform.localPosition;
         }
 
         public void Initialize(CitadelTurretType type, Sprite sprite = null, float customRange = -1f, float customInterval = -1f, float customDmg = -1f)
@@ -109,6 +111,11 @@ namespace FantasyDefense.Combat
             if (sprite != null)
             {
                 turretRenderer.sprite = sprite;
+            }
+            else if (turretRenderer.sprite == null)
+            {
+                // Standar visual ganda balista (meriam tersimpan dalam database aset untuk fitur penukaran & peningkatan masa depan)
+                turretRenderer.sprite = Resources.Load<Sprite>("Sprites/Combat/ballista_turret");
             }
 
             turretRenderer.sortingOrder = 15; // Di atas barikade
@@ -264,27 +271,44 @@ namespace FantasyDefense.Combat
 
         private IEnumerator AnimateRecoilKick()
         {
-            Vector3 squashedScale = new Vector3(originalLocalScale.x * 1.15f, originalLocalScale.y * 0.82f, originalLocalScale.z);
-            float elapsed = 0f;
-            float kickDuration = 0.08f;
+            if (originalLocalPos == Vector3.zero)
+            {
+                originalLocalPos = transform.localPosition;
+            }
 
+            Vector3 squashedScale = new Vector3(originalLocalScale.x * 1.12f, originalLocalScale.y * 0.84f, originalLocalScale.z);
+            Vector3 kickPos = originalLocalPos + Vector3.down * 0.08f; // Hentakan fisik ke bawah sepanjang sumbu Y
+            float elapsed = 0f;
+            float kickDuration = 0.06f;
+
+            // Fase 1: Hentakan kilat tolak-balik
             while (elapsed < kickDuration)
             {
-                transform.localScale = Vector3.Lerp(originalLocalScale, squashedScale, elapsed / kickDuration);
+                float t = elapsed / kickDuration;
+                transform.localScale = Vector3.Lerp(originalLocalScale, squashedScale, t);
+                transform.localPosition = Vector3.Lerp(originalLocalPos, kickPos, t);
                 elapsed += Time.deltaTime;
                 yield return null;
             }
 
+            // Fase 2: Pegas pemulihan halus (overshoot spring-back)
             elapsed = 0f;
-            float recoverDuration = 0.14f;
+            float recoverDuration = 0.16f;
+            Vector3 overshootScale = new Vector3(originalLocalScale.x * 0.98f, originalLocalScale.y * 1.04f, originalLocalScale.z);
+
             while (elapsed < recoverDuration)
             {
-                transform.localScale = Vector3.Lerp(squashedScale, originalLocalScale, elapsed / recoverDuration);
+                float t = elapsed / recoverDuration;
+                // Kurva transisi pegas elastis
+                float elasticT = Mathf.Sin(t * Mathf.PI * 0.5f);
+                transform.localScale = Vector3.Lerp(squashedScale, originalLocalScale, elasticT);
+                transform.localPosition = Vector3.Lerp(kickPos, originalLocalPos, elasticT);
                 elapsed += Time.deltaTime;
                 yield return null;
             }
 
             transform.localScale = originalLocalScale;
+            transform.localPosition = originalLocalPos;
             recoilCoroutine = null;
         }
 
