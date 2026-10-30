@@ -108,6 +108,7 @@ namespace FantasyDefense.Combat
         {
             maxHealth = startingHealth;
             currentHealth = startingHealth;
+            if (spriteRenderer != null) spriteRenderer.enabled = true;
             EnsureCrackOverlay();
             UpdateDamageVisuals();
             OnCastleHealthChanged?.Invoke(currentHealth, maxHealth);
@@ -229,6 +230,25 @@ namespace FantasyDefense.Combat
             if (currentHealth <= 0)
             {
                 Debug.LogWarning("[CastleBarricade] Benteng Runtuh! Pertahanan jebol!");
+
+                // Efek Shatter Debris Burst saat barikade runtuh
+                if (SkillVfxManager.Instance != null)
+                {
+                    SkillVfxManager.Instance.SpawnBarricadeCollapseShatter(transform.position);
+                }
+                if (spriteRenderer != null) spriteRenderer.enabled = false;
+                if (crackOverlayRenderer != null) crackOverlayRenderer.enabled = false;
+
+                if (AudioManager.Instance != null)
+                {
+                    AudioManager.Instance.PlaySound(SoundType.CastleHitBoss, 0.85f);
+                }
+
+                if (MobileCameraAdapter.Instance != null)
+                {
+                    MobileCameraAdapter.Instance.TriggerScreenShake(0.40f, 0.30f);
+                }
+
                 OnCastleBreached?.Invoke();
 
                 if (GameManager.Instance != null)

@@ -1371,45 +1371,65 @@ namespace FantasyDefense.UI
         {
             if (victoryStarsText == null) yield break;
 
-            victoryStarsText.text = "☆☆☆";
-            victoryStarsText.color = new Color(0.4f, 0.45f, 0.5f);
+            victoryStarsText.supportRichText = true;
+            victoryStarsText.text = "<color=#3D4A5E><size=36>☆  ☆  ☆</size></color>";
 
-            yield return new WaitForSecondsRealtime(0.25f);
+            yield return new WaitForSecondsRealtime(0.35f);
 
             for (int i = 1; i <= 3; i++)
             {
-                string s = "";
+                System.Text.StringBuilder sb = new System.Text.StringBuilder();
                 for (int j = 1; j <= 3; j++)
                 {
-                    s += (j <= i && j <= starCount) ? "★" : "☆";
+                    if (j <= i && j <= starCount)
+                    {
+                        sb.Append("<color=#FFD700><size=46>★</size></color>  ");
+                    }
+                    else
+                    {
+                        sb.Append("<color=#3D4A5E><size=36>☆</size></color>  ");
+                    }
                 }
 
-                victoryStarsText.text = s;
+                victoryStarsText.text = sb.ToString().TrimEnd();
 
                 if (i <= starCount)
                 {
-                    victoryStarsText.color = new Color(1f, 0.85f, 0.2f);
                     if (AudioManager.Instance != null)
                     {
-                        AudioManager.Instance.PlaySound(SoundType.MergeSuccess);
+                        if (i == 3)
+                        {
+                            AudioManager.Instance.PlaySound(SoundType.VictoryFanfare);
+                        }
+                        else
+                        {
+                            float pitch = (i == 1) ? 1.05f : 1.30f;
+                            AudioManager.Instance.PlaySound(SoundType.MergeSuccess, pitch);
+                        }
                     }
 
-                    // Punch scale bintang saat dicap
-                    float punchDuration = 0.18f;
+                    if (SkillVfxManager.Instance != null)
+                    {
+                        Color starColor = i == 3 ? new Color(1f, 0.85f, 0.2f) : new Color(0.35f, 0.90f, 1f);
+                        SkillVfxManager.Instance.SpawnProceduralParticleBurst(victoryStarsText.transform.position, starColor, Color.white, 12, 1.8f);
+                    }
+
+                    // Punch scale bintang dengan overshoot elastis
+                    float punchDuration = 0.22f;
                     float elapsed = 0f;
                     Vector3 origScale = Vector3.one;
                     while (elapsed < punchDuration)
                     {
                         elapsed += Time.unscaledDeltaTime;
                         float t = elapsed / punchDuration;
-                        float scale = 1f + Mathf.Sin(t * Mathf.PI) * 0.35f;
+                        float scale = 1f + Mathf.Sin(t * Mathf.PI) * 0.45f;
                         victoryStarsText.transform.localScale = origScale * scale;
                         yield return null;
                     }
                     victoryStarsText.transform.localScale = origScale;
                 }
 
-                yield return new WaitForSecondsRealtime(0.20f);
+                yield return new WaitForSecondsRealtime(0.28f);
             }
         }
 

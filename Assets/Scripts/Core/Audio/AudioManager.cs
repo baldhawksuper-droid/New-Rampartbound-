@@ -468,11 +468,44 @@ namespace FantasyDefense.Audio
             return null;
         }
 
+        /// <summary>
+        /// Memainkan seruan vokal heroik khas pahlawan (Hero Battle Grunt / Vocal Shouts)
+        /// saat mengeksekusi skill aktif Tier 2 ke atas.
+        /// </summary>
+        public void PlayHeroSkillVoice(UnitType heroType)
+        {
+            if (isSfxMuted || sfxSources.Count == 0) return;
+
+            string voiceKey = heroType switch
+            {
+                UnitType.Cedric => "Voice_Cedric_Skill",
+                UnitType.RoseTanker => "Voice_Rose_Skill",
+                UnitType.RabbitMage => "Voice_Rabbit_Skill",
+                UnitType.WindRanger => "Voice_Wind_Skill",
+                _ => "Voice_Cedric_Skill"
+            };
+
+            AudioClip clip = Resources.Load<AudioClip>($"Audio/SFX/{voiceKey}");
+            if (clip != null)
+            {
+                AudioSource source = sfxSources[currentSourceIndex];
+                currentSourceIndex = (currentSourceIndex + 1) % sfxSources.Count;
+                source.volume = sfxVolume * masterVolume * 0.95f;
+                source.pitch = Random.Range(0.96f, 1.04f);
+                source.PlayOneShot(clip);
+            }
+        }
+
         #region Event Handlers
 
         private void HandleUnitSkillTriggered(UnitController unit, string skillName)
         {
             if (unit == null) return;
+
+            if (unit.CurrentTier >= UnitTier.Tier2)
+            {
+                PlayHeroSkillVoice(unit.UnitType);
+            }
 
             switch (unit.UnitType)
             {

@@ -855,6 +855,96 @@ namespace FantasyDefense.Combat
             return cachedReticleSprite;
         }
 
+        /// <summary>
+        /// Menampilkan efek runtuh dramatis hancur berkeping (Shatter Debris Burst)
+        /// saat HP barikade benteng mencapai 0 (Kekalahan / Defeat).
+        /// Balok kayu, paku besi, dan kepulan debu beterbangan dengan gravitasi fisik.
+        /// </summary>
+        public void SpawnBarricadeCollapseShatter(Vector3 centerPos)
+        {
+            if (!enableParticleEffects) return;
+            StartCoroutine(BarricadeCollapseShatterRoutine(centerPos));
+        }
+
+        private IEnumerator BarricadeCollapseShatterRoutine(Vector3 centerPos)
+        {
+            int debrisCount = 18;
+            List<GameObject> debrisList = new List<GameObject>();
+            List<Vector3> velocities = new List<Vector3>();
+            List<float> rotSpeeds = new List<float>();
+
+            Color woodColor = new Color(0.48f, 0.32f, 0.18f);
+            Color ironColor = new Color(0.35f, 0.38f, 0.42f);
+
+            var boxTex = Texture2D.whiteTexture;
+            Sprite boxSprite = Sprite.Create(boxTex, new Rect(0, 0, 4, 4), new Vector2(0.5f, 0.5f), 100f);
+
+            for (int i = 0; i < debrisCount; i++)
+            {
+                GameObject chunk = new GameObject($"BarricadeDebris_{i}");
+                chunk.transform.position = centerPos + new Vector3(Random.Range(-0.9f, 0.9f), Random.Range(-0.2f, 0.3f), 0f);
+
+                var sr = chunk.AddComponent<SpriteRenderer>();
+                sr.sprite = boxSprite;
+                sr.color = (i % 3 == 0) ? ironColor : woodColor;
+                sr.sortingOrder = 30;
+
+                float w = (i % 3 == 0) ? Random.Range(0.08f, 0.15f) : Random.Range(0.20f, 0.45f);
+                float h = (i % 3 == 0) ? Random.Range(0.08f, 0.15f) : Random.Range(0.08f, 0.18f);
+                chunk.transform.localScale = new Vector3(w, h, 1f);
+
+                float vx = Random.Range(-3.2f, 3.2f);
+                float vy = Random.Range(2.0f, 5.2f);
+                velocities.Add(new Vector3(vx, vy, 0f));
+                rotSpeeds.Add(Random.Range(-360f, 360f));
+                debrisList.Add(chunk);
+            }
+
+            // Kepulan debu batu kapur & serbuk kayu
+            SpawnProceduralParticleBurst(centerPos, new Color(0.85f, 0.78f, 0.68f), new Color(0.55f, 0.45f, 0.35f), 25, 3.2f);
+            if (enableShockwaves)
+            {
+                StartCoroutine(SpawnShockwaveRingRoutine(centerPos, 1.8f, new Color(0.9f, 0.3f, 0.1f, 0.8f)));
+            }
+
+            float duration = 0.75f;
+            float elapsed = 0f;
+            float gravity = -14.0f;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float fade = Mathf.Clamp01(1f - (elapsed / duration));
+
+                for (int i = 0; i < debrisList.Count; i++)
+                {
+                    if (debrisList[i] == null) continue;
+
+                    Vector3 vel = velocities[i];
+                    vel.y += gravity * Time.deltaTime;
+                    velocities[i] = vel;
+
+                    debrisList[i].transform.position += vel * Time.deltaTime;
+                    debrisList[i].transform.Rotate(0f, 0f, rotSpeeds[i] * Time.deltaTime);
+
+                    var sr = debrisList[i].GetComponent<SpriteRenderer>();
+                    if (sr != null)
+                    {
+                        Color c = sr.color;
+                        c.a = fade;
+                        sr.color = c;
+                    }
+                }
+
+                yield return null;
+            }
+
+            for (int i = 0; i < debrisList.Count; i++)
+            {
+                if (debrisList[i] != null) Destroy(debrisList[i]);
+            }
+        }
+
         #region Hero Defender Battle Emotes (Point 3)
 
         private static Sprite cachedEmoteBubbleSprite;
