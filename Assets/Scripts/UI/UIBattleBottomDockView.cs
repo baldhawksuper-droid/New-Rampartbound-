@@ -87,11 +87,29 @@ namespace FantasyDefense.UI
             if (heroCards.TryGetValue(type, out var widgets))
             {
                 int bonusPct = Mathf.RoundToInt((newMultiplier - 1f) * 100f);
-                widgets.levelText.text = $"Lv.{newLevel} (+{bonusPct}%)";
+                bool isMax = (BattleArchetypeManager.Instance != null && BattleArchetypeManager.Instance.IsMaxLevel(type));
+                widgets.levelText.text = isMax ? $"Lv.{newLevel} (MAX)" : $"Lv.{newLevel} (+{bonusPct}%)";
+
                 if (BattleArchetypeManager.Instance != null)
                 {
-                    widgets.costText.text = $"💰 {BattleArchetypeManager.Instance.GetUpgradeCost(type)}G";
+                    if (isMax)
+                    {
+                        widgets.costText.text = "⭐ MAX";
+                        widgets.costText.color = new Color(0.85f, 0.95f, 1f, 0.9f);
+                        if (widgets.cardFrameImg != null)
+                        {
+                            widgets.cardFrameImg.color = new Color(0.92f, 0.95f, 1.0f, 1.0f);
+                        }
+                    }
+                    else
+                    {
+                        widgets.costText.text = $"💰 {BattleArchetypeManager.Instance.GetUpgradeCost(type)}G";
+                    }
                 }
+
+                // Floating gold spend indicator (-XXG)
+                int costPaid = (type == UnitType.RoseTanker ? 60 : 50) + (newLevel - 2) * (type == UnitType.RoseTanker ? 30 : 25);
+                SpawnFloatingGoldCost(widgets.rootObj.GetComponent<RectTransform>(), costPaid);
 
                 UpdateStarBadges(widgets, newLevel);
 
@@ -147,12 +165,17 @@ namespace FantasyDefense.UI
                 if (heroCards.TryGetValue(type, out var widgets))
                 {
                     int lvl = BattleArchetypeManager.Instance.GetLevel(type);
+                    bool isMax = BattleArchetypeManager.Instance.IsMaxLevel(type);
                     float mult = BattleArchetypeManager.Instance.GetDamageMultiplier(type);
                     int bonusPct = Mathf.RoundToInt((mult - 1f) * 100f);
                     int cost = BattleArchetypeManager.Instance.GetUpgradeCost(type);
 
-                    widgets.levelText.text = $"Lv.{lvl} (+{bonusPct}%)";
-                    widgets.costText.text = $"💰 {cost}G";
+                    widgets.levelText.text = isMax ? $"Lv.{lvl} (MAX)" : $"Lv.{lvl} (+{bonusPct}%)";
+                    widgets.costText.text = isMax ? "⭐ MAX" : $"💰 {cost}G";
+                    if (isMax && widgets.cardFrameImg != null)
+                    {
+                        widgets.cardFrameImg.color = new Color(0.92f, 0.95f, 1.0f, 1.0f);
+                    }
                     UpdateStarBadges(widgets, lvl);
                 }
             }
@@ -167,15 +190,30 @@ namespace FantasyDefense.UI
 
             foreach (var kvp in heroCards)
             {
+                bool isMax = BattleArchetypeManager.Instance.IsMaxLevel(kvp.Key);
                 int cost = BattleArchetypeManager.Instance.GetUpgradeCost(kvp.Key);
-                bool canAfford = gold >= cost;
+                bool canAfford = !isMax && (gold >= cost);
+
                 if (kvp.Value.upgradeButton != null)
                 {
                     kvp.Value.upgradeButton.interactable = canAfford;
                 }
                 if (kvp.Value.costText != null)
                 {
-                    kvp.Value.costText.color = canAfford ? new Color(1f, 0.9f, 0.3f) : new Color(0.7f, 0.7f, 0.7f, 0.6f);
+                    if (isMax)
+                    {
+                        kvp.Value.costText.text = "⭐ MAX";
+                        kvp.Value.costText.color = new Color(0.85f, 0.95f, 1f, 0.9f);
+                    }
+                    else
+                    {
+                        kvp.Value.costText.text = $"💰 {cost}G";
+                        kvp.Value.costText.color = canAfford ? new Color(1f, 0.9f, 0.3f) : new Color(0.7f, 0.7f, 0.7f, 0.6f);
+                    }
+                }
+                if (isMax && kvp.Value.cardFrameImg != null)
+                {
+                    kvp.Value.cardFrameImg.color = new Color(0.92f, 0.95f, 1.0f, 1.0f);
                 }
             }
         }
@@ -483,6 +521,53 @@ namespace FantasyDefense.UI
                 yield return null;
             }
             tr.localScale = orig;
+        }
+
+        private void SpawnFloatingGoldCost(RectTransform parentCard, int cost)
+        {
+            if (parentCard == null) return;
+            var floatObj = new GameObject("FloatingGoldCost", typeof(RectTransform), typeof(Text));
+            floatObj.transform.SetParent(parentCard, false);
+            var rt = floatObj.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0.5f, 0.22f);
+            rt.anchorMax = new Vector2(0.5f, 0.22f);
+            rt.sizeDelta = new Vector2(90, 26);
+            rt.anchoredPosition = Vector2.zero;
+
+            var txt = floatObj.GetComponent<Text>();
+            var font = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+            if (font != null) txt.font = font;
+            txt.alignment = TextAnchor.MiddleCenter;
+            txt.fontSize = 14;
+            txt.fontStyle = FontStyle.Bold;
+            txt.text = $"-{cost}G";
+            txt.color = new Color(1f, 0.85f, 0.25f, 1f);
+            txt.raycastTarget = false;
+
+            StartCoroutine(FloatingGoldCostRoutine(floatObj, rt, txt, 0.55f));
+        }
+
+        private System.Collections.IEnumerator FloatingGoldCostRoutine(GameObject obj, RectTransform rt, Text txt, float duration)
+        {
+            float elapsed = 0f;
+            Vector2 startPos = (rt != null) ? rt.anchoredPosition : Vector2.zero;
+            Vector2 endPos = startPos + new Vector2(0f, 38f);
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float progress = elapsed / duration;
+                if (rt != null)
+                {
+                    rt.anchoredPosition = Vector2.Lerp(startPos, endPos, Mathf.SmoothStep(0f, 1f, progress));
+                }
+                if (txt != null)
+                {
+                    float alpha = 1f - (progress * progress);
+                    txt.color = new Color(1f, 0.85f, 0.25f, alpha);
+                }
+                yield return null;
+            }
+            if (obj != null) Destroy(obj);
         }
     }
 }

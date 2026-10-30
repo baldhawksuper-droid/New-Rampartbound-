@@ -17,6 +17,8 @@ namespace FantasyDefense.Combat
     {
         public static BattleArchetypeManager Instance { get; private set; }
 
+        public const int MAX_ARCHETYPE_LEVEL = 5;
+
         private readonly Dictionary<UnitType, int> archetypeLevels = new Dictionary<UnitType, int>();
 
         public static event Action<UnitType, int, float> OnArchetypeUpgraded;
@@ -53,8 +55,11 @@ namespace FantasyDefense.Combat
             return archetypeLevels[type];
         }
 
+        public bool IsMaxLevel(UnitType type) => GetLevel(type) >= MAX_ARCHETYPE_LEVEL;
+
         public int GetUpgradeCost(UnitType type)
         {
+            if (IsMaxLevel(type)) return 0;
             int currentLvl = GetLevel(type);
             int baseCost = (type == UnitType.RoseTanker) ? 60 : 50;
             int increment = (type == UnitType.RoseTanker) ? 30 : 25;
@@ -70,6 +75,11 @@ namespace FantasyDefense.Combat
 
         public bool TryUpgradeArchetype(UnitType type)
         {
+            if (IsMaxLevel(type))
+            {
+                return false;
+            }
+
             int cost = GetUpgradeCost(type);
             if (EconomyManager.Instance == null || !EconomyManager.Instance.SpendBattleGold(cost))
             {

@@ -425,10 +425,35 @@ namespace FantasyDefense.UI
 
         private void HandleBattleModeSelected(BattleMode mode)
         {
+            EnsureModeBadgeBuilt();
             if (modeBadgeContainer != null) modeBadgeContainer.SetActive(true);
+
             if (modeBadgeText != null)
             {
-                modeBadgeText.text = mode == BattleMode.PuzzlePreparation ? "MODE 1: PUZZLE PREPARATION" : "MODE 2: REAL-TIME DEPLOY";
+                if (mode == BattleMode.PuzzlePreparation)
+                {
+                    modeBadgeText.text = "🧩 MODE 1: SWAP & MERGE (PAPAN TAKTIS)";
+                    modeBadgeText.color = new Color(0.35f, 0.95f, 0.88f);
+                    if (modeBadgeContainer != null && modeBadgeContainer.TryGetComponent<Image>(out var img))
+                    {
+                        img.color = new Color(0.08f, 0.18f, 0.25f, 0.95f);
+                    }
+                }
+                else
+                {
+                    modeBadgeText.text = "⚔️ MODE 2: REAL-TIME DEPLOY (PERTEMPURAN AKTIF)";
+                    modeBadgeText.color = new Color(1f, 0.85f, 0.35f);
+                    if (modeBadgeContainer != null && modeBadgeContainer.TryGetComponent<Image>(out var img))
+                    {
+                        img.color = new Color(0.24f, 0.12f, 0.10f, 0.95f);
+                    }
+                }
+            }
+
+            if (modeBadgeContainer != null)
+            {
+                StartCoroutine(PunchScaleRoutine(modeBadgeContainer.transform, 1.10f, 0.22f));
+                StartCoroutine(ModeBadgeSheenRoutine(modeBadgeContainer.transform));
             }
 
             if (puzzlePreparationPanel != null)
@@ -451,6 +476,90 @@ namespace FantasyDefense.UI
                 bottomDockView.gameObject.SetActive(true);
                 bottomDockView.RefreshAllCards();
             }
+        }
+
+        private void EnsureModeBadgeBuilt()
+        {
+            if (modeBadgeContainer != null) return;
+
+            var badgeObj = new GameObject("BattleModeHeaderBadge", typeof(RectTransform), typeof(Image));
+            badgeObj.transform.SetParent(transform, false);
+            var rt = badgeObj.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0.20f, 0.942f);
+            rt.anchorMax = new Vector2(0.80f, 0.985f);
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+
+            var img = badgeObj.GetComponent<Image>();
+            var frameSprite = Resources.Load<Sprite>("Sprites/UI/Frame_StoneBastion_9Slice")
+#if UNITY_EDITOR
+                           ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Frame_StoneBastion_9Slice.png")
+#endif
+                           ;
+            if (frameSprite != null)
+            {
+                img.sprite = frameSprite;
+                img.type = Image.Type.Sliced;
+            }
+            img.color = new Color(0.10f, 0.15f, 0.22f, 0.95f);
+
+            var textObj = new GameObject("ModeBadgeText", typeof(RectTransform), typeof(Text));
+            textObj.transform.SetParent(badgeObj.transform, false);
+            var tRt = textObj.GetComponent<RectTransform>();
+            tRt.anchorMin = Vector2.zero;
+            tRt.anchorMax = Vector2.one;
+            tRt.offsetMin = new Vector2(6, 2);
+            tRt.offsetMax = new Vector2(-6, -2);
+
+            var txt = textObj.GetComponent<Text>();
+            var font = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+            if (font != null) txt.font = font;
+            txt.alignment = TextAnchor.MiddleCenter;
+            txt.fontSize = 13;
+            txt.fontStyle = FontStyle.Bold;
+
+            modeBadgeContainer = badgeObj;
+            modeBadgeText = txt;
+        }
+
+        private IEnumerator ModeBadgeSheenRoutine(Transform badgeTr)
+        {
+            if (badgeTr == null) yield break;
+
+            var sheenObj = new GameObject("VerticalSheenBeam", typeof(RectTransform), typeof(Image));
+            sheenObj.transform.SetParent(badgeTr, false);
+            sheenObj.transform.SetAsFirstSibling();
+            var rt = sheenObj.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0f, 0f);
+            rt.anchorMax = new Vector2(0.18f, 1f);
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+
+            var img = sheenObj.GetComponent<Image>();
+            img.color = new Color(1f, 1f, 1f, 0.65f);
+            img.raycastTarget = false;
+
+            float duration = 0.45f;
+            float elapsed = 0f;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float progress = elapsed / duration;
+                if (rt != null)
+                {
+                    rt.anchorMin = new Vector2(progress * 1.1f - 0.2f, 0f);
+                    rt.anchorMax = new Vector2(progress * 1.1f, 1f);
+                }
+                if (img != null)
+                {
+                    float alpha = Mathf.Sin(progress * Mathf.PI) * 0.45f;
+                    img.color = new Color(1f, 1f, 1f, alpha);
+                }
+                yield return null;
+            }
+
+            if (sheenObj != null) Destroy(sheenObj);
         }
 
         private Coroutine movePunchCoroutine = null;
