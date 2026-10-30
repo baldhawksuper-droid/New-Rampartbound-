@@ -605,6 +605,23 @@ namespace FantasyDefense.Combat
 
             OnMonsterDamaged?.Invoke(this, finalDamage, isCrit);
 
+            // Audio pukulan khas monster canonical (Kenyal Slime Gemetite Ooze vs Clank Goblin Mire Scrapper)
+            if (FantasyDefense.Audio.AudioManager.Instance != null && monsterData != null)
+            {
+                if (monsterData.monsterType == MonsterType.Creep)
+                {
+                    FantasyDefense.Audio.AudioManager.Instance.PlaySound(
+                        FantasyDefense.Audio.SoundType.SlimeSquishImpact,
+                        UnityEngine.Random.Range(0.92f, 1.15f));
+                }
+                else if (monsterData.monsterType == MonsterType.Brute)
+                {
+                    FantasyDefense.Audio.AudioManager.Instance.PlaySound(
+                        FantasyDefense.Audio.SoundType.GoblinBucklerClank,
+                        UnityEngine.Random.Range(0.88f, 1.08f));
+                }
+            }
+
             if (currentHealth <= 0)
             {
                 Die();

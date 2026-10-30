@@ -41,7 +41,11 @@ namespace FantasyDefense.Audio
         GoldCoinSpend,
         ModeSwitchWhoosh,
         ArchetypeMaxChime,
-        TileSlideSwish
+        TileSlideSwish,
+        SlimeSquishImpact,
+        GoblinBucklerClank,
+        MonsterHitSlime = SlimeSquishImpact,
+        MonsterHitGoblin = GoblinBucklerClank
     }
 
     public enum AudioSfxType
@@ -631,6 +635,10 @@ namespace FantasyDefense.Audio
             proceduralClipCache[SoundType.ModeSwitchWhoosh] = CreateToneClip("ModeSwitchWhoosh", 0.42f, 280f, 620f);
             proceduralClipCache[SoundType.ArchetypeMaxChime] = CreateArpeggioClip("ArchetypeMaxChime", new float[] { 1046.50f, 1318.51f, 1567.98f, 2093.00f, 2637.02f }, 0.055f);
             proceduralClipCache[SoundType.TileSlideSwish] = CreateToneClip("TileSlideSwish", 0.16f, 480f, 210f);
+
+            // Audio Khusus Monster Canonical Mockup (Chibi Slime & Chibi Goblin)
+            proceduralClipCache[SoundType.SlimeSquishImpact] = CreateToneClip("SlimeSquishImpact", 0.16f, 360f, 160f); // Kenyal gelatinous bubble squish slime
+            proceduralClipCache[SoundType.GoblinBucklerClank] = CreateToneClip("GoblinBucklerClank", 0.22f, 540f, 150f); // Denting tameng kayu & bilah goblin
         }
 
         private AudioClip CreateToneClip(string name, float duration, float startFreq, float endFreq)
@@ -641,6 +649,8 @@ namespace FantasyDefense.Audio
 
             bool isClick = name == "ButtonClick";
             bool isBlade = name.Contains("Slash") || name.Contains("Arrow");
+            bool isSlime = name.Contains("Slime") || name == "CastleHitCreep";
+            bool isGoblinBuckler = name.Contains("Goblin") || name == "CastleHitBrute";
             bool isImpact = name.Contains("Hit") || name.Contains("Cannon") || name.Contains("Earthshaker") || name.Contains("Shield") || name.Contains("Meteor");
             bool isZap = name == "CatalystThunderZap";
             bool isWhoosh = name == "ModeSwitchWhoosh";
@@ -697,6 +707,27 @@ namespace FantasyDefense.Audio
                     filterNoise += 0.25f * (Random.Range(-1f, 1f) - filterNoise);
                     float steel = Mathf.Sin(2 * Mathf.PI * Mathf.Lerp(startFreq, endFreq, progress) * t) * 0.35f;
                     samples[i] = (filterNoise * 0.65f + steel) * env * 0.45f;
+                }
+                else if (isSlime)
+                {
+                    // Viscous gelatinous squish & wet bubble cavitation (Chibi Slime Gemetite Ooze)
+                    float env = Mathf.Sin(progress * Mathf.PI);
+                    filterNoise += 0.30f * (Random.Range(-1f, 1f) - filterNoise);
+                    float bubbleWobble = Mathf.Sin(2 * Mathf.PI * 22f * t) * 35f;
+                    float jellyFreq = Mathf.Lerp(startFreq, endFreq, Mathf.Pow(progress, 0.7f)) + bubbleWobble;
+                    float squishTone = Mathf.Sin(2 * Mathf.PI * jellyFreq * t) * 0.60f +
+                                       Mathf.Sin(4 * Mathf.PI * jellyFreq * t) * 0.25f;
+                    samples[i] = (squishTone + filterNoise * 0.20f) * env * 0.50f;
+                }
+                else if (isGoblinBuckler)
+                {
+                    // Heavy wooden buckler clank with sharp metallic transient (Chibi Goblin Mire Scrapper)
+                    float envWood = Mathf.Exp(-14f * progress);
+                    float envMetal = Mathf.Exp(-28f * progress);
+                    filterNoise += 0.38f * (Random.Range(-1f, 1f) - filterNoise);
+                    float woodThud = Mathf.Sin(2 * Mathf.PI * Mathf.Lerp(startFreq, endFreq, progress) * t) * 0.65f;
+                    float metalClang = Mathf.Sin(2 * Mathf.PI * 1320f * t) * 0.35f;
+                    samples[i] = (woodThud * envWood + metalClang * envMetal + filterNoise * 0.25f * envWood) * 0.55f;
                 }
                 else if (isImpact)
                 {
