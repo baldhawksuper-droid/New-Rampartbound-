@@ -22,6 +22,7 @@ namespace FantasyDefense.UI
         [SerializeField] private Text costText;
         [SerializeField] private Image cubeIconImage;
         [SerializeField] private Image glowOutlineImage;
+        private readonly List<RectTransform> orbitMotes = new List<RectTransform>();
 
         [Header("Visual Feedback")]
         [SerializeField] private Color normalColor = Color.white;
@@ -101,6 +102,41 @@ namespace FantasyDefense.UI
                 }
                 glowOutlineImage.color = new Color(1f, 0.85f, 0.2f, 0f);
             }
+
+            if (orbitMotes.Count == 0)
+            {
+                var motesParent = transform.Find("OrbitMotesContainer")?.gameObject;
+                if (motesParent == null)
+                {
+                    motesParent = new GameObject("OrbitMotesContainer", typeof(RectTransform));
+                    motesParent.transform.SetParent(transform, false);
+                    motesParent.transform.SetSiblingIndex(cubeIconImage != null ? cubeIconImage.transform.GetSiblingIndex() + 1 : 1);
+                    var mRt = motesParent.GetComponent<RectTransform>();
+                    mRt.anchorMin = new Vector2(0.5f, 0.62f);
+                    mRt.anchorMax = new Vector2(0.5f, 0.62f);
+                    mRt.sizeDelta = Vector2.zero;
+                }
+
+                var starSprite = Resources.Load<Sprite>("Sprites/UI/UI_Star_Badge_Gold")
+#if UNITY_EDITOR
+                              ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Star_Badge_Gold.png")
+#endif
+                              ;
+
+                for (int i = 0; i < 3; i++)
+                {
+                    var moteObj = new GameObject($"Mote_{i + 1}", typeof(RectTransform), typeof(Image));
+                    moteObj.transform.SetParent(motesParent.transform, false);
+                    var mRt = moteObj.GetComponent<RectTransform>();
+                    mRt.sizeDelta = new Vector2(10, 10);
+                    var img = moteObj.GetComponent<Image>();
+                    img.sprite = starSprite;
+                    img.preserveAspect = true;
+                    img.raycastTarget = false;
+                    img.color = new Color(1f, 0.92f, 0.45f, 0.85f);
+                    orbitMotes.Add(mRt);
+                }
+            }
         }
 
         private void OnEnable()
@@ -130,6 +166,10 @@ namespace FantasyDefense.UI
         private System.Collections.IEnumerator PulseGlowRoutine()
         {
             Vector3 baseScale = Vector3.one;
+            float orbitSpeed = 1.9f;
+            float radiusX = 36f;
+            float radiusY = 22f;
+
             while (true)
             {
                 if (button != null && button.interactable)
@@ -145,11 +185,39 @@ namespace FantasyDefense.UI
                         float alpha = 0.35f + sine * 0.25f;
                         glowOutlineImage.color = new Color(1f, 0.85f, 0.2f, Mathf.Clamp01(alpha));
                     }
+
+                    // Rotating starlight motes orbiting the cube
+                    for (int i = 0; i < orbitMotes.Count; i++)
+                    {
+                        var mote = orbitMotes[i];
+                        if (mote != null)
+                        {
+                            mote.gameObject.SetActive(true);
+                            float phase = i * (Mathf.PI * 2f / 3f);
+                            float angle = Time.unscaledTime * orbitSpeed + phase;
+                            float x = Mathf.Cos(angle) * radiusX;
+                            float y = Mathf.Sin(angle) * radiusY;
+                            mote.anchoredPosition = new Vector2(x, y);
+
+                            float scale = 0.85f + 0.35f * Mathf.Sin(angle);
+                            mote.localScale = Vector3.one * scale;
+                            var img = mote.GetComponent<Image>();
+                            if (img != null)
+                            {
+                                float moteAlpha = 0.45f + 0.45f * Mathf.Sin(angle + Mathf.PI * 0.5f);
+                                img.color = new Color(1f, 0.95f, 0.50f, Mathf.Clamp01(moteAlpha));
+                            }
+                        }
+                    }
                 }
                 else
                 {
                     if (cubeIconImage != null) cubeIconImage.transform.localScale = baseScale;
                     if (glowOutlineImage != null) glowOutlineImage.color = new Color(1f, 0.85f, 0.2f, 0f);
+                    for (int i = 0; i < orbitMotes.Count; i++)
+                    {
+                        if (orbitMotes[i] != null) orbitMotes[i].gameObject.SetActive(false);
+                    }
                 }
                 yield return null;
             }

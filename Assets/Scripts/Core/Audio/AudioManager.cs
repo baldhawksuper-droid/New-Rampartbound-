@@ -36,7 +36,8 @@ namespace FantasyDefense.Audio
         BallistaShoot = ArrowShot,
         Surrender = DefeatChime,
         WaveIncoming,
-        BarricadeRepair
+        BarricadeRepair,
+        CatalystThunderZap
     }
 
     public enum AudioSfxType
@@ -621,6 +622,7 @@ namespace FantasyDefense.Audio
             proceduralClipCache[SoundType.CannonFire] = CreateToneClip("CannonFire", 0.32f, 180f, 40f);
             proceduralClipCache[SoundType.WaveIncoming] = CreateArpeggioClip("WaveIncoming", new float[] { 349.23f, 440f, 523.25f, 698.46f }, 0.09f);
             proceduralClipCache[SoundType.BarricadeRepair] = CreateArpeggioClip("BarricadeRepair", new float[] { 523.25f, 659.25f, 783.99f, 1046.50f, 1318.5f }, 0.05f);
+            proceduralClipCache[SoundType.CatalystThunderZap] = CreateToneClip("CatalystThunderZap", 0.36f, 1250f, 85f);
         }
 
         private AudioClip CreateToneClip(string name, float duration, float startFreq, float endFreq)
@@ -632,6 +634,7 @@ namespace FantasyDefense.Audio
             bool isClick = name == "ButtonClick";
             bool isBlade = name.Contains("Slash") || name.Contains("Arrow");
             bool isImpact = name.Contains("Hit") || name.Contains("Cannon") || name.Contains("Earthshaker") || name.Contains("Shield") || name.Contains("Meteor");
+            bool isZap = name == "CatalystThunderZap";
 
             float filterNoise = 0f;
 
@@ -646,6 +649,17 @@ namespace FantasyDefense.Audio
                     float env = Mathf.Exp(-75f * progress);
                     float tone = Mathf.Sin(2 * Mathf.PI * 820f * t) * 0.65f + Mathf.Sin(2 * Mathf.PI * 260f * t) * 0.35f;
                     samples[i] = tone * env * 0.5f;
+                }
+                else if (isZap)
+                {
+                    // Thunder zap: high frequency electrical sizzle decaying rapidly into deep sub-bass resonance
+                    float env = Mathf.Exp(-9.5f * progress);
+                    filterNoise += 0.35f * (Random.Range(-1f, 1f) - filterNoise);
+                    float freqSweep = Mathf.Lerp(startFreq, endFreq, Mathf.Pow(progress, 0.45f));
+                    float electricalTone = Mathf.Sin(2 * Mathf.PI * freqSweep * t) * 0.45f +
+                                           Mathf.Sin(6 * Mathf.PI * freqSweep * t) * 0.20f;
+                    float subBass = Mathf.Sin(2 * Mathf.PI * 65f * t) * Mathf.Clamp01(1f - progress * 1.5f) * 0.35f;
+                    samples[i] = (electricalTone + filterNoise * 0.35f + subBass) * env * 0.55f;
                 }
                 else if (isBlade)
                 {

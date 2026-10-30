@@ -39,6 +39,7 @@ namespace FantasyDefense.UI
             public Text costText;
             public RectTransform starsContainer;
             public readonly List<Image> starImages = new List<Image>();
+            public Image glowOverlayImg;
         }
 
         private void Awake()
@@ -94,7 +95,16 @@ namespace FantasyDefense.UI
 
                 UpdateStarBadges(widgets, newLevel);
 
-                // Punch animation pada kartu
+                // Elemental card border glow flash & punch animation
+                Color elemColor = type switch
+                {
+                    UnitType.RabbitMage => new Color(0.35f, 0.88f, 1f, 0.95f),   // Arcane Cyan
+                    UnitType.Cedric => new Color(1f, 0.45f, 0.25f, 0.95f),       // Fiery Crimson
+                    UnitType.RoseTanker => new Color(1f, 0.82f, 0.20f, 0.95f),   // Golden Amber
+                    UnitType.WindRanger => new Color(0.35f, 0.95f, 0.55f, 0.95f),// Emerald Gale
+                    _ => Color.white
+                };
+                StartCoroutine(CardGlowFlashRoutine(widgets.glowOverlayImg, elemColor, 0.38f));
                 StartCoroutine(PunchScaleRoutine(widgets.rootObj.transform, 1.18f, 0.20f));
             }
 
@@ -256,6 +266,24 @@ namespace FantasyDefense.UI
                 cardImg.color = new Color(0.10f, 0.14f, 0.22f, 0.95f);
             }
 
+            // Glow Overlay for elemental level-up flash
+            var glowObj = new GameObject("GlowOverlay", typeof(RectTransform), typeof(Image));
+            glowObj.transform.SetParent(cardObj.transform, false);
+            var gRt = glowObj.GetComponent<RectTransform>();
+            gRt.anchorMin = Vector2.zero;
+            gRt.anchorMax = Vector2.one;
+            gRt.offsetMin = new Vector2(-2, -2);
+            gRt.offsetMax = new Vector2(2, 2);
+            var gImg = glowObj.GetComponent<Image>();
+            if (frameSprite != null)
+            {
+                gImg.sprite = frameSprite;
+                gImg.type = Image.Type.Sliced;
+            }
+            gImg.color = new Color(1f, 1f, 1f, 0f);
+            gImg.raycastTarget = false;
+            widgets.glowOverlayImg = gImg;
+
             // Avatar Portrait
             var portObj = new GameObject("HeroPortrait", typeof(RectTransform), typeof(Image));
             portObj.transform.SetParent(cardObj.transform, false);
@@ -398,6 +426,21 @@ namespace FantasyDefense.UI
             {
                 widgets.starImages[i].gameObject.SetActive(i < clampedLevel);
             }
+        }
+
+        private System.Collections.IEnumerator CardGlowFlashRoutine(Image glowImg, Color flashColor, float duration)
+        {
+            if (glowImg == null) yield break;
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float progress = elapsed / duration;
+                float alpha = Mathf.Sin(progress * Mathf.PI) * flashColor.a;
+                glowImg.color = new Color(flashColor.r, flashColor.g, flashColor.b, alpha);
+                yield return null;
+            }
+            glowImg.color = new Color(flashColor.r, flashColor.g, flashColor.b, 0f);
         }
 
         private System.Collections.IEnumerator PunchScaleRoutine(Transform tr, float targetScale, float duration)

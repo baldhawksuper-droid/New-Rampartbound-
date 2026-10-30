@@ -370,6 +370,7 @@ namespace FantasyDefense.Summon
             // Audio & Partikel Spektakuler
             if (Audio.AudioManager.Instance != null)
             {
+                Audio.AudioManager.Instance.PlaySound(Audio.SoundType.CatalystThunderZap);
                 Audio.AudioManager.Instance.PlaySound(Audio.SoundType.MergeSuccess, 1.40f);
             }
 
