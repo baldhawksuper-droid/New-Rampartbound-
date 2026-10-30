@@ -689,6 +689,52 @@ namespace FantasyDefense.Combat
             }
         }
 
+        /// <summary>
+        /// Menampilkan letupan ledakan artileri meriam benteng (Incendiary Siege Detonation)
+        /// dengan serpihan bara api, gelombang kejut AOE, dan kilatan api vulkanik.
+        /// </summary>
+        public void SpawnCannonImpactVfx(Vector3 impactPos, float aoeRadius)
+        {
+            if (!enableParticleEffects) return;
+
+            Color fireOrange = new Color(1f, 0.45f, 0.08f);
+            Color emberGold = new Color(1f, 0.88f, 0.22f);
+            int count = 24;
+            float speed = 3.6f;
+
+            SpawnProceduralParticleBurst(impactPos, fireOrange, emberGold, count, speed);
+
+            if (enableShockwaves)
+            {
+                float radius = Mathf.Max(aoeRadius, 1.4f);
+                Color waveColor = new Color(1f, 0.40f, 0.05f, 0.75f);
+                StartCoroutine(SpawnShockwaveRingRoutine(impactPos, radius, waveColor));
+            }
+        }
+
+        /// <summary>
+        /// Menampilkan letupan kinetik penembus zirah baut balista benteng (Armor-Piercing Kinetic Shock)
+        /// dengan kilatan kristal toska runik tajam, garis serpihan kinetik, dan gelombang kejut udara.
+        /// </summary>
+        public void SpawnBallistaPierceImpactVfx(Vector3 impactPos, bool isCrit)
+        {
+            if (!enableParticleEffects) return;
+
+            Color cyanRunic = isCrit ? new Color(0.25f, 1f, 0.95f) : new Color(0.12f, 0.82f, 0.98f);
+            Color kineticWhite = new Color(0.95f, 0.98f, 1f);
+            int count = isCrit ? 22 : 14;
+            float speed = isCrit ? 3.8f : 2.6f;
+
+            SpawnProceduralParticleBurst(impactPos, cyanRunic, kineticWhite, count, speed);
+
+            if (enableShockwaves)
+            {
+                float radius = isCrit ? 1.1f : 0.75f;
+                Color waveColor = isCrit ? new Color(0.3f, 0.95f, 1f, 0.7f) : new Color(0.15f, 0.75f, 0.95f, 0.5f);
+                StartCoroutine(SpawnShockwaveRingRoutine(impactPos, radius, waveColor));
+            }
+        }
+
         #region Hero Defender Battle Emotes (Point 3)
 
         private static Sprite cachedEmoteBubbleSprite;

@@ -245,23 +245,23 @@ namespace FantasyDefense.Metagame
                     var minionData = ScriptableObject.CreateInstance<MonsterDataSO>();
                     minionData.monsterType = MonsterType.Brute;
                     minionData.monsterName = "Pengawal Abyssal";
-                    minionData.maxHealth = 200f + (stageNum * 30f);
-                    minionData.moveSpeed = 1.2f;
-                    minionData.castleDamage = 10;
-                    minionData.gemsReward = 5;
+                    minionData.maxHealth = 480f + (stageNum * 45f);
+                    minionData.moveSpeed = 1.15f;
+                    minionData.castleDamage = 12;
+                    minionData.gemsReward = 8;
                     minionData.monsterSprite = Resources.Load<Sprite>("Sprites/Monsters/Monster_Brute");
                     minionData.visualScale = 0.28f;
                     minionData.themeColor = Color.white;
 
-                    var group1 = new WaveSpawnGroup { monsterData = minionData, count = 3, spawnInterval = 1.0f, initialDelay = 0.2f };
+                    var group1 = new WaveSpawnGroup { monsterData = minionData, count = 4, spawnInterval = 0.9f, initialDelay = 0.2f };
 
                     var bossData = ScriptableObject.CreateInstance<MonsterDataSO>();
                     bossData.monsterType = MonsterType.Boss;
                     bossData.monsterName = bossName;
-                    bossData.maxHealth = stageNum == 10 ? 1600f : 750f;
-                    bossData.moveSpeed = stageNum == 10 ? 0.9f : 1.1f;
-                    bossData.castleDamage = stageNum == 10 ? 35 : 20;
-                    bossData.gemsReward = stageNum == 10 ? 50 : 25;
+                    bossData.maxHealth = stageNum == 10 ? 2800f : (1100f + stageNum * 120f);
+                    bossData.moveSpeed = stageNum == 10 ? 0.85f : 1.05f;
+                    bossData.castleDamage = stageNum == 10 ? 35 : 22;
+                    bossData.gemsReward = stageNum == 10 ? 60 : 30;
                     bossData.visualScale = 0.42f;
                     bossData.themeColor = Color.white;
                     bossData.monsterSprite = Resources.Load<Sprite>("Sprites/Monsters/Monster_Boss");
@@ -277,16 +277,16 @@ namespace FantasyDefense.Metagame
                     var creepData = ScriptableObject.CreateInstance<MonsterDataSO>();
                     creepData.monsterType = MonsterType.Creep;
                     creepData.monsterName = $"Serangga Abyssal Lv.{stageNum}";
-                    creepData.maxHealth = 120f + (stageNum * 25f);
-                    creepData.moveSpeed = 1.4f;
+                    creepData.maxHealth = 240f + (stageNum * 35f);
+                    creepData.moveSpeed = 1.45f;
                     creepData.castleDamage = 8;
-                    creepData.gemsReward = 4;
+                    creepData.gemsReward = 5;
                     creepData.monsterSprite = Resources.Load<Sprite>("Sprites/Monsters/Monster_Creep");
                     creepData.visualScale = 0.20f;
                     creepData.themeColor = Color.white;
 
                     // Squad rombongan Creep awal
-                    var groupCreeps = new WaveSpawnGroup { monsterData = creepData, count = 4 + (w * 2), spawnInterval = 0.8f, initialDelay = 0.3f };
+                    var groupCreeps = new WaveSpawnGroup { monsterData = creepData, count = 6 + (w * 2), spawnInterval = 0.75f, initialDelay = 0.2f };
                     wave.spawnGroups.Add(groupCreeps);
 
                     // Sesuai Poin 2: Pada penanda tengkorak (Wave 2+ atau akhir gelombang), musuh lebih kuat (Brute) tiba!
@@ -295,15 +295,15 @@ namespace FantasyDefense.Metagame
                         var bruteData = ScriptableObject.CreateInstance<MonsterDataSO>();
                         bruteData.monsterType = MonsterType.Brute;
                         bruteData.monsterName = $"Panglima Brute Wilayah {stageNum}";
-                        bruteData.maxHealth = 260f + (stageNum * 35f);
+                        bruteData.maxHealth = 620f + (stageNum * 55f);
                         bruteData.moveSpeed = 1.15f;
-                        bruteData.castleDamage = 12;
-                        bruteData.gemsReward = 10;
+                        bruteData.castleDamage = 14;
+                        bruteData.gemsReward = 12;
                         bruteData.monsterSprite = Resources.Load<Sprite>("Sprites/Monsters/Monster_Brute");
                         bruteData.visualScale = 0.28f;
                         bruteData.themeColor = Color.white;
 
-                        var groupBrute = new WaveSpawnGroup { monsterData = bruteData, count = w - 1, spawnInterval = 1.5f, initialDelay = 2.5f };
+                        var groupBrute = new WaveSpawnGroup { monsterData = bruteData, count = w, spawnInterval = 1.4f, initialDelay = 2.0f };
                         wave.spawnGroups.Add(groupBrute);
                     }
                 }

@@ -15,8 +15,8 @@ MonoBehaviour:
   waveTitle: Serbuan Awal Goblin Creep
   spawnGroups:
   - monsterData: {fileID: 11400000, guid: 7af81211fadc40a6ba2996b8ceed9393, type: 3}
-    count: 6
-    spawnInterval: 1.2
+    count: 8
+    spawnInterval: 0.9
     initialDelay: 1.0
   restTimeAfterWave: 4
   bonusGemsOnClear: 20

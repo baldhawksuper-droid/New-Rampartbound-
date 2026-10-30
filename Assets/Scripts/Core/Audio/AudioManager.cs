@@ -530,14 +530,52 @@ namespace FantasyDefense.Audio
             int totalSamples = Mathf.FloorToInt(sampleRate * duration);
             float[] samples = new float[totalSamples];
 
+            bool isClick = name == "ButtonClick";
+            bool isBlade = name.Contains("Slash") || name.Contains("Arrow");
+            bool isImpact = name.Contains("Hit") || name.Contains("Cannon") || name.Contains("Earthshaker") || name.Contains("Shield") || name.Contains("Meteor");
+
+            float filterNoise = 0f;
+
             for (int i = 0; i < totalSamples; i++)
             {
                 float t = (float)i / sampleRate;
                 float progress = (float)i / totalSamples;
-                float currentFreq = Mathf.Lerp(startFreq, endFreq, progress);
-                float envelope = 1f - progress; // Linear decay
 
-                samples[i] = Mathf.Sin(2 * Mathf.PI * currentFreq * t) * envelope * 0.4f;
+                if (isClick)
+                {
+                    // Tactile wooden button tap: rapid exponential decay with warm body
+                    float env = Mathf.Exp(-75f * progress);
+                    float tone = Mathf.Sin(2 * Mathf.PI * 820f * t) * 0.65f + Mathf.Sin(2 * Mathf.PI * 260f * t) * 0.35f;
+                    samples[i] = tone * env * 0.5f;
+                }
+                else if (isBlade)
+                {
+                    // Aerodynamic blade swoosh: shaped filtered noise + steel overtone
+                    float env = Mathf.Sin(progress * Mathf.PI);
+                    filterNoise += 0.25f * (Random.Range(-1f, 1f) - filterNoise);
+                    float steel = Mathf.Sin(2 * Mathf.PI * Mathf.Lerp(startFreq, endFreq, progress) * t) * 0.35f;
+                    samples[i] = (filterNoise * 0.65f + steel) * env * 0.45f;
+                }
+                else if (isImpact)
+                {
+                    // Physical siege impact: low frequency punch + sub-bass body + dampening
+                    float env = Mathf.Exp(-8f * progress);
+                    float currentFreq = Mathf.Lerp(startFreq, endFreq, progress);
+                    filterNoise += 0.15f * (Random.Range(-1f, 1f) - filterNoise);
+                    float punch = Mathf.Sin(2 * Mathf.PI * currentFreq * t) * 0.7f + filterNoise * 0.3f;
+                    samples[i] = punch * env * 0.6f;
+                }
+                else
+                {
+                    // Harmonic overtone synthesis (fundamental + 2nd + 3rd harmonics + sub-octave)
+                    float env = Mathf.Exp(-4.5f * progress);
+                    float currentFreq = Mathf.Lerp(startFreq, endFreq, progress);
+                    float tone = Mathf.Sin(2 * Mathf.PI * currentFreq * t) * 0.50f +
+                                 Mathf.Sin(4 * Mathf.PI * currentFreq * t) * 0.25f +
+                                 Mathf.Sin(6 * Mathf.PI * currentFreq * t) * 0.12f +
+                                 Mathf.Sin(Mathf.PI * currentFreq * t) * 0.13f;
+                    samples[i] = tone * env * 0.4f;
+                }
             }
 
             AudioClip clip = AudioClip.Create(name, totalSamples, 1, sampleRate, false);
@@ -549,21 +587,28 @@ namespace FantasyDefense.Audio
         {
             int sampleRate = 44100;
             int samplesPerNote = Mathf.FloorToInt(sampleRate * noteDuration);
-            int totalSamples = samplesPerNote * freqs.Length;
+            int tailSamples = Mathf.FloorToInt(sampleRate * 0.4f);
+            int totalSamples = samplesPerNote * freqs.Length + tailSamples;
             float[] samples = new float[totalSamples];
 
             for (int n = 0; n < freqs.Length; n++)
             {
                 float freq = freqs[n];
                 int offset = n * samplesPerNote;
+                int remainingSamples = totalSamples - offset;
 
-                for (int i = 0; i < samplesPerNote; i++)
+                for (int i = 0; i < remainingSamples; i++)
                 {
                     float t = (float)i / sampleRate;
-                    float progress = (float)i / samplesPerNote;
-                    float envelope = 1f - progress;
+                    float env = Mathf.Exp(-5.5f * t);
+                    if (env < 0.001f) break;
 
-                    samples[offset + i] = Mathf.Sin(2 * Mathf.PI * freq * t) * envelope * 0.35f;
+                    // Bell acoustic partials (1.0, 2.76, 5.40)
+                    float tone = Mathf.Sin(2 * Mathf.PI * freq * t) * 0.28f +
+                                 Mathf.Sin(2 * Mathf.PI * (freq * 2.76f) * t) * 0.10f +
+                                 Mathf.Sin(2 * Mathf.PI * (freq * 5.40f) * t) * 0.04f;
+
+                    samples[offset + i] += tone * env;
                 }
             }
 

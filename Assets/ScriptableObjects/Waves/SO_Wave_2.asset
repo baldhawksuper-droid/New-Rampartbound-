@@ -15,8 +15,8 @@ MonoBehaviour:
   waveTitle: Barisan Perisai Orc Brute
   spawnGroups:
   - monsterData: {fileID: 11400000, guid: 7af81211fadc40a6ba2996b8ceed9393, type: 3}
-    count: 4
-    spawnInterval: 1.0
+    count: 6
+    spawnInterval: 0.8
     initialDelay: 0.5
   - monsterData: {fileID: 11400000, guid: e3ea6493c4b34bfba9bc7c2e4d20b9e0, type: 3}
     count: 3

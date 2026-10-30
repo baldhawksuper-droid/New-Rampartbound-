@@ -271,7 +271,7 @@ namespace FantasyDefense.Combat
                     sr.color = new Color(1f, 0.55f, 0.2f);
                     projObj.transform.localScale = Vector3.one * 0.5f;
                 }
-                proj.Initialize(target, baseDamage, aoeRadius: splashRadius, slow: 0.15f, slowTime: 1.5f, critical: false, meteor: false, arrow: false);
+                proj.Initialize(target, baseDamage, aoeRadius: splashRadius, slow: 0.15f, slowTime: 1.5f, critical: false, meteor: false, arrow: false, cannon: true, ballista: false);
 
                 if (AudioManager.Instance != null)
                 {
@@ -298,7 +298,7 @@ namespace FantasyDefense.Combat
                     sr.color = new Color(0.9f, 0.95f, 1f);
                     projObj.transform.localScale = new Vector3(0.35f, 0.65f, 1f);
                 }
-                proj.Initialize(target, baseDamage, aoeRadius: 0f, slow: 0f, slowTime: 0f, critical: false, meteor: false, arrow: true);
+                proj.Initialize(target, baseDamage, aoeRadius: 0f, slow: 0f, slowTime: 0f, critical: false, meteor: false, arrow: false, cannon: false, ballista: true);
 
                 if (AudioManager.Instance != null)
                 {

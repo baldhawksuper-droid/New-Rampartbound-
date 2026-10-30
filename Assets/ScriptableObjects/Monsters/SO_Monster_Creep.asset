@@ -14,8 +14,8 @@ MonoBehaviour:
   monsterType: 0
   monsterName: Mire Horned Scrapper
   description: Monster kadal rawa bertopeng kumbang bertanduk mini dengan rantai jangkar kapal. Gesit dan lincah menyerbu benteng.
-  moveSpeed: 2
-  maxHealth: 220
+  moveSpeed: 1.8
+  maxHealth: 280
   castleDamage: 5
   gemsReward: 8
   monsterSprite: {fileID: 21300000, guid: 9b2d5d588bc0445b847103ffe0f5f6ff, type: 3}

@@ -21,6 +21,8 @@ namespace FantasyDefense.Combat
         private bool isCrit = false;
         private bool isMeteor = false;
         private bool isArrow = false;
+        private bool isCannon = false;
+        private bool isBallista = false;
         private Vector3 lastTargetPos;
 
         public void Initialize(
@@ -31,7 +33,9 @@ namespace FantasyDefense.Combat
             float slowTime = 0f,
             bool critical = false,
             bool meteor = false,
-            bool arrow = false)
+            bool arrow = false,
+            bool cannon = false,
+            bool ballista = false)
         {
             target = targetMonster;
             damage = damageAmount;
@@ -41,6 +45,8 @@ namespace FantasyDefense.Combat
             isCrit = critical;
             isMeteor = meteor;
             isArrow = arrow;
+            isCannon = cannon;
+            isBallista = ballista;
 
             if (target != null)
                 lastTargetPos = target.transform.position;
@@ -99,10 +105,18 @@ namespace FantasyDefense.Combat
                 fireField.Initialize(splashRadius, 3.0f, damage * 0.35f, slowPercent > 0f ? slowPercent : 0.40f);
             }
 
-            // 4. Semburan partikel impak proyektil (letupan angin panah zamrud atau percikan sihir kristal)
+            // 4. Semburan partikel impak proyektil (letupan meriam berapi, tembusan balista runik, panah zamrud, atau sihir kristal)
             if (SkillVfxManager.Instance != null)
             {
-                if (isArrow)
+                if (isCannon)
+                {
+                    SkillVfxManager.Instance.SpawnCannonImpactVfx(transform.position, splashRadius);
+                }
+                else if (isBallista)
+                {
+                    SkillVfxManager.Instance.SpawnBallistaPierceImpactVfx(transform.position, isCrit);
+                }
+                else if (isArrow)
                 {
                     SkillVfxManager.Instance.SpawnArrowImpactVfx(transform.position, isCrit);
                 }
