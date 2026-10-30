@@ -281,6 +281,7 @@ namespace FantasyDefense.Combat
                 if (SkillVfxManager.Instance != null)
                 {
                     SkillVfxManager.Instance.SpawnProceduralParticleBurst(spawnPos, new Color(1f, 0.7f, 0.2f), Color.white, 8, 1.5f);
+                    SkillVfxManager.Instance.SpawnArtilleryTrajectoryArc(spawnPos, target.transform.position);
                 }
             }
             else

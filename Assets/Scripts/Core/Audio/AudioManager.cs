@@ -171,10 +171,58 @@ namespace FantasyDefense.Audio
         }
 
         private int sfxPlayCounter = 0;
+        private readonly Dictionary<SoundType, float> lastPlayTimeBySound = new Dictionary<SoundType, float>();
+        private Coroutine duckBgmCoroutine;
+
+        /// <summary>
+        /// Meredam volume BGM sementara saat ledakan besar/fanfare terjadi (Sidechain Ducking),
+        /// memberikan kejelasan dan kepuasan impak tanpa menenggelamkan melodi pertempuran.
+        /// </summary>
+        public void DuckBgm(float duckMultiplier = 0.78f, float duration = 0.40f)
+        {
+            if (bgmSource == null || !bgmSource.isPlaying || isBgmMuted) return;
+            if (duckBgmCoroutine != null) StopCoroutine(duckBgmCoroutine);
+            duckBgmCoroutine = StartCoroutine(DuckBgmRoutine(duckMultiplier, duration));
+        }
+
+        private System.Collections.IEnumerator DuckBgmRoutine(float duckMultiplier, float duration)
+        {
+            float normalVol = bgmVolume * masterVolume;
+            float targetDuckedVol = normalVol * duckMultiplier;
+            float attackDur = duration * 0.25f;
+            float elapsed = 0f;
+
+            while (elapsed < attackDur)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                bgmSource.volume = Mathf.Lerp(normalVol, targetDuckedVol, elapsed / attackDur);
+                yield return null;
+            }
+
+            elapsed = 0f;
+            float releaseDur = duration - attackDur;
+            while (elapsed < releaseDur)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                bgmSource.volume = Mathf.Lerp(targetDuckedVol, normalVol, elapsed / releaseDur);
+                yield return null;
+            }
+
+            bgmSource.volume = normalVol;
+            duckBgmCoroutine = null;
+        }
 
         public void PlaySound(SoundType type, float pitchOverride = 1.0f)
         {
             if (isSfxMuted || sfxSources.Count == 0) return;
+
+            // Anti-clipping & concurrency throttling: cegah tumpukan suara identik dalam hitungan frame (0.032s)
+            float now = Time.unscaledTime;
+            if (lastPlayTimeBySound.TryGetValue(type, out float lastTime))
+            {
+                if (now - lastTime < 0.032f) return;
+            }
+            lastPlayTimeBySound[type] = now;
 
             AudioClip clip = GetAudioClip(type);
             if (clip == null) return;
@@ -183,14 +231,26 @@ namespace FantasyDefense.Audio
             currentSourceIndex = (currentSourceIndex + 1) % sfxSources.Count;
             sfxPlayCounter++;
 
-            source.volume = sfxVolume * masterVolume;
+            // Kalibrasi Volume Balancing adaptif terhadap kecepatan game (1x, 2x, 3x)
+            float speedFactor = Time.timeScale;
+            float speedVolumeDamping = 1.0f;
+            if (speedFactor >= 2.5f)
+            {
+                // Kecepatan 3x: redam 30% agar serangan beruntun tidak menimbulkan audio mud / ear fatigue
+                speedVolumeDamping = 0.70f;
+            }
+            else if (speedFactor >= 1.8f)
+            {
+                // Kecepatan 2x: redam 18% untuk keseimbangan jernih dengan musik pertempuran
+                speedVolumeDamping = 0.82f;
+            }
+
+            source.volume = sfxVolume * masterVolume * speedVolumeDamping;
 
             // Variasi nada alami & anti-monotoni saat pertempuran berjalan di kecepatan 2x atau 3x
-            float speedFactor = Time.timeScale;
             float pitchJitter;
             if (speedFactor >= 2.0f)
             {
-                // Variasi pitch diperluas dan diiringi rhythmic micro-offset 3-ketukan agar tidak monoton
                 float rhythmicStep = (sfxPlayCounter % 3 - 1) * 0.04f;
                 pitchJitter = Random.Range(0.92f, 1.10f) + rhythmicStep;
             }
@@ -201,6 +261,12 @@ namespace FantasyDefense.Audio
 
             source.pitch = Mathf.Clamp(pitchOverride * pitchJitter, 0.75f, 1.45f);
             source.PlayOneShot(clip);
+
+            // BGM sidechain ducking otomatis pada tembakan meriam benteng dan ledakan berat
+            if (type == SoundType.CannonFire || type == SoundType.MeteorImpact || type == SoundType.CastleHitBoss)
+            {
+                DuckBgm(0.78f, 0.40f);
+            }
         }
 
         public void PlaySfx(AudioSfxType sfxType)

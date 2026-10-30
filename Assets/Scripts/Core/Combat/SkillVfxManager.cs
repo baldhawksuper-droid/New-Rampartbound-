@@ -735,6 +735,126 @@ namespace FantasyDefense.Combat
             }
         }
 
+        /// <summary>
+        /// Menampilkan garis lintasan parabola berpendar (Artillery Trajectory Arc)
+        /// saat artileri meriam membidik dan menembakkan peluru ke target musuh.
+        /// </summary>
+        public void SpawnArtilleryTrajectoryArc(Vector3 startPos, Vector3 targetPos)
+        {
+            if (!enableParticleEffects) return;
+            StartCoroutine(ArtilleryTrajectoryArcRoutine(startPos, targetPos));
+        }
+
+        private IEnumerator ArtilleryTrajectoryArcRoutine(Vector3 startPos, Vector3 targetPos)
+        {
+            GameObject arcObj = new GameObject("VFX_ArtilleryTrajectoryArc");
+            LineRenderer line = arcObj.AddComponent<LineRenderer>();
+
+            Shader spriteShader = Shader.Find("Sprites/Default");
+            if (spriteShader != null)
+            {
+                line.material = new Material(spriteShader);
+            }
+
+            int segments = 18;
+            line.positionCount = segments + 1;
+            line.useWorldSpace = true;
+            line.sortingOrder = 22;
+
+            float dist = Vector2.Distance(startPos, targetPos);
+            float arcHeight = Mathf.Clamp(0.8f + dist * 0.18f, 1.0f, 2.5f);
+            Vector3 midPoint = (startPos + targetPos) * 0.5f + Vector3.up * arcHeight;
+
+            Color goldStart = new Color(1f, 0.82f, 0.25f, 0.85f);
+            Color fireEnd = new Color(1f, 0.40f, 0.08f, 0.90f);
+
+            line.startColor = goldStart;
+            line.endColor = fireEnd;
+            line.startWidth = 0.055f;
+            line.endWidth = 0.025f;
+
+            for (int i = 0; i <= segments; i++)
+            {
+                float t = (float)i / segments;
+                Vector3 pt = (1f - t) * (1f - t) * startPos + 2f * (1f - t) * t * midPoint + t * t * targetPos;
+                line.SetPosition(i, pt);
+            }
+
+            GameObject reticleObj = new GameObject("VFX_CannonTargetReticle");
+            reticleObj.transform.position = targetPos;
+            var reticleSr = reticleObj.AddComponent<SpriteRenderer>();
+            reticleSr.sortingOrder = 20;
+            var reticleTex = GetOrCreateReticleSprite();
+            if (reticleTex != null) reticleSr.sprite = reticleTex;
+            reticleSr.color = new Color(1f, 0.45f, 0.1f, 0.75f);
+            reticleObj.transform.localScale = Vector3.one * 0.35f;
+
+            float duration = 0.38f;
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float fade = 1f - (elapsed / duration);
+                line.startColor = new Color(goldStart.r, goldStart.g, goldStart.b, goldStart.a * fade);
+                line.endColor = new Color(fireEnd.r, fireEnd.g, fireEnd.b, fireEnd.a * fade);
+                line.startWidth = 0.055f * fade;
+                line.endWidth = 0.025f * fade;
+
+                if (reticleObj != null)
+                {
+                    reticleSr.color = new Color(1f, 0.45f, 0.1f, 0.75f * fade);
+                    reticleObj.transform.localScale = Vector3.one * (0.35f + (1f - fade) * 0.2f);
+                }
+
+                yield return null;
+            }
+
+            Destroy(arcObj);
+            if (reticleObj != null) Destroy(reticleObj);
+        }
+
+        private static Sprite cachedReticleSprite;
+        private static Sprite GetOrCreateReticleSprite()
+        {
+            if (cachedReticleSprite != null) return cachedReticleSprite;
+
+            int size = 64;
+            Texture2D tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+            Color[] pixels = new Color[size * size];
+            float center = (size - 1) * 0.5f;
+            float outerR = center - 2f;
+            float innerR = outerR - 4f;
+
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    float dx = x - center;
+                    float dy = y - center;
+                    float d = Mathf.Sqrt(dx * dx + dy * dy);
+
+                    if (d >= innerR && d <= outerR)
+                    {
+                        float alpha = Mathf.Clamp01(1f - Mathf.Abs(d - (innerR + outerR) * 0.5f) / 2f);
+                        pixels[y * size + x] = new Color(1f, 1f, 1f, alpha);
+                    }
+                    else if (d <= 3f)
+                    {
+                        pixels[y * size + x] = new Color(1f, 1f, 1f, 1f);
+                    }
+                    else
+                    {
+                        pixels[y * size + x] = Color.clear;
+                    }
+                }
+            }
+
+            tex.SetPixels(pixels);
+            tex.Apply();
+            cachedReticleSprite = Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 100f);
+            return cachedReticleSprite;
+        }
+
         #region Hero Defender Battle Emotes (Point 3)
 
         private static Sprite cachedEmoteBubbleSprite;
