@@ -648,6 +648,62 @@ namespace FantasyDefense.Combat
         }
 
         /// <summary>
+        /// Menampilkan berkas petir transmutasi berkilau emas & toska (Catalyst Lightning Beam)
+        /// yang melesat dari tombol dock bawah menuju ke petak unit yang ditransmutasi pada Mode Swap & Merge.
+        /// </summary>
+        public void SpawnCatalystLightningBeam(Vector3 startPos, Vector3 targetPos)
+        {
+            if (!enableParticleEffects) return;
+            StartCoroutine(CatalystLightningBeamRoutine(startPos, targetPos));
+        }
+
+        private IEnumerator CatalystLightningBeamRoutine(Vector3 startPos, Vector3 targetPos)
+        {
+            var lineObj = new GameObject("CatalystLightningBeam");
+            var lr = lineObj.AddComponent<LineRenderer>();
+            lr.sortingOrder = 35;
+            lr.material = new Material(Shader.Find("Sprites/Default"));
+
+            lr.startColor = new Color(1f, 0.95f, 0.45f, 1f);
+            lr.endColor = new Color(0.40f, 0.95f, 1f, 0.95f);
+            lr.startWidth = 0.12f;
+            lr.endWidth = 0.04f;
+
+            int segments = 12;
+            lr.positionCount = segments;
+
+            float duration = 0.38f;
+            float elapsed = 0f;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float progress = Mathf.Clamp01(elapsed / duration);
+
+                for (int i = 0; i < segments; i++)
+                {
+                    float t = (float)i / (segments - 1);
+                    Vector3 linearPos = Vector3.Lerp(startPos, targetPos, t);
+                    float jitterMagnitude = Mathf.Sin(t * Mathf.PI) * 0.32f * (1f - progress);
+                    Vector3 offset = new Vector3(
+                        Random.Range(-jitterMagnitude, jitterMagnitude),
+                        Random.Range(-jitterMagnitude, jitterMagnitude),
+                        0f
+                    );
+                    lr.SetPosition(i, linearPos + offset);
+                }
+
+                float alpha = 1f - progress;
+                lr.startColor = new Color(1f, 0.95f, 0.45f, alpha);
+                lr.endColor = new Color(0.40f, 0.95f, 1f, alpha);
+
+                yield return null;
+            }
+
+            Destroy(lineObj);
+        }
+
+        /// <summary>
         /// Menampilkan letupan angin partikel zamrud saat panah Wind Ranger menembus musuh.
         /// </summary>
         public void SpawnArrowImpactVfx(Vector3 impactPos, bool isCrit)

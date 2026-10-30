@@ -37,6 +37,8 @@ namespace FantasyDefense.UI
             public Text levelText;
             public Button upgradeButton;
             public Text costText;
+            public RectTransform starsContainer;
+            public readonly List<Image> starImages = new List<Image>();
         }
 
         private void Awake()
@@ -90,6 +92,8 @@ namespace FantasyDefense.UI
                     widgets.costText.text = $"💰 {BattleArchetypeManager.Instance.GetUpgradeCost(type)}G";
                 }
 
+                UpdateStarBadges(widgets, newLevel);
+
                 // Punch animation pada kartu
                 StartCoroutine(PunchScaleRoutine(widgets.rootObj.transform, 1.18f, 0.20f));
             }
@@ -113,6 +117,7 @@ namespace FantasyDefense.UI
 
                     widgets.levelText.text = $"Lv.{lvl} (+{bonusPct}%)";
                     widgets.costText.text = $"💰 {cost}G";
+                    UpdateStarBadges(widgets, lvl);
                 }
             }
 
@@ -271,6 +276,24 @@ namespace FantasyDefense.UI
                 widgets.portraitImg.preserveAspect = true;
             }
 
+            // Star Badges Container (Pojok Kiri Atas Kartu)
+            var starsObj = new GameObject("StarsContainer", typeof(RectTransform), typeof(HorizontalLayoutGroup));
+            starsObj.transform.SetParent(cardObj.transform, false);
+            var sRt = starsObj.GetComponent<RectTransform>();
+            sRt.anchorMin = new Vector2(0.06f, 0.74f);
+            sRt.anchorMax = new Vector2(0.85f, 0.94f);
+            sRt.offsetMin = Vector2.zero;
+            sRt.offsetMax = Vector2.zero;
+            var hlg = starsObj.GetComponent<HorizontalLayoutGroup>();
+            hlg.spacing = 2f;
+            hlg.childControlWidth = false;
+            hlg.childControlHeight = false;
+            hlg.childForceExpandWidth = false;
+            hlg.childForceExpandHeight = false;
+            widgets.starsContainer = sRt;
+
+            UpdateStarBadges(widgets, 1);
+
             // Name Text
             var nameObj = new GameObject("NameText", typeof(RectTransform), typeof(Text));
             nameObj.transform.SetParent(cardObj.transform, false);
@@ -340,6 +363,40 @@ namespace FantasyDefense.UI
             if (BattleArchetypeManager.Instance != null)
             {
                 BattleArchetypeManager.Instance.TryUpgradeArchetype(type);
+            }
+        }
+
+        private void UpdateStarBadges(HeroCardWidgets widgets, int level)
+        {
+            if (widgets.starsContainer == null) return;
+
+            var starSprite = Resources.Load<Sprite>("Sprites/UI/UI_Star_Badge_Gold")
+#if UNITY_EDITOR
+                          ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Star_Badge_Gold.png")
+#endif
+                          ;
+
+            int clampedLevel = Mathf.Clamp(level, 1, 5);
+
+            while (widgets.starImages.Count < clampedLevel)
+            {
+                var starObj = new GameObject($"Star_{widgets.starImages.Count + 1}", typeof(RectTransform), typeof(Image));
+                starObj.transform.SetParent(widgets.starsContainer, false);
+                var rt = starObj.GetComponent<RectTransform>();
+                rt.sizeDelta = new Vector2(16, 16);
+                var img = starObj.GetComponent<Image>();
+                img.sprite = starSprite;
+                img.preserveAspect = true;
+                img.raycastTarget = false;
+                widgets.starImages.Add(img);
+
+                // Punch scale pada bintang baru yang terbuka
+                StartCoroutine(PunchScaleRoutine(starObj.transform, 1.45f, 0.22f));
+            }
+
+            for (int i = 0; i < widgets.starImages.Count; i++)
+            {
+                widgets.starImages[i].gameObject.SetActive(i < clampedLevel);
             }
         }
 

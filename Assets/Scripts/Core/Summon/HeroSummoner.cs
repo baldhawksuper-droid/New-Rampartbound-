@@ -375,6 +375,12 @@ namespace FantasyDefense.Summon
 
             if (SkillVfxManager.Instance != null)
             {
+                // Sambaran petir berkilau dari dock kubus bawah ke petak unit target
+                Vector3 originPos = (FantasyDefense.UI.SummonButtonUI.Instance != null)
+                    ? FantasyDefense.UI.SummonButtonUI.Instance.transform.position
+                    : new Vector3(2.2f, -4.2f, 0f);
+                SkillVfxManager.Instance.SpawnCatalystLightningBeam(originPos, chosenCell.transform.position);
+
                 SkillVfxManager.Instance.SpawnProceduralParticleBurst(
                     chosenCell.transform.position,
                     new Color(1f, 0.85f, 0.2f),
