@@ -403,6 +403,26 @@ namespace FantasyDefense.Combat
             }
         }
 
+        /// <summary>
+        /// Menampilkan cincin pendaran aura di kaki unit hero di arena saat kelasnya di-upgrade pada dock bawah.
+        /// </summary>
+        public void SpawnHeroBuffAura(Vector3 heroPos, Color buffColor)
+        {
+            Vector3 groundPos = heroPos + Vector3.down * 0.35f;
+
+            if (enableShockwaves)
+            {
+                StartCoroutine(SpawnShockwaveRingRoutine(groundPos, 0.75f, buffColor));
+            }
+
+            if (enableParticleEffects)
+            {
+                SpawnProceduralParticleBurst(groundPos, buffColor, Color.white, 12, 1.6f);
+            }
+
+            SpawnFloatingText(heroPos + Vector3.up * 0.5f, "▲ UPGRADE", buffColor, 1.1f);
+        }
+
         #region Procedural Particle VFX System
 
         /// <summary>

@@ -37,7 +37,8 @@ namespace FantasyDefense.Audio
         Surrender = DefeatChime,
         WaveIncoming,
         BarricadeRepair,
-        CatalystThunderZap
+        CatalystThunderZap,
+        GoldCoinSpend
     }
 
     public enum AudioSfxType
@@ -623,6 +624,7 @@ namespace FantasyDefense.Audio
             proceduralClipCache[SoundType.WaveIncoming] = CreateArpeggioClip("WaveIncoming", new float[] { 349.23f, 440f, 523.25f, 698.46f }, 0.09f);
             proceduralClipCache[SoundType.BarricadeRepair] = CreateArpeggioClip("BarricadeRepair", new float[] { 523.25f, 659.25f, 783.99f, 1046.50f, 1318.5f }, 0.05f);
             proceduralClipCache[SoundType.CatalystThunderZap] = CreateToneClip("CatalystThunderZap", 0.36f, 1250f, 85f);
+            proceduralClipCache[SoundType.GoldCoinSpend] = CreateArpeggioClip("GoldCoinSpend", new float[] { 1760f, 2637f, 3520f }, 0.045f);
         }
 
         private AudioClip CreateToneClip(string name, float duration, float startFreq, float endFreq)

@@ -374,6 +374,13 @@ namespace FantasyDefense.Summon
                 Audio.AudioManager.Instance.PlaySound(Audio.SoundType.MergeSuccess, 1.40f);
             }
 
+            // Respons Haptic Getaran Taktil (Hanya aktif jika pemain menyalakan getaran di pengaturan)
+            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+            {
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Heavy);
+            }
+
             if (SkillVfxManager.Instance != null)
             {
                 // Sambaran petir berkilau dari dock kubus bawah ke petak unit target

@@ -106,6 +106,32 @@ namespace FantasyDefense.UI
                 };
                 StartCoroutine(CardGlowFlashRoutine(widgets.glowOverlayImg, elemColor, 0.38f));
                 StartCoroutine(PunchScaleRoutine(widgets.rootObj.transform, 1.18f, 0.20f));
+
+                // Audio denting koin emas khusus pembelian upgrade pertempuran
+                if (Audio.AudioManager.Instance != null)
+                {
+                    Audio.AudioManager.Instance.PlaySound(Audio.SoundType.GoldCoinSpend);
+                }
+
+                // Respons Haptic Getaran Taktil (Hanya aktif jika pemain menyalakan getaran di pengaturan)
+                if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
+                    FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+                {
+                    FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Light);
+                }
+
+                // Pemicu pendaran cincin aura buff di bawah kaki semua hero bertipe ini di arena
+                if (SkillVfxManager.Instance != null)
+                {
+                    var activeUnits = UnitController.GetActiveUnitsSnapshot();
+                    foreach (var unit in activeUnits)
+                    {
+                        if (unit != null && unit.UnitType == type)
+                        {
+                            SkillVfxManager.Instance.SpawnHeroBuffAura(unit.transform.position, elemColor);
+                        }
+                    }
+                }
             }
 
             UpdateCardButtonStates();
