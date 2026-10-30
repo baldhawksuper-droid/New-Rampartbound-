@@ -95,6 +95,36 @@ namespace FantasyDefense.Combat
             originalLocalPos = transform.localPosition;
         }
 
+        private void Start()
+        {
+            ApplyAccountTurretConfig();
+        }
+
+        public void ApplyAccountTurretConfig()
+        {
+            if (FantasyDefense.Core.Metagame.CitadelLobbyManager.Instance != null &&
+                FantasyDefense.Core.Metagame.CitadelLobbyManager.Instance.AccountData != null)
+            {
+                var acc = FantasyDefense.Core.Metagame.CitadelLobbyManager.Instance.AccountData;
+                bool isLeft = transform.localPosition.x < 0f;
+                int typeIdx = isLeft ? acc.leftTurretTypeIndex : acc.rightTurretTypeIndex;
+                int tier = isLeft ? acc.leftTurretTier : acc.rightTurretTier;
+
+                CitadelTurretType resolvedType = typeIdx == 0 ? CitadelTurretType.Cannon : CitadelTurretType.Archer;
+                Sprite resolvedSprite = resolvedType == CitadelTurretType.Cannon
+                    ? (Resources.Load<Sprite>("Sprites/Combat/cannon_turret") ?? Resources.Load<Sprite>("Sprites/Combat/bastion_cannon_left"))
+                    : Resources.Load<Sprite>("Sprites/Combat/ballista_turret");
+
+                float tierMult = 1f + (tier - 1) * 0.25f; // +25% damage per tier
+                float speedMult = Mathf.Max(0.6f, 1f - (tier - 1) * 0.06f); // +6% attack speed per tier
+                float baseDmg = resolvedType == CitadelTurretType.Cannon ? 60f * tierMult : 35f * tierMult;
+                float interval = resolvedType == CitadelTurretType.Cannon ? 2.2f * speedMult : 1.2f * speedMult;
+
+                turretTier = tier;
+                Initialize(resolvedType, resolvedSprite, customInterval: interval, customDmg: baseDmg);
+            }
+        }
+
         public void Initialize(CitadelTurretType type, Sprite sprite = null, float customRange = -1f, float customInterval = -1f, float customDmg = -1f)
         {
             turretType = type;
@@ -229,8 +259,18 @@ namespace FantasyDefense.Combat
             if (turretType == CitadelTurretType.Cannon)
             {
                 // Roket / Peluru Meriam Ledakan Area
-                sr.color = new Color(1f, 0.55f, 0.2f);
-                projObj.transform.localScale = Vector3.one * 0.5f;
+                var cannonBombSprite = Resources.Load<Sprite>("Sprites/Combat/Projectile_Cannon_Bomb");
+                if (cannonBombSprite != null)
+                {
+                    sr.sprite = cannonBombSprite;
+                    sr.color = Color.white;
+                    projObj.transform.localScale = Vector3.one * 0.40f;
+                }
+                else
+                {
+                    sr.color = new Color(1f, 0.55f, 0.2f);
+                    projObj.transform.localScale = Vector3.one * 0.5f;
+                }
                 proj.Initialize(target, baseDamage, aoeRadius: splashRadius, slow: 0.15f, slowTime: 1.5f, critical: false, meteor: false, arrow: false);
 
                 if (AudioManager.Instance != null)
@@ -246,8 +286,18 @@ namespace FantasyDefense.Combat
             else
             {
                 // Panah Tajam Balista Pemanah
-                sr.color = new Color(0.9f, 0.95f, 1f);
-                projObj.transform.localScale = new Vector3(0.35f, 0.65f, 1f);
+                var ballistaBoltSprite = Resources.Load<Sprite>("Sprites/Combat/Projectile_Ballista_Bolt");
+                if (ballistaBoltSprite != null)
+                {
+                    sr.sprite = ballistaBoltSprite;
+                    sr.color = Color.white;
+                    projObj.transform.localScale = new Vector3(0.55f, 0.55f, 1f);
+                }
+                else
+                {
+                    sr.color = new Color(0.9f, 0.95f, 1f);
+                    projObj.transform.localScale = new Vector3(0.35f, 0.65f, 1f);
+                }
                 proj.Initialize(target, baseDamage, aoeRadius: 0f, slow: 0f, slowTime: 0f, critical: false, meteor: false, arrow: true);
 
                 if (AudioManager.Instance != null)

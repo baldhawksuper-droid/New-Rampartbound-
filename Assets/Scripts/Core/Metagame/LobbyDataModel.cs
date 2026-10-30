@@ -328,6 +328,12 @@ namespace FantasyDefense.Metagame
         // Rekor riwayat stage & perolehan bintang
         public List<StageRecord> stageRecords = new List<StageRecord>();
 
+        // Manajemen Artileri Benteng Citadel (Modular Balista & Meriam)
+        public int leftTurretTypeIndex = 1;  // 0 = Meriam (Cannon), 1 = Balista (Archer) (Default: Balista kembar)
+        public int rightTurretTypeIndex = 1; // 0 = Meriam (Cannon), 1 = Balista (Archer) (Default: Balista kembar)
+        public int leftTurretTier = 1;
+        public int rightTurretTier = 1;
+
         // Rekor misi harian & pencapaian
         public List<QuestRecord> questRecords = new List<QuestRecord>();
 

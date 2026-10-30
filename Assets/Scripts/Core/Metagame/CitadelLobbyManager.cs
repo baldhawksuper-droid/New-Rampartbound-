@@ -677,6 +677,73 @@ namespace FantasyDefense.Metagame
             return false;
         }
 
+        #region Citadel Defense Turret Management (Modular Ballistas & Cannons)
+
+        public static event Action OnTurretConfigChanged;
+
+        public void SetLeftTurretTypeIndex(int typeIndex)
+        {
+            if (accountData != null)
+            {
+                accountData.leftTurretTypeIndex = typeIndex;
+                SaveManager.Instance?.SaveProfile(accountData);
+                OnTurretConfigChanged?.Invoke();
+            }
+        }
+
+        public void SetRightTurretTypeIndex(int typeIndex)
+        {
+            if (accountData != null)
+            {
+                accountData.rightTurretTypeIndex = typeIndex;
+                SaveManager.Instance?.SaveProfile(accountData);
+                OnTurretConfigChanged?.Invoke();
+            }
+        }
+
+        public bool TryUpgradeTurret(bool isLeft, out string message)
+        {
+            if (accountData == null)
+            {
+                message = "Akun tidak ditemukan.";
+                return false;
+            }
+
+            int currentTier = isLeft ? accountData.leftTurretTier : accountData.rightTurretTier;
+            if (currentTier >= 5)
+            {
+                message = "Artileri telah mencapai Tier Maksimum (Tier 5)!";
+                return false;
+            }
+
+            int cost = currentTier switch
+            {
+                1 => 200,
+                2 => 450,
+                3 => 800,
+                4 => 1500,
+                _ => 2000
+            };
+
+            if (accountData.goldCoins < cost)
+            {
+                message = $"Koin emas tidak mencukupi (Butuh {cost} 🪙).";
+                return false;
+            }
+
+            accountData.goldCoins -= cost;
+            if (isLeft) accountData.leftTurretTier++;
+            else accountData.rightTurretTier++;
+
+            OnGoldChanged?.Invoke(accountData.goldCoins);
+            OnTurretConfigChanged?.Invoke();
+            SaveManager.Instance?.SaveProfile(accountData);
+            message = $"Artileri berhasil ditingkatkan ke Tier {(isLeft ? accountData.leftTurretTier : accountData.rightTurretTier)}!";
+            return true;
+        }
+
+        #endregion
+
         #endregion
     }
 }

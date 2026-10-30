@@ -477,12 +477,12 @@ namespace FantasyDefense.Combat
             anchorPos.z = -0.1f;
             transform.position = anchorPos;
 
-            Vector3 baseScale = transform.localScale;
+            Vector3 tokenScale = transform.localScale;
             Color originalColor = spriteRenderer.color;
 
-            // Fase 1: Mengambang naik sedikit dengan pendaran aura persiapan (0.35 detik)
+            // Fase 1: Mengambang naik sedikit dengan pendaran aura persiapan (0.25 detik)
             float elapsed = 0f;
-            float duration1 = 0.35f;
+            float duration1 = 0.25f;
             Color auraColor = currentTier switch
             {
                 UnitTier.Tier5 => new Color(1f, 0.95f, 0.6f, 1f),  // Celestial Gold
@@ -495,35 +495,40 @@ namespace FantasyDefense.Combat
             {
                 elapsed += Time.deltaTime;
                 float t = elapsed / duration1;
-                transform.position = anchorPos + new Vector3(0f, Mathf.Sin(t * Mathf.PI * 0.5f) * 0.22f, 0f);
+                transform.position = anchorPos + new Vector3(0f, Mathf.Sin(t * Mathf.PI * 0.5f) * 0.12f, 0f);
                 spriteRenderer.color = Color.Lerp(originalColor, auraColor, t);
-                transform.localScale = baseScale * (1f + 0.15f * Mathf.Sin(t * Mathf.PI));
+                transform.localScale = tokenScale * (1f + 0.08f * Mathf.Sin(t * Mathf.PI));
                 yield return null;
             }
 
-            // Fase 2: Ganti wujud ke Hero Unit tempur sesungguhnya
+            // Fase 2: Ganti wujud ke Hero Unit tempur sesungguhnya & hitung skala hero yang akurat
             UpdateVisualAppearance();
+            Vector3 combatScale = transform.localScale;
+            if (visualAnimator != null)
+            {
+                visualAnimator.SetBaseScale(combatScale);
+            }
             Color targetHeroColor = spriteRenderer.color;
 
-            // Fase 3: Mendarat kokoh kembali ke petak dengan hentakan tanah heroik (0.40 detik)
+            // Fase 3: Mendarat kokoh kembali ke petak dengan hentakan tanah heroik (0.25 detik)
             elapsed = 0f;
-            float duration2 = 0.40f;
+            float duration2 = 0.25f;
             while (elapsed < duration2)
             {
                 elapsed += Time.deltaTime;
                 float t = elapsed / duration2;
-                transform.position = Vector3.Lerp(anchorPos + new Vector3(0f, 0.22f, 0f), anchorPos, t * t);
+                transform.position = Vector3.Lerp(anchorPos + new Vector3(0f, 0.12f, 0f), anchorPos, t * t);
 
-                // Squash & stretch heroik saat mendarat di petak
-                float squash = t > 0.7f ? Mathf.Sin((t - 0.7f) / 0.3f * Mathf.PI) * 0.20f : 0f;
-                transform.localScale = new Vector3(baseScale.x * (1f + squash), baseScale.y * (1f - squash), baseScale.z);
+                // Subtle heroic landing squash proporsional terhadap skala tempur hero (bebas glitch raksasa!)
+                float squash = t > 0.7f ? Mathf.Sin((t - 0.7f) / 0.3f * Mathf.PI) * 0.12f : 0f;
+                transform.localScale = new Vector3(combatScale.x * (1f + squash), combatScale.y * (1f - squash), combatScale.z);
                 spriteRenderer.color = Color.Lerp(auraColor, targetHeroColor, t);
                 yield return null;
             }
 
-            // Kunci posisi akhir tepat di petak
+            // Kunci posisi dan skala akhir tepat di petak sesuai skala tempur hero
             transform.position = anchorPos;
-            transform.localScale = baseScale;
+            transform.localScale = combatScale;
             spriteRenderer.color = targetHeroColor;
 
             // Efek partikel pendaran transformasi
@@ -533,14 +538,15 @@ namespace FantasyDefense.Combat
                     anchorPos,
                     new Color(1f, 0.92f, 0.35f), // Golden sparkle
                     Color.white,
-                    16,
-                    2.2f
+                    12,
+                    1.4f
                 );
             }
 
             if (visualAnimator != null)
             {
-                visualAnimator.PlayMergeCelebration();
+                visualAnimator.SetBaseScale(combatScale);
+                visualAnimator.StartIdleAnimation();
             }
         }
 

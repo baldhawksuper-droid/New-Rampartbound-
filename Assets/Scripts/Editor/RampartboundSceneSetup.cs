@@ -691,6 +691,10 @@ namespace Rampartbound.Editor
             var defendBtn = CreateButton(lobbyPanelObj.transform, "DefendCitadelButton", "⚔️ BATTLE (5 ⚡)", new Color(0.85f, 0.15f, 0.15f), Color.white, 32, defaultFont);
             PositionUI(defendBtn, 0.10f, 0.115f, 0.90f, 0.185f);
 
+            // Workshop Artileri Benteng Citadel (Modular Balista & Meriam)
+            var defenseTurretBtn = CreateButton(lobbyPanelObj.transform, "DefenseTurretWorkshopButton", "🏰 ARTILERI BENTENG", new Color(0.18f, 0.32f, 0.48f), new Color(1f, 0.92f, 0.45f), 16, defaultFont);
+            PositionUI(defenseTurretBtn, 0.20f, 0.77f, 0.80f, 0.825f);
+
             var trialBtn = CreateButton(lobbyPanelObj.transform, "AbyssalTrialButton", "🌌 UJIAN ABYSSAL", new Color(0.42f, 0.25f, 0.75f), Color.white, 24, defaultFont);
             trialBtn.SetActive(false);
 
@@ -746,6 +750,7 @@ namespace Rampartbound.Editor
             lobbySO.FindProperty("windRangerCardButton").objectReferenceValue = windCard.GetComponent<Button>();
             lobbySO.FindProperty("windRangerInfoText").objectReferenceValue = windCard.GetComponentInChildren<Text>();
             lobbySO.FindProperty("defendCitadelButton").objectReferenceValue = defendBtn.GetComponent<Button>();
+            lobbySO.FindProperty("defenseTurretWorkshopButton").objectReferenceValue = defenseTurretBtn.GetComponent<Button>();
             lobbySO.FindProperty("abyssalTrialButton").objectReferenceValue = trialBtn.GetComponent<Button>();
             var prevProp = lobbySO.FindProperty("featurePreviewButton");
             if (prevProp != null) prevProp.objectReferenceValue = null;

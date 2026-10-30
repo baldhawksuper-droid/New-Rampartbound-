@@ -47,6 +47,7 @@ namespace FantasyDefense.UI
 
         [Header("Core Battle Action Buttons")]
         [SerializeField] private Button defendCitadelButton;
+        [SerializeField] private Button defenseTurretWorkshopButton;
         [SerializeField] private Button abyssalTrialButton;
         [SerializeField] private Button featurePreviewButton;
 
@@ -165,6 +166,7 @@ namespace FantasyDefense.UI
             CitadelLobbyManager.OnHeroUpgraded += HandleHeroUpgraded;
             CitadelLobbyManager.OnHeroStarPromoted += HandleHeroStarPromoted;
             CitadelLobbyManager.OnFormationChanged += HandleFormationChanged;
+            CitadelLobbyManager.OnTurretConfigChanged += RefreshTurretWorkshopDisplay;
             CitadelSummonManager.OnGachaPullsCompleted += HandleGachaPullsCompleted;
             FantasyDefense.Localization.CitadelLocalizationManager.OnLanguageChanged += HandleLanguageChanged;
 
@@ -183,6 +185,7 @@ namespace FantasyDefense.UI
             CitadelLobbyManager.OnHeroUpgraded -= HandleHeroUpgraded;
             CitadelLobbyManager.OnHeroStarPromoted -= HandleHeroStarPromoted;
             CitadelLobbyManager.OnFormationChanged -= HandleFormationChanged;
+            CitadelLobbyManager.OnTurretConfigChanged -= RefreshTurretWorkshopDisplay;
             CitadelSummonManager.OnGachaPullsCompleted -= HandleGachaPullsCompleted;
             FantasyDefense.Localization.CitadelLocalizationManager.OnLanguageChanged -= HandleLanguageChanged;
         }
@@ -222,6 +225,15 @@ namespace FantasyDefense.UI
                 if (txt != null)
                 {
                     txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("LOBBY_PREVIEW_BTN", "🏛️ PRATINJAU FITUR CITADEL", "🏛️ CITADEL FEATURE PREVIEW");
+                }
+            }
+
+            if (defenseTurretWorkshopButton != null)
+            {
+                var txt = defenseTurretWorkshopButton.GetComponentInChildren<Text>();
+                if (txt != null)
+                {
+                    txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("LOBBY_TURRET_BTN", "🏰 ARTILERI BENTENG", "🏰 CITADEL TURRETS");
                 }
             }
 
@@ -282,6 +294,8 @@ namespace FantasyDefense.UI
                     if (UIFeaturePreviewHubView.Instance != null)
                         UIFeaturePreviewHubView.Instance.OpenView();
                 });
+            if (defenseTurretWorkshopButton != null)
+                defenseTurretWorkshopButton.onClick.AddListener(OpenTurretWorkshopModal);
 
             // Bottom Dock
             if (navStageMapButton != null)
@@ -669,5 +683,381 @@ namespace FantasyDefense.UI
         private void HandleHeroStarPromoted(HeroLobbyProfile p) => RefreshDisplays();
         private void HandleFormationChanged(List<UnitType> formation) => RefreshDisplays();
         private void HandleGachaPullsCompleted(List<GachaResultItem> results) => RefreshDisplays();
+
+        #region Citadel Defense Turret Workshop Modal
+
+        private GameObject turretWorkshopModalObj;
+        private Image leftTurretIcon;
+        private Text leftTurretTitleText;
+        private Text leftTurretStatsText;
+        private Button leftTurretSwitchBtn;
+        private Button leftTurretUpgradeBtn;
+        private Text leftTurretUpgradeText;
+
+        private Image rightTurretIcon;
+        private Text rightTurretTitleText;
+        private Text rightTurretStatsText;
+        private Button rightTurretSwitchBtn;
+        private Button rightTurretUpgradeBtn;
+        private Text rightTurretUpgradeText;
+
+        public void OpenTurretWorkshopModal()
+        {
+            if (turretWorkshopModalObj == null)
+            {
+                BuildTurretWorkshopModal();
+            }
+            turretWorkshopModalObj.SetActive(true);
+            RefreshTurretWorkshopDisplay();
+        }
+
+        public void CloseTurretWorkshopModal()
+        {
+            if (turretWorkshopModalObj != null)
+            {
+                turretWorkshopModalObj.SetActive(false);
+            }
+        }
+
+        private void BuildTurretWorkshopModal()
+        {
+            Font lilitaFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+
+            // Modal Dimmer Backdrop
+            turretWorkshopModalObj = new GameObject("TurretWorkshopModal", typeof(RectTransform), typeof(Image));
+            turretWorkshopModalObj.transform.SetParent(transform, false);
+            var modalRt = turretWorkshopModalObj.GetComponent<RectTransform>();
+            modalRt.anchorMin = Vector2.zero;
+            modalRt.anchorMax = Vector2.one;
+            modalRt.offsetMin = Vector2.zero;
+            modalRt.offsetMax = Vector2.zero;
+            var modalBg = turretWorkshopModalObj.GetComponent<Image>();
+            modalBg.color = new Color(0.02f, 0.04f, 0.08f, 0.88f);
+
+            // Center Dialog Card
+            var cardObj = new GameObject("WorkshopCard", typeof(RectTransform), typeof(Image));
+            cardObj.transform.SetParent(turretWorkshopModalObj.transform, false);
+            var cardRt = cardObj.GetComponent<RectTransform>();
+            cardRt.anchorMin = new Vector2(0.06f, 0.15f);
+            cardRt.anchorMax = new Vector2(0.94f, 0.85f);
+            cardRt.offsetMin = Vector2.zero;
+            cardRt.offsetMax = Vector2.zero;
+            var cardImg = cardObj.GetComponent<Image>();
+            cardImg.color = new Color(0.08f, 0.12f, 0.20f, 0.98f);
+
+            // Header Title
+            var headerObj = new GameObject("HeaderTitle", typeof(RectTransform), typeof(Text));
+            headerObj.transform.SetParent(cardObj.transform, false);
+            var headerRt = headerObj.GetComponent<RectTransform>();
+            headerRt.anchorMin = new Vector2(0.05f, 0.88f);
+            headerRt.anchorMax = new Vector2(0.95f, 0.98f);
+            headerRt.offsetMin = Vector2.zero;
+            headerRt.offsetMax = Vector2.zero;
+            var headerTxt = headerObj.GetComponent<Text>();
+            headerTxt.text = "🏰 BENGKEL ARTILERI BENTENG CITADEL";
+            headerTxt.font = lilitaFont;
+            headerTxt.fontSize = 26;
+            headerTxt.alignment = TextAnchor.MiddleCenter;
+            headerTxt.color = new Color(1f, 0.88f, 0.35f, 1f);
+
+            // Subtitle
+            var subObj = new GameObject("Subtitle", typeof(RectTransform), typeof(Text));
+            subObj.transform.SetParent(cardObj.transform, false);
+            var subRt = subObj.GetComponent<RectTransform>();
+            subRt.anchorMin = new Vector2(0.05f, 0.82f);
+            subRt.anchorMax = new Vector2(0.95f, 0.88f);
+            subRt.offsetMin = Vector2.zero;
+            subRt.offsetMax = Vector2.zero;
+            var subTxt = subObj.GetComponent<Text>();
+            subTxt.text = "Konfigurasi tipe artileri & tingkatkan tier pertahanan tembok benteng";
+            subTxt.font = lilitaFont;
+            subTxt.fontSize = 15;
+            subTxt.alignment = TextAnchor.MiddleCenter;
+            subTxt.color = new Color(0.7f, 0.8f, 0.9f, 1f);
+
+            // Container Menara Kiri
+            var leftSlot = CreateTurretSlotUI(cardObj.transform, "Slot_LeftTurret", new Vector2(0.04f, 0.14f), new Vector2(0.48f, 0.80f),
+                out leftTurretIcon, out leftTurretTitleText, out leftTurretStatsText, out leftTurretSwitchBtn, out leftTurretUpgradeBtn, out leftTurretUpgradeText);
+
+            leftTurretSwitchBtn.onClick.AddListener(() =>
+            {
+                var lobby = CitadelLobbyManager.Instance;
+                if (lobby != null && lobby.AccountData != null)
+                {
+                    int nextType = lobby.AccountData.leftTurretTypeIndex == 0 ? 1 : 0;
+                    lobby.SetLeftTurretTypeIndex(nextType);
+                }
+            });
+
+            leftTurretUpgradeBtn.onClick.AddListener(() =>
+            {
+                var lobby = CitadelLobbyManager.Instance;
+                if (lobby != null)
+                {
+                    if (lobby.TryUpgradeTurret(true, out string msg))
+                    {
+                        if (UIToastManager.Instance != null) UIToastManager.Instance.ShowToast(msg);
+                    }
+                    else
+                    {
+                        if (UIToastManager.Instance != null) UIToastManager.Instance.ShowToast(msg);
+                    }
+                }
+            });
+
+            // Container Menara Kanan
+            var rightSlot = CreateTurretSlotUI(cardObj.transform, "Slot_RightTurret", new Vector2(0.52f, 0.14f), new Vector2(0.96f, 0.80f),
+                out rightTurretIcon, out rightTurretTitleText, out rightTurretStatsText, out rightTurretSwitchBtn, out rightTurretUpgradeBtn, out rightTurretUpgradeText);
+
+            rightTurretSwitchBtn.onClick.AddListener(() =>
+            {
+                var lobby = CitadelLobbyManager.Instance;
+                if (lobby != null && lobby.AccountData != null)
+                {
+                    int nextType = lobby.AccountData.rightTurretTypeIndex == 0 ? 1 : 0;
+                    lobby.SetRightTurretTypeIndex(nextType);
+                }
+            });
+
+            rightTurretUpgradeBtn.onClick.AddListener(() =>
+            {
+                var lobby = CitadelLobbyManager.Instance;
+                if (lobby != null)
+                {
+                    if (lobby.TryUpgradeTurret(false, out string msg))
+                    {
+                        if (UIToastManager.Instance != null) UIToastManager.Instance.ShowToast(msg);
+                    }
+                    else
+                    {
+                        if (UIToastManager.Instance != null) UIToastManager.Instance.ShowToast(msg);
+                    }
+                }
+            });
+
+            // Close Button
+            var closeObj = new GameObject("CloseBtn", typeof(RectTransform), typeof(Image), typeof(Button));
+            closeObj.transform.SetParent(cardObj.transform, false);
+            var closeRt = closeObj.GetComponent<RectTransform>();
+            closeRt.anchorMin = new Vector2(0.35f, 0.025f);
+            closeRt.anchorMax = new Vector2(0.65f, 0.10f);
+            closeRt.offsetMin = Vector2.zero;
+            closeRt.offsetMax = Vector2.zero;
+            var closeImg = closeObj.GetComponent<Image>();
+            closeImg.color = new Color(0.25f, 0.30f, 0.40f, 1f);
+            var closeBtn = closeObj.GetComponent<Button>();
+            closeBtn.onClick.AddListener(CloseTurretWorkshopModal);
+
+            var closeTxtObj = new GameObject("CloseTxt", typeof(RectTransform), typeof(Text));
+            closeTxtObj.transform.SetParent(closeObj.transform, false);
+            var closeTxtRt = closeTxtObj.GetComponent<RectTransform>();
+            closeTxtRt.anchorMin = Vector2.zero;
+            closeTxtRt.anchorMax = Vector2.one;
+            closeTxtRt.offsetMin = Vector2.zero;
+            closeTxtRt.offsetMax = Vector2.zero;
+            var closeTxt = closeTxtObj.GetComponent<Text>();
+            closeTxt.text = "TUTUP (✕)";
+            closeTxt.font = lilitaFont;
+            closeTxt.fontSize = 18;
+            closeTxt.alignment = TextAnchor.MiddleCenter;
+            closeTxt.color = Color.white;
+        }
+
+        private GameObject CreateTurretSlotUI(
+            Transform parent,
+            string name,
+            Vector2 anchorMin,
+            Vector2 anchorMax,
+            out Image iconImg,
+            out Text titleTxt,
+            out Text statsTxt,
+            out Button switchBtn,
+            out Button upgradeBtn,
+            out Text upgradeTxt)
+        {
+            Font lilitaFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+
+            var slotObj = new GameObject(name, typeof(RectTransform), typeof(Image));
+            slotObj.transform.SetParent(parent, false);
+            var slotRt = slotObj.GetComponent<RectTransform>();
+            slotRt.anchorMin = anchorMin;
+            slotRt.anchorMax = anchorMax;
+            slotRt.offsetMin = Vector2.zero;
+            slotRt.offsetMax = Vector2.zero;
+            var slotImg = slotObj.GetComponent<Image>();
+            slotImg.color = new Color(0.12f, 0.16f, 0.25f, 0.95f);
+
+            // Icon Avatar
+            var iconObj = new GameObject("TurretIcon", typeof(RectTransform), typeof(Image));
+            iconObj.transform.SetParent(slotObj.transform, false);
+            var iconRt = iconObj.GetComponent<RectTransform>();
+            iconRt.anchorMin = new Vector2(0.15f, 0.54f);
+            iconRt.anchorMax = new Vector2(0.85f, 0.94f);
+            iconRt.offsetMin = Vector2.zero;
+            iconRt.offsetMax = Vector2.zero;
+            iconImg = iconObj.GetComponent<Image>();
+            iconImg.preserveAspect = true;
+
+            // Title
+            var tObj = new GameObject("TurretTitle", typeof(RectTransform), typeof(Text));
+            tObj.transform.SetParent(slotObj.transform, false);
+            var tRt = tObj.GetComponent<RectTransform>();
+            tRt.anchorMin = new Vector2(0.05f, 0.44f);
+            tRt.anchorMax = new Vector2(0.95f, 0.54f);
+            tRt.offsetMin = Vector2.zero;
+            tRt.offsetMax = Vector2.zero;
+            titleTxt = tObj.GetComponent<Text>();
+            titleTxt.font = lilitaFont;
+            titleTxt.fontSize = 16;
+            titleTxt.alignment = TextAnchor.MiddleCenter;
+            titleTxt.color = new Color(1f, 0.88f, 0.35f, 1f);
+
+            // Stats
+            var sObj = new GameObject("TurretStats", typeof(RectTransform), typeof(Text));
+            sObj.transform.SetParent(slotObj.transform, false);
+            var sRt = sObj.GetComponent<RectTransform>();
+            sRt.anchorMin = new Vector2(0.05f, 0.22f);
+            sRt.anchorMax = new Vector2(0.95f, 0.44f);
+            sRt.offsetMin = Vector2.zero;
+            sRt.offsetMax = Vector2.zero;
+            statsTxt = sObj.GetComponent<Text>();
+            statsTxt.font = lilitaFont;
+            statsTxt.fontSize = 13;
+            statsTxt.alignment = TextAnchor.UpperCenter;
+            statsTxt.color = new Color(0.85f, 0.90f, 0.95f, 1f);
+
+            // Switch Button
+            var swObj = new GameObject("SwitchBtn", typeof(RectTransform), typeof(Image), typeof(Button));
+            swObj.transform.SetParent(slotObj.transform, false);
+            var swRt = swObj.GetComponent<RectTransform>();
+            swRt.anchorMin = new Vector2(0.08f, 0.11f);
+            swRt.anchorMax = new Vector2(0.92f, 0.20f);
+            swRt.offsetMin = Vector2.zero;
+            swRt.offsetMax = Vector2.zero;
+            var swImg = swObj.GetComponent<Image>();
+            swImg.color = new Color(0.18f, 0.35f, 0.55f, 1f);
+            switchBtn = swObj.GetComponent<Button>();
+
+            var swTxtObj = new GameObject("Txt", typeof(RectTransform), typeof(Text));
+            swTxtObj.transform.SetParent(swObj.transform, false);
+            var swTxtRt = swTxtObj.GetComponent<RectTransform>();
+            swTxtRt.anchorMin = Vector2.zero;
+            swTxtRt.anchorMax = Vector2.one;
+            swTxtRt.offsetMin = Vector2.zero;
+            swTxtRt.offsetMax = Vector2.zero;
+            var swTxt = swTxtObj.GetComponent<Text>();
+            swTxt.text = "GANTI TIPE";
+            swTxt.font = lilitaFont;
+            swTxt.fontSize = 13;
+            swTxt.alignment = TextAnchor.MiddleCenter;
+            swTxt.color = Color.white;
+
+            // Upgrade Button
+            var upObj = new GameObject("UpgradeBtn", typeof(RectTransform), typeof(Image), typeof(Button));
+            upObj.transform.SetParent(slotObj.transform, false);
+            var upRt = upObj.GetComponent<RectTransform>();
+            upRt.anchorMin = new Vector2(0.08f, 0.015f);
+            upRt.anchorMax = new Vector2(0.92f, 0.10f);
+            upRt.offsetMin = Vector2.zero;
+            upRt.offsetMax = Vector2.zero;
+            var upImg = upObj.GetComponent<Image>();
+            upImg.color = new Color(0.20f, 0.55f, 0.25f, 1f);
+            upgradeBtn = upObj.GetComponent<Button>();
+
+            var upTxtObj = new GameObject("Txt", typeof(RectTransform), typeof(Text));
+            upTxtObj.transform.SetParent(upObj.transform, false);
+            var upTxtRt = upTxtObj.GetComponent<RectTransform>();
+            upTxtRt.anchorMin = Vector2.zero;
+            upTxtRt.anchorMax = Vector2.one;
+            upTxtRt.offsetMin = Vector2.zero;
+            upTxtRt.offsetMax = Vector2.zero;
+            upgradeTxt = upTxtObj.GetComponent<Text>();
+            upgradeTxt.text = "TINGKATKAN (🪙)";
+            upgradeTxt.font = lilitaFont;
+            upgradeTxt.fontSize = 13;
+            upgradeTxt.alignment = TextAnchor.MiddleCenter;
+            upgradeTxt.color = Color.white;
+
+            return slotObj;
+        }
+
+        public void RefreshTurretWorkshopDisplay()
+        {
+            if (turretWorkshopModalObj == null || !turretWorkshopModalObj.activeSelf) return;
+
+            var lobby = CitadelLobbyManager.Instance;
+            if (lobby == null || lobby.AccountData == null) return;
+            var data = lobby.AccountData;
+
+            // 1. Menara Kiri
+            bool isLeftCannon = data.leftTurretTypeIndex == 0;
+            int leftTier = data.leftTurretTier;
+            if (leftTurretIcon != null)
+            {
+                leftTurretIcon.sprite = isLeftCannon
+                    ? (Resources.Load<Sprite>("Sprites/Combat/cannon_turret") ?? Resources.Load<Sprite>("Sprites/Combat/bastion_cannon_left"))
+                    : Resources.Load<Sprite>("Sprites/Combat/ballista_turret");
+            }
+            if (leftTurretTitleText != null)
+            {
+                leftTurretTitleText.text = isLeftCannon ? $"MERIAM BENTENG (Tier {leftTier})" : $"BALISTA SNIPER (Tier {leftTier})";
+            }
+            if (leftTurretStatsText != null)
+            {
+                float tierMult = 1f + (leftTier - 1) * 0.25f;
+                float spdMult = Mathf.Max(0.6f, 1f - (leftTier - 1) * 0.06f);
+                if (isLeftCannon)
+                    leftTurretStatsText.text = $"• DMG Area: {60 * tierMult:F0}\n• Interval: {2.2f * spdMult:F1}s | Radius: 1.3m\n• Efek: 15% Slow Mob\n• Peluru: Incendiary Bomb";
+                else
+                    leftTurretStatsText.text = $"• DMG Satuan: {35 * tierMult:F0}\n• Interval: {1.2f * spdMult:F1}s | Range: 8.5m\n• Efek: Tembus Armor Cepat\n• Peluru: Chisel Crystal Bolt";
+            }
+            if (leftTurretSwitchBtn != null)
+            {
+                var txt = leftTurretSwitchBtn.GetComponentInChildren<Text>();
+                if (txt != null) txt.text = isLeftCannon ? "Tukar ke Balista 🏹" : "Tukar ke Meriam 💣";
+            }
+            if (leftTurretUpgradeText != null)
+            {
+                int cost = leftTier switch { 1 => 200, 2 => 450, 3 => 800, 4 => 1500, _ => 0 };
+                leftTurretUpgradeText.text = leftTier >= 5 ? "TIER MAKSIMUM (5★)" : $"Tingkatkan ({cost} 🪙)";
+                if (leftTurretUpgradeBtn != null) leftTurretUpgradeBtn.interactable = leftTier < 5 && data.goldCoins >= cost;
+            }
+
+            // 2. Menara Kanan
+            bool isRightCannon = data.rightTurretTypeIndex == 0;
+            int rightTier = data.rightTurretTier;
+            if (rightTurretIcon != null)
+            {
+                rightTurretIcon.sprite = isRightCannon
+                    ? (Resources.Load<Sprite>("Sprites/Combat/cannon_turret") ?? Resources.Load<Sprite>("Sprites/Combat/bastion_cannon_left"))
+                    : Resources.Load<Sprite>("Sprites/Combat/ballista_turret");
+            }
+            if (rightTurretTitleText != null)
+            {
+                rightTurretTitleText.text = isRightCannon ? $"MERIAM BENTENG (Tier {rightTier})" : $"BALISTA SNIPER (Tier {rightTier})";
+            }
+            if (rightTurretStatsText != null)
+            {
+                float tierMult = 1f + (rightTier - 1) * 0.25f;
+                float spdMult = Mathf.Max(0.6f, 1f - (rightTier - 1) * 0.06f);
+                if (isRightCannon)
+                    rightTurretStatsText.text = $"• DMG Area: {60 * tierMult:F0}\n• Interval: {2.2f * spdMult:F1}s | Radius: 1.3m\n• Efek: 15% Slow Mob\n• Peluru: Incendiary Bomb";
+                else
+                    rightTurretStatsText.text = $"• DMG Satuan: {35 * tierMult:F0}\n• Interval: {1.2f * spdMult:F1}s | Range: 8.5m\n• Efek: Tembus Armor Cepat\n• Peluru: Chisel Crystal Bolt";
+            }
+            if (rightTurretSwitchBtn != null)
+            {
+                var txt = rightTurretSwitchBtn.GetComponentInChildren<Text>();
+                if (txt != null) txt.text = isRightCannon ? "Tukar ke Balista 🏹" : "Tukar ke Meriam 💣";
+            }
+            if (rightTurretUpgradeText != null)
+            {
+                int cost = rightTier switch { 1 => 200, 2 => 450, 3 => 800, 4 => 1500, _ => 0 };
+                rightTurretUpgradeText.text = rightTier >= 5 ? "TIER MAKSIMUM (5★)" : $"Tingkatkan ({cost} 🪙)";
+                if (rightTurretUpgradeBtn != null) rightTurretUpgradeBtn.interactable = rightTier < 5 && data.goldCoins >= cost;
+            }
+        }
+
+        #endregion
     }
 }
