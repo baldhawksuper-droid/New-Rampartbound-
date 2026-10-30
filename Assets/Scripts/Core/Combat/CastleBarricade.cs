@@ -316,6 +316,8 @@ namespace FantasyDefense.Combat
             }
         }
 
+        private Coroutine criticalCrackPulseCoroutine;
+
         public void UpdateDamageVisuals()
         {
             if (spriteRenderer != null)
@@ -335,27 +337,53 @@ namespace FantasyDefense.Combat
             {
                 crackOverlayRenderer.gameObject.SetActive(true);
                 crackOverlayRenderer.sprite = GetOrCreateCrackSprite(3);
-                crackOverlayRenderer.color = new Color(1f, 0.25f, 0.15f, 0.98f); // Retakan parah kritis membara
                 crackOverlayRenderer.transform.localScale = new Vector3(1.05f, 1.05f, 1f);
-            }
-            else if (pct <= 0.50f)
-            {
-                crackOverlayRenderer.gameObject.SetActive(true);
-                crackOverlayRenderer.sprite = GetOrCreateCrackSprite(2);
-                crackOverlayRenderer.color = new Color(0.95f, 0.80f, 0.55f, 0.90f); // Retakan struktural menengah
-                crackOverlayRenderer.transform.localScale = Vector3.one;
-            }
-            else if (pct <= 0.75f)
-            {
-                crackOverlayRenderer.gameObject.SetActive(true);
-                crackOverlayRenderer.sprite = GetOrCreateCrackSprite(1);
-                crackOverlayRenderer.color = new Color(0.85f, 0.85f, 0.90f, 0.75f); // Retakan halus awal
-                crackOverlayRenderer.transform.localScale = Vector3.one;
+                if (criticalCrackPulseCoroutine == null && gameObject.activeInHierarchy)
+                {
+                    criticalCrackPulseCoroutine = StartCoroutine(PulsingCriticalCrackRoutine());
+                }
             }
             else
             {
-                crackOverlayRenderer.gameObject.SetActive(false);
+                if (criticalCrackPulseCoroutine != null)
+                {
+                    StopCoroutine(criticalCrackPulseCoroutine);
+                    criticalCrackPulseCoroutine = null;
+                }
+
+                if (pct <= 0.50f)
+                {
+                    crackOverlayRenderer.gameObject.SetActive(true);
+                    crackOverlayRenderer.sprite = GetOrCreateCrackSprite(2);
+                    crackOverlayRenderer.color = new Color(0.95f, 0.80f, 0.55f, 0.90f); // Retakan struktural menengah
+                    crackOverlayRenderer.transform.localScale = Vector3.one;
+                }
+                else if (pct <= 0.75f)
+                {
+                    crackOverlayRenderer.gameObject.SetActive(true);
+                    crackOverlayRenderer.sprite = GetOrCreateCrackSprite(1);
+                    crackOverlayRenderer.color = new Color(0.85f, 0.85f, 0.90f, 0.75f); // Retakan halus awal
+                    crackOverlayRenderer.transform.localScale = Vector3.one;
+                }
+                else
+                {
+                    crackOverlayRenderer.gameObject.SetActive(false);
+                }
             }
+        }
+
+        private IEnumerator PulsingCriticalCrackRoutine()
+        {
+            Color emberLow = new Color(1f, 0.22f, 0.10f, 0.90f);
+            Color emberHigh = new Color(1f, 0.78f, 0.25f, 1.0f);
+            while (HealthPercent <= 0.25f && crackOverlayRenderer != null)
+            {
+                float t = (Mathf.Sin(Time.time * 5.0f) + 1f) * 0.5f;
+                crackOverlayRenderer.color = Color.Lerp(emberLow, emberHigh, t);
+                crackOverlayRenderer.transform.localScale = Vector3.one * Mathf.Lerp(1.03f, 1.08f, t);
+                yield return null;
+            }
+            criticalCrackPulseCoroutine = null;
         }
 
         private static Sprite GetOrCreateCrackSprite(int stage)

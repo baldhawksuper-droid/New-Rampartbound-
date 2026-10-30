@@ -508,6 +508,10 @@ namespace FantasyDefense.UI
             OnStandeeTapped(btn, currentType);
         }
 
+        private UnitType lastTappedStandee = (UnitType)(-1);
+        private float lastStandeeTapTime = -1f;
+        private GameObject activeGreetingBubble;
+
         private void OnStandeeTapped(Button btn, UnitType type)
         {
             if (btn != null && btn.gameObject.activeInHierarchy)
@@ -515,15 +519,14 @@ namespace FantasyDefense.UI
                 StartCoroutine(StandeeTapJuiceRoutine(btn.transform));
             }
 
-            if (AudioManager.Instance != null)
-            {
-                AudioManager.Instance.PlaySound(SoundType.ButtonClick);
-            }
-
             var lobby = CitadelLobbyManager.Instance;
             var profile = lobby != null ? lobby.GetHeroProfile(type) : null;
             if (profile != null && !profile.isUnlocked)
             {
+                if (AudioManager.Instance != null)
+                {
+                    AudioManager.Instance.PlaySound(SoundType.ButtonClick);
+                }
                 string lockedMsg = FantasyDefense.Localization.CitadelLocalizationManager.Text(
                     "🔒 Slot Pahlawan ke-4 ini masih terkunci!\nDapatkan Wind Ranger melalui Balai Pemanggilan (Gacha).",
                     "🔒 The 4th Hero Slot is currently locked!\nSummon Wind Ranger in the Summoning Hall."
@@ -533,7 +536,145 @@ namespace FantasyDefense.UI
                 return;
             }
 
-            OpenHeroUpgrade(type);
+            // Standee Tap Juice: Ucapan Hero & Mikro-partikel
+            SpawnHeroGreetingBubble(btn != null ? btn.transform : transform, type);
+
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySound(SoundType.MergeSuccess, 1.35f);
+            }
+
+            float now = Time.unscaledTime;
+            if (lastTappedStandee == type && (now - lastStandeeTapTime) < 1.1f)
+            {
+                // Double tap: Buka layar Hero Upgrade
+                lastStandeeTapTime = -1f;
+                OpenHeroUpgrade(type);
+            }
+            else
+            {
+                lastTappedStandee = type;
+                lastStandeeTapTime = now;
+            }
+        }
+
+        private void SpawnHeroGreetingBubble(Transform targetTr, UnitType type)
+        {
+            if (targetTr == null) return;
+            if (activeGreetingBubble != null)
+            {
+                Destroy(activeGreetingBubble);
+            }
+
+            var lilitaFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+            var canvas = GetComponentInParent<Canvas>();
+            Transform parentTr = canvas != null ? canvas.transform : (targetTr.parent != null ? targetTr.parent : targetTr);
+
+            activeGreetingBubble = new GameObject("StandeeGreetingBubble", typeof(RectTransform), typeof(Image));
+            activeGreetingBubble.transform.SetParent(parentTr, false);
+
+            var rt = activeGreetingBubble.GetComponent<RectTransform>();
+            rt.position = targetTr.position + new Vector3(0f, 95f, 0f);
+            rt.sizeDelta = new Vector2(250, 75);
+
+            var img = activeGreetingBubble.GetComponent<Image>();
+            img.color = new Color(0.08f, 0.12f, 0.20f, 0.94f);
+
+            var outline = activeGreetingBubble.AddComponent<Outline>();
+            outline.effectColor = new Color(1f, 0.82f, 0.25f, 0.85f);
+            outline.effectDistance = new Vector2(2, -2);
+
+            var textObj = new GameObject("BubbleText", typeof(RectTransform), typeof(Text));
+            textObj.transform.SetParent(activeGreetingBubble.transform, false);
+            var textRt = textObj.GetComponent<RectTransform>();
+            textRt.anchorMin = Vector2.zero;
+            textRt.anchorMax = Vector2.one;
+            textRt.offsetMin = new Vector2(10, 6);
+            textRt.offsetMax = new Vector2(-10, -6);
+
+            var txt = textObj.GetComponent<Text>();
+            if (lilitaFont != null) txt.font = lilitaFont;
+            txt.alignment = TextAnchor.MiddleCenter;
+            txt.fontSize = 15;
+            txt.color = Color.white;
+            txt.horizontalOverflow = HorizontalWrapMode.Wrap;
+            txt.verticalOverflow = VerticalWrapMode.Truncate;
+
+            string quote = type switch
+            {
+                UnitType.Cedric => FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                    "⚔️ \"Pedangku siap melindungi gerbang benteng, Komandan!\"",
+                    "⚔️ \"My blade defends the citadel gates, Commander!\""
+                ),
+                UnitType.RabbitMage => FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                    "🔮 \"Sihir bintang dan mantraku siap basmi monster!\"",
+                    "🔮 \"My astral magic is ready to blast the monsters!\""
+                ),
+                UnitType.RoseTanker => FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                    "🛡️ \"Perisai mawar takkan pernah membiarkan monster lewat!\"",
+                    "🛡️ \"The Rose Aegis shall never let a fiend pass!\""
+                ),
+                UnitType.WindRanger => FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                    "🏹 \"Hembusan angin utara memandu setiap bidikan panahku!\"",
+                    "🏹 \"The zephyr gale guides every arrow to its mark!\""
+                ),
+                _ => "⚔️ \"Siap bertempur!\""
+            };
+
+            txt.text = quote;
+
+            StartCoroutine(GreetingBubbleRoutine(activeGreetingBubble));
+        }
+
+        private IEnumerator GreetingBubbleRoutine(GameObject bubble)
+        {
+            if (bubble == null) yield break;
+
+            var rt = bubble.GetComponent<RectTransform>();
+            var img = bubble.GetComponent<Image>();
+            var txt = bubble.GetComponentInChildren<Text>();
+            Vector3 targetPos = rt.position;
+            Vector3 startPos = targetPos - new Vector3(0f, 15f, 0f);
+
+            float popDur = 0.20f;
+            float elapsed = 0f;
+            while (elapsed < popDur)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = elapsed / popDur;
+                float s = Mathf.Sin(t * Mathf.PI * 0.5f);
+                rt.position = Vector3.Lerp(startPos, targetPos, s);
+                rt.localScale = Vector3.one * (0.4f + s * 0.6f);
+                yield return null;
+            }
+
+            rt.position = targetPos;
+            rt.localScale = Vector3.one;
+
+            yield return new WaitForSecondsRealtime(1.6f);
+
+            if (bubble == null) yield break;
+
+            float fadeDur = 0.35f;
+            elapsed = 0f;
+            Color origImgCol = img.color;
+            Color origTxtCol = txt != null ? txt.color : Color.white;
+
+            while (elapsed < fadeDur)
+            {
+                if (bubble == null) yield break;
+                elapsed += Time.unscaledDeltaTime;
+                float t = elapsed / fadeDur;
+                rt.position = targetPos + new Vector3(0f, t * 18f, 0f);
+                img.color = new Color(origImgCol.r, origImgCol.g, origImgCol.b, origImgCol.a * (1f - t));
+                if (txt != null)
+                {
+                    txt.color = new Color(origTxtCol.r, origTxtCol.g, origTxtCol.b, origTxtCol.a * (1f - t));
+                }
+                yield return null;
+            }
+
+            if (bubble != null) Destroy(bubble);
         }
 
         private IEnumerator StandeeTapJuiceRoutine(Transform tr)
