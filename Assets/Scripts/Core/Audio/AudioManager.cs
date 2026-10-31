@@ -544,29 +544,39 @@ namespace FantasyDefense.Audio
                 PlayHeroSkillVoice(unit.UnitType);
             }
 
+            // Kalibrasi pitch dinamis berbasis Tier pahlawan (T1 -> T5) agar progres merge terasa bertenaga
+            float tierPitchMultiplier = unit.CurrentTier switch
+            {
+                UnitTier.Tier5 => 1.25f,
+                UnitTier.Tier4 => 1.15f,
+                UnitTier.Tier3 => 1.08f,
+                UnitTier.Tier2 => 1.02f,
+                _ => 1.0f
+            };
+
             switch (unit.UnitType)
             {
                 case UnitType.Cedric:
-                    if (unit.CurrentTier >= UnitTier.Tier3) PlaySound(SoundType.BladeTempest);
-                    else if (unit.CurrentTier == UnitTier.Tier2) PlaySound(SoundType.DualSlash);
-                    else PlaySound(SoundType.Slash);
+                    if (unit.CurrentTier >= UnitTier.Tier3) PlaySound(SoundType.BladeTempest, tierPitchMultiplier);
+                    else if (unit.CurrentTier == UnitTier.Tier2) PlaySound(SoundType.DualSlash, tierPitchMultiplier);
+                    else PlaySound(SoundType.Slash, tierPitchMultiplier);
                     break;
 
                 case UnitType.RoseTanker:
-                    if (unit.CurrentTier >= UnitTier.Tier3) PlaySound(SoundType.Earthshaker);
-                    else PlaySound(SoundType.ShieldSlam);
+                    if (unit.CurrentTier >= UnitTier.Tier3) PlaySound(SoundType.Earthshaker, tierPitchMultiplier);
+                    else PlaySound(SoundType.ShieldSlam, tierPitchMultiplier);
                     break;
 
                 case UnitType.RabbitMage:
-                    if (unit.CurrentTier >= UnitTier.Tier3) PlaySound(SoundType.MeteorImpact);
-                    else if (unit.CurrentTier == UnitTier.Tier2) PlaySound(SoundType.MysticBurst);
-                    else PlaySound(SoundType.MagicSpark);
+                    if (unit.CurrentTier >= UnitTier.Tier3) PlaySound(SoundType.MeteorImpact, tierPitchMultiplier);
+                    else if (unit.CurrentTier == UnitTier.Tier2) PlaySound(SoundType.MysticBurst, tierPitchMultiplier);
+                    else PlaySound(SoundType.MagicSpark, tierPitchMultiplier);
                     break;
 
                 case UnitType.WindRanger:
-                    if (unit.CurrentTier >= UnitTier.Tier3) PlaySound(SoundType.TornadoImpact);
-                    else if (unit.CurrentTier == UnitTier.Tier2) PlaySound(SoundType.PiercingGale);
-                    else PlaySound(SoundType.ArrowShot);
+                    if (unit.CurrentTier >= UnitTier.Tier3) PlaySound(SoundType.TornadoImpact, tierPitchMultiplier);
+                    else if (unit.CurrentTier == UnitTier.Tier2) PlaySound(SoundType.PiercingGale, tierPitchMultiplier);
+                    else PlaySound(SoundType.ArrowShot, tierPitchMultiplier);
                     break;
             }
         }

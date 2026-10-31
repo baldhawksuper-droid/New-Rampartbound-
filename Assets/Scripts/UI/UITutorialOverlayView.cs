@@ -233,6 +233,11 @@ namespace FantasyDefense.UI
 
         private void OnSkipClicked()
         {
+            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null && FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+            {
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Selection);
+            }
+
             TutorialGuideManager.Instance?.CompleteTutorial();
         }
 
