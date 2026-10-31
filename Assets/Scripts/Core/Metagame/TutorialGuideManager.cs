@@ -54,7 +54,7 @@ namespace FantasyDefense.Metagame
         private const string PREF_TUTORIAL_COMPLETED = "Rampartbound_Tutorial_Completed";
 
         [Header("State")]
-        [SerializeField] private bool disableTutorial = true;
+        [SerializeField] private bool disableTutorial = false;
         [SerializeField] private TutorialStep currentStep = TutorialStep.WelcomeGreeting;
         [SerializeField] private bool isTutorialActive = false;
         [SerializeField] private List<TutorialStepData> stepDefinitions = new List<TutorialStepData>();

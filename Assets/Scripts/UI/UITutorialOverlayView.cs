@@ -38,6 +38,8 @@ namespace FantasyDefense.UI
             if (canvasGroup == null)
                 canvasGroup = GetComponent<CanvasGroup>();
 
+            EnsureTutorialVisualsBuilt();
+
             if (tapToContinueButton != null)
                 tapToContinueButton.onClick.AddListener(OnTapContinue);
 
@@ -46,6 +48,96 @@ namespace FantasyDefense.UI
 
             // Pastikan overlay tutorial benar-benar tertutup dan tidak memblokir raycast saat inisialisasi awal
             ShowOverlay(false);
+        }
+
+        private void EnsureTutorialVisualsBuilt()
+        {
+            var lilitaFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+            var frame9Slice = Resources.Load<Sprite>("Sprites/UI/Frame_StoneBastion_9Slice")
+#if UNITY_EDITOR
+                          ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Frame_StoneBastion_9Slice.png")
+#endif
+                          ;
+            var pointerSprite = Resources.Load<Sprite>("Sprites/UI/UI_Pointer_Hand")
+#if UNITY_EDITOR
+                          ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Pointer_Hand.png")
+#endif
+                          ;
+            var mentorAvatarSprite = Resources.Load<Sprite>("Sprites/UI/UI_Mentor_BaldHawk_Avatar")
+#if UNITY_EDITOR
+                          ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Mentor_BaldHawk_Avatar.png")
+#endif
+                          ;
+
+            // Pastikan Pointer Hand memiliki Sprite grafis tangan penunjuk arcade yang jelas
+            if (pointerHand != null)
+            {
+                var ptrImg = pointerHand.GetComponent<Image>();
+                if (ptrImg == null) ptrImg = pointerHand.gameObject.AddComponent<Image>();
+                if (pointerSprite != null)
+                {
+                    ptrImg.sprite = pointerSprite;
+                    ptrImg.color = Color.white;
+                    ptrImg.preserveAspect = true;
+                }
+                pointerHand.sizeDelta = new Vector2(64f, 64f);
+            }
+
+            // Pastikan tombol Skip Tutorial selalu ada, aktif, dan memiliki styling jelas
+            if (skipTutorialButton == null)
+            {
+                var skipObj = new GameObject("DynamicSkipButton", typeof(RectTransform), typeof(Image), typeof(Button));
+                skipObj.transform.SetParent(transform, false);
+
+                var rt = skipObj.GetComponent<RectTransform>();
+                rt.anchorMin = new Vector2(1f, 1f);
+                rt.anchorMax = new Vector2(1f, 1f);
+                rt.pivot = new Vector2(1f, 1f);
+                rt.anchoredPosition = new Vector2(-20f, -25f);
+                rt.sizeDelta = new Vector2(130f, 42f);
+
+                var img = skipObj.GetComponent<Image>();
+                img.sprite = frame9Slice;
+                img.type = Image.Type.Sliced;
+                img.color = new Color(0.28f, 0.12f, 0.15f, 0.95f); // Crimson dark stone
+
+                skipTutorialButton = skipObj.GetComponent<Button>();
+                skipTutorialButton.onClick.AddListener(OnSkipClicked);
+
+                var txtObj = new GameObject("SkipText", typeof(RectTransform), typeof(Text));
+                txtObj.transform.SetParent(skipObj.transform, false);
+                var textRt = txtObj.GetComponent<RectTransform>();
+                textRt.anchorMin = Vector2.zero;
+                textRt.anchorMax = Vector2.one;
+                textRt.offsetMin = Vector2.zero;
+                textRt.offsetMax = Vector2.zero;
+
+                var txt = txtObj.GetComponent<Text>();
+                txt.font = lilitaFont ?? Resources.GetBuiltinResource<Font>("Arial.ttf");
+                txt.fontSize = 14;
+                txt.alignment = TextAnchor.MiddleCenter;
+                txt.color = new Color(1f, 0.85f, 0.85f, 1f);
+                txt.text = "LEWATI (SKIP) ✕";
+                txt.raycastTarget = false;
+            }
+
+            // Pastikan Portrait Avatar Mentor BaldHawk terpasang di samping dialog
+            var avatarTr = transform.Find("MentorAvatar");
+            if (avatarTr == null && mentorAvatarSprite != null)
+            {
+                var avObj = new GameObject("MentorAvatar", typeof(RectTransform), typeof(Image));
+                avObj.transform.SetParent(transform, false);
+                var avRt = avObj.GetComponent<RectTransform>();
+                avRt.anchorMin = new Vector2(0.04f, 0.28f);
+                avRt.anchorMax = new Vector2(0.04f, 0.28f);
+                avRt.pivot = new Vector2(0f, 0.5f);
+                avRt.sizeDelta = new Vector2(72f, 72f);
+
+                var avImg = avObj.GetComponent<Image>();
+                avImg.sprite = mentorAvatarSprite;
+                avImg.preserveAspect = true;
+                avImg.raycastTarget = false;
+            }
         }
 
         private void OnEnable()

@@ -28,6 +28,10 @@ namespace FantasyDefense.UI
         [SerializeField] private Text refundPreviewText;
         [SerializeField] private CanvasGroup canvasGroup;
 
+        [Header("Tutorial Hint Tooltip")]
+        private GameObject firstTimeTooltipObj;
+        private const string PREF_SEEN_RECYCLE_TUTORIAL = "Rampartbound_SeenRecycleTutorial";
+
         [Header("State")]
         private bool isHovered = false;
         private bool isDragActive = false;
@@ -178,6 +182,7 @@ namespace FantasyDefense.UI
                     refundPreviewText.text = $"+{refundVal} 💎";
                 }
                 SetDropZoneActive(true);
+                CheckAndShowFirstTimeRecycleHint();
             }
         }
 
@@ -657,6 +662,67 @@ namespace FantasyDefense.UI
             lastRecycledHeroData = null;
             lastRecycledCell = null;
             lastRecycledRefundAmount = 0;
+        }
+
+        #endregion
+
+        #region First-Time Recycle Tooltip
+
+        private void CheckAndShowFirstTimeRecycleHint()
+        {
+            if (PlayerPrefs.GetInt(PREF_SEEN_RECYCLE_TUTORIAL, 0) == 1) return;
+            PlayerPrefs.SetInt(PREF_SEEN_RECYCLE_TUTORIAL, 1);
+            PlayerPrefs.Save();
+
+            if (firstTimeTooltipObj == null)
+            {
+                var lilitaFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+                var frame9Slice = Resources.Load<Sprite>("Sprites/UI/Frame_StoneBastion_9Slice")
+#if UNITY_EDITOR
+                              ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Frame_StoneBastion_9Slice.png")
+#endif
+                              ;
+
+                firstTimeTooltipObj = new GameObject("RecycleTooltipBubble", typeof(RectTransform), typeof(Image));
+                firstTimeTooltipObj.transform.SetParent(transform.parent, false);
+
+                var rt = firstTimeTooltipObj.GetComponent<RectTransform>();
+                rt.anchorMin = rectTransform.anchorMin;
+                rt.anchorMax = rectTransform.anchorMax;
+                rt.pivot = new Vector2(1f, 0f);
+                rt.anchoredPosition = rectTransform.anchoredPosition + new Vector2(0f, 50f);
+                rt.sizeDelta = new Vector2(170f, 65f);
+
+                var img = firstTimeTooltipObj.GetComponent<Image>();
+                img.sprite = frame9Slice;
+                img.type = Image.Type.Sliced;
+                img.color = new Color(0.12f, 0.15f, 0.22f, 0.98f); // Deep fortress obsidian
+
+                var textObj = new GameObject("HintText", typeof(RectTransform), typeof(Text));
+                textObj.transform.SetParent(firstTimeTooltipObj.transform, false);
+                var textRt = textObj.GetComponent<RectTransform>();
+                textRt.anchorMin = Vector2.zero;
+                textRt.anchorMax = Vector2.one;
+                textRt.offsetMin = new Vector2(8f, 6f);
+                textRt.offsetMax = new Vector2(-8f, -6f);
+
+                var txt = textObj.GetComponent<Text>();
+                txt.font = lilitaFont ?? Resources.GetBuiltinResource<Font>("Arial.ttf");
+                txt.fontSize = 11;
+                txt.alignment = TextAnchor.MiddleCenter;
+                txt.color = new Color(1.0f, 0.88f, 0.45f, 1f);
+                txt.text = "💡 LEPAS DI SINI UNTUK LEBUR HERO & REFUND 50% GEMS!";
+                txt.raycastTarget = false;
+            }
+
+            firstTimeTooltipObj.SetActive(true);
+            StartCoroutine(DismissTooltipRoutine(firstTimeTooltipObj, 4.5f));
+        }
+
+        private IEnumerator DismissTooltipRoutine(GameObject tooltip, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            if (tooltip != null) tooltip.SetActive(false);
         }
 
         #endregion
