@@ -32,6 +32,12 @@ namespace FantasyDefense.Combat
         private float groundSmashTimer = 0f;
         private float flameBreathTimer = 0f;
 
+        [Header("Enrage Magma Aura Visuals")]
+        private GameObject magmaAuraObj;
+        private SpriteRenderer magmaAuraSr;
+        private Coroutine magmaPulseCoroutine;
+        private Coroutine magmaEmberCoroutine;
+
         public string BossTitle => bossTitle;
         public bool IsFinalBoss => isFinalBoss;
         public bool IsEnraged => isEnraged;
@@ -168,6 +174,9 @@ namespace FantasyDefense.Combat
             {
                 spriteRenderer.color = GetEffectiveThemeColor();
             }
+
+            // Inisialisasi Cincin Magma Membara (Magma Enrage Aura) di bawah kaki Boss
+            SpawnMagmaEnrageAura();
 
             // VFX aura & audio roar
             if (SkillVfxManager.Instance != null)
@@ -339,9 +348,95 @@ namespace FantasyDefense.Combat
             }
         }
 
+        #region Magma Enrage Aura Systems
+
+        private void SpawnMagmaEnrageAura()
+        {
+            if (magmaAuraObj == null)
+            {
+                magmaAuraObj = new GameObject("MagmaEnrageAura");
+                magmaAuraObj.transform.SetParent(transform, false);
+                magmaAuraObj.transform.localPosition = new Vector3(0f, -0.55f, 0.05f);
+                magmaAuraObj.transform.localScale = new Vector3(1.4f, 0.9f, 1f);
+
+                magmaAuraSr = magmaAuraObj.AddComponent<SpriteRenderer>();
+                magmaAuraSr.sprite = Resources.Load<Sprite>("Sprites/VFX/VFX_Aura_Magma_Ring");
+                magmaAuraSr.sortingLayerName = "Gem";
+                if (spriteRenderer != null)
+                {
+                    magmaAuraSr.sortingOrder = spriteRenderer.sortingOrder - 1;
+                }
+                magmaAuraSr.color = new Color(1f, 0.45f, 0.1f, 0.85f);
+            }
+
+            if (magmaPulseCoroutine != null) StopCoroutine(magmaPulseCoroutine);
+            magmaPulseCoroutine = StartCoroutine(MagmaAuraPulseRoutine());
+
+            if (magmaEmberCoroutine != null) StopCoroutine(magmaEmberCoroutine);
+            magmaEmberCoroutine = StartCoroutine(MagmaEmberEruptionRoutine());
+        }
+
+        private System.Collections.IEnumerator MagmaAuraPulseRoutine()
+        {
+            float timer = 0f;
+            while (isEnraged && !isDead)
+            {
+                timer += Time.deltaTime * 5f;
+                float pulse = 1.35f + Mathf.Sin(timer) * 0.15f;
+                if (magmaAuraObj != null)
+                {
+                    magmaAuraObj.transform.localScale = new Vector3(pulse, pulse * 0.65f, 1f);
+                }
+                if (magmaAuraSr != null)
+                {
+                    magmaAuraSr.color = Color.Lerp(
+                        new Color(1f, 0.35f, 0.05f, 0.75f),
+                        new Color(1f, 0.85f, 0.20f, 0.95f),
+                        (Mathf.Sin(timer) + 1f) * 0.5f
+                    );
+                }
+                yield return null;
+            }
+        }
+
+        private System.Collections.IEnumerator MagmaEmberEruptionRoutine()
+        {
+            var wait = new WaitForSeconds(0.35f);
+            while (isEnraged && !isDead)
+            {
+                yield return wait;
+                if (SkillVfxManager.Instance != null)
+                {
+                    Vector3 sparkPos = transform.position + new Vector3(UnityEngine.Random.Range(-0.35f, 0.35f), -0.4f, 0);
+                    SkillVfxManager.Instance.SpawnProceduralParticleBurst(
+                        sparkPos,
+                        new Color(1f, 0.3f, 0.05f),
+                        new Color(1f, 0.85f, 0.2f),
+                        5,
+                        2.2f
+                    );
+                }
+            }
+        }
+
+        private void CleanupMagmaAura()
+        {
+            if (magmaPulseCoroutine != null) StopCoroutine(magmaPulseCoroutine);
+            if (magmaEmberCoroutine != null) StopCoroutine(magmaEmberCoroutine);
+            if (magmaAuraObj != null)
+            {
+                Destroy(magmaAuraObj);
+                magmaAuraObj = null;
+            }
+        }
+
+        #endregion
+
         protected override void Die()
         {
             if (isDead) return;
+
+            CleanupMagmaAura();
 
             Debug.Log($"[BossMonsterController] Boss {monsterData?.monsterName ?? "Boss"} berhasil dikalahkan!");
             OnBossDefeated?.Invoke(this);
@@ -359,6 +454,12 @@ namespace FantasyDefense.Combat
             }
 
             base.Die();
+        }
+
+        protected override void OnDestroy()
+        {
+            CleanupMagmaAura();
+            base.OnDestroy();
         }
     }
 }

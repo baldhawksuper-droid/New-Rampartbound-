@@ -43,6 +43,8 @@ namespace FantasyDefense.Data
         [Range(5, 30)] public int preparationMoves = 15;
         [Tooltip("Kondisi cuaca medan tempur pada stage ini (Sprint 12)")]
         public WeatherType stageWeather = WeatherType.None;
+        [Tooltip("Tema visual lingkungan medan tempur (Forest, Mountain, Volcanic)")]
+        public BattlefieldEnvironmentTheme environmentTheme = BattlefieldEnvironmentTheme.Forest;
 
         [Header("Level & Waves Setup")]
         public LevelConfigSO levelConfig;

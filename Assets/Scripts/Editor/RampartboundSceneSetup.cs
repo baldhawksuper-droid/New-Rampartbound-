@@ -331,6 +331,9 @@ namespace Rampartbound.Editor
             var weatherObj = new GameObject("BattlefieldWeatherManager");
             weatherObj.AddComponent<BattlefieldWeatherManager>();
 
+            var envObj = new GameObject("BattlefieldEnvironmentManager");
+            envObj.AddComponent<BattlefieldEnvironmentManager>();
+
             var autoMergeObj = new GameObject("AutoMergeAssistant");
             autoMergeObj.AddComponent<AutoMergeAssistant>();
 

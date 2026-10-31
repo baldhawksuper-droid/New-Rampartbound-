@@ -158,6 +158,10 @@ namespace FantasyDefense.Core
                     {
                         Combat.BattlefieldWeatherManager.Instance.SetWeather(stage.stageWeather);
                     }
+                    if (Combat.BattlefieldEnvironmentManager.Instance != null)
+                    {
+                        Combat.BattlefieldEnvironmentManager.Instance.SetEnvironmentTheme(stage.environmentTheme);
+                    }
                 }
             }
 
