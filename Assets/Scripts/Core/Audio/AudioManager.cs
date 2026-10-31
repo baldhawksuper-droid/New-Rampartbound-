@@ -69,7 +69,10 @@ namespace FantasyDefense.Audio
         LobbyTheme,
         BattleTheme,
         CitadelLobby = LobbyTheme,
-        BattlefieldTheme = BattleTheme
+        BattlefieldTheme = BattleTheme,
+        TitleTheme,
+        MiniBossTheme,
+        BossTheme
     }
 
     /// <summary>
@@ -368,8 +371,19 @@ namespace FantasyDefense.Audio
             // 2. Cek Resources drop-in (Assets/Resources/Audio/Music/)
             if (realBgm == null)
             {
-                string resPath = track == BgmTrack.LobbyTheme ? "Audio/Music/BGM_Citadel_Lobby" : "Audio/Music/BGM_Battle_Theme";
-                realBgm = Resources.Load<AudioClip>(resPath);
+                string resPath = track switch
+                {
+                    BgmTrack.TitleTheme => "Audio/Music/BGM_Title_Screen",
+                    BgmTrack.MiniBossTheme => "Audio/Music/BGM_MiniBoss_Theme",
+                    BgmTrack.BossTheme => "Audio/Music/BGM_Boss_Theme",
+                    BgmTrack.LobbyTheme => "Audio/Music/BGM_Citadel_Lobby",
+                    BgmTrack.BattleTheme => "Audio/Music/BGM_Battle_Theme",
+                    _ => null
+                };
+                if (!string.IsNullOrEmpty(resPath))
+                {
+                    realBgm = Resources.Load<AudioClip>(resPath);
+                }
             }
 
             if (realBgm != null)

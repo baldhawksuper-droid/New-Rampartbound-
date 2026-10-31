@@ -116,6 +116,12 @@ namespace FantasyDefense.UI
         {
             RefreshLocalization();
 
+            // Putar musik tema megah pembuka judul kerajaan (Title Screen Theme)
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlayBGM(BgmTrack.TitleTheme);
+            }
+
             // Jalankan pre-warming seluruh aset sejak awal game terbuka (Point 6)
             StartCoroutine(PreloadAllGameAssetsRoutine());
 

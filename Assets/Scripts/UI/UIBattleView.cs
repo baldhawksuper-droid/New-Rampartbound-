@@ -763,6 +763,19 @@ namespace FantasyDefense.UI
             if (bossBarContainer != null) bossBarContainer.SetActive(true);
             if (bossEnrageBanner != null) bossEnrageBanner.SetActive(false);
 
+            // Transisi dinamis ke BGM Boss vs Mini-Boss
+            if (AudioManager.Instance != null && boss != null)
+            {
+                if (boss.IsFinalBoss)
+                {
+                    AudioManager.Instance.PlayBGM(BgmTrack.BossTheme);
+                }
+                else
+                {
+                    AudioManager.Instance.PlayBGM(BgmTrack.MiniBossTheme);
+                }
+            }
+
             if (bossNameText != null)
             {
                 bossNameText.text = boss.Data != null ? boss.Data.monsterName : "BOSS MONSTER";
@@ -812,6 +825,12 @@ namespace FantasyDefense.UI
             if (bossEnrageBanner != null)
             {
                 bossEnrageBanner.SetActive(false);
+            }
+
+            // Kembalikan ke BGM Battle reguler saat boss ditumbangkan
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlayBGM(BgmTrack.BattleTheme);
             }
         }
 
