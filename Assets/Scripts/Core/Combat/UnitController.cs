@@ -646,8 +646,10 @@ namespace FantasyDefense.Combat
                     {
                         maxTierBadgeObj = new GameObject("MaxTierBadge_Star");
                         maxTierBadgeObj.transform.SetParent(transform, false);
-                        maxTierBadgeObj.transform.localPosition = new Vector3(0.36f, -0.22f, -0.05f);
-                        maxTierBadgeObj.transform.localScale = new Vector3(0.24f, 0.24f, 1f);
+                        // Koordinat presisi (0.32f, -0.22f) menjamin bintang tetap di dalam diameter tatakan plinth (radius 0.42f)
+                        // dan tidak pernah keluar dari petak grid (cellSize 1.18f) pada rasio tablet 4:3 maupun ponsel 20:9
+                        maxTierBadgeObj.transform.localPosition = new Vector3(0.32f, -0.22f, -0.05f);
+                        maxTierBadgeObj.transform.localScale = new Vector3(0.22f, 0.22f, 1f);
                         maxTierBadgeSr = maxTierBadgeObj.AddComponent<SpriteRenderer>();
                         maxTierBadgeSr.sprite = Resources.Load<Sprite>("Sprites/UI/UI_Badge_MaxTier_Star");
                         maxTierBadgeSr.sortingLayerName = "Gem";

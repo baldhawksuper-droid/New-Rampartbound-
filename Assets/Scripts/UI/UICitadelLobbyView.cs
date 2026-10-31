@@ -156,6 +156,16 @@ namespace FantasyDefense.UI
             }
         }
 
+        private void Update()
+        {
+            // Animasi berdenyut halus (breathe animation) pada tombol Battle Crimson agar memandu mata pemain
+            if (defendCitadelButton != null && defendCitadelButton.gameObject.activeInHierarchy)
+            {
+                float pulse = 1.0f + Mathf.Sin(Time.unscaledTime * 3.5f) * 0.035f;
+                defendCitadelButton.transform.localScale = new Vector3(pulse, pulse, 1f);
+            }
+        }
+
         private void OnEnable()
         {
             CitadelLobbyManager.OnEnergyChanged += HandleEnergyChanged;

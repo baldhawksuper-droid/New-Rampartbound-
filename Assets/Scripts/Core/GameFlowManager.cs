@@ -247,7 +247,12 @@ namespace FantasyDefense.Core
 
                 if (AudioManager.Instance != null)
                 {
-                    AudioManager.Instance.PlaySound(SoundType.ButtonClick);
+                    AudioManager.Instance.PlaySound(SoundType.AltarWhooshClose, 1.15f);
+                }
+
+                if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null && FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+                {
+                    FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Selection);
                 }
 
                 if (lobbyView != null)
