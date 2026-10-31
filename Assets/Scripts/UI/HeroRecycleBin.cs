@@ -80,6 +80,11 @@ namespace FantasyDefense.UI
             if (runeGlowCoroutine != null) StopCoroutine(runeGlowCoroutine);
             if (undoCountdownCoroutine != null) StopCoroutine(undoCountdownCoroutine);
             ClearUndoWindow();
+
+            if (firstTimeTooltipObj != null)
+            {
+                firstTimeTooltipObj.SetActive(false);
+            }
         }
 
         private void EnsureVisualElementsBuilt()
@@ -570,6 +575,11 @@ namespace FantasyDefense.UI
 
         private void OnUndoButtonClicked()
         {
+            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null && FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+            {
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Selection);
+            }
+
             if (lastRecycledHeroData == null || lastRecycledCell == null)
             {
                 ClearUndoWindow();
@@ -713,6 +723,8 @@ namespace FantasyDefense.UI
                 txt.color = new Color(1.0f, 0.88f, 0.45f, 1f);
                 txt.text = "💡 LEPAS DI SINI UNTUK LEBUR HERO & REFUND 50% GEMS!";
                 txt.raycastTarget = false;
+
+                img.raycastTarget = false;
             }
 
             firstTimeTooltipObj.SetActive(true);

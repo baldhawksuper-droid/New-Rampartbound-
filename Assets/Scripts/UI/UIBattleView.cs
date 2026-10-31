@@ -1600,6 +1600,13 @@ namespace FantasyDefense.UI
             if (victoryPanel != null)
             {
                 victoryPanel.SetActive(true);
+
+                // Efek partikel konfeti perayaan kemenangan di layer UI (sorting order 555)
+                if (SkillVfxManager.Instance != null)
+                {
+                    SkillVfxManager.Instance.SpawnProceduralParticleBurst(Vector3.up * 1.5f, new Color(1f, 0.84f, 0.0f, 1f), new Color(0.2f, 0.8f, 1f, 1f), 32, 3.2f, 555);
+                    SkillVfxManager.Instance.SpawnProceduralParticleBurst(Vector3.up * 0.5f, new Color(1f, 0.3f, 0.6f, 1f), new Color(1f, 1f, 1f, 1f), 24, 2.8f, 555);
+                }
             }
 
             if (bottomDockView != null)
@@ -1681,6 +1688,12 @@ namespace FantasyDefense.UI
             if (defeatPanel != null)
             {
                 defeatPanel.SetActive(true);
+
+                // Efek partikel abu & bara benteng gugur di layer UI (sorting order 555)
+                if (SkillVfxManager.Instance != null)
+                {
+                    SkillVfxManager.Instance.SpawnProceduralParticleBurst(Vector3.down * 1.5f, new Color(0.85f, 0.25f, 0.15f, 0.95f), new Color(0.25f, 0.22f, 0.22f, 0.95f), 28, 2.2f, 555);
+                }
             }
 
             if (bottomDockView != null)
