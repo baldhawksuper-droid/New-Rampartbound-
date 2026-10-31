@@ -801,6 +801,19 @@ namespace FantasyDefense.Combat
             eliteAffix.InitializeAffix(affix);
         }
 
+        /// <summary>
+        /// Mengembalikan warna tint tema monster asli yang telah memperhitungkan modifikasi mutasi elite atau enrage boss.
+        /// </summary>
+        public virtual Color GetEffectiveThemeColor()
+        {
+            Color baseCol = monsterData != null && monsterData.themeColor != default ? monsterData.themeColor : Color.white;
+            if (eliteAffix != null && eliteAffix.CurrentAffix != EliteAffixType.None)
+            {
+                return Color.Lerp(baseCol, eliteAffix.GetAffixThemeColor(), 0.35f);
+            }
+            return baseCol;
+        }
+
         public void ApplyStun(float duration)
         {
             if (isDead) return;
@@ -810,7 +823,7 @@ namespace FantasyDefense.Combat
         private IEnumerator StunRoutine(float duration)
         {
             isStunned = true;
-            Color originalColor = spriteRenderer != null ? spriteRenderer.color : Color.white;
+            Color originalColor = GetEffectiveThemeColor();
             if (spriteRenderer != null) spriteRenderer.color = new Color(0.7f, 0.7f, 1f, 1f); // Stun tint
 
             yield return new WaitForSeconds(duration);
@@ -862,7 +875,7 @@ namespace FantasyDefense.Combat
             float elapsed = 0f;
             float tickInterval = 0.5f;
 
-            Color originalColor = spriteRenderer != null ? spriteRenderer.color : Color.white;
+            Color originalColor = GetEffectiveThemeColor();
             if (spriteRenderer != null) spriteRenderer.color = new Color(1f, 0.5f, 0.2f, 1f); // Orange burn tint
 
             while (elapsed < duration && !isDead)
@@ -884,7 +897,7 @@ namespace FantasyDefense.Combat
         {
             if (spriteRenderer == null) yield break;
 
-            Color original = monsterData != null ? monsterData.themeColor : Color.white;
+            Color original = GetEffectiveThemeColor();
             spriteRenderer.color = flashColor;
             yield return new WaitForSeconds(0.08f);
             if (spriteRenderer != null && !isDead) spriteRenderer.color = original;

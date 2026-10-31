@@ -145,6 +145,16 @@ namespace FantasyDefense.Combat
             }
         }
 
+        public override Color GetEffectiveThemeColor()
+        {
+            Color baseCol = base.GetEffectiveThemeColor();
+            if (isEnraged)
+            {
+                return Color.Lerp(baseCol, new Color(1f, 0.15f, 0.15f, 1f), 0.65f);
+            }
+            return baseCol;
+        }
+
         private void TriggerEnragePhase()
         {
             isEnraged = true;
@@ -153,10 +163,10 @@ namespace FantasyDefense.Combat
             // Buff stat kecepatan gerak +40%
             currentMoveSpeed *= 1.40f;
 
-            // Visual feedback: Boss membara merah menyala
+            // Visual feedback: Boss membara merah menyala (berbasis kombinasi warna tema)
             if (spriteRenderer != null)
             {
-                spriteRenderer.color = new Color(1f, 0.25f, 0.25f, 1f);
+                spriteRenderer.color = GetEffectiveThemeColor();
             }
 
             // VFX aura & audio roar

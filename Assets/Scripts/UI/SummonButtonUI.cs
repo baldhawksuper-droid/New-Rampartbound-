@@ -231,6 +231,7 @@ namespace FantasyDefense.UI
             EconomyManager.OnGemsChanged += HandleGemsChanged;
             EconomyManager.OnSummonCostChanged += HandleSummonCostChanged;
             HeroSummoner.OnHeroSummoned += HandleHeroSummoned;
+            HeroSummoner.OnSummonFailed += HandleSummonFailed;
             GridManager.OnGridGenerated += UpdateButtonState;
             CitadelLocalizationManager.OnLanguageChanged += HandleLanguageChanged;
             Combat.AutoSummonAssistant.OnAutoSummonToggled += HandleAutoSummonToggled;
@@ -246,11 +247,35 @@ namespace FantasyDefense.UI
             EconomyManager.OnGemsChanged -= HandleGemsChanged;
             EconomyManager.OnSummonCostChanged -= HandleSummonCostChanged;
             HeroSummoner.OnHeroSummoned -= HandleHeroSummoned;
+            HeroSummoner.OnSummonFailed -= HandleSummonFailed;
             GridManager.OnGridGenerated -= UpdateButtonState;
             CitadelLocalizationManager.OnLanguageChanged -= HandleLanguageChanged;
             Combat.AutoSummonAssistant.OnAutoSummonToggled -= HandleAutoSummonToggled;
 
             if (pulseCoroutine != null) StopCoroutine(pulseCoroutine);
+        }
+
+        private void HandleSummonFailed(HeroSummoner.SummonFailureReason reason)
+        {
+            StartCoroutine(ShakeButtonRoutine());
+        }
+
+        private System.Collections.IEnumerator ShakeButtonRoutine()
+        {
+            Vector3 originalPos = transform.localPosition;
+            float elapsed = 0f;
+            float duration = 0.22f;
+            float magnitude = 10f;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float offsetX = Mathf.Sin(elapsed * 45f) * magnitude * (1f - elapsed / duration);
+                transform.localPosition = originalPos + new Vector3(offsetX, 0, 0);
+                yield return null;
+            }
+
+            transform.localPosition = originalPos;
         }
 
         private System.Collections.IEnumerator PulseGlowRoutine()
