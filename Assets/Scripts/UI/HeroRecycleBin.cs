@@ -256,6 +256,12 @@ namespace FantasyDefense.UI
                 binFrameImage.color = new Color(0.55f, 0.15f, 0.18f, 0.98f); // Glowing active crimson
             }
 
+            // Pendaran skala mikro ikon altar saat drag hero melintasi area (1.05x scale pop)
+            if (binIconImage != null)
+            {
+                binIconImage.transform.localScale = new Vector3(1.05f, 1.05f, 1f);
+            }
+
             if (runeGlowCoroutine != null) StopCoroutine(runeGlowCoroutine);
             runeGlowCoroutine = StartCoroutine(RuneGlowPulseRoutine());
 
@@ -281,6 +287,7 @@ namespace FantasyDefense.UI
             if (binIconImage != null)
             {
                 binIconImage.color = Color.white;
+                binIconImage.transform.localScale = Vector3.one; // Kembalikan skala ikon ke normal
             }
         }
 

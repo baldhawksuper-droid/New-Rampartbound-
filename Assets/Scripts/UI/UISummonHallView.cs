@@ -491,21 +491,21 @@ namespace FantasyDefense.UI
 
             // Tentukan sprite border & warna kelangkaan
             string borderPath = "Border_Rarity_Common";
-            Color rarityColor = new Color(0.7f, 0.7f, 0.7f);
+            Color rarityColor = CitadelRarityColors.Common;
             if (item.rarityLabel.Contains("Legendary") || item.unitType == UnitType.WindRanger)
             {
                 borderPath = "Border_Rarity_Legendary";
-                rarityColor = new Color(1f, 0.85f, 0.2f);
+                rarityColor = CitadelRarityColors.Legendary;
             }
             else if (item.rarityLabel.Contains("Epic") || item.unitType == UnitType.RabbitMage)
             {
                 borderPath = "Border_Rarity_Epic";
-                rarityColor = new Color(0.8f, 0.4f, 1f);
+                rarityColor = CitadelRarityColors.Epic;
             }
             else
             {
                 borderPath = "Border_Rarity_Rare";
-                rarityColor = new Color(0.25f, 0.75f, 1f);
+                rarityColor = CitadelRarityColors.Rare;
             }
 
             var borderSprite = Resources.Load<Sprite>($"Sprites/UI/{borderPath}")
@@ -649,7 +649,7 @@ namespace FantasyDefense.UI
 
             if (SkillVfxManager.Instance != null)
             {
-                Color burstColor = isLegendary ? new Color(1f, 0.85f, 0.2f) : (isEpic ? new Color(0.8f, 0.4f, 1f) : new Color(0.25f, 0.75f, 1f));
+                Color burstColor = isLegendary ? CitadelRarityColors.Legendary : (isEpic ? CitadelRarityColors.Epic : CitadelRarityColors.Rare);
                 int particleCount = isLegendary ? 22 : (isEpic ? 16 : 10);
                 SkillVfxManager.Instance.SpawnProceduralParticleBurst(cardTr.position, burstColor, Color.white, particleCount, 1.8f);
             }
