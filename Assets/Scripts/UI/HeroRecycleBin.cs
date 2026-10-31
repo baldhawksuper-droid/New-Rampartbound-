@@ -445,7 +445,11 @@ namespace FantasyDefense.UI
 
         private void EnsureUndoButtonCreated()
         {
-            if (undoButtonObj != null) return;
+            if (undoButtonObj != null)
+            {
+                UpdateUndoButtonPosition();
+                return;
+            }
 
             var lilitaFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
             var frame9Slice = Resources.Load<Sprite>("Sprites/UI/Frame_StoneBastion_9Slice")
@@ -461,9 +465,8 @@ namespace FantasyDefense.UI
             rt.anchorMin = rectTransform.anchorMin;
             rt.anchorMax = rectTransform.anchorMax;
             rt.pivot = rectTransform.pivot;
-            // Posisikan tepat di sebelah kiri altar daur ulang
-            rt.anchoredPosition = rectTransform.anchoredPosition + new Vector2(-115f, 0f);
-            rt.sizeDelta = new Vector2(100f, 44f);
+            rt.sizeDelta = new Vector2(104f, 44f);
+            UpdateUndoButtonPosition();
 
             var img = undoButtonObj.GetComponent<Image>();
             img.sprite = frame9Slice;
@@ -501,6 +504,33 @@ namespace FantasyDefense.UI
             undoButtonText.color = new Color(1.0f, 0.85f, 0.35f, 1f);
             undoButtonText.text = "↩️ UNDO (3s)";
             undoButtonText.raycastTarget = false;
+        }
+
+        /// <summary>
+        /// Menyesuaikan posisi tombol undo secara responsif berdasarkan rasio aspek layar
+        /// agar tidak terpotong oleh notch, bezel, atau batas layar tablet (4:3) / ultrawide (20:9).
+        /// </summary>
+        private void UpdateUndoButtonPosition()
+        {
+            if (undoButtonObj == null || rectTransform == null) return;
+            var rt = undoButtonObj.GetComponent<RectTransform>();
+
+            float screenAspect = (float)Screen.width / Mathf.Max(1f, Screen.height);
+            // Default offset ke kiri altar
+            float targetOffsetX = -115f;
+            float targetOffsetY = 0f;
+
+            // Jika rasio layar sempit/tablet (<= 9:16 atau 4:3), geser ke bawah sedikit agar tetap di dalam safe area
+            if (screenAspect < 0.52f) // Rasio sangat tinggi/ramping (20:9 atau 21:9)
+            {
+                targetOffsetX = -110f;
+            }
+            else if (screenAspect > 0.65f) // Tablet lebar (4:3 / 3:2)
+            {
+                targetOffsetX = -120f;
+            }
+
+            rt.anchoredPosition = rectTransform.anchoredPosition + new Vector2(targetOffsetX, targetOffsetY);
         }
 
         private IEnumerator UndoCountdownRoutine(float duration)
