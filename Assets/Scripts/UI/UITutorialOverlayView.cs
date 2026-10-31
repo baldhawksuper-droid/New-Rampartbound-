@@ -179,7 +179,14 @@ namespace FantasyDefense.UI
             // Posisikan pointer jika ada target UI
             PositionSpotlightAndPointer(stepData.targetUiElementName);
 
-            AudioManager.Instance?.PlaySfx(AudioSfxType.ButtonClick);
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySound(SoundType.DialogueBlipChime, 1.15f);
+            }
+            else
+            {
+                AudioManager.Instance?.PlaySfx(AudioSfxType.ButtonClick);
+            }
         }
 
         private void PositionSpotlightAndPointer(string targetElementName)
