@@ -490,15 +490,22 @@ namespace FantasyDefense.Audio
             }
 
             // 2. Cek Resources drop-in (Assets/Resources/Audio/SFX/[SoundType])
-            AudioClip resClip = Resources.Load<AudioClip>($"Audio/SFX/{key}");
-            if (resClip != null)
+            try
             {
-                externalClipCache[key] = resClip;
-                return resClip;
+                AudioClip resClip = Resources.Load<AudioClip>($"Audio/SFX/{key}");
+                if (resClip != null)
+                {
+                    externalClipCache[key] = resClip;
+                    return resClip;
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning($"[AudioManager] Exception loading Resources audio '{key}': {ex.Message}");
             }
 
             // 3. Fallback mulus ke procedural synthesis
-            if (proceduralClipCache.TryGetValue(type, out AudioClip clip))
+            if (proceduralClipCache.TryGetValue(type, out AudioClip clip) && clip != null)
             {
                 return clip;
             }

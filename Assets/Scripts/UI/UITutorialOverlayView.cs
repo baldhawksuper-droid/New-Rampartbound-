@@ -38,6 +38,22 @@ namespace FantasyDefense.UI
             if (canvasGroup == null)
                 canvasGroup = GetComponent<CanvasGroup>();
 
+            // Memastikan Canvas Tutorial selalu memiliki sorting order terdepan (950) di atas seluruh panel gameplay
+            Canvas canvas = GetComponent<Canvas>();
+            if (canvas == null)
+            {
+                canvas = gameObject.AddComponent<Canvas>();
+            }
+            if (canvas != null)
+            {
+                canvas.overrideSorting = true;
+                canvas.sortingOrder = 950;
+            }
+            if (GetComponent<GraphicRaycaster>() == null)
+            {
+                gameObject.AddComponent<GraphicRaycaster>();
+            }
+
             EnsureTutorialVisualsBuilt();
 
             if (tapToContinueButton != null)

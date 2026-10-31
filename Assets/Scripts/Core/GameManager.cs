@@ -414,7 +414,30 @@ namespace FantasyDefense.Core
 
         private System.Collections.IEnumerator StartWaveCountdownRoutine()
         {
-            yield return new WaitForSeconds(preparationDuration);
+            float remaining = preparationDuration;
+            while (remaining > 0f)
+            {
+                if (remaining <= 3.1f && remaining > 0.1f)
+                {
+                    if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null && FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+                    {
+                        FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Selection);
+                    }
+                    if (FantasyDefense.Audio.AudioManager.Instance != null)
+                    {
+                        FantasyDefense.Audio.AudioManager.Instance.PlaySound(FantasyDefense.Audio.SoundType.ButtonClick, 1.35f);
+                    }
+                }
+                float step = Mathf.Min(1.0f, remaining);
+                yield return new WaitForSeconds(step);
+                remaining -= step;
+            }
+
+            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null && FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+            {
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Medium);
+            }
+
             StartBattleWavesNow();
         }
 
