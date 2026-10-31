@@ -1405,6 +1405,12 @@ namespace FantasyDefense.Combat
             bgObj.transform.localScale = new Vector3(width, 0.42f, 1f);
             borderObj.transform.localScale = new Vector3(width * 1.05f, 0.48f, 1f);
 
+            // Jika pahlawan memiliki aura tier tinggi (Tier 5/Tier 4), semburkan partikel kilau pendaran
+            if (themeColor.a > 0.8f)
+            {
+                SpawnProceduralParticleBurst(worldPos + Vector3.up * 0.2f, themeColor, 6, 0.45f, 0.6f, 507);
+            }
+
             StartCoroutine(DefenderEmoteRoutine(emoteObj, bgRenderer, borderRenderer, tm));
         }
 

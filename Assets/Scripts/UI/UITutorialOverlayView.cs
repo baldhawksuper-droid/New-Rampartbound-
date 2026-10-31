@@ -150,6 +150,13 @@ namespace FantasyDefense.UI
         {
             TutorialGuideManager.OnTutorialStepStarted -= HandleStepStarted;
             TutorialGuideManager.OnTutorialCompleted -= HandleTutorialCompleted;
+
+            // Pastikan raycast blocker dibersihkan saat objek dinonaktifkan / berganti scene
+            if (canvasGroup != null)
+            {
+                canvasGroup.blocksRaycasts = false;
+                canvasGroup.interactable = false;
+            }
         }
 
         private void Update()
