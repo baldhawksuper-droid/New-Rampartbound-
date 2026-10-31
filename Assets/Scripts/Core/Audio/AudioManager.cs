@@ -340,7 +340,16 @@ namespace FantasyDefense.Audio
                 _ => 1.0f
             };
 
-            PlaySound(sound, pitch);
+            // Volume balance: creep 0.72x, brute 0.82x, boss 0.95x agar tidak menutupi BGM & dialog
+            float volumeScale = monsterType switch
+            {
+                MonsterType.Creep => 0.72f,
+                MonsterType.Brute => 0.82f,
+                MonsterType.Boss => 0.95f,
+                _ => 0.75f
+            };
+
+            PlaySound(sound, pitch * volumeScale);
 
             // Memicu haptic feedback ponsel yang proporsional dengan bobot musuh
             if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null)

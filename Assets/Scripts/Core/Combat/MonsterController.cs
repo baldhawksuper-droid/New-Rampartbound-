@@ -366,10 +366,10 @@ namespace FantasyDefense.Combat
                 int monsterAtk = monsterData != null ? monsterData.castleDamage : 10;
                 hero.TakeDamage(monsterAtk);
 
-                // Mainkan SFX benturan serangan
+                // Mainkan SFX benturan serangan proporsional
                 if (FantasyDefense.Audio.AudioManager.Instance != null)
                 {
-                    FantasyDefense.Audio.AudioManager.Instance.PlaySound(FantasyDefense.Audio.SoundType.CastleHit);
+                    FantasyDefense.Audio.AudioManager.Instance.PlayCastleHit(monsterData != null ? monsterData.monsterType : MonsterType.Creep);
                 }
             }
 
