@@ -20,5 +20,6 @@ MonoBehaviour:
   gemsReward: 60
   monsterSprite: {fileID: 21300000, guid: cca6fb02d4f74f5198afa190215dab8c, type: 3}
   monsterWalkSprite: {fileID: 21300000, guid: 9bf3f152713d4960ab0ce9d519573787, type: 3}
+  monsterAttackSprite: {fileID: 21300000, guid: e78077ca49e04235b0c91174467e0a10, type: 3}
   themeColor: {r: 1, g: 1, b: 1, a: 1}
   visualScale: 0.30

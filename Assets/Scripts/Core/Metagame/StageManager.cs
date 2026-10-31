@@ -254,6 +254,7 @@ namespace FantasyDefense.Metagame
 
             data.monsterSprite = Resources.Load<Sprite>($"Sprites/Monsters/{spriteName}");
             data.monsterWalkSprite = Resources.Load<Sprite>($"Sprites/Monsters/{spriteName}_Walk");
+            data.monsterAttackSprite = Resources.Load<Sprite>($"Sprites/Monsters/{spriteName}_Attack");
             return data;
         }
 

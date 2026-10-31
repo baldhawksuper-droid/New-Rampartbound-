@@ -50,6 +50,7 @@ namespace FantasyDefense.Combat
 
         [Header("Procedural Walk Animation Juice & Frame Cycling")]
         [SerializeField] protected Sprite[] walkFrames;
+        [SerializeField] protected Sprite attackSprite;
         protected float walkCycleTimer = 0f;
         protected int currentWalkFrame = 0;
         protected Vector3 baseScale = Vector3.one;
@@ -185,6 +186,17 @@ namespace FantasyDefense.Combat
                         {
                             walkFrames = new Sprite[] { spriteRenderer.sprite, walkSpr };
                         }
+                    }
+
+                    // Konfigurasi sprite pose menyerang (Attack Frame)
+                    if (data.monsterAttackSprite != null)
+                    {
+                        attackSprite = data.monsterAttackSprite;
+                    }
+                    else
+                    {
+                        string attackName = $"Monster_{data.monsterType}_Attack";
+                        attackSprite = Resources.Load<Sprite>($"Sprites/Monsters/{attackName}");
                     }
                 }
 
@@ -368,6 +380,24 @@ namespace FantasyDefense.Combat
         {
             if (targetHero == null) yield break;
             Vector3 startPos = transform.position;
+            Sprite prevSprite = spriteRenderer != null ? spriteRenderer.sprite : null;
+
+            // Alihkan ke pose menyerang jika tersedia
+            if (attackSprite != null && spriteRenderer != null)
+            {
+                spriteRenderer.sprite = attackSprite;
+            }
+
+            // Windup: monster menarik badan ke belakang sedikit sebelum menerjang
+            float windup = 0f;
+            Vector3 windupPos = startPos + (startPos - targetHero.transform.position).normalized * 0.12f;
+            while (windup < 0.08f)
+            {
+                windup += Time.deltaTime;
+                transform.position = Vector3.Lerp(startPos, windupPos, windup / 0.08f);
+                yield return null;
+            }
+
             // Lunge dibatasi agar tidak meluncur melewati posisi pahlawan
             float targetY = Mathf.Max(startPos.y - 0.25f, targetHero.transform.position.y + 0.35f);
             Vector3 lungeTarget = new Vector3(
@@ -380,8 +410,20 @@ namespace FantasyDefense.Combat
             while (t < 0.10f)
             {
                 t += Time.deltaTime;
-                transform.position = Vector3.Lerp(startPos, lungeTarget, t / 0.10f);
+                transform.position = Vector3.Lerp(windupPos, lungeTarget, t / 0.10f);
                 yield return null;
+            }
+
+            // Hentakan partikel benturan tebasan/tusukan ke hero
+            if (SkillVfxManager.Instance != null)
+            {
+                SkillVfxManager.Instance.SpawnProceduralParticleBurst(
+                    transform.position + (targetHero.transform.position - transform.position) * 0.4f,
+                    new Color(1f, 0.35f, 0.15f),
+                    new Color(0.9f, 0.1f, 0.1f),
+                    6,
+                    1.8f
+                );
             }
 
             t = 0f;
@@ -392,6 +434,12 @@ namespace FantasyDefense.Combat
                 yield return null;
             }
             transform.position = startPos;
+
+            // Kembalikan ke sprite berjalan/idle setelah selesai menyerang
+            if (prevSprite != null && spriteRenderer != null)
+            {
+                spriteRenderer.sprite = prevSprite;
+            }
         }
 
         protected virtual void MoveAlongWaypoints()
@@ -593,12 +641,29 @@ namespace FantasyDefense.Combat
         {
             Vector3 startPos = transform.position;
             Vector3 lungeTarget = startPos + Vector3.down * 0.25f;
+            Sprite prevSprite = spriteRenderer != null ? spriteRenderer.sprite : null;
+
+            // Alihkan ke pose menyerang jika tersedia
+            if (attackSprite != null && spriteRenderer != null)
+            {
+                spriteRenderer.sprite = attackSprite;
+            }
+
+            // Windup: menarik badan ke atas/belakang sebelum menghantam pintu gerbang
+            float windup = 0f;
+            Vector3 windupPos = startPos + Vector3.up * 0.10f;
+            while (windup < 0.08f)
+            {
+                windup += Time.deltaTime;
+                transform.position = Vector3.Lerp(startPos, windupPos, windup / 0.08f);
+                yield return null;
+            }
 
             float t = 0f;
             while (t < 0.10f)
             {
                 t += Time.deltaTime;
-                transform.position = Vector3.Lerp(startPos, lungeTarget, t / 0.10f);
+                transform.position = Vector3.Lerp(windupPos, lungeTarget, t / 0.10f);
                 yield return null;
             }
 
@@ -622,6 +687,12 @@ namespace FantasyDefense.Combat
                 yield return null;
             }
             transform.position = startPos;
+
+            // Kembalikan ke sprite berjalan/idle setelah hantaman selesai
+            if (prevSprite != null && spriteRenderer != null)
+            {
+                spriteRenderer.sprite = prevSprite;
+            }
         }
 
         public virtual void TakeDamage(float damage, bool isCrit = false)

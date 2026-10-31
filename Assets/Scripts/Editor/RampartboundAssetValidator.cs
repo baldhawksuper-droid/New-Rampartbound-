@@ -390,9 +390,9 @@ namespace Rampartbound.Editor
             BindUnitSO("Assets/ScriptableObjects/Units/SO_RabbitMage.asset", "RabbitMage");
             BindUnitSO("Assets/ScriptableObjects/Units/SO_WindRanger.asset", "WindRanger");
 
-            BindMonsterSO("Assets/ScriptableObjects/Monsters/SO_Monster_Creep.asset", "Assets/Art/Sprites/Monsters/Monster_Creep.png");
-            BindMonsterSO("Assets/ScriptableObjects/Monsters/SO_Monster_Brute.asset", "Assets/Art/Sprites/Monsters/Monster_Brute.png");
-            BindMonsterSO("Assets/ScriptableObjects/Monsters/SO_Monster_Boss.asset", "Assets/Art/Sprites/Monsters/Monster_Boss.png");
+            BindMonsterSO("Assets/ScriptableObjects/Monsters/SO_Monster_Creep.asset", "Assets/Art/Sprites/Monsters/Monster_Creep.png", "Assets/Art/Sprites/Monsters/Monster_Creep_Walk.png", "Assets/Art/Sprites/Monsters/Monster_Creep_Attack.png");
+            BindMonsterSO("Assets/ScriptableObjects/Monsters/SO_Monster_Brute.asset", "Assets/Art/Sprites/Monsters/Monster_Brute.png", "Assets/Art/Sprites/Monsters/Monster_Brute_Walk.png", "Assets/Art/Sprites/Monsters/Monster_Brute_Attack.png");
+            BindMonsterSO("Assets/ScriptableObjects/Monsters/SO_Monster_Boss.asset", "Assets/Art/Sprites/Monsters/Monster_Boss.png", "Assets/Art/Sprites/Monsters/Monster_Boss_Walk.png", "Assets/Art/Sprites/Monsters/Monster_Boss_Attack.png");
 
             AssetDatabase.SaveAssets();
             Debug.Log("[Rampartbound Asset Validator] Sukses mengaitkan ulang seluruh ScriptableObjects unit & monster!");
@@ -432,7 +432,7 @@ namespace Rampartbound.Editor
             EditorUtility.SetDirty(so);
         }
 
-        private static void BindMonsterSO(string soPath, string spritePath)
+        private static void BindMonsterSO(string soPath, string spritePath, string walkPath = null, string attackPath = null)
         {
             var so = AssetDatabase.LoadAssetAtPath<MonsterDataSO>(soPath);
             if (so == null) return;
@@ -441,8 +441,21 @@ namespace Rampartbound.Editor
             if (sprite != null)
             {
                 so.monsterSprite = sprite;
-                EditorUtility.SetDirty(so);
             }
+
+            if (!string.IsNullOrEmpty(walkPath))
+            {
+                var walk = AssetDatabase.LoadAssetAtPath<Sprite>(walkPath);
+                if (walk != null) so.monsterWalkSprite = walk;
+            }
+
+            if (!string.IsNullOrEmpty(attackPath))
+            {
+                var atk = AssetDatabase.LoadAssetAtPath<Sprite>(attackPath);
+                if (atk != null) so.monsterAttackSprite = atk;
+            }
+
+            EditorUtility.SetDirty(so);
         }
     }
 }

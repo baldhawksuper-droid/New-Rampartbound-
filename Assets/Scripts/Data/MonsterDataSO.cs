@@ -39,6 +39,8 @@ namespace FantasyDefense.Data
         public Sprite monsterSprite;
         [Tooltip("Sprite pose melangkah kedua untuk animasi berjalan 2-frame (Sprint 44 Poin 4)")]
         public Sprite monsterWalkSprite;
+        [Tooltip("Sprite pose menyerang / menerjang saat memukul benteng atau hero")]
+        public Sprite monsterAttackSprite;
         public Color themeColor = Color.white;
         public float visualScale = 1.0f;
     }

@@ -194,6 +194,12 @@ namespace FantasyDefense.Combat
 
             OnBossSkillUsed?.Invoke(this, "GROUND SMASH!");
 
+            // Alihkan visual boss ke mode menyerang saat melepaskan Ground Smash
+            if (attackSprite != null && spriteRenderer != null)
+            {
+                StartCoroutine(BossSkillAttackPoseRoutine());
+            }
+
             if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null)
             {
                 FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Heavy);
@@ -234,6 +240,20 @@ namespace FantasyDefense.Combat
             if (CastleBarricade.Instance != null && Vector3.Distance(transform.position, CastleBarricade.Instance.transform.position) <= 3.5f)
             {
                 CastleBarricade.Instance.TakeDamage(15);
+            }
+        }
+
+        private System.Collections.IEnumerator BossSkillAttackPoseRoutine()
+        {
+            Sprite prev = spriteRenderer != null ? spriteRenderer.sprite : null;
+            if (attackSprite != null && spriteRenderer != null)
+            {
+                spriteRenderer.sprite = attackSprite;
+            }
+            yield return new WaitForSeconds(0.45f);
+            if (prev != null && spriteRenderer != null)
+            {
+                spriteRenderer.sprite = prev;
             }
         }
 
