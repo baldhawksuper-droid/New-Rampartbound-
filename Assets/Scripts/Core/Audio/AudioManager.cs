@@ -45,7 +45,8 @@ namespace FantasyDefense.Audio
         SlimeSquishImpact,
         GoblinBucklerClank,
         MonsterHitSlime = SlimeSquishImpact,
-        MonsterHitGoblin = GoblinBucklerClank
+        MonsterHitGoblin = GoblinBucklerClank,
+        HeroRecycleChime
     }
 
     public enum AudioSfxType
@@ -646,6 +647,7 @@ namespace FantasyDefense.Audio
             proceduralClipCache[SoundType.BarricadeRepair] = CreateArpeggioClip("BarricadeRepair", new float[] { 523.25f, 659.25f, 783.99f, 1046.50f, 1318.5f }, 0.05f);
             proceduralClipCache[SoundType.CatalystThunderZap] = CreateToneClip("CatalystThunderZap", 0.36f, 1250f, 85f);
             proceduralClipCache[SoundType.GoldCoinSpend] = CreateArpeggioClip("GoldCoinSpend", new float[] { 1760f, 2637f, 3520f }, 0.045f);
+            proceduralClipCache[SoundType.HeroRecycleChime] = CreateArpeggioClip("HeroRecycleChime", new float[] { 659.25f, 987.77f, 1318.51f, 1975.53f }, 0.05f);
             proceduralClipCache[SoundType.ModeSwitchWhoosh] = CreateToneClip("ModeSwitchWhoosh", 0.42f, 280f, 620f);
             proceduralClipCache[SoundType.ArchetypeMaxChime] = CreateArpeggioClip("ArchetypeMaxChime", new float[] { 1046.50f, 1318.51f, 1567.98f, 2093.00f, 2637.02f }, 0.055f);
             proceduralClipCache[SoundType.TileSlideSwish] = CreateToneClip("TileSlideSwish", 0.16f, 480f, 210f);

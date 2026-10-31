@@ -304,15 +304,15 @@ namespace FantasyDefense.UI
                 }
             }
 
-            // Pastikan Hero Recycle Bin (Tempat Sampah / Daur Ulang Pahlawan) ada di sisi kiri atas dock
+            // Pastikan Hero Recycle Bin (Tempat Sampah / Daur Ulang Pahlawan) ada di sisi atas dock
             if (HeroRecycleBin.Instance == null)
             {
                 var binObj = new GameObject("HeroRecycleBin", typeof(RectTransform), typeof(CanvasGroup), typeof(HeroRecycleBin));
                 binObj.transform.SetParent(dockRoot, false);
                 var binRt = binObj.GetComponent<RectTransform>();
-                // Diposisikan tepat di atas sudut kanan/kiri dock ibu jari
-                binRt.anchorMin = new Vector2(0.74f, 1.08f);
-                binRt.anchorMax = new Vector2(0.98f, 1.82f);
+                // Diposisikan tepat di atas sudut kanan dock ibu jari dengan rasio proporsional
+                binRt.anchorMin = new Vector2(0.72f, 1.06f);
+                binRt.anchorMax = new Vector2(0.98f, 2.05f);
                 binRt.offsetMin = Vector2.zero;
                 binRt.offsetMax = Vector2.zero;
             }

@@ -72,6 +72,11 @@ namespace FantasyDefense.UI
                           ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Frame_StoneBastion_9Slice.png")
 #endif
                           ;
+            var altarIconSprite = Resources.Load<Sprite>("Sprites/UI/UI_Altar_Recycle_Hero")
+#if UNITY_EDITOR
+                          ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Altar_Recycle_Hero.png")
+#endif
+                          ;
 
             if (binFrameImage == null)
             {
@@ -82,22 +87,39 @@ namespace FantasyDefense.UI
                 binFrameImage.color = new Color(0.18f, 0.08f, 0.10f, 0.88f); // Dark crimson slate
             }
 
+            // Ikon Grafis Altar Peleburan / Tungku Runic Recycle
+            if (binIconImage == null)
+            {
+                var iconObj = new GameObject("AltarIcon", typeof(RectTransform), typeof(Image));
+                iconObj.transform.SetParent(transform, false);
+                var rt = iconObj.GetComponent<RectTransform>();
+                rt.anchorMin = new Vector2(0.5f, 0.62f);
+                rt.anchorMax = new Vector2(0.5f, 0.62f);
+                rt.sizeDelta = new Vector2(58f, 58f);
+
+                binIconImage = iconObj.GetComponent<Image>();
+                binIconImage.sprite = altarIconSprite;
+                binIconImage.preserveAspect = true;
+                binIconImage.raycastTarget = false;
+            }
+
             if (binLabelText == null)
             {
                 var labelObj = new GameObject("RecycleLabel", typeof(RectTransform), typeof(Text));
                 labelObj.transform.SetParent(transform, false);
                 var rt = labelObj.GetComponent<RectTransform>();
-                rt.anchorMin = new Vector2(0f, 0.45f);
-                rt.anchorMax = new Vector2(1f, 0.95f);
+                rt.anchorMin = new Vector2(0f, 0.26f);
+                rt.anchorMax = new Vector2(1f, 0.52f);
                 rt.offsetMin = Vector2.zero;
                 rt.offsetMax = Vector2.zero;
 
                 binLabelText = labelObj.GetComponent<Text>();
                 binLabelText.font = lilitaFont ?? Resources.GetBuiltinResource<Font>("Arial.ttf");
-                binLabelText.fontSize = 18;
+                binLabelText.fontSize = 15;
                 binLabelText.alignment = TextAnchor.MiddleCenter;
                 binLabelText.color = new Color(1.0f, 0.45f, 0.45f, 1f);
-                binLabelText.text = "🗑️ RECYCLE";
+                binLabelText.text = "RECYCLE";
+                binLabelText.raycastTarget = false;
             }
 
             if (refundPreviewText == null)
@@ -105,17 +127,18 @@ namespace FantasyDefense.UI
                 var refundObj = new GameObject("RefundPreview", typeof(RectTransform), typeof(Text));
                 refundObj.transform.SetParent(transform, false);
                 var rt = refundObj.GetComponent<RectTransform>();
-                rt.anchorMin = new Vector2(0f, 0.05f);
-                rt.anchorMax = new Vector2(1f, 0.45f);
+                rt.anchorMin = new Vector2(0f, 0.02f);
+                rt.anchorMax = new Vector2(1f, 0.28f);
                 rt.offsetMin = Vector2.zero;
                 rt.offsetMax = Vector2.zero;
 
                 refundPreviewText = refundObj.GetComponent<Text>();
                 refundPreviewText.font = lilitaFont ?? Resources.GetBuiltinResource<Font>("Arial.ttf");
-                refundPreviewText.fontSize = 14;
+                refundPreviewText.fontSize = 13;
                 refundPreviewText.alignment = TextAnchor.MiddleCenter;
                 refundPreviewText.color = new Color(1.0f, 0.85f, 0.35f, 0.95f);
                 refundPreviewText.text = "+50% GEMS";
+                refundPreviewText.raycastTarget = false;
             }
         }
 
@@ -292,7 +315,7 @@ namespace FantasyDefense.UI
 
             if (Audio.AudioManager.Instance != null)
             {
-                Audio.AudioManager.Instance.PlaySound(Audio.SoundType.GoldCoinSpend, 1.25f);
+                Audio.AudioManager.Instance.PlaySound(Audio.SoundType.HeroRecycleChime);
             }
 
             // Feedback getaran perangkat
