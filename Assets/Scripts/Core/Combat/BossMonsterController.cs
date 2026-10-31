@@ -225,6 +225,7 @@ namespace FantasyDefense.Combat
             {
                 SkillVfxManager.Instance.SpawnSkillParticles(transform.position, UnitType.RoseTanker, UnitTier.Tier3);
                 SkillVfxManager.Instance.SpawnFloatingText(transform.position + Vector3.up * 1.2f, "★ GROUND SMASH! ★", Color.red, 1.3f);
+                SkillVfxManager.Instance.SpawnBossGroundSmashDebris(transform.position);
             }
 
             if (Audio.AudioManager.Instance != null)

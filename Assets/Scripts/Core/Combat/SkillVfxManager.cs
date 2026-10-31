@@ -1133,6 +1133,96 @@ namespace FantasyDefense.Combat
             }
         }
 
+        /// <summary>
+        /// Efek visual partikel tanah berhamburan & retakan lahar vulkanik saat serangan Ground Smash Bos Titan (Sprint 13 Polish).
+        /// </summary>
+        public void SpawnBossGroundSmashDebris(Vector3 impactPos)
+        {
+            if (!enableParticleEffects) return;
+            StartCoroutine(BossGroundSmashDebrisRoutine(impactPos));
+        }
+
+        private IEnumerator BossGroundSmashDebrisRoutine(Vector3 impactPos)
+        {
+            int debrisCount = 16;
+            List<GameObject> debrisList = new List<GameObject>();
+            List<Vector3> velocities = new List<Vector3>();
+            List<float> rotSpeeds = new List<float>();
+
+            // Palet batu obsidian gelap dan bara lahar membara
+            Color obsidianColor = new Color(0.18f, 0.16f, 0.20f);
+            Color magmaRockColor = new Color(0.85f, 0.32f, 0.12f);
+            Color emberColor = new Color(1.0f, 0.65f, 0.15f);
+
+            var boxTex = Texture2D.whiteTexture;
+            Sprite boxSprite = Sprite.Create(boxTex, new Rect(0, 0, 4, 4), new Vector2(0.5f, 0.5f), 100f);
+
+            for (int i = 0; i < debrisCount; i++)
+            {
+                GameObject chunk = new GameObject($"BossSmashRock_{i}");
+                chunk.transform.position = impactPos + new Vector3(Random.Range(-0.6f, 0.6f), Random.Range(-0.2f, 0.2f), 0f);
+
+                var sr = chunk.AddComponent<SpriteRenderer>();
+                sr.sprite = boxSprite;
+                sr.color = (i % 2 == 0) ? obsidianColor : (i % 3 == 0 ? emberColor : magmaRockColor);
+                sr.sortingOrder = 32;
+
+                float size = Random.Range(0.12f, 0.28f);
+                chunk.transform.localScale = new Vector3(size, size * Random.Range(0.7f, 1.3f), 1f);
+
+                float vx = Random.Range(-2.8f, 2.8f);
+                float vy = Random.Range(2.5f, 5.0f);
+                velocities.Add(new Vector3(vx, vy, 0f));
+                rotSpeeds.Add(Random.Range(-450f, 450f));
+                debrisList.Add(chunk);
+            }
+
+            // Kepulan debu vulkanik tebal & partikel bara api
+            SpawnProceduralParticleBurst(impactPos, new Color(0.95f, 0.40f, 0.10f), new Color(0.25f, 0.20f, 0.22f), 28, 3.5f);
+
+            if (enableShockwaves)
+            {
+                StartCoroutine(SpawnShockwaveRingRoutine(impactPos, 2.4f, new Color(1.0f, 0.35f, 0.15f, 0.85f)));
+            }
+
+            float duration = 0.65f;
+            float elapsed = 0f;
+            float gravity = -15.0f;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float fade = Mathf.Clamp01(1f - (elapsed / duration));
+
+                for (int i = 0; i < debrisList.Count; i++)
+                {
+                    if (debrisList[i] == null) continue;
+
+                    Vector3 vel = velocities[i];
+                    vel.y += gravity * Time.deltaTime;
+                    velocities[i] = vel;
+
+                    debrisList[i].transform.position += vel * Time.deltaTime;
+                    debrisList[i].transform.Rotate(0f, 0f, rotSpeeds[i] * Time.deltaTime);
+
+                    var sr = debrisList[i].GetComponent<SpriteRenderer>();
+                    if (sr != null)
+                    {
+                        Color c = sr.color;
+                        c.a = fade;
+                        sr.color = c;
+                    }
+                }
+
+                yield return null;
+            }
+
+            for (int i = 0; i < debrisList.Count; i++)
+            {
+                if (debrisList[i] != null) Destroy(debrisList[i]);
+            }
+        }
+
         #region Hero Defender Battle Emotes (Point 3)
 
         private static Sprite cachedEmoteBubbleSprite;

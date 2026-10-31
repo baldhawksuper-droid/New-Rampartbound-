@@ -474,13 +474,14 @@ namespace FantasyDefense.Summon
                 if (SkillVfxManager.Instance != null)
                 {
                     Vector3 originPos = (FantasyDefense.UI.SummonButtonUI.Instance != null)
-                        ? FantasyDefense.UI.SummonButtonUI.Instance.transform.position
-                        : Vector3.zero;
+                        ? FantasyDefense.UI.SummonButtonUI.Instance.transform.position + Vector3.up * 0.8f
+                        : Vector3.up * -1.5f;
                     SkillVfxManager.Instance.SpawnFloatingText(
                         originPos,
                         "⭐ SEMUA TOKEN TELAH TIER 5 (MAX)! ⭐",
                         new Color(1f, 0.85f, 0.2f),
-                        2.0f
+                        1.4f,
+                        true
                     );
                 }
                 return false;

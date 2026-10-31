@@ -670,13 +670,20 @@ namespace FantasyDefense.Combat
             // Hentakan Debu & Pukulan saat menghantam gerbang benteng (Divisi Art & Visual - Point 5)
             if (SkillVfxManager.Instance != null)
             {
-                SkillVfxManager.Instance.SpawnProceduralParticleBurst(
-                    transform.position + Vector3.down * 0.22f,
-                    new Color(0.85f, 0.78f, 0.65f), // Dust tan
-                    new Color(0.55f, 0.50f, 0.42f), // Ash stone
-                    8,
-                    2.0f
-                );
+                if (monsterType == MonsterType.Boss)
+                {
+                    SkillVfxManager.Instance.SpawnBossGroundSmashDebris(transform.position + Vector3.down * 0.25f);
+                }
+                else
+                {
+                    SkillVfxManager.Instance.SpawnProceduralParticleBurst(
+                        transform.position + Vector3.down * 0.22f,
+                        new Color(0.85f, 0.78f, 0.65f), // Dust tan
+                        new Color(0.55f, 0.50f, 0.42f), // Ash stone
+                        8,
+                        2.0f
+                    );
+                }
             }
 
             t = 0f;
