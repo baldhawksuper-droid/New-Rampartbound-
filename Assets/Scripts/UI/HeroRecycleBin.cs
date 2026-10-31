@@ -535,7 +535,7 @@ namespace FantasyDefense.UI
             // Potong kembali Gems yang sebelumnya direfund
             if (EconomyManager.Instance != null)
             {
-                if (!EconomyManager.Instance.TrySpendGems(lastRecycledRefundAmount))
+                if (!EconomyManager.Instance.SpendGems(lastRecycledRefundAmount))
                 {
                     if (SkillVfxManager.Instance != null)
                     {
@@ -604,3 +604,5 @@ namespace FantasyDefense.UI
         }
 
         #endregion
+    }
+}
