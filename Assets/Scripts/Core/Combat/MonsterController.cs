@@ -414,11 +414,57 @@ namespace FantasyDefense.Combat
                 currentMoveSpeed * Time.deltaTime
             );
 
-            // Animasi langkah berjalan procedural (Bobbing, Tilting & Squash-Stretch)
-            walkCycleTimer += Time.deltaTime * (currentMoveSpeed * 3.2f);
-            float stepBob = Mathf.Abs(Mathf.Sin(walkCycleTimer * Mathf.PI)) * 0.06f;
-            float stepTilt = Mathf.Sin(walkCycleTimer * Mathf.PI) * 3.0f * (spriteRenderer != null && spriteRenderer.flipX ? -1f : 1f);
-            float squash = Mathf.Sin(walkCycleTimer * Mathf.PI * 2f) * 0.04f;
+            // Animasi langkah berjalan procedural terharmonisasi per tipe monster (Squash, Stretch, Bobbing, Tilting)
+            float stepBob = 0f;
+            float stepTilt = 0f;
+            float scaleModX = 1f;
+            float scaleModY = 1f;
+
+            MonsterType mType = data != null ? data.monsterType : MonsterType.Creep;
+            if (mType == MonsterType.Creep)
+            {
+                // Slime: Bouncing Hop dengan Squash-and-Stretch elastis khas jeli/lendir
+                walkCycleTimer += Time.deltaTime * (currentMoveSpeed * 3.8f);
+                float hopPhase = Mathf.Sin(walkCycleTimer * Mathf.PI);
+                if (hopPhase > 0f)
+                {
+                    // Fase Melompat (Airborne): Melar vertikal (+22%), ramping horizontal (-15%)
+                    float hopHeight = hopPhase * 0.12f;
+                    stepBob = hopHeight;
+                    scaleModX = 1f - (hopPhase * 0.15f);
+                    scaleModY = 1f + (hopPhase * 0.22f);
+                    stepTilt = Mathf.Sin(walkCycleTimer * Mathf.PI * 0.5f) * 4.0f * (spriteRenderer != null && spriteRenderer.flipX ? -1f : 1f);
+                }
+                else
+                {
+                    // Fase Mendarat (Impact Landing): Pipih horizontal (+24%), membal elastis (-20%)
+                    float landSquash = Mathf.Abs(hopPhase);
+                    stepBob = 0f;
+                    scaleModX = 1f + (landSquash * 0.24f);
+                    scaleModY = 1f - (landSquash * 0.20f);
+                    stepTilt = 0f;
+                }
+            }
+            else if (mType == MonsterType.Brute)
+            {
+                // Goblin Brute: Langkah berat berirama (Heavy Stomp) dengan ayunan bahu
+                walkCycleTimer += Time.deltaTime * (currentMoveSpeed * 2.8f);
+                stepBob = Mathf.Abs(Mathf.Sin(walkCycleTimer * Mathf.PI)) * 0.08f;
+                stepTilt = Mathf.Sin(walkCycleTimer * Mathf.PI) * 5.5f * (spriteRenderer != null && spriteRenderer.flipX ? -1f : 1f);
+                float squash = Mathf.Sin(walkCycleTimer * Mathf.PI * 2f) * 0.05f;
+                scaleModX = 1f + squash;
+                scaleModY = 1f - squash;
+            }
+            else // MonsterType.Boss
+            {
+                // Boss Titan: Langkah kolosal berwibawa (Colossal Lumbering March)
+                walkCycleTimer += Time.deltaTime * (currentMoveSpeed * 2.0f);
+                stepBob = Mathf.Abs(Mathf.Sin(walkCycleTimer * Mathf.PI)) * 0.04f;
+                stepTilt = Mathf.Sin(walkCycleTimer * Mathf.PI) * 2.0f * (spriteRenderer != null && spriteRenderer.flipX ? -1f : 1f);
+                float squash = Mathf.Sin(walkCycleTimer * Mathf.PI * 2f) * 0.03f;
+                scaleModX = 1f + squash;
+                scaleModY = 1f - squash;
+            }
 
             if (spriteRenderer != null)
             {
@@ -427,12 +473,12 @@ namespace FantasyDefense.Combat
                 {
                     spriteRenderer.transform.localPosition = new Vector3(0f, stepBob, 0f);
                     spriteRenderer.transform.localRotation = Quaternion.Euler(0f, 0f, stepTilt);
-                    spriteRenderer.transform.localScale = new Vector3(1f + squash, 1f - squash, 1f);
+                    spriteRenderer.transform.localScale = new Vector3(scaleModX, scaleModY, 1f);
                 }
                 else
                 {
                     // Fallback aman jika spriteRenderer di root objek: JANGAN sentuh localPosition!
-                    transform.localScale = new Vector3(baseScale.x * (1f + squash), baseScale.y * (1f - squash), baseScale.z);
+                    transform.localScale = new Vector3(baseScale.x * scaleModX, baseScale.y * scaleModY, baseScale.z);
                     transform.localRotation = Quaternion.Euler(0f, 0f, stepTilt);
                 }
 

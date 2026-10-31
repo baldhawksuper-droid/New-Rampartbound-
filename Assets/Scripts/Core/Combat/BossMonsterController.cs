@@ -76,10 +76,17 @@ namespace FantasyDefense.Combat
                 float spriteW = spriteRenderer.sprite.bounds.size.x;
                 if (spriteW > 0.01f)
                 {
-                    float targetWidth = isFinalBoss ? 1.30f : 1.15f;
+                    // Skala Bos Warlord & Drake Purba diperbesar proporsional agar mencerminkan otoritas Bos Medan Tempur
+                    float targetWidth = isFinalBoss ? 1.55f : 1.35f;
                     float scale = targetWidth / spriteW;
                     baseScale = Vector3.one * scale;
                     transform.localScale = baseScale;
+
+                    var col = GetComponent<CircleCollider2D>();
+                    if (col != null)
+                    {
+                        col.radius = isFinalBoss ? 0.85f : 0.70f;
+                    }
                 }
             }
 
