@@ -73,6 +73,8 @@ namespace FantasyDefense.Combat
 
         [Header("3D Hero Plinth Pedestal")]
         [SerializeField] protected GameObject groundPlinthObj;
+        protected GameObject maxTierBadgeObj;
+        protected SpriteRenderer maxTierBadgeSr;
         [SerializeField] protected SpriteRenderer groundPlinthSr;
 
         [Header("Mobile Ergonomics")]
@@ -636,6 +638,30 @@ namespace FantasyDefense.Combat
                     groundPlinthSr.sortingOrder = sortOrder - 1;
                 }
                 groundPlinthObj.SetActive(true);
+
+                // 1b. Lencana Bintang Emas Maksimal (Max Tier Badge) di atas tatakan plinth untuk Tier 5
+                if (currentTier == UnitTier.Tier5)
+                {
+                    if (maxTierBadgeObj == null)
+                    {
+                        maxTierBadgeObj = new GameObject("MaxTierBadge_Star");
+                        maxTierBadgeObj.transform.SetParent(transform, false);
+                        maxTierBadgeObj.transform.localPosition = new Vector3(0.36f, -0.22f, -0.05f);
+                        maxTierBadgeObj.transform.localScale = new Vector3(0.24f, 0.24f, 1f);
+                        maxTierBadgeSr = maxTierBadgeObj.AddComponent<SpriteRenderer>();
+                        maxTierBadgeSr.sprite = Resources.Load<Sprite>("Sprites/UI/UI_Badge_MaxTier_Star");
+                        maxTierBadgeSr.sortingLayerName = "Gem";
+                    }
+                    if (maxTierBadgeSr != null)
+                    {
+                        maxTierBadgeSr.sortingOrder = sortOrder + 2;
+                    }
+                    maxTierBadgeObj.SetActive(true);
+                }
+                else if (maxTierBadgeObj != null)
+                {
+                    maxTierBadgeObj.SetActive(false);
+                }
 
                 // 2. Soft contact shadow di bawah tatakan hero (bayangan lembut menapak di petak)
                 if (groundShadowObj == null)

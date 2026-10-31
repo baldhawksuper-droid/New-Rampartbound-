@@ -809,6 +809,16 @@ namespace FantasyDefense.UI
 
         private void OpenPanel(GamePanelType panelType)
         {
+            if (FantasyDefense.Audio.AudioManager.Instance != null)
+            {
+                FantasyDefense.Audio.AudioManager.Instance.PlaySound(FantasyDefense.Audio.SoundType.AltarWhooshOpen, 1.25f);
+            }
+
+            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null && FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+            {
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Selection);
+            }
+
             if (GameFlowManager.Instance != null)
             {
                 GameFlowManager.Instance.OpenPanel(panelType);
