@@ -37,6 +37,7 @@ namespace FantasyDefense.UI
         [Header("Undo State")]
         private GameObject undoButtonObj;
         private Text undoButtonText;
+        private Image undoFillBarImage;
         private Coroutine undoCountdownCoroutine;
         private UnitDataSO lastRecycledHeroData;
         private UnitTier lastRecycledTier;
@@ -472,10 +473,23 @@ namespace FantasyDefense.UI
             var btn = undoButtonObj.GetComponent<Button>();
             btn.onClick.AddListener(OnUndoButtonClicked);
 
+            // Bar Pengukur Waktu Undo (Fill Bar) menyusut di latar belakang tombol
+            var fillBarObj = new GameObject("UndoFillBar", typeof(RectTransform), typeof(Image));
+            fillBarObj.transform.SetParent(undoButtonObj.transform, false);
+            var fillRt = fillBarObj.GetComponent<RectTransform>();
+            fillRt.anchorMin = new Vector2(0.04f, 0.08f);
+            fillRt.anchorMax = new Vector2(0.96f, 0.22f);
+            fillRt.offsetMin = Vector2.zero;
+            fillRt.offsetMax = Vector2.zero;
+
+            undoFillBarImage = fillBarObj.GetComponent<Image>();
+            undoFillBarImage.color = new Color(0.35f, 0.95f, 0.55f, 0.85f); // Glowing emerald timer bar
+            undoFillBarImage.raycastTarget = false;
+
             var textObj = new GameObject("UndoText", typeof(RectTransform), typeof(Text));
             textObj.transform.SetParent(undoButtonObj.transform, false);
             var textRt = textObj.GetComponent<RectTransform>();
-            textRt.anchorMin = Vector2.zero;
+            textRt.anchorMin = new Vector2(0f, 0.18f);
             textRt.anchorMax = Vector2.one;
             textRt.offsetMin = Vector2.zero;
             textRt.offsetMax = Vector2.zero;
@@ -500,6 +514,18 @@ namespace FantasyDefense.UI
                 {
                     undoButtonText.text = $"↩️ UNDO ({remaining:F1}s)";
                 }
+
+                if (undoFillBarImage != null)
+                {
+                    float pct = Mathf.Clamp01(remaining / duration);
+                    var rt = undoFillBarImage.rectTransform;
+                    rt.anchorMax = new Vector2(0.04f + 0.92f * pct, 0.22f);
+                    // Warna timer bar bertransisi dari hijau zamrud ke kuning lalu merah saat waktu menipis
+                    undoFillBarImage.color = pct > 0.45f
+                        ? Color.Lerp(new Color(1f, 0.85f, 0.2f, 0.85f), new Color(0.35f, 0.95f, 0.55f, 0.85f), (pct - 0.45f) / 0.55f)
+                        : Color.Lerp(new Color(1f, 0.25f, 0.25f, 0.85f), new Color(1f, 0.85f, 0.2f, 0.85f), pct / 0.45f);
+                }
+
                 remaining -= Time.unscaledDeltaTime;
                 yield return null;
             }
@@ -579,7 +605,7 @@ namespace FantasyDefense.UI
 
             if (Audio.AudioManager.Instance != null)
             {
-                Audio.AudioManager.Instance.PlaySound(Audio.SoundType.SummonSuccess);
+                Audio.AudioManager.Instance.PlaySound(Audio.SoundType.UndoRestoreChime, 1.25f);
             }
 
             ClearUndoWindow();
