@@ -660,7 +660,7 @@ namespace FantasyDefense.Combat
         /// Membuat objek ParticleSystem instan dan mandiri yang menyala sesaat lalu menghilang otomatis.
         /// Sepenuhnya kompatibel tanpa dependensi prefab eksternal di Unity Editor, Android, maupun iOS.
         /// </summary>
-        public void SpawnProceduralParticleBurst(Vector3 worldPos, Color mainColor, Color secondaryColor, int count, float speed)
+        public void SpawnProceduralParticleBurst(Vector3 worldPos, Color mainColor, Color secondaryColor, int count, float speed, int sortingOrder = 55)
         {
             if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
                 FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsBatterySaverEnabled)
@@ -673,7 +673,7 @@ namespace FantasyDefense.Combat
 
             ParticleSystem ps = psObj.AddComponent<ParticleSystem>();
             ParticleSystemRenderer psRenderer = psObj.GetComponent<ParticleSystemRenderer>();
-            psRenderer.sortingOrder = 55;
+            psRenderer.sortingOrder = sortingOrder;
             if (psRenderer.sharedMaterial == null)
             {
                 Shader shader = Shader.Find("Sprites/Default") ?? Shader.Find("Particles/Standard Unlit");
@@ -1308,7 +1308,8 @@ namespace FantasyDefense.Combat
                 new Color(1f, 0.85f, 0.25f), // Gold shimmer
                 new Color(0.35f, 1.0f, 0.65f), // Cyan mint
                 22,
-                3.2f
+                3.2f,
+                555
             );
 
             onComplete?.Invoke();

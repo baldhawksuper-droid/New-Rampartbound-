@@ -32,6 +32,16 @@ namespace FantasyDefense.UI
         private bool isHovered = false;
         private bool isDragActive = false;
         private Coroutine pulseCoroutine;
+        private Coroutine runeGlowCoroutine;
+
+        [Header("Undo State")]
+        private GameObject undoButtonObj;
+        private Text undoButtonText;
+        private Coroutine undoCountdownCoroutine;
+        private UnitDataSO lastRecycledHeroData;
+        private UnitTier lastRecycledTier;
+        private TileCell lastRecycledCell;
+        private int lastRecycledRefundAmount;
 
         public static event Action<UnitController, int> OnHeroRecycled;
 
@@ -62,6 +72,9 @@ namespace FantasyDefense.UI
             UnitController.OnUnitDragStarted -= HandleUnitDragStarted;
             UnitController.OnUnitDragEnded -= HandleUnitDragEnded;
             if (pulseCoroutine != null) StopCoroutine(pulseCoroutine);
+            if (runeGlowCoroutine != null) StopCoroutine(runeGlowCoroutine);
+            if (undoCountdownCoroutine != null) StopCoroutine(undoCountdownCoroutine);
+            ClearUndoWindow();
         }
 
         private void EnsureVisualElementsBuilt()
@@ -229,8 +242,11 @@ namespace FantasyDefense.UI
 
             if (binFrameImage != null)
             {
-                binFrameImage.color = new Color(0.45f, 0.12f, 0.15f, 0.98f); // Glowing active crimson
+                binFrameImage.color = new Color(0.55f, 0.15f, 0.18f, 0.98f); // Glowing active crimson
             }
+
+            if (runeGlowCoroutine != null) StopCoroutine(runeGlowCoroutine);
+            runeGlowCoroutine = StartCoroutine(RuneGlowPulseRoutine());
 
             if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
                 FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
@@ -244,10 +260,51 @@ namespace FantasyDefense.UI
             if (!isDragActive) return;
             isHovered = false;
 
+            if (runeGlowCoroutine != null) StopCoroutine(runeGlowCoroutine);
+
             if (binFrameImage != null)
             {
                 binFrameImage.color = new Color(0.18f, 0.08f, 0.10f, 0.88f);
             }
+
+            if (binIconImage != null)
+            {
+                binIconImage.color = Color.white;
+            }
+        }
+
+        private IEnumerator RuneGlowPulseRoutine()
+        {
+            float timer = 0f;
+            while (isHovered && isDragActive)
+            {
+                timer += Time.unscaledDeltaTime * 6f;
+                float glow = (Mathf.Sin(timer) + 1f) * 0.5f;
+
+                if (binIconImage != null)
+                {
+                    // Pendaran warna rune emas-oranye membara di sekeliling kawah altar
+                    binIconImage.color = Color.Lerp(Color.white, new Color(1.0f, 0.75f, 0.35f, 1f), glow);
+                }
+
+                // Emisi partikel percikan bara esensi halus saat melayang di atas altar
+                if (SkillVfxManager.Instance != null && UnityEngine.Random.value < 0.25f)
+                {
+                    Vector3 jitter = new Vector3(UnityEngine.Random.Range(-0.25f, 0.25f), UnityEngine.Random.Range(-0.25f, 0.25f), 0f);
+                    SkillVfxManager.Instance.SpawnProceduralParticleBurst(
+                        transform.position + jitter,
+                        new Color(1f, 0.75f, 0.2f),
+                        new Color(1f, 0.3f, 0.1f),
+                        4,
+                        1.5f,
+                        555
+                    );
+                }
+
+                yield return null;
+            }
+
+            if (binIconImage != null) binIconImage.color = Color.white;
         }
 
         /// <summary>
@@ -320,7 +377,12 @@ namespace FantasyDefense.UI
                 FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Medium);
             }
 
-            // 3. Kosongkan cell petak
+            // 3. Simpan state untuk Undo Window 3 detik
+            TileCell originCell = unit.CurrentCell;
+            UnitDataSO originData = unit.HeroData;
+            UnitTier originTier = unit.CurrentTier;
+
+            // Kosongkan cell petak
             if (unit.CurrentCell != null)
             {
                 unit.CurrentCell.ClearOccupant();
@@ -328,6 +390,9 @@ namespace FantasyDefense.UI
 
             OnHeroRecycled?.Invoke(unit, refundGems);
             Debug.Log($"[HeroRecycleBin] Unit {unit.HeroType} T{(int)unit.CurrentTier} berhasil didaur ulang. Refund: {refundGems} Gems.");
+
+            // Aktifkan jendela waktu Urungkan (Undo Window 3 Detik)
+            ActivateUndoWindow(originData, originTier, originCell, refundGems);
 
             // 4. Efek animasi hisap (Suction Vortex) ke kawah altar sebelum GameObject dihancurkan
             if (SkillVfxManager.Instance != null)
@@ -359,5 +424,183 @@ namespace FantasyDefense.UI
 
             return true;
         }
-    }
-}
+
+        #region Undo Recycle Feature (Window 3 Detik)
+
+        private void ActivateUndoWindow(UnitDataSO data, UnitTier tier, TileCell cell, int refundAmount)
+        {
+            if (data == null || cell == null) return;
+
+            lastRecycledHeroData = data;
+            lastRecycledTier = tier;
+            lastRecycledCell = cell;
+            lastRecycledRefundAmount = refundAmount;
+
+            EnsureUndoButtonCreated();
+
+            if (undoCountdownCoroutine != null) StopCoroutine(undoCountdownCoroutine);
+            undoCountdownCoroutine = StartCoroutine(UndoCountdownRoutine(3.0f));
+        }
+
+        private void EnsureUndoButtonCreated()
+        {
+            if (undoButtonObj != null) return;
+
+            var lilitaFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+            var frame9Slice = Resources.Load<Sprite>("Sprites/UI/Frame_StoneBastion_9Slice")
+#if UNITY_EDITOR
+                          ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Frame_StoneBastion_9Slice.png")
+#endif
+                          ;
+
+            undoButtonObj = new GameObject("RecycleUndoButton", typeof(RectTransform), typeof(Image), typeof(Button));
+            undoButtonObj.transform.SetParent(transform.parent, false);
+
+            var rt = undoButtonObj.GetComponent<RectTransform>();
+            rt.anchorMin = rectTransform.anchorMin;
+            rt.anchorMax = rectTransform.anchorMax;
+            rt.pivot = rectTransform.pivot;
+            // Posisikan tepat di sebelah kiri altar daur ulang
+            rt.anchoredPosition = rectTransform.anchoredPosition + new Vector2(-115f, 0f);
+            rt.sizeDelta = new Vector2(100f, 44f);
+
+            var img = undoButtonObj.GetComponent<Image>();
+            img.sprite = frame9Slice;
+            img.type = Image.Type.Sliced;
+            img.color = new Color(0.25f, 0.20f, 0.22f, 0.95f); // Dark stone backing
+
+            var btn = undoButtonObj.GetComponent<Button>();
+            btn.onClick.AddListener(OnUndoButtonClicked);
+
+            var textObj = new GameObject("UndoText", typeof(RectTransform), typeof(Text));
+            textObj.transform.SetParent(undoButtonObj.transform, false);
+            var textRt = textObj.GetComponent<RectTransform>();
+            textRt.anchorMin = Vector2.zero;
+            textRt.anchorMax = Vector2.one;
+            textRt.offsetMin = Vector2.zero;
+            textRt.offsetMax = Vector2.zero;
+
+            undoButtonText = textObj.GetComponent<Text>();
+            undoButtonText.font = lilitaFont ?? Resources.GetBuiltinResource<Font>("Arial.ttf");
+            undoButtonText.fontSize = 13;
+            undoButtonText.alignment = TextAnchor.MiddleCenter;
+            undoButtonText.color = new Color(1.0f, 0.85f, 0.35f, 1f);
+            undoButtonText.text = "↩️ UNDO (3s)";
+            undoButtonText.raycastTarget = false;
+        }
+
+        private IEnumerator UndoCountdownRoutine(float duration)
+        {
+            if (undoButtonObj != null) undoButtonObj.SetActive(true);
+
+            float remaining = duration;
+            while (remaining > 0f)
+            {
+                if (undoButtonText != null)
+                {
+                    undoButtonText.text = $"↩️ UNDO ({remaining:F1}s)";
+                }
+                remaining -= Time.unscaledDeltaTime;
+                yield return null;
+            }
+
+            ClearUndoWindow();
+        }
+
+        private void OnUndoButtonClicked()
+        {
+            if (lastRecycledHeroData == null || lastRecycledCell == null)
+            {
+                ClearUndoWindow();
+                return;
+            }
+
+            // Periksa apakah petak asal sudah terisi oleh unit lain
+            if (lastRecycledCell.IsOccupied)
+            {
+                if (SkillVfxManager.Instance != null)
+                {
+                    SkillVfxManager.Instance.SpawnFloatingText(
+                        lastRecycledCell.transform.position + Vector3.up * 0.7f,
+                        "⚠️ PETAK SUDAH TERISI!",
+                        Color.yellow,
+                        1.2f,
+                        true
+                    );
+                }
+                ClearUndoWindow();
+                return;
+            }
+
+            // Potong kembali Gems yang sebelumnya direfund
+            if (EconomyManager.Instance != null)
+            {
+                if (!EconomyManager.Instance.TrySpendGems(lastRecycledRefundAmount))
+                {
+                    if (SkillVfxManager.Instance != null)
+                    {
+                        SkillVfxManager.Instance.SpawnFloatingText(
+                            transform.position + Vector3.up * 0.7f,
+                            "⚠️ GEMS TIDAK CUKUP UNTUK UNDO!",
+                            Color.red,
+                            1.2f,
+                            true
+                        );
+                    }
+                    ClearUndoWindow();
+                    return;
+                }
+            }
+
+            // Spawn kembali unit pahlawan ke petak asal
+            if (HeroSummoner.Instance != null)
+            {
+                HeroSummoner.Instance.SpawnUnitAtCell(lastRecycledHeroData, lastRecycledCell, lastRecycledTier);
+            }
+
+            if (SkillVfxManager.Instance != null)
+            {
+                SkillVfxManager.Instance.SpawnFloatingText(
+                    lastRecycledCell.transform.position + Vector3.up * 0.7f,
+                    $"↩️ UNIT DIKEMBALIKAN!",
+                    new Color(0.4f, 1.0f, 0.6f),
+                    1.35f,
+                    true
+                );
+
+                SkillVfxManager.Instance.SpawnProceduralParticleBurst(
+                    lastRecycledCell.transform.position,
+                    new Color(0.4f, 1.0f, 0.6f),
+                    Color.white,
+                    16,
+                    2.5f
+                );
+            }
+
+            if (Audio.AudioManager.Instance != null)
+            {
+                Audio.AudioManager.Instance.PlaySound(Audio.SoundType.SummonSuccess);
+            }
+
+            ClearUndoWindow();
+        }
+
+        private void ClearUndoWindow()
+        {
+            if (undoCountdownCoroutine != null)
+            {
+                StopCoroutine(undoCountdownCoroutine);
+                undoCountdownCoroutine = null;
+            }
+
+            if (undoButtonObj != null)
+            {
+                undoButtonObj.SetActive(false);
+            }
+
+            lastRecycledHeroData = null;
+            lastRecycledCell = null;
+            lastRecycledRefundAmount = 0;
+        }
+
+        #endregion
