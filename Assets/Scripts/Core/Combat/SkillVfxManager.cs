@@ -1234,6 +1234,86 @@ namespace FantasyDefense.Combat
             }
         }
 
+        /// <summary>
+        /// Efek visual pusaran hisap esensi (Suction Vortex) saat pahlawan dilebur di Recycle Altar (Sprint 14 Polish).
+        /// Menyedot pahlawan ke kawah tengah disertai rotasi akselerasi, scale down, dan pendaran partikel koin permata.
+        /// </summary>
+        public void SpawnRecycleSuctionVortex(Vector3 startWorldPos, Vector3 targetWorldPos, Sprite heroSprite, Action onComplete)
+        {
+            if (!enableParticleEffects)
+            {
+                onComplete?.Invoke();
+                return;
+            }
+            StartCoroutine(RecycleSuctionVortexRoutine(startWorldPos, targetWorldPos, heroSprite, onComplete));
+        }
+
+        private IEnumerator RecycleSuctionVortexRoutine(Vector3 startPos, Vector3 altarPos, Sprite heroSprite, Action onComplete)
+        {
+            float duration = 0.38f;
+            float elapsed = 0f;
+
+            GameObject suctionObj = new GameObject("RecycleSuctionActor");
+            suctionObj.transform.position = startPos;
+            var sr = suctionObj.AddComponent<SpriteRenderer>();
+            sr.sprite = heroSprite;
+            sr.sortingLayerName = "UI";
+            sr.sortingOrder = 550;
+
+            Vector3 initialScale = Vector3.one * 0.9f;
+            suctionObj.transform.localScale = initialScale;
+
+            // Efek cincin pendaran esensi awal
+            if (enableShockwaves)
+            {
+                StartCoroutine(SpawnShockwaveRingRoutine(startPos, 0.75f, new Color(1.0f, 0.45f, 0.35f, 0.9f)));
+            }
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+
+                // Perjalanan kurva melengkung gravitasi ke kawah altar
+                Vector3 currentPos = Vector3.Lerp(startPos, altarPos, Mathf.SmoothStep(0f, 1f, t));
+                // Efek spiral melingkar ke pusat kawah
+                float spiralAngle = t * 720f * Mathf.Deg2Rad;
+                float spiralRadius = (1f - t) * 0.45f;
+                Vector3 spiralOffset = new Vector3(Mathf.Cos(spiralAngle), Mathf.Sin(spiralAngle), 0f) * spiralRadius;
+
+                if (suctionObj != null)
+                {
+                    suctionObj.transform.position = currentPos + spiralOffset;
+                    // Rotasi berputar cepat saat tersedot
+                    suctionObj.transform.rotation = Quaternion.Euler(0f, 0f, t * 540f);
+                    // Pengecilan skala dramatis hingga lenyap di pusat kawah
+                    float s = Mathf.Lerp(1.0f, 0.05f, t * t);
+                    suctionObj.transform.localScale = initialScale * s;
+
+                    // Fade tint ke warna emas kemerahan
+                    sr.color = Color.Lerp(Color.white, new Color(1f, 0.65f, 0.25f, 0.8f), t);
+                }
+
+                yield return null;
+            }
+
+            if (suctionObj != null)
+            {
+                Destroy(suctionObj);
+            }
+
+            // Letupan kembang api partikel permata di pusat altar saat unit tertelan sempurna
+            SpawnProceduralParticleBurst(
+                altarPos,
+                new Color(1f, 0.85f, 0.25f), // Gold shimmer
+                new Color(0.35f, 1.0f, 0.65f), // Cyan mint
+                22,
+                3.2f
+            );
+
+            onComplete?.Invoke();
+        }
+
         #region Hero Defender Battle Emotes (Point 3)
 
         private static Sprite cachedEmoteBubbleSprite;

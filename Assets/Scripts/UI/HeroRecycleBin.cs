@@ -187,13 +187,24 @@ namespace FantasyDefense.UI
                 gameObject.SetActive(active);
             }
 
+            // Audio respon buka / tutup altar
             if (active)
             {
+                if (Audio.AudioManager.Instance != null)
+                {
+                    Audio.AudioManager.Instance.PlaySound(Audio.SoundType.AltarWhooshOpen, 1.1f);
+                }
+
                 if (pulseCoroutine != null) StopCoroutine(pulseCoroutine);
                 pulseCoroutine = StartCoroutine(PulseRoutine());
             }
             else
             {
+                if (isDragActive && Audio.AudioManager.Instance != null)
+                {
+                    Audio.AudioManager.Instance.PlaySound(Audio.SoundType.AltarWhooshClose, 0.95f);
+                }
+
                 if (pulseCoroutine != null) StopCoroutine(pulseCoroutine);
                 transform.localScale = Vector3.one;
             }
@@ -294,24 +305,8 @@ namespace FantasyDefense.UI
 
             // 2. Efek visual dan audio daur ulang
             Vector3 unitPos = unit.transform.position;
-            if (SkillVfxManager.Instance != null)
-            {
-                SkillVfxManager.Instance.SpawnProceduralParticleBurst(
-                    unitPos,
-                    new Color(1f, 0.35f, 0.35f), // Crimson spark
-                    new Color(1f, 0.85f, 0.35f), // Gold shimmer
-                    18,
-                    2.8f
-                );
-
-                SkillVfxManager.Instance.SpawnFloatingText(
-                    unitPos + Vector3.up * 0.7f,
-                    $"♻️ +{refundGems} 💎 REFUND!",
-                    new Color(0.35f, 1.0f, 0.55f),
-                    1.35f,
-                    true
-                );
-            }
+            Vector3 altarTargetPos = transform.position;
+            Sprite heroSprite = unit.GetComponent<SpriteRenderer>() != null ? unit.GetComponent<SpriteRenderer>().sprite : null;
 
             if (Audio.AudioManager.Instance != null)
             {
@@ -334,8 +329,34 @@ namespace FantasyDefense.UI
             OnHeroRecycled?.Invoke(unit, refundGems);
             Debug.Log($"[HeroRecycleBin] Unit {unit.HeroType} T{(int)unit.CurrentTier} berhasil didaur ulang. Refund: {refundGems} Gems.");
 
-            // 4. Hancurkan unit dari arena
-            Destroy(unit.gameObject);
+            // 4. Efek animasi hisap (Suction Vortex) ke kawah altar sebelum GameObject dihancurkan
+            if (SkillVfxManager.Instance != null)
+            {
+                SkillVfxManager.Instance.SpawnFloatingText(
+                    unitPos + Vector3.up * 0.7f,
+                    $"♻️ +{refundGems} 💎 REFUND!",
+                    new Color(0.35f, 1.0f, 0.55f),
+                    1.35f,
+                    true
+                );
+
+                GameObject heroObjToDestroy = unit.gameObject;
+                // Sembunyikan unit asli seketika agar aktor hisap vortex mengambil alih secara mulus
+                unit.gameObject.SetActive(false);
+
+                SkillVfxManager.Instance.SpawnRecycleSuctionVortex(unitPos, altarTargetPos, heroSprite, () =>
+                {
+                    if (heroObjToDestroy != null)
+                    {
+                        Destroy(heroObjToDestroy);
+                    }
+                });
+            }
+            else
+            {
+                Destroy(unit.gameObject);
+            }
+
             return true;
         }
     }
