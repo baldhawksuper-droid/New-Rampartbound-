@@ -303,6 +303,19 @@ namespace FantasyDefense.UI
                     summonCubeContainer.offsetMax = Vector2.zero;
                 }
             }
+
+            // Pastikan Hero Recycle Bin (Tempat Sampah / Daur Ulang Pahlawan) ada di sisi kiri atas dock
+            if (HeroRecycleBin.Instance == null)
+            {
+                var binObj = new GameObject("HeroRecycleBin", typeof(RectTransform), typeof(CanvasGroup), typeof(HeroRecycleBin));
+                binObj.transform.SetParent(dockRoot, false);
+                var binRt = binObj.GetComponent<RectTransform>();
+                // Diposisikan tepat di atas sudut kanan/kiri dock ibu jari
+                binRt.anchorMin = new Vector2(0.74f, 1.08f);
+                binRt.anchorMax = new Vector2(0.98f, 1.82f);
+                binRt.offsetMin = Vector2.zero;
+                binRt.offsetMax = Vector2.zero;
+            }
         }
 
         private HeroCardWidgets BuildSingleHeroCard(Transform parent, UnitType type, Font font, Sprite frameSprite)

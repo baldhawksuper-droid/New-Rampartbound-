@@ -1037,6 +1037,14 @@ namespace FantasyDefense.Combat
             dropScreenPos.z = -mainCamera.transform.position.z;
             Vector3 dropWorldPos = mainCamera.ScreenToWorldPoint(dropScreenPos);
 
+            // Deteksi apakah hero didrop ke dalam zona Recycle Bin (Tempat Sampah / Jual Hero)
+            if (FantasyDefense.UI.HeroRecycleBin.Instance != null &&
+                FantasyDefense.UI.HeroRecycleBin.Instance.ContainsScreenPoint(eventData.position))
+            {
+                bool recycled = FantasyDefense.UI.HeroRecycleBin.Instance.TryRecycleHero(this);
+                if (recycled) return;
+            }
+
             // Deteksi petak target berdasarkan World-Space Slot Snapping standar 2D Merge Defense
             TileCell targetCell = null;
             if (GridManager.Instance != null)

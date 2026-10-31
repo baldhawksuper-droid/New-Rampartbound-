@@ -1188,11 +1188,22 @@ namespace FantasyDefense.Combat
             float duration = 0.65f;
             float elapsed = 0f;
             float gravity = -15.0f;
+            bool groundCrackSoundPlayed = false;
 
             while (elapsed < duration)
             {
                 elapsed += Time.deltaTime;
                 float fade = Mathf.Clamp01(1f - (elapsed / duration));
+
+                // Resonansi audio keretakan tanah vulkanik saat debris mulai jatuh menyentuh tanah (~0.22s)
+                if (!groundCrackSoundPlayed && elapsed >= 0.22f)
+                {
+                    groundCrackSoundPlayed = true;
+                    if (Audio.AudioManager.Instance != null)
+                    {
+                        Audio.AudioManager.Instance.PlaySound(Audio.SoundType.CastleHitBoss, 1.45f);
+                    }
+                }
 
                 for (int i = 0; i < debrisList.Count; i++)
                 {
