@@ -51,6 +51,7 @@ namespace FantasyDefense.Combat
         {
             ApplyTheme(currentTheme, immediate: true);
             RestartAmbientWeatherRoutine();
+            PlayBiomeBgm(currentTheme);
         }
 
         public void SetEnvironmentTheme(BattlefieldEnvironmentTheme newTheme)
@@ -63,7 +64,30 @@ namespace FantasyDefense.Combat
             currentTheme = newTheme;
             ApplyTheme(currentTheme, immediate: false);
             RestartAmbientWeatherRoutine();
+            PlayBiomeBgm(currentTheme);
             OnEnvironmentChanged?.Invoke(currentTheme);
+        }
+
+        private void PlayBiomeBgm(BattlefieldEnvironmentTheme theme)
+        {
+            if (Audio.AudioManager.Instance == null) return;
+
+            // Lindungi BGM Boss & MiniBoss agar tidak tertimpa saat stage boss berlangsung
+            var current = Audio.AudioManager.Instance.CurrentBgmTrack;
+            if (current == Audio.BgmTrack.BossTheme || current == Audio.BgmTrack.MiniBossTheme)
+            {
+                return;
+            }
+
+            Audio.BgmTrack targetTrack = theme switch
+            {
+                BattlefieldEnvironmentTheme.Forest => Audio.BgmTrack.BattlefieldForest,
+                BattlefieldEnvironmentTheme.Mountain => Audio.BgmTrack.BattlefieldMountain,
+                BattlefieldEnvironmentTheme.Volcanic => Audio.BgmTrack.BattlefieldVolcanic,
+                _ => Audio.BgmTrack.BattlefieldForest
+            };
+
+            Audio.AudioManager.Instance.PlayBGM(targetTrack);
         }
 
         private void EnsureBackdropRenderer()

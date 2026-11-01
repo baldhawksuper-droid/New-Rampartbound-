@@ -1235,6 +1235,62 @@ namespace FantasyDefense.Combat
         }
 
         /// <summary>
+        /// Efek retakan tanah berapi (Charred Ground Fissure) saat Boss Titan Warlord
+        /// melancarkan Ground Smash dalam fase Enrage (HP <= 35%).
+        /// Memancarkan urat magma membara di tanah yang mendingin dan memudar dalam 2.5 detik.
+        /// </summary>
+        public void SpawnBossEnrageGroundFissure(Vector3 smashPos)
+        {
+            if (!enableParticleEffects) return;
+            StartCoroutine(BossEnrageGroundFissureRoutine(smashPos));
+        }
+
+        private IEnumerator BossEnrageGroundFissureRoutine(Vector3 smashPos)
+        {
+            GameObject fissureObj = new GameObject("BossEnrageGroundFissure");
+            fissureObj.transform.position = smashPos + new Vector3(0f, -0.45f, 0f);
+            fissureObj.transform.localScale = new Vector3(1.6f, 1.1f, 1f);
+
+            var sr = fissureObj.AddComponent<SpriteRenderer>();
+            sr.sprite = Resources.Load<Sprite>("Sprites/VFX/VFX_Charred_Ground_Fissure");
+            sr.sortingLayerName = "Default";
+            sr.sortingOrder = -30;
+            sr.color = new Color(1f, 1f, 1f, 0.95f);
+
+            // Letupan gelombang kejut magma saat retakan merekah
+            StartCoroutine(SpawnShockwaveRingRoutine(smashPos + Vector3.down * 0.45f, 2.6f, new Color(1f, 0.35f, 0.05f, 0.85f)));
+            SpawnProceduralParticleBurst(smashPos + Vector3.down * 0.45f, new Color(1f, 0.4f, 0.05f), new Color(1f, 0.85f, 0.2f), 24, 3.2f, sortingOrder: -25);
+
+            float duration = 2.5f;
+            float elapsed = 0f;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float progress = elapsed / duration;
+
+                if (sr == null) yield break;
+
+                // Tahap 1 (0.0s - 1.2s): Magma membara berdenyut
+                // Tahap 2 (1.2s - 2.5s): Dingin menjadi batu obsidian menghitam dan memudar
+                if (progress < 0.5f)
+                {
+                    float pulse = 0.85f + Mathf.Sin(elapsed * 8f) * 0.15f;
+                    sr.color = Color.Lerp(new Color(1f, 0.5f, 0.2f, 0.95f), Color.white, pulse);
+                }
+                else
+                {
+                    float fade = 1f - ((progress - 0.5f) / 0.5f);
+                    sr.color = new Color(0.35f, 0.30f, 0.30f, fade * 0.90f);
+                }
+
+                yield return null;
+            }
+
+            if (fissureObj != null) Destroy(fissureObj);
+        }
+
+        /// <summary>
         /// Efek visual pusaran hisap esensi (Suction Vortex) saat pahlawan dilebur di Recycle Altar (Sprint 14 Polish).
         /// Menyedot pahlawan ke kawah tengah disertai rotasi akselerasi, scale down, dan pendaran partikel koin permata.
         /// </summary>

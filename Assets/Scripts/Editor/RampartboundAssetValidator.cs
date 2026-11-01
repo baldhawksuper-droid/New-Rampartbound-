@@ -124,6 +124,7 @@ namespace Rampartbound.Editor
             AuditEnvironment("Battlefield Mountain", "Assets/Art/Sprites/Environment/Battlefield_Mountain.png");
             AuditEnvironment("Battlefield Volcanic", "Assets/Art/Sprites/Environment/Battlefield_Volcanic.png");
             AuditEnvironment("VFX Magma Aura Ring", "Assets/Art/Sprites/VFX/VFX_Aura_Magma_Ring.png");
+            AuditEnvironment("VFX Charred Ground Fissure", "Assets/Art/Sprites/VFX/VFX_Charred_Ground_Fissure.png");
 
             Repaint();
         }

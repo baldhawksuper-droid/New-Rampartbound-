@@ -77,7 +77,10 @@ namespace FantasyDefense.Audio
         BattlefieldTheme = BattleTheme,
         TitleTheme,
         MiniBossTheme,
-        BossTheme
+        BossTheme,
+        BattlefieldForest,
+        BattlefieldMountain,
+        BattlefieldVolcanic
     }
 
     /// <summary>
@@ -392,6 +395,9 @@ namespace FantasyDefense.Audio
                     BgmTrack.BossTheme => "Audio/Music/BGM_Boss_Theme",
                     BgmTrack.LobbyTheme => "Audio/Music/BGM_Citadel_Lobby",
                     BgmTrack.BattleTheme => "Audio/Music/BGM_Battle_Theme",
+                    BgmTrack.BattlefieldForest => "Audio/Music/BGM_Battlefield_Forest",
+                    BgmTrack.BattlefieldMountain => "Audio/Music/BGM_Battlefield_Mountain",
+                    BgmTrack.BattlefieldVolcanic => "Audio/Music/BGM_Battlefield_Volcanic",
                     _ => null
                 };
                 if (!string.IsNullOrEmpty(resPath))
@@ -859,6 +865,33 @@ namespace FantasyDefense.Audio
                 293.66f, 329.63f, 440.00f, 523.25f
             };
             proceduralBgmCache[BgmTrack.BattleTheme] = CreateRhythmicBgmClip("BGM_BattleTheme", battleMelody, 0.22f);
+
+            // BGM 3: Bioma Hutan (Forest Outskirts) - Melodi pastoral petualangan orkestra ringan (F Major / C Major)
+            float[] forestMelody = new float[] {
+                349.23f, 392.00f, 440.00f, 523.25f,
+                440.00f, 392.00f, 349.23f, 293.66f,
+                329.63f, 349.23f, 392.00f, 523.25f,
+                587.33f, 523.25f, 440.00f, 392.00f
+            };
+            proceduralBgmCache[BgmTrack.BattlefieldForest] = CreateHarmonicBgmClip("BGM_BattlefieldForest", forestMelody, 0.28f);
+
+            // BGM 4: Bioma Gunung (Mountain Pass) - Suasana angin dingin hening dengan resonansi kristal alpine (D Dorian)
+            float[] mountainMelody = new float[] {
+                293.66f, 349.23f, 440.00f, 587.33f,
+                440.00f, 349.23f, 329.63f, 392.00f,
+                493.88f, 659.25f, 493.88f, 392.00f,
+                293.66f, 440.00f, 587.33f, 880.00f
+            };
+            proceduralBgmCache[BgmTrack.BattlefieldMountain] = CreateHarmonicBgmClip("BGM_BattlefieldMountain", mountainMelody, 0.34f);
+
+            // BGM 5: Bioma Vulkanik (Abyssal Volcanic) - Tensi dramatis cepat & hentakan ritme perang magma (C Minor War March)
+            float[] volcanicMelody = new float[] {
+                261.63f, 311.13f, 392.00f, 311.13f,
+                246.94f, 293.66f, 369.99f, 293.66f,
+                220.00f, 261.63f, 329.63f, 261.63f,
+                196.00f, 246.94f, 293.66f, 392.00f
+            };
+            proceduralBgmCache[BgmTrack.BattlefieldVolcanic] = CreateRhythmicBgmClip("BGM_BattlefieldVolcanic", volcanicMelody, 0.18f);
         }
 
         private AudioClip CreateHarmonicBgmClip(string name, float[] freqs, float noteDuration)

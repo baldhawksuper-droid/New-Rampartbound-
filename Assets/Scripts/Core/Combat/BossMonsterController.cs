@@ -219,7 +219,7 @@ namespace FantasyDefense.Combat
                 StartCoroutine(BossSkillAttackPoseRoutine());
             }
 
-            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null)
+            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null && FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
             {
                 FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Heavy);
             }
@@ -227,19 +227,35 @@ namespace FantasyDefense.Combat
             // Efek guncangan kamera khusus Boss Ground Smash dengan mikro-rotasi (Point 4 - Boss Impact Screen-Shake Twist)
             if (MobileCameraAdapter.Instance != null)
             {
-                MobileCameraAdapter.Instance.TriggerBossScreenShake(0.40f, 0.32f, 0.70f);
+                if (isEnraged)
+                {
+                    MobileCameraAdapter.Instance.TriggerBossScreenShake(0.55f, 0.45f, 1.10f);
+                }
+                else
+                {
+                    MobileCameraAdapter.Instance.TriggerBossScreenShake(0.40f, 0.32f, 0.70f);
+                }
             }
 
             if (SkillVfxManager.Instance != null)
             {
                 SkillVfxManager.Instance.SpawnSkillParticles(transform.position, UnitType.RoseTanker, UnitTier.Tier3);
-                SkillVfxManager.Instance.SpawnFloatingText(transform.position + Vector3.up * 1.2f, "★ GROUND SMASH! ★", Color.red, 1.3f);
+                SkillVfxManager.Instance.SpawnFloatingText(transform.position + Vector3.up * 1.2f, isEnraged ? "★ MAGMA GROUND SMASH! ★" : "★ GROUND SMASH! ★", Color.red, 1.35f);
                 SkillVfxManager.Instance.SpawnBossGroundSmashDebris(transform.position);
+
+                if (isEnraged)
+                {
+                    SkillVfxManager.Instance.SpawnBossEnrageGroundFissure(transform.position);
+                }
             }
 
             if (Audio.AudioManager.Instance != null)
             {
                 Audio.AudioManager.Instance.PlaySound(Audio.SoundType.Earthshaker);
+                if (isEnraged)
+                {
+                    Audio.AudioManager.Instance.PlaySound(Audio.SoundType.CastleHitBoss, 1.10f);
+                }
             }
 
             // Stun hero terdekat di barisan arena selama 1.2 detik
