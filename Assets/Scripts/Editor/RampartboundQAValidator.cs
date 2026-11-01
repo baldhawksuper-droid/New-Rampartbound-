@@ -167,7 +167,7 @@ namespace Rampartbound.Editor
 
             CitadelDefenseTurret[] turrets;
 #if UNITY_6000_0_OR_NEWER
-            turrets = FindObjectsByType<CitadelDefenseTurret>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            turrets = FindObjectsByType<CitadelDefenseTurret>(FindObjectsInactive.Include);
 #else
             turrets = UnityEngine.Object.FindObjectsOfType<CitadelDefenseTurret>(true);
 #endif
@@ -316,7 +316,7 @@ namespace Rampartbound.Editor
 #if UNITY_6000_0_OR_NEWER
             GameObject[] allObjects = FindObjectsByType<GameObject>(FindObjectsInactive.Include);
 #else
-            GameObject[] allObjects = FindObjectsByType<GameObject>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            GameObject[] allObjects = UnityEngine.Object.FindObjectsOfType<GameObject>(true);
 #endif
             int missingScriptsCount = 0;
             int auditedGameObjects = allObjects.Length;
