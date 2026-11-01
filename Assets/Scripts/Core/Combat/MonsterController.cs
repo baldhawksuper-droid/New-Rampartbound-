@@ -228,15 +228,30 @@ namespace FantasyDefense.Combat
                 baseScale = Vector3.one * scale;
                 transform.localScale = baseScale;
 
-                // Load frame animasi berjalan multi-frame jika tersedia
-                if (walkFrames == null || walkFrames.Length == 0)
+            // Load frame animasi berjalan multi-frame jika tersedia
+            if (walkFrames == null || walkFrames.Length == 0)
+            {
+                var loadedFrames = Resources.LoadAll<Sprite>($"Sprites/Monsters/Monster_{data.monsterType}_Walk");
+                if (loadedFrames != null && loadedFrames.Length > 0)
                 {
-                    var loadedFrames = Resources.LoadAll<Sprite>($"Sprites/Monsters/Monster_{data.monsterType}_Walk");
-                    if (loadedFrames != null && loadedFrames.Length > 0)
-                    {
-                        walkFrames = loadedFrames;
-                    }
+                    walkFrames = loadedFrames;
                 }
+            }
+
+            // Pasang bayangan tanah taktil (Ground Shadow) menggunakan UI_Shadow_Oval agar monster menjejak kokoh di jalan
+            Transform shadowTrans = transform.Find("Monster_Ground_Shadow");
+            if (shadowTrans == null)
+            {
+                GameObject shadowObj = new GameObject("Monster_Ground_Shadow");
+                shadowObj.transform.SetParent(transform, false);
+                shadowObj.transform.localPosition = new Vector3(0f, -0.42f, 0.05f);
+                shadowObj.transform.localScale = new Vector3(1.10f, 0.45f, 1f);
+                var shadowSr = shadowObj.AddComponent<SpriteRenderer>();
+                shadowSr.sprite = Resources.Load<Sprite>("Sprites/UI/UI_Shadow_Oval");
+                shadowSr.color = new Color(0f, 0f, 0f, 0.38f);
+                shadowSr.sortingLayerName = "Cell";
+                shadowSr.sortingOrder = 2;
+            }
             }
 
             if (waypoints != null && waypoints.Length > 0)

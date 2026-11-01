@@ -95,6 +95,10 @@ namespace FantasyDefense.UI
                     pippinShadowImage = shadow.GetComponent<Image>();
                 }
             }
+            if (pippinShadowImage != null && pippinShadowImage.sprite == null)
+            {
+                pippinShadowImage.sprite = Resources.Load<Sprite>("Sprites/UI/UI_Shadow_Oval");
+            }
 
             if (cedricShadowRt == null && cedricHeroRt != null && cedricHeroRt.parent != null)
             {
@@ -104,6 +108,10 @@ namespace FantasyDefense.UI
                     cedricShadowRt = shadow.GetComponent<RectTransform>();
                     cedricShadowImage = shadow.GetComponent<Image>();
                 }
+            }
+            if (cedricShadowImage != null && cedricShadowImage.sprite == null)
+            {
+                cedricShadowImage.sprite = Resources.Load<Sprite>("Sprites/UI/UI_Shadow_Oval");
             }
 
             if (handCursorRt != null)
