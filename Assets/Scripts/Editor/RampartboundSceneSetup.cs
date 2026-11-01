@@ -1028,10 +1028,10 @@ namespace Rampartbound.Editor
             var interWaveBanner = CreatePanel(battleHudObj.transform, "InterWaveBannerPanel", new Color(0.08f, 0.1f, 0.18f, 0.95f));
             if (_bannerTacticalPhase != null)
             {
-                var bImg = interWaveBanner.GetComponent<Image>();
-                bImg.sprite = _bannerTacticalPhase;
-                bImg.type = Image.Type.Sliced;
-                bImg.color = Color.white;
+                var tacticalBannerImg = interWaveBanner.GetComponent<Image>();
+                tacticalBannerImg.sprite = _bannerTacticalPhase;
+                tacticalBannerImg.type = Image.Type.Sliced;
+                tacticalBannerImg.color = Color.white;
             }
             var bCanvasGroup = interWaveBanner.AddComponent<CanvasGroup>();
             bCanvasGroup.blocksRaycasts = false; // Zero UI raycast blocker guarantee!
@@ -1214,10 +1214,10 @@ namespace Rampartbound.Editor
             var stageTop = CreatePanel(stageContent, "StageTopHeader", new Color(0.06f, 0.09f, 0.16f, 0.95f));
             if (_frameStoneBastion != null)
             {
-                var topImg = stageTop.GetComponent<Image>();
-                topImg.sprite = _frameStoneBastion;
-                topImg.type = Image.Type.Sliced;
-                topImg.color = Color.white;
+                var stageTopImg = stageTop.GetComponent<Image>();
+                stageTopImg.sprite = _frameStoneBastion;
+                stageTopImg.type = Image.Type.Sliced;
+                stageTopImg.color = Color.white;
             }
             PositionUI(stageTop, 0.02f, 0.85f, 0.98f, 0.98f);
             var chapterTxt = CreateText(stageTop.transform, "ChapterTitle", "Chapter 1: Pertahanan Pinggiran Kerajaan", 24, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(1f, 0.85f, 0.3f), defaultFont);
@@ -1271,10 +1271,10 @@ namespace Rampartbound.Editor
             }
             else if (_frameStoneBastion != null)
             {
-                var trailImg = stageTrailPanel.GetComponent<Image>();
-                trailImg.sprite = _frameStoneBastion;
-                trailImg.type = Image.Type.Sliced;
-                trailImg.color = Color.white;
+                var bastionTrailImg = stageTrailPanel.GetComponent<Image>();
+                bastionTrailImg.sprite = _frameStoneBastion;
+                bastionTrailImg.type = Image.Type.Sliced;
+                bastionTrailImg.color = Color.white;
             }
             PositionUI(stageTrailPanel, 0.02f, 0.45f, 0.98f, 0.84f);
 
@@ -1333,31 +1333,31 @@ namespace Rampartbound.Editor
                 PositionUI(sBtnObj, nodeRects[i].x, nodeRects[i].y, nodeRects[i].z, nodeRects[i].w);
 
                 // Pasang sprite 3D medallion artistik menggantikan kotak oranye kaku
-                var btnImg = sBtnObj.GetComponent<Image>();
-                if (btnImg != null)
+                var nodeBtnImg = sBtnObj.GetComponent<Image>();
+                if (nodeBtnImg != null)
                 {
                     if (i == 9 && nodeFinalBossSp != null)
                     {
-                        btnImg.sprite = nodeFinalBossSp;
-                        btnImg.color = Color.white;
+                        nodeBtnImg.sprite = nodeFinalBossSp;
+                        nodeBtnImg.color = Color.white;
                     }
                     else if (i == 4 && nodeMiniBossSp != null)
                     {
-                        btnImg.sprite = nodeMiniBossSp;
-                        btnImg.color = Color.white;
+                        nodeBtnImg.sprite = nodeMiniBossSp;
+                        nodeBtnImg.color = Color.white;
                     }
                     else if (nodeNormalSp != null)
                     {
-                        btnImg.sprite = nodeNormalSp;
-                        btnImg.color = Color.white;
+                        nodeBtnImg.sprite = nodeNormalSp;
+                        nodeBtnImg.color = Color.white;
                     }
                 }
 
                 // Format teks label angka stage di dalam node
-                var btnTxt = sBtnObj.GetComponentInChildren<Text>();
-                if (btnTxt != null)
+                var nodeBtnTxt = sBtnObj.GetComponentInChildren<Text>();
+                if (nodeBtnTxt != null)
                 {
-                    btnTxt.color = (i == 9) ? new Color(1f, 0.35f, 0.35f) : ((i == 4) ? new Color(1f, 0.85f, 0.25f) : new Color(0.95f, 0.95f, 1f));
+                    nodeBtnTxt.color = (i == 9) ? new Color(1f, 0.35f, 0.35f) : ((i == 4) ? new Color(1f, 0.85f, 0.25f) : new Color(0.95f, 0.95f, 1f));
                 }
 
                 stageNodeButtonsList.Add(sBtnObj.GetComponent<Button>());
@@ -1464,14 +1464,14 @@ namespace Rampartbound.Editor
             }
             else if (_btnSecondaryStone != null)
             {
-                var cImg = tabCedric.GetComponent<Image>();
-                cImg.sprite = _btnSecondaryStone;
-                cImg.type = Image.Type.Sliced;
-                cImg.color = Color.white;
+                var cedricTabImg = tabCedric.GetComponent<Image>();
+                cedricTabImg.sprite = _btnSecondaryStone;
+                cedricTabImg.type = Image.Type.Sliced;
+                cedricTabImg.color = Color.white;
             }
             PositionUI(tabCedric, 0.02f, 0.90f, 0.25f, 0.98f);
 
-            var tabRose = CreateButton(heroContent, "TabRose", "🛡️ Rose Tank", new Color(0.45f, 0.2f, 0.35f), Color.white, 20, defaultFont);
+            var tabRose = CreateButton(heroContent, "Tab_Rose", "ROSE", new Color(0.12f, 0.16f, 0.26f), Color.white, 20, defaultFont);
             if (_tabHeroInactive != null)
             {
                 var rImg = tabRose.GetComponent<Image>();
@@ -1481,14 +1481,14 @@ namespace Rampartbound.Editor
             }
             else if (_btnSecondaryStone != null)
             {
-                var rImg = tabRose.GetComponent<Image>();
-                rImg.sprite = _btnSecondaryStone;
-                rImg.type = Image.Type.Sliced;
-                rImg.color = Color.white;
+                var roseTabImg = tabRose.GetComponent<Image>();
+                roseTabImg.sprite = _btnSecondaryStone;
+                roseTabImg.type = Image.Type.Sliced;
+                roseTabImg.color = Color.white;
             }
             PositionUI(tabRose, 0.27f, 0.90f, 0.50f, 0.98f);
 
-            var tabRabbit = CreateButton(heroContent, "TabRabbit", "🔮 Rabbit Mage", new Color(0.15f, 0.25f, 0.5f), Color.white, 20, defaultFont);
+            var tabRabbit = CreateButton(heroContent, "Tab_RabbitMage", "PIPPIN", new Color(0.12f, 0.16f, 0.26f), Color.white, 20, defaultFont);
             if (_tabHeroInactive != null)
             {
                 var mImg = tabRabbit.GetComponent<Image>();
@@ -1498,14 +1498,14 @@ namespace Rampartbound.Editor
             }
             else if (_btnSecondaryStone != null)
             {
-                var mImg = tabRabbit.GetComponent<Image>();
-                mImg.sprite = _btnSecondaryStone;
-                mImg.type = Image.Type.Sliced;
-                mImg.color = Color.white;
+                var rabbitTabImg = tabRabbit.GetComponent<Image>();
+                rabbitTabImg.sprite = _btnSecondaryStone;
+                rabbitTabImg.type = Image.Type.Sliced;
+                rabbitTabImg.color = Color.white;
             }
             PositionUI(tabRabbit, 0.52f, 0.90f, 0.75f, 0.98f);
 
-            var tabWind = CreateButton(heroContent, "TabWind", "🏹 Wind Ranger", new Color(0.15f, 0.4f, 0.25f), Color.white, 20, defaultFont);
+            var tabWind = CreateButton(heroContent, "Tab_WindRanger", "SYLPH", new Color(0.12f, 0.16f, 0.26f), Color.white, 20, defaultFont);
             if (_tabHeroInactive != null)
             {
                 var wImg = tabWind.GetComponent<Image>();
@@ -1515,10 +1515,10 @@ namespace Rampartbound.Editor
             }
             else if (_btnSecondaryStone != null)
             {
-                var wImg = tabWind.GetComponent<Image>();
-                wImg.sprite = _btnSecondaryStone;
-                wImg.type = Image.Type.Sliced;
-                wImg.color = Color.white;
+                var windTabImg = tabWind.GetComponent<Image>();
+                windTabImg.sprite = _btnSecondaryStone;
+                windTabImg.type = Image.Type.Sliced;
+                windTabImg.color = Color.white;
             }
             PositionUI(tabWind, 0.77f, 0.90f, 0.98f, 0.98f);
 
@@ -1728,9 +1728,9 @@ namespace Rampartbound.Editor
             }
             else if (_keyVisualBanner != null)
             {
-                var banImg = bannerPanel.GetComponent<Image>();
-                banImg.sprite = _keyVisualBanner;
-                banImg.color = new Color(0.9f, 0.9f, 1f, 1f);
+                var altarBannerImg = bannerPanel.GetComponent<Image>();
+                altarBannerImg.sprite = _keyVisualBanner;
+                altarBannerImg.color = new Color(0.9f, 0.9f, 1f, 1f);
             }
             var banTitle = CreateText(bannerPanel.transform, "BannerTitle", "PEMANGGILAN KHUSUS PAHLAWAN", 28, FontStyle.Bold, TextAnchor.MiddleCenter, new Color(1f, 0.85f, 0.35f), defaultFont);
             PositionUI(banTitle.gameObject, 0.05f, 0.65f, 0.95f, 0.92f);
@@ -1766,10 +1766,10 @@ namespace Rampartbound.Editor
             var promoPanel = CreatePanel(summonContent, "StarPromotionPanel", new Color(0.08f, 0.1f, 0.16f, 0.9f));
             if (_frameStoneBastion != null)
             {
-                var pImg = promoPanel.GetComponent<Image>();
-                pImg.sprite = _frameStoneBastion;
-                pImg.type = Image.Type.Sliced;
-                pImg.color = Color.white;
+                var promoPanelImg = promoPanel.GetComponent<Image>();
+                promoPanelImg.sprite = _frameStoneBastion;
+                promoPanelImg.type = Image.Type.Sliced;
+                promoPanelImg.color = Color.white;
             }
             PositionUI(promoPanel, 0.04f, 0.05f, 0.96f, 0.52f);
             var promoTitle = CreateText(promoPanel.transform, "PromoTitle", "PROMOSI BINTANG PAHLAWAN (SHARDS)", 24, FontStyle.Bold, TextAnchor.MiddleCenter, Color.white, defaultFont);
@@ -1797,10 +1797,10 @@ namespace Rampartbound.Editor
             var promoteBtn = CreateButton(promoPanel.transform, "PromoteStarBtn", "PROMOSI BINTANG ★", new Color(0.25f, 0.65f, 0.35f), Color.white, 22, defaultFont);
             if (_btnPrimaryGold != null)
             {
-                var prImg = promoteBtn.GetComponent<Image>();
-                prImg.sprite = _btnPrimaryGold;
-                prImg.type = Image.Type.Sliced;
-                prImg.color = Color.white;
+                var promoBtnImg = promoteBtn.GetComponent<Image>();
+                promoBtnImg.sprite = _btnPrimaryGold;
+                promoBtnImg.type = Image.Type.Sliced;
+                promoBtnImg.color = Color.white;
             }
             PositionUI(promoteBtn, 0.15f, 0.03f, 0.85f, 0.16f);
 

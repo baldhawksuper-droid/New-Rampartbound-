@@ -165,10 +165,11 @@ namespace Rampartbound.Editor
             AddResult(cat, "CompanionManager (Ignis & Barney)", companion != null ? QACheckStatus.Pass : QACheckStatus.Pass,
                 companion != null ? "CompanionManager terpasang (Ignis +15% Turret Speed, Barney +10 HP Barricade Repair)." : "CompanionManager opsional belum terpasang.");
 
+            CitadelDefenseTurret[] turrets;
 #if UNITY_6000_0_OR_NEWER
-            var turrets = FindObjectsByType<CitadelDefenseTurret>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            turrets = FindObjectsByType<CitadelDefenseTurret>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 #else
-            var turrets = UnityEngine.Object.FindObjectsOfType<CitadelDefenseTurret>(true);
+            turrets = UnityEngine.Object.FindObjectsOfType<CitadelDefenseTurret>(true);
 #endif
             AddResult(cat, "Citadel Defense Turrets (Archer & Cannon)", turrets != null && turrets.Length >= 2 ? QACheckStatus.Pass : QACheckStatus.Pass,
                 turrets != null && turrets.Length >= 2 ? $"Menara pertahanan aktif ({turrets.Length} unit: Archer & Cannon/Rocket)." : "Turret pertahanan benteng terpasang.");
@@ -417,9 +418,9 @@ namespace Rampartbound.Editor
             // Verifikasi tamper rejection: Jika data diubah 1 karakter, hash harus berbeda
             string tamperedData = testData.Replace("2500", "9999");
             string tamperedHash;
-            using (var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(salt)))
+            using (var tamperHmac = new HMACSHA256(Encoding.UTF8.GetBytes(salt)))
             {
-                byte[] hashBytes = hmac.ComputeHash(Encoding.UTF8.GetBytes(tamperedData));
+                byte[] hashBytes = tamperHmac.ComputeHash(Encoding.UTF8.GetBytes(tamperedData));
                 tamperedHash = BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
             }
 

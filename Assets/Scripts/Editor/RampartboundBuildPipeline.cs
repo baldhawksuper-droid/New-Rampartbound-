@@ -253,10 +253,11 @@ namespace Rampartbound.Editor
             }
 
             // 3. Scripting Backend
+            ScriptingImplementation backend;
 #if UNITY_2021_2_OR_NEWER
-            var backend = PlayerSettings.GetScriptingBackend(NamedBuildTarget.Android);
+            backend = PlayerSettings.GetScriptingBackend(NamedBuildTarget.Android);
 #else
-            var backend = PlayerSettings.GetScriptingBackend(BuildTargetGroup.Android);
+            backend = PlayerSettings.GetScriptingBackend(BuildTargetGroup.Android);
 #endif
             reportMsg += $"[INFO] Scripting Backend: {backend}\n";
 
