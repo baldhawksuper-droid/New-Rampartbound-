@@ -219,6 +219,14 @@ namespace FantasyDefense.UI
         {
             if (StageManager.Instance == null || CitadelLobbyManager.Instance == null) return;
 
+            var panelTitle = transform.Find("HeaderBanner/TitleText")?.GetComponent<Text>();
+            if (panelTitle != null)
+            {
+                panelTitle.text = FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                    "PETA DUNIA & SELEKSI STAGE",
+                    "WORLD MAP & STAGE SELECTION");
+            }
+
             int totalStars = StageManager.Instance.GetTotalChapterStars();
 
             if (chapterTitleText != null)
@@ -412,7 +420,7 @@ namespace FantasyDefense.UI
                     : $"{stage.stageId}";
                 stageCodeText.text = $"<b>STAGE {cleanCode}</b>";
             }
-            if (stageTitleText != null) stageTitleText.text = $"<b>{stage.stageTitle.ToUpper()}</b>";
+            if (stageTitleText != null) stageTitleText.text = $"<b>{stage.GetLocalizedTitle().ToUpper()}</b>";
 
             if (battleModeText != null)
             {
@@ -423,7 +431,7 @@ namespace FantasyDefense.UI
             if (stageDescriptionText != null)
             {
                 string modeTag = battleModeText == null ? $"\n<color=#FFD700><b>Mode:</b> {stage.GetBattleModeLabel()}</color>" : "";
-                stageDescriptionText.text = $"{stage.stageDescription}{modeTag}";
+                stageDescriptionText.text = $"{stage.GetLocalizedDescription()}{modeTag}";
             }
 
             if (recommendedCpText != null)

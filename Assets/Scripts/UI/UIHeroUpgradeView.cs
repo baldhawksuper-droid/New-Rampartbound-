@@ -515,11 +515,26 @@ namespace FantasyDefense.UI
         {
             switch (type)
             {
-                case UnitType.Cedric: return "Frontline Melee DPS Striker (Tebasan Ganda & Badai Pedang)";
-                case UnitType.RabbitMage: return "Ranged Magic AoE & Kontrol Massa (Meteor Siang & Api Purba)";
-                case UnitType.RoseTanker: return "Heavy Frontline Tank & Crowd Control (Hantaman Palu & Stun)";
-                case UnitType.WindRanger: return "Long-Range Physical DPS & Crowd Control (Panah Badai & Tornado Zephyr)";
-                default: return "Pahlawan Kerajaan";
+                case UnitType.Cedric:
+                    return FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                        "Frontline Melee DPS Striker (Tebasan Ganda & Badai Pedang)",
+                        "Frontline Melee DPS Striker (Dual Slash & Blade Storm)");
+                case UnitType.RabbitMage:
+                    return FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                        "Ranged Magic AoE & Kontrol Massa (Meteor Siang & Api Purba)",
+                        "Ranged Magic AoE & Crowd Control (Noon Meteor & Ancient Fire)");
+                case UnitType.RoseTanker:
+                    return FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                        "Heavy Frontline Tank & Crowd Control (Hantaman Palu & Stun)",
+                        "Heavy Frontline Tank & Crowd Control (Hammer Slam & Stun)");
+                case UnitType.WindRanger:
+                    return FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                        "Long-Range Physical DPS & Crowd Control (Panah Badai & Tornado Zephyr)",
+                        "Long-Range Physical DPS & Crowd Control (Storm Arrows & Zephyr Tornado)");
+                default:
+                    return FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                        "Pahlawan Kerajaan",
+                        "Citadel Hero");
             }
         }
 

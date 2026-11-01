@@ -56,6 +56,7 @@ namespace FantasyDefense.UI
             DevicePerformanceManager.OnFpsLimitChanged += HandleFpsChanged;
             DevicePerformanceManager.OnBatterySaverToggled += HandleBatterySaverChanged;
             DevicePerformanceManager.OnHapticsToggled += HandleHapticsChanged;
+            FantasyDefense.Localization.CitadelLocalizationManager.OnLanguageChanged += HandleLanguageChanged;
         }
 
         private void OnDisable()
@@ -64,6 +65,12 @@ namespace FantasyDefense.UI
             DevicePerformanceManager.OnFpsLimitChanged -= HandleFpsChanged;
             DevicePerformanceManager.OnBatterySaverToggled -= HandleBatterySaverChanged;
             DevicePerformanceManager.OnHapticsToggled -= HandleHapticsChanged;
+            FantasyDefense.Localization.CitadelLocalizationManager.OnLanguageChanged -= HandleLanguageChanged;
+        }
+
+        private void HandleLanguageChanged(FantasyDefense.Localization.AppLanguage lang)
+        {
+            RefreshAllSettings();
         }
 
         private void InitializeActionButtons()
@@ -166,8 +173,77 @@ namespace FantasyDefense.UI
 
         public void RefreshAllSettings()
         {
+            RefreshLocalization();
             RefreshAudioUI();
             RefreshPerformanceUI();
+        }
+
+        private void RefreshLocalization()
+        {
+            // Update Header Title
+            var headerTitle = transform.Find("HeaderBanner/TitleText")?.GetComponent<Text>();
+            if (headerTitle != null)
+            {
+                headerTitle.text = FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                    "PENGATURAN AUDIO & SISTEM",
+                    "AUDIO & SYSTEM SETTINGS");
+            }
+
+            // Update FPS Buttons
+            if (fps30Button != null)
+            {
+                var txt = fps30Button.GetComponentInChildren<Text>();
+                if (txt != null) txt.text = "30 FPS";
+            }
+
+            if (fps60Button != null)
+            {
+                var txt = fps60Button.GetComponentInChildren<Text>();
+                if (txt != null) txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Text("60 FPS (Halus)", "60 FPS (Smooth)");
+            }
+
+            // Update Toggles
+            if (batterySaverToggle != null)
+            {
+                var txt = batterySaverToggle.GetComponentInChildren<Text>();
+                if (txt != null) txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Text("Mode Hemat Baterai", "Battery Saver Mode");
+            }
+
+            if (hapticFeedbackToggle != null)
+            {
+                var txt = hapticFeedbackToggle.GetComponentInChildren<Text>();
+                if (txt != null) txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Text("Getaran Haptic Ponsel", "Haptic Vibration");
+            }
+
+            if (bgmMuteToggle != null)
+            {
+                var txt = bgmMuteToggle.GetComponentInChildren<Text>();
+                if (txt != null) txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Text("Mute", "Mute");
+            }
+
+            if (sfxMuteToggle != null)
+            {
+                var txt = sfxMuteToggle.GetComponentInChildren<Text>();
+                if (txt != null) txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Text("Mute", "Mute");
+            }
+
+            // Update Test SFX Button
+            if (testSfxButton != null)
+            {
+                var txt = testSfxButton.GetComponentInChildren<Text>();
+                if (txt != null) txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Text("🔊 UJI COBA SUARA EFEK (TEST SFX)", "🔊 TEST SOUND EFFECTS (SFX)");
+            }
+
+            // Update Account Status Text
+            var setContent = transform.Find("ContentContainer") ?? transform;
+            var accTxt = setContent.Find("AccountStatusText")?.GetComponent<Text>();
+            if (accTxt != null)
+            {
+                accTxt.text = FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                    "☁️ STATUS AKUN: MODE TAMU (GUEST) • AUTO-SAVE AKTIF\n<size=15><color=#AAAAAA>Progres tersimpan otomatis di perangkat secara aman. Hapus Cache / Data Aplikasi di Pengaturan Ponsel jika ingin memulai dari awal.</color></size>",
+                    "☁️ ACCOUNT STATUS: GUEST MODE • AUTO-SAVE ACTIVE\n<size=15><color=#AAAAAA>Progress is safely auto-saved to device storage. Clear App Data in Phone Settings to reset.</color></size>");
+            }
+
             RefreshLanguageDisplay();
         }
 
@@ -177,7 +253,7 @@ namespace FantasyDefense.UI
             {
                 FantasyDefense.Localization.CitadelLocalizationManager.Instance.ToggleLanguage();
             }
-            RefreshLanguageDisplay();
+            RefreshAllSettings();
             if (AudioManager.Instance != null)
             {
                 AudioManager.Instance.PlaySound(SoundType.ButtonClick);
@@ -231,7 +307,8 @@ namespace FantasyDefense.UI
             int targetFps = DevicePerformanceManager.Instance.CurrentTargetFps;
             if (currentFpsText != null)
             {
-                currentFpsText.text = $"FPS: {targetFps}";
+                string targetLabel = FantasyDefense.Localization.CitadelLocalizationManager.Text("Target", "Target");
+                currentFpsText.text = $"{targetLabel}: {targetFps} FPS";
             }
 
             if (batterySaverToggle != null)
@@ -242,6 +319,50 @@ namespace FantasyDefense.UI
             if (hapticFeedbackToggle != null)
             {
                 hapticFeedbackToggle.isOn = DevicePerformanceManager.Instance.IsHapticsEnabled;
+            }
+
+            UpdateFpsButtonsVisual(targetFps);
+        }
+
+        private void UpdateFpsButtonsVisual(int activeFps)
+        {
+            Sprite tabActive = Resources.Load<Sprite>("Sprites/UI/UI_Tab_Hero_Active");
+            Sprite tabInactive = Resources.Load<Sprite>("Sprites/UI/UI_Tab_Hero_Inactive");
+
+            if (fps30Button != null)
+            {
+                var img = fps30Button.GetComponent<Image>();
+                if (img != null)
+                {
+                    if (activeFps == 30)
+                    {
+                        if (tabActive != null) { img.sprite = tabActive; img.type = Image.Type.Sliced; }
+                        img.color = Color.white;
+                    }
+                    else
+                    {
+                        if (tabInactive != null) { img.sprite = tabInactive; img.type = Image.Type.Sliced; }
+                        img.color = new Color(0.7f, 0.7f, 0.7f, 0.9f);
+                    }
+                }
+            }
+
+            if (fps60Button != null)
+            {
+                var img = fps60Button.GetComponent<Image>();
+                if (img != null)
+                {
+                    if (activeFps == 60)
+                    {
+                        if (tabActive != null) { img.sprite = tabActive; img.type = Image.Type.Sliced; }
+                        img.color = Color.white;
+                    }
+                    else
+                    {
+                        if (tabInactive != null) { img.sprite = tabInactive; img.type = Image.Type.Sliced; }
+                        img.color = new Color(0.7f, 0.7f, 0.7f, 0.9f);
+                    }
+                }
             }
         }
 
@@ -282,13 +403,22 @@ namespace FantasyDefense.UI
             }
 
             if (masterPercentText != null)
-                masterPercentText.text = $"MASTER: {Mathf.RoundToInt(master * 100f)}%";
+            {
+                string label = FantasyDefense.Localization.CitadelLocalizationManager.Text("MASTER", "MASTER");
+                masterPercentText.text = $"{label}: {Mathf.RoundToInt(master * 100f)}%";
+            }
 
             if (bgmPercentText != null)
-                bgmPercentText.text = $"MUSIK BGM: {Mathf.RoundToInt(bgm * 100f)}%";
+            {
+                string label = FantasyDefense.Localization.CitadelLocalizationManager.Text("MUSIK BGM", "BGM MUSIC");
+                bgmPercentText.text = $"{label}: {Mathf.RoundToInt(bgm * 100f)}%";
+            }
 
             if (sfxPercentText != null)
-                sfxPercentText.text = $"EFEK SFX: {Mathf.RoundToInt(sfx * 100f)}%";
+            {
+                string label = FantasyDefense.Localization.CitadelLocalizationManager.Text("EFEK SFX", "SFX AUDIO");
+                sfxPercentText.text = $"{label}: {Mathf.RoundToInt(sfx * 100f)}%";
+            }
         }
 
         private void OnMasterSliderChanged(float value)

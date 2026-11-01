@@ -85,6 +85,56 @@ namespace FantasyDefense.Data
             return config;
         }
 
+        /// <summary>
+        /// Mengembalikan judul stage dalam bahasa aktif (Indonesian / English).
+        /// </summary>
+        public string GetLocalizedTitle()
+        {
+            bool isId = FantasyDefense.Localization.CitadelLocalizationManager.Instance == null ||
+                        FantasyDefense.Localization.CitadelLocalizationManager.Instance.CurrentLanguage == FantasyDefense.Localization.AppLanguage.Indonesian;
+            if (isId) return stageTitle;
+
+            return stageId switch
+            {
+                101 => "Outpost Meadow",
+                102 => "Fortress Siege",
+                103 => "Mire Scrapper Camp",
+                104 => "Collapsed Watchtower",
+                105 => "Obsidian Maw Valley",
+                106 => "Cursed Crossroads",
+                107 => "Ancient Temple Ruins",
+                108 => "Crag Ridge Crest",
+                109 => "Void Citadel Gate",
+                110 => "Malakor's Abyssal Lair [BOSS]",
+                _ => stageTitle
+            };
+        }
+
+        /// <summary>
+        /// Mengembalikan deskripsi naratif stage dalam bahasa aktif (Indonesian / English).
+        /// </summary>
+        public string GetLocalizedDescription()
+        {
+            bool isId = FantasyDefense.Localization.CitadelLocalizationManager.Instance == null ||
+                        FantasyDefense.Localization.CitadelLocalizationManager.Instance.CurrentLanguage == FantasyDefense.Localization.AppLanguage.Indonesian;
+            if (isId) return stageDescription;
+
+            return stageId switch
+            {
+                101 => "Defend the royal outskirts from incoming goblin patrol vanguard.",
+                102 => "Hold the stone bastion against heavily armored siege breachers.",
+                103 => "Clear the perilous marshland infested with Mire Scrappers.",
+                104 => "Defend the collapsed watchtower against the Ancient Ironwood Golem.",
+                105 => "Stop the abyssal beasts emerging from the deep Obsidian Maw.",
+                106 => "Navigate and cleanse the cursed crossroads under dense fog.",
+                107 => "Defend the sacred temple ruins from desecration.",
+                108 => "Stand firm on the glacial windswept crags against the Frost Wyrm.",
+                109 => "Breach the final gate guarded by abyssal void sentinels.",
+                110 => "Defeat Malakor, The Void Tyrant, and save the royal realm!",
+                _ => stageDescription
+            };
+        }
+
         public string GetBattleModeLabel()
         {
             if (battleMode == BattleMode.PuzzlePreparation)

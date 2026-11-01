@@ -81,6 +81,7 @@ namespace FantasyDefense.UI
             CitadelLobbyManager.OnHeroStarPromoted += HandleHeroStarPromoted;
             CitadelSummonManager.OnGachaPullsCompleted += ShowGachaResults;
             CitadelSummonManager.OnPityCounterChanged += HandlePityCounterChanged;
+            FantasyDefense.Localization.CitadelLocalizationManager.OnLanguageChanged += HandleLanguageChanged;
 
             UpdateAllDisplays();
         }
@@ -91,6 +92,12 @@ namespace FantasyDefense.UI
             CitadelLobbyManager.OnHeroStarPromoted -= HandleHeroStarPromoted;
             CitadelSummonManager.OnGachaPullsCompleted -= ShowGachaResults;
             CitadelSummonManager.OnPityCounterChanged -= HandlePityCounterChanged;
+            FantasyDefense.Localization.CitadelLocalizationManager.OnLanguageChanged -= HandleLanguageChanged;
+        }
+
+        private void HandleLanguageChanged(FantasyDefense.Localization.AppLanguage lang)
+        {
+            UpdateAllDisplays();
         }
 
         private void Start()
@@ -224,19 +231,32 @@ namespace FantasyDefense.UI
             // 2. Banner Text
             if (bannerTitleText != null)
             {
-                bannerTitleText.text = "★ ALTAR PEMANGGILAN CITADEL ★";
+                bannerTitleText.text = FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                    "★ ALTAR PEMANGGILAN CITADEL ★",
+                    "★ CITADEL SUMMONING ALTAR ★"
+                );
             }
             if (bannerSubtitleText != null)
             {
-                bannerSubtitleText.text = "Rate-Up Pahlawan Baru: Wind Ranger (Pemanah Angin)!";
+                bannerSubtitleText.text = FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                    "Rate-Up Pahlawan Baru: Wind Ranger (Pemanah Angin)!",
+                    "New Hero Rate-Up: Wind Ranger (Wind Archer)!"
+                );
             }
 
             // 2b. Pity Counter Display
             UpdatePityDisplay();
 
             // 3. Tombol Biaya
-            if (singleSummonCostText != null) singleSummonCostText.text = "💎 100 GEMS";
-            if (multiSummonCostText != null) multiSummonCostText.text = "💎 900 GEMS (HEMAT 10%)";
+            if (singleSummonCostText != null)
+            {
+                singleSummonCostText.text = "💎 100 GEMS";
+            }
+            if (multiSummonCostText != null)
+            {
+                string discountTag = FantasyDefense.Localization.CitadelLocalizationManager.Text("HEMAT 10%", "SAVE 10%");
+                multiSummonCostText.text = $"💎 900 GEMS ({discountTag})";
+            }
 
             UpdateStarPromotionDisplay();
         }
@@ -275,7 +295,8 @@ namespace FantasyDefense.UI
             if (heroStarRankText != null)
             {
                 string starString = new string('★', profile.starRank) + new string('☆', 5 - profile.starRank);
-                heroStarRankText.text = $"Tingkat: {starString} ({profile.starRank}★) [Stat Multiplier: x{profile.GetStarMultiplier():0.00}]";
+                string rankLabel = FantasyDefense.Localization.CitadelLocalizationManager.Text("Tingkat", "Rank");
+                heroStarRankText.text = $"{rankLabel}: {starString} ({profile.starRank}★) [Stat Multiplier: x{profile.GetStarMultiplier():0.00}]";
             }
 
             int reqShards = profile.GetShardsRequiredForPromotion();
@@ -289,7 +310,8 @@ namespace FantasyDefense.UI
 
             if (shardProgressText != null)
             {
-                shardProgressText.text = isMaxStar ? "BINTANG MAKSIMAL" : $"{profile.heroShards} / {reqShards} Shards";
+                string maxLabel = FantasyDefense.Localization.CitadelLocalizationManager.Text("BINTANG MAKSIMAL", "MAX RANK");
+                shardProgressText.text = isMaxStar ? maxLabel : $"{profile.heroShards} / {reqShards} Shards";
             }
 
             if (promoteStarButton != null)
@@ -299,7 +321,9 @@ namespace FantasyDefense.UI
 
             if (promoteButtonText != null)
             {
-                promoteButtonText.text = isMaxStar ? "Maksimal" : $"Promosikan ke {profile.starRank + 1}★";
+                string maxBtn = FantasyDefense.Localization.CitadelLocalizationManager.Text("Maksimal", "Max Rank");
+                string promoPrefix = FantasyDefense.Localization.CitadelLocalizationManager.Text("Promosikan ke", "Promote to");
+                promoteButtonText.text = isMaxStar ? maxBtn : $"{promoPrefix} {profile.starRank + 1}★";
             }
         }
 

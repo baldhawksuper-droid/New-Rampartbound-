@@ -2580,10 +2580,17 @@ namespace Rampartbound.Editor
             PositionUI(hapToggle, 0.52f, 0.37f, 0.95f, 0.45f);
 
             var langBtn = CreateButton(setContent, "LanguageSwitchBtn", "🌐 GANTI BAHASA (SWITCH)", new Color(0.2f, 0.45f, 0.55f), Color.white, 20, defaultFont);
-            if (_btnSecondaryStone != null)
+            if (_tabHeroActive != null)
             {
                 var lImg = langBtn.GetComponent<Image>();
-                lImg.sprite = _btnSecondaryStone;
+                lImg.sprite = _tabHeroActive;
+                lImg.type = Image.Type.Sliced;
+                lImg.color = Color.white;
+            }
+            else if (_btnPrimaryGold != null)
+            {
+                var lImg = langBtn.GetComponent<Image>();
+                lImg.sprite = _btnPrimaryGold;
                 lImg.type = Image.Type.Sliced;
                 lImg.color = Color.white;
             }

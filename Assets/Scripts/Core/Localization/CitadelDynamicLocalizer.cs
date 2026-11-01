@@ -71,16 +71,79 @@ namespace FantasyDefense.Localization
             { "TUTUP", "CLOSE" },
             { "KLAIM SEMUA", "CLAIM ALL" },
 
+            // Sub-Panel Headers & Navigation Tabs
+            { "PETA DUNIA & SELEKSI STAGE", "WORLD MAP & STAGE SELECTION" },
+            { "MANAJEMEN & UPGRADE PAHLAWAN", "HERO ROSTER & UPGRADE" },
+            { "BALAI PEMANGGILAN CITADEL", "CITADEL SUMMONING HALL" },
+            { "TOKO CITADEL & IN-APP PURCHASE", "CITADEL STORE & IN-APP PURCHASE" },
+            { "PANDAI BESI & RELIC FORGE", "RELIC FORGE & BLACKSMITH" },
+            { "POHON TALENTA & BERKAH BENTENG", "TALENT TREE & CITADEL BLESSINGS" },
+            { "MISI HARIAN & PENCAPAIAN", "DAILY QUESTS & ACHIEVEMENTS" },
+            { "ALIANSI GUILD & SERBUAN TITAN", "GUILD ALLIANCE & TITAN RAID" },
+            { "CITADEL SEASON PASS (30 TIERS)", "CITADEL SEASON PASS (30 TIERS)" },
+            { "PENGATURAN AUDIO & SISTEM", "AUDIO & SYSTEM SETTINGS" },
+            { "ENDLESS ABYSSAL TRIAL", "ENDLESS ABYSSAL TRIAL" },
+
+            // Dock & Navigation
+            { "PETA", "MAP" },
+            { "HERO", "HEROES" },
+            { "GACHA", "SUMMON" },
+            { "TOKO", "STORE" },
+            { "Peta", "Map" },
+            { "Hero", "Heroes" },
+            { "Gacha", "Summon" },
+            { "Toko", "Store" },
+
+            // World Map & Stage Details
+            { "Total Bintang", "Total Stars" },
+            { "⚡ BIAYA ENERGI", "⚡ ENERGY COST" },
+            { "TERSEDIA", "AVAILABLE" },
+            { "🛡️ CP BENTENG", "🛡️ CITADEL CP" },
+            { "TIM KAMU", "YOUR TEAM" },
+            { "UNGGUL!", "SUPERIOR!" },
+            { "WASPADA!", "WARNING!" },
+            { "⚡ KESULITAN", "⚡ DIFFICULTY" },
+            { "🎁 HADIAH PERTAMA", "🎁 FIRST CLEAR REWARD" },
+            { "🎁 HADIAH PERTAMA: [SUDAH DIKLAIM]", "🎁 FIRST REWARD: [CLAIMED]" },
+            { "REWARD GRINDING", "REPEAT VICTORY REWARD" },
+            { "Aman (Mudah)", "Safe (Easy)" },
+            { "Seimbang (Normal)", "Balanced (Normal)" },
+            { "Menantang (Keras)", "Challenging (Hard)" },
+            { "Sangat Berbahaya (Underleveled)", "Very Dangerous (Underleveled)" },
+            { "Outpost Meadow (Padang Rumput Depan)", "Outpost Meadow" },
+            { "Fortress Siege (Pengepungan Benteng Batu)", "Fortress Siege" },
+            { "Perkemahan Mire Scrapper", "Mire Scrapper Camp" },
+            { "Menara Pantau Runtuh", "Collapsed Watchtower" },
+            { "Lembah Obsidian Maw", "Obsidian Maw Valley" },
+            { "Persimpangan Terkutuk", "Cursed Crossroads" },
+            { "Reruntuhan Kuil Kuno", "Ancient Temple Ruins" },
+            { "Punggungan Bukit Karang", "Crag Ridge Crest" },
+            { "Gerbang Benteng Kehampaan", "Void Citadel Gate" },
+            { "Sarang Malakor Void Tyrant [BOSS]", "Malakor's Abyssal Lair [BOSS]" },
+            { "Pertahankan gerbang terluar kerajaan dari serbuan gelombang patroli goblin.", "Defend the royal outskirts from goblin patrol waves." },
+
             // Settings & Audio
-            { "PENGATURAN SISTEM & AUDIO", "SYSTEM & AUDIO SETTINGS" },
-            { "🌐 GANTI BAHASA (SWITCH)", "🌐 SWITCH LANGUAGE (ID/EN)" },
-            { "Volume Master", "Master Volume" },
-            { "Volume BGM", "BGM Volume" },
-            { "Volume SFX", "SFX Volume" },
-            { "Mode Hemat Baterai (30 FPS)", "Battery Saver (30 FPS)" },
-            { "Getaran Sentuhan (Haptic)", "Haptic Feedback" },
+            { "60 FPS (Halus)", "60 FPS (Smooth)" },
+            { "Mode Hemat Baterai", "Battery Saver Mode" },
             { "Getaran Haptic Ponsel", "Haptic Vibration" },
-            { "🔊 UJI COBA SUARA EFEK (TEST SFX)", "🔊 TEST SOUND EFFECTS (SFX)" },
+            { "📳 GETARAN: AKTIF", "📳 HAPTICS: ON" },
+            { "📴 GETARAN: NONAKTIF", "📴 HAPTICS: OFF" },
+            { "Volume Master", "Master Volume" },
+            { "Volume Musik (BGM)", "BGM Music Volume" },
+            { "Volume Efek (SFX)", "SFX Sound Volume" },
+            { "Bungkam", "Mute" },
+
+            // Hero Roles
+            { "Frontline Melee DPS Striker (Tebasan Ganda & Badai Pedang)", "Frontline Melee DPS Striker (Dual Slash & Blade Storm)" },
+            { "Ranged Magic AoE & Kontrol Massa (Meteor Siang & Api Purba)", "Ranged Magic AoE & Crowd Control (Noon Meteor & Ancient Fire)" },
+            { "Heavy Frontline Tank & Crowd Control (Hantaman Palu & Stun)", "Heavy Frontline Tank & Crowd Control (Hammer Slam & Stun)" },
+            { "Long-Range Physical DPS & Crowd Control (Panah Badai & Tornado Zephyr)", "Long-Range Physical DPS & Crowd Control (Storm Arrows & Zephyr Tornado)" },
+
+            // Summon Hall Banner
+            { "PEMANGGILAN KHUSUS PAHLAWAN", "HERO RATE-UP SUMMON" },
+            { "Rate-Up 50%: Wind Ranger (Pemanah Angin)", "50% Rate-Up: Wind Ranger (Wind Archer)" },
+            { "PANGGIL 1x\n(100 Gems)", "SUMMON 1x\n(100 Gems)" },
+            { "PANGGIL 10x\n(900 Gems)", "SUMMON 10x\n(900 Gems)" },
 
             // Store & Economy
             { "TOKO CITADEL", "CITADEL STORE" },
@@ -158,22 +221,7 @@ namespace FantasyDefense.Localization
             {
                 if (txt == null || string.IsNullOrWhiteSpace(txt.text)) continue;
 
-                string current = txt.text.Trim();
-
-                if (isEnglish)
-                {
-                    if (IdToEnMap.TryGetValue(current, out string translated))
-                    {
-                        txt.text = translated;
-                    }
-                }
-                else
-                {
-                    if (EnToIdMap.TryGetValue(current, out string translated))
-                    {
-                        txt.text = translated;
-                    }
-                }
+                TranslateTextComponent(txt, isEnglish);
             }
         }
 
@@ -188,21 +236,37 @@ namespace FantasyDefense.Localization
             foreach (var txt in allTexts)
             {
                 if (txt == null || string.IsNullOrWhiteSpace(txt.text)) continue;
-                string trimmed = txt.text.Trim();
 
-                if (isEnglish)
+                TranslateTextComponent(txt, isEnglish);
+            }
+        }
+
+        private static void TranslateTextComponent(Text txt, bool isEnglish)
+        {
+            string raw = txt.text.Trim();
+            bool hasBold = raw.StartsWith("<b>") && raw.EndsWith("</b>");
+            string inner = hasBold ? raw.Substring(3, raw.Length - 7).Trim() : raw;
+
+            if (isEnglish)
+            {
+                if (IdToEnMap.TryGetValue(raw, out string translatedDirect))
                 {
-                    if (IdToEnMap.TryGetValue(trimmed, out string translated))
-                    {
-                        txt.text = translated;
-                    }
+                    txt.text = translatedDirect;
                 }
-                else
+                else if (IdToEnMap.TryGetValue(inner, out string translatedInner))
                 {
-                    if (EnToIdMap.TryGetValue(trimmed, out string translated))
-                    {
-                        txt.text = translated;
-                    }
+                    txt.text = hasBold ? $"<b>{translatedInner}</b>" : translatedInner;
+                }
+            }
+            else
+            {
+                if (EnToIdMap.TryGetValue(raw, out string translatedDirect))
+                {
+                    txt.text = translatedDirect;
+                }
+                else if (EnToIdMap.TryGetValue(inner, out string translatedInner))
+                {
+                    txt.text = hasBold ? $"<b>{translatedInner}</b>" : translatedInner;
                 }
             }
         }
