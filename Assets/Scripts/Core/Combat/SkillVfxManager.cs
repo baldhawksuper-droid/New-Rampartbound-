@@ -188,9 +188,20 @@ namespace FantasyDefense.Combat
 
             SpawnFloatingCombatNumber(pos, text, textColor, scale, isCrit);
 
-            if (isCrit && MobileCameraAdapter.Instance != null)
+            if (isCrit)
             {
-                MobileCameraAdapter.Instance.TriggerScreenShake(0.10f, 0.08f);
+                if (AudioManager.Instance != null)
+                {
+                    AudioManager.Instance.PlaySound(SoundType.CriticalHitChime, 1.15f);
+                }
+                if (DevicePerformanceManager.Instance != null && DevicePerformanceManager.Instance.IsHapticsEnabled)
+                {
+                    DevicePerformanceManager.Instance.TriggerHaptic(HapticFeedbackType.Medium);
+                }
+                if (MobileCameraAdapter.Instance != null)
+                {
+                    MobileCameraAdapter.Instance.TriggerScreenShake(0.10f, 0.08f);
+                }
             }
         }
 

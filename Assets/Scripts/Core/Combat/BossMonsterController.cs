@@ -125,7 +125,26 @@ namespace FantasyDefense.Combat
                 }
             }
 
-            // Muat variasi sprite pose serang orisinal spesifik arketipe Mini-Boss
+            // Muat variasi sprite pose jalan/diam & serang orisinal spesifik arketipe Mini-Boss
+            string customIdleName = bossArchetype switch
+            {
+                BossArchetype.ForestGolem => "Monster_ForestGolem",
+                BossArchetype.FrostWyrm => "Monster_FrostWyrm",
+                _ => null
+            };
+            if (!string.IsNullOrEmpty(customIdleName))
+            {
+                Sprite customIdle = Resources.Load<Sprite>($"Sprites/Monsters/{customIdleName}");
+                if (customIdle != null)
+                {
+                    if (spriteRenderer != null)
+                    {
+                        spriteRenderer.sprite = customIdle;
+                    }
+                    walkFrames = new Sprite[] { customIdle };
+                }
+            }
+
             string customAtkName = bossArchetype switch
             {
                 BossArchetype.ForestGolem => "Monster_ForestGolem_Attack",

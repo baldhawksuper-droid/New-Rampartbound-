@@ -54,7 +54,8 @@ namespace FantasyDefense.Audio
         GolemFistSmash,
         FrostWyrmBlizzard,
         PermafrostCrystalShatter,
-        TwinFocusChime
+        TwinFocusChime,
+        CriticalHitChime
     }
 
     public enum AudioSfxType
@@ -707,6 +708,9 @@ namespace FantasyDefense.Audio
 
             // Audio Khusus Tactile Twin Gem Focus (Resonansi Lonceng Kristal Harmonis Emas)
             proceduralClipCache[SoundType.TwinFocusChime] = CreateArpeggioClip("TwinFocusChime", new float[] { 783.99f, 1046.50f, 1318.51f, 1567.98f }, 0.038f);
+
+            // Audio Khusus Critical Hit Chime (Resonansi Logam Emas Tajam Berkekuatan Tinggi)
+            proceduralClipCache[SoundType.CriticalHitChime] = CreateArpeggioClip("CriticalHitChime", new float[] { 1046.50f, 1567.98f, 2093.00f, 3135.96f }, 0.024f);
         }
 
         private AudioClip CreateToneClip(string name, float duration, float startFreq, float endFreq)
