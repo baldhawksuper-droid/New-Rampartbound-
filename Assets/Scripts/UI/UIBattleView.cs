@@ -1508,10 +1508,40 @@ namespace FantasyDefense.UI
 
             if (Audio.AudioManager.Instance != null)
             {
-                Audio.AudioManager.Instance.PlaySound(Audio.SoundType.ButtonClick);
+                float pitch = currentSpeedMode == 1 ? 1.0f : (currentSpeedMode == 2 ? 1.15f : 1.30f);
+                Audio.AudioManager.Instance.PlaySound(Audio.SoundType.ButtonClick, pitch);
+            }
+
+            if (Mobile.DevicePerformanceManager.Instance != null && Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+            {
+                Mobile.DevicePerformanceManager.Instance.TriggerHaptic(Mobile.HapticFeedbackType.Selection);
+            }
+
+            if (speedToggleButton != null && gameObject.activeInHierarchy)
+            {
+                StartCoroutine(PunchSpeedButtonRoutine());
             }
 
             Debug.Log($"[UIBattleView] Kecepatan Tempur Diubah: {currentSpeedMode}x (timeScale: {targetScale})");
+        }
+
+        private IEnumerator PunchSpeedButtonRoutine()
+        {
+            if (speedToggleButton == null) yield break;
+            Transform btnTr = speedToggleButton.transform;
+            Vector3 originalScale = Vector3.one;
+
+            float elapsed = 0f;
+            float dur = 0.15f;
+            while (elapsed < dur)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float progress = elapsed / dur;
+                float scale = 1.0f + Mathf.Sin(progress * Mathf.PI) * 0.15f;
+                btnTr.localScale = new Vector3(scale, scale, 1f);
+                yield return null;
+            }
+            btnTr.localScale = originalScale;
         }
 
         public void TogglePause()

@@ -821,6 +821,28 @@ namespace FantasyDefense.Combat
             return baseCol;
         }
 
+        protected void UpdateEffectiveVisualState()
+        {
+            if (spriteRenderer == null || isDead) return;
+
+            if (isBurned)
+            {
+                spriteRenderer.color = new Color(1f, 0.55f, 0.2f, 1f); // Orange fire burn tint
+            }
+            else if (isStunned)
+            {
+                spriteRenderer.color = new Color(0.85f, 0.85f, 0.4f, 1f); // Yellow lightning stun tint
+            }
+            else if (isSlowed)
+            {
+                spriteRenderer.color = new Color(0.6f, 0.85f, 1f, 1f); // Frost blue slow tint
+            }
+            else
+            {
+                spriteRenderer.color = GetEffectiveThemeColor();
+            }
+        }
+
         public void ApplyStun(float duration)
         {
             if (isDead) return;
@@ -830,13 +852,28 @@ namespace FantasyDefense.Combat
         private IEnumerator StunRoutine(float duration)
         {
             isStunned = true;
-            Color originalColor = GetEffectiveThemeColor();
-            if (spriteRenderer != null) spriteRenderer.color = new Color(0.7f, 0.7f, 1f, 1f); // Stun tint
+            UpdateEffectiveVisualState();
 
-            yield return new WaitForSeconds(duration);
+            float elapsed = 0f;
+            while (elapsed < duration && !isDead)
+            {
+                if (SkillVfxManager.Instance != null)
+                {
+                    SkillVfxManager.Instance.SpawnProceduralParticleBurst(
+                        transform.position + Vector3.up * 0.65f,
+                        Color.yellow,
+                        Color.white,
+                        3,
+                        1.2f,
+                        spriteRenderer != null ? spriteRenderer.sortingOrder + 10 : 55
+                    );
+                }
+                yield return new WaitForSeconds(0.35f);
+                elapsed += 0.35f;
+            }
 
             isStunned = false;
-            if (spriteRenderer != null && !isDead) spriteRenderer.color = originalColor;
+            UpdateEffectiveVisualState();
         }
 
         public void ApplySlow(float slowPercent, float duration)
@@ -850,11 +887,29 @@ namespace FantasyDefense.Combat
             isSlowed = true;
             float baseSpeed = monsterData != null ? monsterData.moveSpeed : 1.5f;
             currentMoveSpeed = baseSpeed * (1f - Mathf.Clamp01(slowPercent));
+            UpdateEffectiveVisualState();
 
-            yield return new WaitForSeconds(duration);
+            float elapsed = 0f;
+            while (elapsed < duration && !isDead)
+            {
+                if (SkillVfxManager.Instance != null)
+                {
+                    SkillVfxManager.Instance.SpawnProceduralParticleBurst(
+                        transform.position + Vector3.down * 0.25f,
+                        new Color(0.6f, 0.9f, 1f),
+                        Color.white,
+                        3,
+                        0.9f,
+                        spriteRenderer != null ? spriteRenderer.sortingOrder + 10 : 55
+                    );
+                }
+                yield return new WaitForSeconds(0.40f);
+                elapsed += 0.40f;
+            }
 
             currentMoveSpeed = baseSpeed;
             isSlowed = false;
+            UpdateEffectiveVisualState();
         }
 
         public void ApplyDefenseDebuff(float percent, float duration)
@@ -881,9 +936,7 @@ namespace FantasyDefense.Combat
             isBurned = true;
             float elapsed = 0f;
             float tickInterval = 0.5f;
-
-            Color originalColor = GetEffectiveThemeColor();
-            if (spriteRenderer != null) spriteRenderer.color = new Color(1f, 0.5f, 0.2f, 1f); // Orange burn tint
+            UpdateEffectiveVisualState();
 
             while (elapsed < duration && !isDead)
             {
@@ -893,21 +946,32 @@ namespace FantasyDefense.Combat
                 if (!isDead)
                 {
                     TakeDamage(damagePerSecond * tickInterval, false);
+                    if (SkillVfxManager.Instance != null)
+                    {
+                        Vector3 flamePos = transform.position + new Vector3(UnityEngine.Random.Range(-0.2f, 0.2f), UnityEngine.Random.Range(-0.1f, 0.3f), 0f);
+                        SkillVfxManager.Instance.SpawnProceduralParticleBurst(
+                            flamePos,
+                            new Color(1f, 0.35f, 0.05f),
+                            new Color(1f, 0.85f, 0.2f),
+                            5,
+                            1.8f,
+                            spriteRenderer != null ? spriteRenderer.sortingOrder + 10 : 55
+                        );
+                    }
                 }
             }
 
             isBurned = false;
-            if (spriteRenderer != null && !isDead) spriteRenderer.color = originalColor;
+            UpdateEffectiveVisualState();
         }
 
         private IEnumerator FlashDamageColor(Color flashColor)
         {
             if (spriteRenderer == null) yield break;
 
-            Color original = GetEffectiveThemeColor();
             spriteRenderer.color = flashColor;
             yield return new WaitForSeconds(0.08f);
-            if (spriteRenderer != null && !isDead) spriteRenderer.color = original;
+            UpdateEffectiveVisualState();
         }
 
         private static readonly System.Collections.Generic.Dictionary<MonsterType, Sprite> cachedProceduralMonsterSprites = new System.Collections.Generic.Dictionary<MonsterType, Sprite>();
