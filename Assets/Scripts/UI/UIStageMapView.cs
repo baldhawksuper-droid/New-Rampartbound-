@@ -388,7 +388,13 @@ namespace FantasyDefense.UI
                 }
             }
 
-            if (stageCodeText != null) stageCodeText.text = $"<b>STAGE {stage.stageCode}</b>";
+            if (stageCodeText != null)
+            {
+                string cleanCode = stage.stageCode != null 
+                    ? stage.stageCode.Replace("Stage ", "").Replace("STAGE ", "").Trim() 
+                    : $"{stage.stageId}";
+                stageCodeText.text = $"<b>STAGE {cleanCode}</b>";
+            }
             if (stageTitleText != null) stageTitleText.text = $"<b>{stage.stageTitle.ToUpper()}</b>";
 
             if (battleModeText != null)
@@ -444,7 +450,7 @@ namespace FantasyDefense.UI
                 else
                 {
                     string firstLabel = FantasyDefense.Localization.CitadelLocalizationManager.Text("🎁 HADIAH PERTAMA", "🎁 FIRST REWARD");
-                    firstClearRewardsText.text = $"{firstLabel}: <color=#FFD700>🪙 +{stage.firstClearGold:N0}</color>  |  <color=#00FFFF>💎 +{stage.firstClearGems:N0}</color>";
+                    firstClearRewardsText.text = $"{firstLabel}: <color=#FFD700>🪙 +{stage.firstClearGold:N0} Gold</color>  |  <color=#00FFFF>💎 +{stage.firstClearGems:N0} Gems</color>";
                 }
             }
 

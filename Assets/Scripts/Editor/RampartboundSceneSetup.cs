@@ -1437,15 +1437,11 @@ namespace Rampartbound.Editor
             }
             PositionUI(detailPanel, 0.04f, 0.04f, 0.96f, 0.52f);
 
-            // Close button X di sudut kanan atas panel detail
-            var closeDetailBtn = CreateButton(detailPanel.transform, "CloseDetailButton", "✕", new Color(0.6f, 0.2f, 0.2f), Color.white, 20, defaultFont);
-            if (_btnCloseX != null)
-            {
-                var cbImg = closeDetailBtn.GetComponent<Image>();
-                cbImg.sprite = _btnCloseX;
-                cbImg.type = Image.Type.Sliced;
-                cbImg.color = Color.white;
-            }
+            // Close button X di sudut kanan atas panel detail (slate/gold kompak, tidak menduplikasi tombol X modal utama)
+            var closeDetailBtn = CreateButton(detailPanel.transform, "CloseDetailButton", "✕", new Color(0.14f, 0.18f, 0.28f, 0.95f), new Color(1f, 0.90f, 0.70f), 18, defaultFont);
+            var cbOutline = closeDetailBtn.AddComponent<Outline>();
+            cbOutline.effectColor = new Color(0.75f, 0.60f, 0.25f, 0.90f);
+            cbOutline.effectDistance = new Vector2(1.5f, -1.5f);
             PositionUI(closeDetailBtn, 0.90f, 0.86f, 0.97f, 0.96f);
             closeDetailBtn.GetComponent<Button>().onClick.AddListener(() => detailPanel.SetActive(false));
 
@@ -3298,8 +3294,11 @@ namespace Rampartbound.Editor
             bg.transform.SetParent(barObj.transform, false);
             PositionUI(bg, 0f, 0.15f, 1f, 0.85f);
             var bgImg = bg.GetComponent<Image>();
-            bgImg.color = new Color(0.08f, 0.11f, 0.18f, 0.95f);
+            bgImg.color = new Color(0.06f, 0.09f, 0.15f, 0.95f);
             bgImg.raycastTarget = false;
+            var bgOutline = bg.AddComponent<Outline>();
+            bgOutline.effectColor = new Color(0.40f, 0.50f, 0.65f, 0.50f);
+            bgOutline.effectDistance = new Vector2(1f, -1f);
 
             var fillArea = new GameObject("Fill Area", typeof(RectTransform));
             fillArea.transform.SetParent(barObj.transform, false);
