@@ -74,6 +74,10 @@ namespace FantasyDefense.UI
         [SerializeField] private Text bossTitleText;
         [SerializeField] private Text bossHpText;
         [SerializeField] private GameObject bossEnrageBanner;
+        [SerializeField] private Image bossAvatarImage;
+        [SerializeField] private Image bossTierBadgeImage;
+        [SerializeField] private Text bossTierLabel;
+        [SerializeField] private Image bossHpSliderFillImage;
 
         [Header("Battlefield Weather Affixes HUD (Sprint 12)")]
         [SerializeField] private GameObject weatherBadgeContainer;
@@ -792,6 +796,115 @@ namespace FantasyDefense.UI
             if (bossHpText != null)
             {
                 bossHpText.text = $"{Mathf.RoundToInt(boss.CurrentHealth)} / {Mathf.RoundToInt(boss.MaxHealth)} (100%)";
+            }
+
+            // Visual Tier & Avatar Identification (Point 3 - Mini-Boss Standee / Unique Head-Icon & Tier Badging)
+            UpdateBossTierVisuals(boss);
+        }
+
+        private void UpdateBossTierVisuals(BossMonsterController boss)
+        {
+            if (boss == null) return;
+
+            // 1. Avatar Sprite
+            if (bossAvatarImage != null)
+            {
+                Sprite avatarSprite = null;
+                if (boss.Data != null && boss.Data.idleSprite != null)
+                {
+                    avatarSprite = boss.Data.idleSprite;
+                }
+                else
+                {
+                    var sr = boss.GetComponent<SpriteRenderer>();
+                    if (sr != null) avatarSprite = sr.sprite;
+                }
+
+                if (avatarSprite != null)
+                {
+                    bossAvatarImage.sprite = avatarSprite;
+                    bossAvatarImage.gameObject.SetActive(true);
+                }
+                else
+                {
+                    bossAvatarImage.gameObject.SetActive(false);
+                }
+            }
+
+            // 2. Tier Badge & Label Specialization
+            Sprite miniBossBadge = Resources.Load<Sprite>("Sprites/UI/UI_Badge_MiniBoss_Horns");
+            Sprite finalBossBadge = Resources.Load<Sprite>("Sprites/UI/UI_Badge_FinalBoss_Crown");
+
+            switch (boss.Archetype)
+            {
+                case BossArchetype.ForestGolem:
+                    if (bossTierLabel != null)
+                    {
+                        bossTierLabel.text = "★ ELITE MINI-BOSS ★";
+                        bossTierLabel.color = new Color(0.40f, 0.95f, 0.45f); // Forest Emerald
+                    }
+                    if (bossTierBadgeImage != null)
+                    {
+                        bossTierBadgeImage.sprite = miniBossBadge;
+                        bossTierBadgeImage.gameObject.SetActive(true);
+                    }
+                    if (bossHpSliderFillImage != null)
+                    {
+                        bossHpSliderFillImage.color = new Color(0.25f, 0.85f, 0.35f);
+                    }
+                    break;
+
+                case BossArchetype.FrostWyrm:
+                    if (bossTierLabel != null)
+                    {
+                        bossTierLabel.text = "★ ELITE MINI-BOSS ★";
+                        bossTierLabel.color = new Color(0.45f, 0.88f, 1.0f); // Glacial Ice Cyan
+                    }
+                    if (bossTierBadgeImage != null)
+                    {
+                        bossTierBadgeImage.sprite = miniBossBadge;
+                        bossTierBadgeImage.gameObject.SetActive(true);
+                    }
+                    if (bossHpSliderFillImage != null)
+                    {
+                        bossHpSliderFillImage.color = new Color(0.35f, 0.82f, 1.0f);
+                    }
+                    break;
+
+                case BossArchetype.ObsidianMaw:
+                    if (bossTierLabel != null)
+                    {
+                        bossTierLabel.text = "★ ELITE MINI-BOSS ★";
+                        bossTierLabel.color = new Color(1.0f, 0.65f, 0.20f); // Magma Amber
+                    }
+                    if (bossTierBadgeImage != null)
+                    {
+                        bossTierBadgeImage.sprite = miniBossBadge;
+                        bossTierBadgeImage.gameObject.SetActive(true);
+                    }
+                    if (bossHpSliderFillImage != null)
+                    {
+                        bossHpSliderFillImage.color = new Color(0.95f, 0.45f, 0.15f);
+                    }
+                    break;
+
+                case BossArchetype.TitanWarlord:
+                default:
+                    if (bossTierLabel != null)
+                    {
+                        bossTierLabel.text = "💀 FINAL BOSS TITAN 💀";
+                        bossTierLabel.color = new Color(1.0f, 0.30f, 0.30f); // Abyssal Crimson
+                    }
+                    if (bossTierBadgeImage != null)
+                    {
+                        bossTierBadgeImage.sprite = finalBossBadge;
+                        bossTierBadgeImage.gameObject.SetActive(true);
+                    }
+                    if (bossHpSliderFillImage != null)
+                    {
+                        bossHpSliderFillImage.color = new Color(0.95f, 0.20f, 0.20f);
+                    }
+                    break;
             }
         }
 

@@ -963,15 +963,40 @@ namespace Rampartbound.Editor
                 bcImg.type = Image.Type.Sliced;
                 bcImg.color = Color.white;
             }
-            PositionUI(bossBarCont, 0.10f, 0.84f, 0.90f, 0.94f);
+            PositionUI(bossBarCont, 0.06f, 0.83f, 0.94f, 0.94f);
 
-            var bName = CreateText(bossBarCont.transform, "BossNameText", "💀 RAJA TITAN ABYSSAL", 22, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(1f, 0.35f, 0.35f), defaultFont);
-            PositionUI(bName.gameObject, 0.04f, 0.55f, 0.50f, 0.95f);
-            var bTitleTxt = CreateText(bossBarCont.transform, "BossTitleText", "Penghancur Gerbang Benteng", 18, FontStyle.Italic, TextAnchor.MiddleLeft, new Color(0.9f, 0.85f, 0.7f), defaultFont);
-            PositionUI(bTitleTxt.gameObject, 0.52f, 0.55f, 0.96f, 0.95f);
+            // Avatar Container & Tier Horns/Crown Badge
+            var bAvatarCont = CreatePanel(bossBarCont.transform, "BossAvatarContainer", new Color(0.12f, 0.15f, 0.22f, 0.95f));
+            PositionUI(bAvatarCont, 0.02f, 0.10f, 0.16f, 0.90f);
+            if (_frameStoneBastion != null)
+            {
+                var avFrImg = bAvatarCont.GetComponent<Image>();
+                avFrImg.sprite = _frameStoneBastion;
+                avFrImg.type = Image.Type.Sliced;
+            }
+
+            var bAvatarImgObj = new GameObject("BossAvatarImage");
+            bAvatarImgObj.transform.SetParent(bAvatarCont.transform, false);
+            var bAvatarImg = bAvatarImgObj.AddComponent<Image>();
+            bAvatarImg.preserveAspect = true;
+            PositionUI(bAvatarImgObj, 0.10f, 0.10f, 0.90f, 0.90f);
+
+            var bTierBadgeObj = new GameObject("BossTierBadgeImage");
+            bTierBadgeObj.transform.SetParent(bossBarCont.transform, false);
+            var bTierBadgeImg = bTierBadgeObj.AddComponent<Image>();
+            bTierBadgeImg.preserveAspect = true;
+            PositionUI(bTierBadgeObj, 0.00f, 0.52f, 0.10f, 1.15f);
+
+            var bTierLabel = CreateText(bossBarCont.transform, "BossTierLabel", "★ ELITE MINI-BOSS ★", 15, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(0.40f, 0.95f, 0.45f), defaultFont);
+            PositionUI(bTierLabel.gameObject, 0.18f, 0.70f, 0.55f, 0.95f);
+
+            var bName = CreateText(bossBarCont.transform, "BossNameText", "💀 RAJA TITAN ABYSSAL", 20, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(1f, 0.35f, 0.35f), defaultFont);
+            PositionUI(bName.gameObject, 0.18f, 0.44f, 0.58f, 0.72f);
+            var bTitleTxt = CreateText(bossBarCont.transform, "BossTitleText", "Penghancur Gerbang Benteng", 16, FontStyle.Italic, TextAnchor.MiddleLeft, new Color(0.9f, 0.85f, 0.7f), defaultFont);
+            PositionUI(bTitleTxt.gameObject, 0.58f, 0.44f, 0.98f, 0.95f);
 
             var bHpSliderObj = CreateProgressBar(bossBarCont.transform, "BossHpSlider", 0, 10000, 10000, new Color(0.95f, 0.25f, 0.25f));
-            PositionUI(bHpSliderObj, 0.04f, 0.12f, 0.96f, 0.50f);
+            PositionUI(bHpSliderObj, 0.18f, 0.10f, 0.98f, 0.42f);
             if (_sliderTrackStone != null)
             {
                 var bg = bHpSliderObj.transform.Find("Background")?.GetComponent<Image>();
@@ -981,8 +1006,9 @@ namespace Rampartbound.Editor
                     bg.type = Image.Type.Sliced;
                 }
             }
-            var bHpTxt = CreateText(bossBarCont.transform, "BossHpText", "10,000 / 10,000 (100%)", 18, FontStyle.Bold, TextAnchor.MiddleCenter, Color.white, defaultFont);
-            PositionUI(bHpTxt.gameObject, 0.04f, 0.12f, 0.96f, 0.50f);
+            var bHpSliderFill = bHpSliderObj.transform.Find("Fill Area/Fill")?.GetComponent<Image>() ?? bHpSliderObj.transform.Find("Fill")?.GetComponent<Image>();
+            var bHpTxt = CreateText(bossBarCont.transform, "BossHpText", "10,000 / 10,000 (100%)", 17, FontStyle.Bold, TextAnchor.MiddleCenter, Color.white, defaultFont);
+            PositionUI(bHpTxt.gameObject, 0.18f, 0.10f, 0.98f, 0.42f);
 
             var bEnrageBanner = CreatePanel(battleHudObj.transform, "BossEnrageBanner", new Color(0.85f, 0.15f, 0.15f, 0.95f));
             if (_bannerTacticalPhase != null)
@@ -1167,6 +1193,10 @@ namespace Rampartbound.Editor
             battleSO.FindProperty("bossTitleText").objectReferenceValue = bTitleTxt;
             battleSO.FindProperty("bossHpText").objectReferenceValue = bHpTxt;
             battleSO.FindProperty("bossEnrageBanner").objectReferenceValue = bEnrageBanner;
+            battleSO.FindProperty("bossAvatarImage").objectReferenceValue = bAvatarImg;
+            battleSO.FindProperty("bossTierBadgeImage").objectReferenceValue = bTierBadgeImg;
+            battleSO.FindProperty("bossTierLabel").objectReferenceValue = bTierLabel;
+            battleSO.FindProperty("bossHpSliderFillImage").objectReferenceValue = bHpSliderFill;
             battleSO.ApplyModifiedProperties();
 
             battleHudObj.SetActive(false);
