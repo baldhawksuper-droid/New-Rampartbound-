@@ -99,25 +99,58 @@ namespace FantasyDefense.Metagame
                 stage.firstClearGold = 350 + (i * 75);
                 stage.firstClearGems = 60 + (i * 15);
                 stage.firstClearExp = 120 + (i * 25);
-                stage.firstClearShards = i == 9 ? 35 : (i == 4 ? 25 : 15);
-                stage.firstClearShardHero = (UnitType)(i % 4);
-
-                if (i == 9)
-                {
-                    stage.firstClearGear = new EquipmentItem("EQ_LEG_01", "Mahkota Abyssal Purba", EquipmentSlot.Relic, EquipmentRarity.Legendary, 5, 25f, 120f, 0.08f, 0.15f);
-                }
-                else if (i == 4) // Stage 1-5 Mini-boss checkpoint
-                {
-                    stage.firstClearGear = new EquipmentItem("EQ_EPC_02", "Pedang Komandan Penjaga", EquipmentSlot.Weapon, EquipmentRarity.Epic, 3, 20f, 0f, 0.05f);
-                }
-                else if (i == 2) // Stage 1-3: Drop Zirah Pertama Pemain
-                {
-                    stage.firstClearGear = new EquipmentItem("EQ_RAR_01", "Zirah Pelindung Citadel", EquipmentSlot.Armor, EquipmentRarity.Rare, 1, 0f, 60f, 0f, 0.08f);
-                }
 
                 stage.repeatClearGold = 120 + (i * 20);
                 stage.repeatClearExp = 40 + (i * 10);
                 stage.repeatClearGems = 10 + (i * 2);
+
+                if (i == 9) // Stage 1-10 Final Boss Titan Warlord
+                {
+                    stage.firstClearShards = 35;
+                    stage.firstClearShardHero = UnitType.Cedric;
+                    stage.firstClearGear = new EquipmentItem("EQ_LEG_01", "Mahkota Abyssal Purba", EquipmentSlot.Relic, EquipmentRarity.Legendary, 5, 25f, 120f, 0.08f, 0.15f);
+                    stage.repeatClearShards = 4;
+                    stage.repeatClearShardHero = UnitType.Cedric;
+                    stage.repeatClearGems = 35;
+                }
+                else if (i == 7) // Stage 1-8 Mini-Boss Glacial Frost Wyrm
+                {
+                    stage.firstClearShards = 30;
+                    stage.firstClearShardHero = UnitType.Rabbit;
+                    stage.firstClearGear = new EquipmentItem("EQ_EPC_03", "Taring Kristal Frost Wyrm", EquipmentSlot.Relic, EquipmentRarity.Epic, 4, 18f, 80f, 0.08f, 0.10f);
+                    stage.repeatClearShards = 3;
+                    stage.repeatClearShardHero = UnitType.Rabbit;
+                    stage.repeatClearGems = 25;
+                }
+                else if (i == 4) // Stage 1-5 Mini-boss checkpoint
+                {
+                    stage.firstClearShards = 25;
+                    stage.firstClearShardHero = UnitType.Wind;
+                    stage.firstClearGear = new EquipmentItem("EQ_EPC_02", "Pedang Komandan Penjaga", EquipmentSlot.Weapon, EquipmentRarity.Epic, 3, 20f, 0f, 0.05f);
+                    stage.repeatClearShards = 2;
+                    stage.repeatClearShardHero = UnitType.Wind;
+                    stage.repeatClearGems = 20;
+                }
+                else if (i == 3) // Stage 1-4 Mini-Boss Ancient Ironwood Golem
+                {
+                    stage.firstClearShards = 25;
+                    stage.firstClearShardHero = UnitType.Rose;
+                    stage.firstClearGear = new EquipmentItem("EQ_RAR_02", "Amulet Getah Kayu Purba", EquipmentSlot.Relic, EquipmentRarity.Rare, 2, 8f, 50f, 0.04f, 0.06f);
+                    stage.repeatClearShards = 2;
+                    stage.repeatClearShardHero = UnitType.Rose;
+                    stage.repeatClearGems = 18;
+                }
+                else if (i == 2) // Stage 1-3: Drop Zirah Pertama Pemain
+                {
+                    stage.firstClearShards = 15;
+                    stage.firstClearShardHero = UnitType.Cedric;
+                    stage.firstClearGear = new EquipmentItem("EQ_RAR_01", "Zirah Pelindung Citadel", EquipmentSlot.Armor, EquipmentRarity.Rare, 1, 0f, 60f, 0f, 0.08f);
+                }
+                else
+                {
+                    stage.firstClearShards = 15;
+                    stage.firstClearShardHero = (UnitType)(i % 4);
+                }
 
                 // Konfigurasi Battle Mode spesifik per Stage:
                 // Mode 1 (Puzzle Preparation): Stage 1-1, Stage 1-2, Stage 1-5 (Mini-Boss), Stage 1-7
@@ -699,10 +732,15 @@ namespace FantasyDefense.Metagame
                 gearReward
             );
 
-            // Berikan bonus pecahan Hero Shards jika First-Clear
+            // Berikan bonus pecahan Hero Shards jika First-Clear atau jaminan drop pada repeat clear Mini-Boss / Boss
             if (isFirstClear && currentStage.firstClearShards > 0)
             {
                 CitadelLobbyManager.Instance.AddHeroShards(currentStage.firstClearShardHero, currentStage.firstClearShards);
+            }
+            else if (!isFirstClear && currentStage.repeatClearShards > 0)
+            {
+                CitadelLobbyManager.Instance.AddHeroShards(currentStage.repeatClearShardHero, currentStage.repeatClearShards);
+                Debug.Log($"[StageManager] Guaranteed Repeat Drop: +{currentStage.repeatClearShards} Shards untuk {currentStage.repeatClearShardHero}!");
             }
 
             // Live-Ops KPI Telemetry Tracking

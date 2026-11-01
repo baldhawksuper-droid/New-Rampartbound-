@@ -127,6 +127,8 @@ namespace Rampartbound.Editor
             AuditEnvironment("VFX Charred Ground Fissure", "Assets/Art/Sprites/VFX/VFX_Charred_Ground_Fissure.png");
             AuditEnvironment("UI Badge Mini-Boss Horns", "Assets/Art/Sprites/UI/UI_Badge_MiniBoss_Horns.png");
             AuditEnvironment("UI Badge Final Boss Crown", "Assets/Art/Sprites/UI/UI_Badge_FinalBoss_Crown.png");
+            AuditEnvironment("Monster Forest Golem Attack", "Assets/Art/Sprites/Monsters/Monster_ForestGolem_Attack.png");
+            AuditEnvironment("Monster Frost Wyrm Attack", "Assets/Art/Sprites/Monsters/Monster_FrostWyrm_Attack.png");
 
             Repaint();
         }

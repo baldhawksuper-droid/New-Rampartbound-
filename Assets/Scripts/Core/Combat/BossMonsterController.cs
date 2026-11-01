@@ -125,6 +125,22 @@ namespace FantasyDefense.Combat
                 }
             }
 
+            // Muat variasi sprite pose serang orisinal spesifik arketipe Mini-Boss
+            string customAtkName = bossArchetype switch
+            {
+                BossArchetype.ForestGolem => "Monster_ForestGolem_Attack",
+                BossArchetype.FrostWyrm => "Monster_FrostWyrm_Attack",
+                _ => null
+            };
+            if (!string.IsNullOrEmpty(customAtkName))
+            {
+                Sprite customAtk = Resources.Load<Sprite>($"Sprites/Monsters/{customAtkName}");
+                if (customAtk != null)
+                {
+                    attackSprite = customAtk;
+                }
+            }
+
             OnBossSpawned?.Invoke(this);
             OnBossHealthChanged?.Invoke(this, currentHealth, MaxHealth);
         }
@@ -367,14 +383,22 @@ namespace FantasyDefense.Combat
             }
         }
 
-        private System.Collections.IEnumerator BossSkillAttackPoseRoutine()
+        private System.Collections.IEnumerator BossSkillAttackPoseRoutine(float duration = 0.50f)
         {
             Sprite prev = spriteRenderer != null ? spriteRenderer.sprite : null;
+            Vector3 originalScale = baseScale;
             if (attackSprite != null && spriteRenderer != null)
             {
                 spriteRenderer.sprite = attackSprite;
             }
-            yield return new WaitForSeconds(0.45f);
+
+            // Punchy attack animation squash & stretch
+            transform.localScale = new Vector3(originalScale.x * 1.14f, originalScale.y * 0.90f, originalScale.z);
+            yield return new WaitForSeconds(0.12f);
+            transform.localScale = new Vector3(originalScale.x * 0.95f, originalScale.y * 1.10f, originalScale.z);
+            yield return new WaitForSeconds(Mathf.Max(0.1f, duration - 0.12f));
+            transform.localScale = originalScale;
+
             if (prev != null && spriteRenderer != null)
             {
                 spriteRenderer.sprite = prev;
@@ -586,6 +610,11 @@ namespace FantasyDefense.Combat
         {
             Debug.Log($"[BossMonsterController] Frost Wyrm menyemburkan Glacial Blizzard!");
             OnBossSkillUsed?.Invoke(this, "GLACIAL BLIZZARD!");
+
+            if (attackSprite != null && spriteRenderer != null)
+            {
+                StartCoroutine(BossSkillAttackPoseRoutine());
+            }
 
             if (SkillVfxManager.Instance != null)
             {
@@ -810,7 +839,14 @@ namespace FantasyDefense.Combat
 
             if (SkillVfxManager.Instance != null)
             {
-                SkillVfxManager.Instance.SpawnFloatingText(transform.position + Vector3.up * 1.5f, "★ BOSS DEFEATED! ★", Color.yellow, 1.6f);
+                string dropBanner = bossArchetype switch
+                {
+                    BossArchetype.ForestGolem => "🎁 GUARANTEED DROP: FOREST RELIC & SHARDS! 🎁",
+                    BossArchetype.FrostWyrm => "🎁 GUARANTEED DROP: WYRM RELIC & SHARDS! 🎁",
+                    BossArchetype.TitanWarlord => "👑 GUARANTEED DROP: TITAN ABYSSAL CROWN! 👑",
+                    _ => "★ BOSS DEFEATED! ★"
+                };
+                SkillVfxManager.Instance.SpawnFloatingText(transform.position + Vector3.up * 1.5f, dropBanner, Color.yellow, 1.8f);
                 SkillVfxManager.Instance.SpawnProceduralParticleBurst(
                     transform.position,
                     Color.yellow,

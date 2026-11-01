@@ -1814,7 +1814,8 @@ namespace FantasyDefense.UI
                     else
                     {
                         string repeatHeader = CitadelLocalizationManager.Text("⚔️ STAGE SELESAI (REPEAT CLEAR)", "⚔️ STAGE CLEARED");
-                        victoryRewardsText.text = $"{stage.stageCode}: {stage.stageTitle}\n{repeatHeader}\n+{stage.repeatClearGold} Gold  |  +{stage.repeatClearExp} EXP  |  +{stage.repeatClearGems} Gems";
+                        string shardInfo = stage.repeatClearShards > 0 ? $"\n🎁 Jaminan Drop Mini-Boss: +{stage.repeatClearShards} Shards ({stage.repeatClearShardHero})" : "";
+                        victoryRewardsText.text = $"{stage.stageCode}: {stage.stageTitle}\n{repeatHeader}\n+{stage.repeatClearGold} Gold  |  +{stage.repeatClearExp} EXP  |  +{stage.repeatClearGems} Gems{shardInfo}";
                     }
                 }
             }

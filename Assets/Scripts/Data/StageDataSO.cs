@@ -36,6 +36,11 @@ namespace FantasyDefense.Data
         public int repeatClearGold = 150;
         public int repeatClearExp = 50;
         public int repeatClearGems = 15;
+        [Tooltip("Jumlah jaminan hero shards pada repeat clear (khusus Mini-Boss & Boss Stage)")]
+        public int repeatClearShards = 0;
+        public UnitType repeatClearShardHero = UnitType.Cedric;
+        [Tooltip("Peluang bonus drop relic material pada repeat clear (0.0 - 1.0)")]
+        public float repeatClearRelicDropRate = 0f;
 
         [Header("Battle Mode & Weather Configuration")]
         [Tooltip("Mode pertempuran untuk stage ini: Mode 1 (Puzzle Preparation) atau Mode 2 (Real-time Deploy)")]
