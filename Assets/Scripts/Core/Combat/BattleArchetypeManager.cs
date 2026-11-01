@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using FantasyDefense.Audio;
 using FantasyDefense.Data;
 using FantasyDefense.Metagame;
 using FantasyDefense.Combat;
-using FantasyDefense.Data;
 using FantasyDefense.Economy;
 
 namespace FantasyDefense.Combat
