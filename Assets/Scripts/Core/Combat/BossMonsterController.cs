@@ -512,7 +512,7 @@ namespace FantasyDefense.Combat
 
             if (Audio.AudioManager.Instance != null)
             {
-                Audio.AudioManager.Instance.PlaySound(Audio.SoundType.AltarWhooshClose, 0.85f);
+                Audio.AudioManager.Instance.PlaySound(Audio.SoundType.GolemFistSmash, 1.05f);
             }
 
             // Disrupsi hero terdekat dengan root tangle
@@ -630,7 +630,7 @@ namespace FantasyDefense.Combat
 
             if (Audio.AudioManager.Instance != null)
             {
-                Audio.AudioManager.Instance.PlaySound(Audio.SoundType.BladeTempest, 1.25f);
+                Audio.AudioManager.Instance.PlaySound(Audio.SoundType.FrostWyrmBlizzard, 1.15f);
             }
 
             // Perlambat ritme serang hero dengan hawa dingin beku
@@ -683,7 +683,7 @@ namespace FantasyDefense.Combat
 
             if (Audio.AudioManager.Instance != null)
             {
-                Audio.AudioManager.Instance.PlaySound(Audio.SoundType.Earthshaker, 1.35f);
+                Audio.AudioManager.Instance.PlaySound(Audio.SoundType.PermafrostCrystalShatter, 1.20f);
             }
 
             // Stun hero terdekat

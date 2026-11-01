@@ -50,7 +50,10 @@ namespace FantasyDefense.Audio
         AltarWhooshOpen,
         AltarWhooshClose,
         UndoRestoreChime,
-        DialogueBlipChime
+        DialogueBlipChime,
+        GolemFistSmash,
+        FrostWyrmBlizzard,
+        PermafrostCrystalShatter
     }
 
     public enum AudioSfxType
@@ -695,6 +698,11 @@ namespace FantasyDefense.Audio
             // Audio Khusus Monster Canonical Mockup (Chibi Slime & Chibi Goblin)
             proceduralClipCache[SoundType.SlimeSquishImpact] = CreateToneClip("SlimeSquishImpact", 0.16f, 360f, 160f); // Kenyal gelatinous bubble squish slime
             proceduralClipCache[SoundType.GoblinBucklerClank] = CreateToneClip("GoblinBucklerClank", 0.22f, 540f, 150f); // Denting tameng kayu & bilah goblin
+
+            // Audio Khusus Mini-Boss Archetype Attacks
+            proceduralClipCache[SoundType.GolemFistSmash] = CreateToneClip("GolemFistSmash", 0.38f, 160f, 35f); // Hentakan tinju batu & kayu purba berbobot gempa
+            proceduralClipCache[SoundType.FrostWyrmBlizzard] = CreateToneClip("FrostWyrmBlizzard", 0.45f, 680f, 180f); // Desisan hembusan badai salju kutub
+            proceduralClipCache[SoundType.PermafrostCrystalShatter] = CreateArpeggioClip("PermafrostCrystalShatter", new float[] { 880f, 1318.5f, 1760f, 2637f }, 0.04f); // Pecahan kristal es tajam permafrost
         }
 
         private AudioClip CreateToneClip(string name, float duration, float startFreq, float endFreq)
