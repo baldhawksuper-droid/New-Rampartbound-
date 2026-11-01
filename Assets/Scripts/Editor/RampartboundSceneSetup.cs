@@ -910,9 +910,23 @@ namespace Rampartbound.Editor
             PositionUI(battleGemsPill, 0.32f, 0.52f, 0.62f, 0.95f);
 
             var speedBtnObj = CreateButton(topBarObj.transform, "SpeedToggleButton", "1x", new Color(0.2f, 0.35f, 0.6f), Color.white, 24, defaultFont);
+            if (_btnHudSpeed != null)
+            {
+                var sImg = speedBtnObj.GetComponent<Image>();
+                sImg.sprite = _btnHudSpeed;
+                sImg.type = Image.Type.Sliced;
+                sImg.color = Color.white;
+            }
             PositionUI(speedBtnObj, 0.64f, 0.52f, 0.80f, 0.95f);
 
             var pauseBtnObj = CreateButton(topBarObj.transform, "PauseButton", "⏸️ MENU", new Color(0.45f, 0.25f, 0.6f), Color.white, 22, defaultFont);
+            if (_btnHudPause != null)
+            {
+                var pImg = pauseBtnObj.GetComponent<Image>();
+                pImg.sprite = _btnHudPause;
+                pImg.type = Image.Type.Sliced;
+                pImg.color = Color.white;
+            }
             PositionUI(pauseBtnObj, 0.82f, 0.52f, 0.98f, 0.95f);
 
             // Indikator Baris Wave Progress Bar & Penanda Tengkorak Bos (Wave Milestone Progress Bar - Baris Bawah TopBar)
@@ -2855,11 +2869,15 @@ namespace Rampartbound.Editor
         private static Sprite _slotIconRelic;
         private static Sprite _tabHeroActive;
         private static Sprite _tabHeroInactive;
+        private static Sprite _btnHudSpeed;
+        private static Sprite _btnHudPause;
 
         private static void LoadUISprites()
         {
             if (_frameOrnateGold == null) _frameOrnateGold = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Frame_OrnateGold_9Slice.png");
             if (_frameStoneBastion == null) _frameStoneBastion = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Frame_StoneBastion_9Slice.png");
+            if (_btnHudSpeed == null) _btnHudSpeed = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Btn_HUD_Speed.png");
+            if (_btnHudPause == null) _btnHudPause = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Btn_HUD_Pause.png");
             if (_bannerTacticalPhase == null) _bannerTacticalPhase = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Banner_Tactical_Phase.png");
             if (_iconTacticalMove == null) _iconTacticalMove = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Icon_Tactical_Move.png");
             if (_btnPrimaryGold == null) _btnPrimaryGold = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Btn_Primary_Gold.png");
@@ -3070,6 +3088,18 @@ namespace Rampartbound.Editor
                 if (cTxt != null) cTxt.text = "";
             }
             PositionUI(closeBtn, 0.84f, 0.05f, 0.98f, 0.95f);
+            closeBtn.transform.SetAsLastSibling();
+
+            var cBtn = closeBtn.GetComponent<Button>();
+            if (cBtn != null)
+            {
+                cBtn.onClick.AddListener(() =>
+                {
+                    panel.SetActive(false);
+                    if (GameFlowManager.Instance != null) GameFlowManager.Instance.CloseCurrentPanel();
+                    if (AudioManager.Instance != null) AudioManager.Instance.PlaySound(SoundType.ButtonClick);
+                });
+            }
 
             // Container Konten Sub-Panel
             var contentContainer = CreatePanel(panel.transform, "ContentContainer", new Color(0.08f, 0.11f, 0.18f, 0.5f));

@@ -144,8 +144,18 @@ namespace FantasyDefense.UI
 
         private void InitializeButtons()
         {
+            if (closeButton == null)
+            {
+                closeButton = transform.Find("HeaderBanner/CloseButton")?.GetComponent<Button>()
+                           ?? transform.Find("CloseButton")?.GetComponent<Button>()
+                           ?? GetComponentInChildren<Button>(true);
+            }
             if (closeButton != null)
+            {
+                closeButton.onClick.RemoveListener(CloseView);
                 closeButton.onClick.AddListener(CloseView);
+                closeButton.transform.SetAsLastSibling();
+            }
 
             if (startBattleButton != null)
             {

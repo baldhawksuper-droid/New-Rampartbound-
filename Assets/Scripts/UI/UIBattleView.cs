@@ -396,8 +396,21 @@ namespace FantasyDefense.UI
                 }
             }
 
-            StyleButton(pauseButton, btnStone, Color.white);
-            StyleButton(speedToggleButton, btnStone, Color.white);
+            var btnHudSpeed = Resources.Load<Sprite>("Sprites/UI/UI_Btn_HUD_Speed");
+            var btnHudPause = Resources.Load<Sprite>("Sprites/UI/UI_Btn_HUD_Pause");
+
+            StyleButton(pauseButton, btnHudPause ?? btnStone, Color.white);
+            if (pauseButton != null)
+            {
+                var pOutline = pauseButton.GetComponent<Outline>() ?? pauseButton.gameObject.AddComponent<Outline>();
+                pOutline.effectColor = new Color(0.85f, 0.70f, 0.25f, 0.85f);
+                pOutline.effectDistance = new Vector2(1.5f, -1.5f);
+                var pTxt = pauseButton.GetComponentInChildren<Text>();
+                if (pTxt != null) pTxt.color = new Color(1f, 0.95f, 0.80f, 1f);
+            }
+
+            StyleButton(speedToggleButton, btnHudSpeed ?? btnStone, Color.white);
+            UpdateSpeedButtonVisual();
             StyleButton(victoryReturnButton, btnGold, Color.white);
             StyleButton(defeatRetryButton, btnGold, Color.white);
             StyleButton(defeatReturnButton, btnStone, Color.white);
@@ -1655,10 +1668,7 @@ namespace FantasyDefense.UI
                 Time.timeScale = targetScale;
             }
 
-            if (speedToggleText != null)
-            {
-                speedToggleText.text = $"{currentSpeedMode}x Speed";
-            }
+            UpdateSpeedButtonVisual();
 
             if (Audio.AudioManager.Instance != null)
             {
@@ -1677,6 +1687,67 @@ namespace FantasyDefense.UI
             }
 
             Debug.Log($"[UIBattleView] Kecepatan Tempur Diubah: {currentSpeedMode}x (timeScale: {targetScale})");
+        }
+
+        private void UpdateSpeedButtonVisual()
+        {
+            if (speedToggleButton == null) return;
+
+            var img = speedToggleButton.GetComponent<Image>();
+            if (img != null && (img.sprite == null || img.sprite.name.Contains("UISprite") || img.sprite.name.Contains("Btn_Secondary")))
+            {
+                var s = Resources.Load<Sprite>("Sprites/UI/UI_Btn_HUD_Speed");
+                if (s != null)
+                {
+                    img.sprite = s;
+                    img.type = Image.Type.Sliced;
+                }
+            }
+
+            var outline = speedToggleButton.GetComponent<Outline>() ?? speedToggleButton.gameObject.AddComponent<Outline>();
+
+            if (currentSpeedMode == 1)
+            {
+                if (speedToggleText != null)
+                {
+                    speedToggleText.text = "<b>▶ 1x SPEED</b>";
+                    speedToggleText.color = new Color(0.85f, 0.95f, 1f, 1f);
+                }
+                if (outline != null)
+                {
+                    outline.effectColor = new Color(0.30f, 0.65f, 0.90f, 0.85f);
+                    outline.effectDistance = new Vector2(1.5f, -1.5f);
+                }
+                if (img != null) img.color = Color.white;
+            }
+            else if (currentSpeedMode == 2)
+            {
+                if (speedToggleText != null)
+                {
+                    speedToggleText.text = "<b>⏩ 2x TURBO</b>";
+                    speedToggleText.color = new Color(1f, 0.92f, 0.40f, 1f);
+                }
+                if (outline != null)
+                {
+                    outline.effectColor = new Color(1f, 0.78f, 0.20f, 0.95f);
+                    outline.effectDistance = new Vector2(2.0f, -2.0f);
+                }
+                if (img != null) img.color = new Color(1f, 0.96f, 0.88f, 1f);
+            }
+            else // 3x HYPER
+            {
+                if (speedToggleText != null)
+                {
+                    speedToggleText.text = "<b>⚡ 3x HYPER</b>";
+                    speedToggleText.color = new Color(1f, 0.50f, 0.35f, 1f);
+                }
+                if (outline != null)
+                {
+                    outline.effectColor = new Color(1f, 0.35f, 0.20f, 1f);
+                    outline.effectDistance = new Vector2(2.4f, -2.4f);
+                }
+                if (img != null) img.color = new Color(1f, 0.88f, 0.88f, 1f);
+            }
         }
 
         private IEnumerator PunchSpeedButtonRoutine()

@@ -109,8 +109,7 @@ namespace FantasyDefense.UI
 
         private void InitializeButtons()
         {
-            if (closeButton != null)
-                closeButton.onClick.AddListener(CloseView);
+            EnsureCloseButtonBound();
 
             if (cedricTabButton != null)
                 cedricTabButton.onClick.AddListener(() => SelectHero(UnitType.Cedric));
@@ -140,8 +139,43 @@ namespace FantasyDefense.UI
                 openForgeButton.onClick.AddListener(OnOpenForgeClicked);
         }
 
+        private void EnsureCloseButtonBound()
+        {
+            if (closeButton == null)
+            {
+                var tr = transform.Find("HeaderBanner/CloseButton")
+                      ?? transform.Find("CloseButton")
+                      ?? transform.Find("HeaderPanel/CloseButton");
+                if (tr != null)
+                {
+                    closeButton = tr.GetComponent<Button>();
+                }
+                else
+                {
+                    var allBtns = GetComponentsInChildren<Button>(true);
+                    foreach (var b in allBtns)
+                    {
+                        if (b != null && (b.name.Contains("Close") || b.name.Contains("Btn_Close")))
+                        {
+                            closeButton = b;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (closeButton != null)
+            {
+                closeButton.onClick.RemoveListener(CloseView);
+                closeButton.onClick.AddListener(CloseView);
+                closeButton.transform.SetAsLastSibling();
+            }
+        }
+
         public void OpenView()
         {
+            EnsureCloseButtonBound();
+
             if (rootPanel != null) rootPanel.SetActive(true);
             else gameObject.SetActive(true);
 

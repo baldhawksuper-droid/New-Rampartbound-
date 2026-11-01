@@ -179,6 +179,7 @@ namespace FantasyDefense.UI
             CitadelLobbyManager.OnTurretConfigChanged += RefreshTurretWorkshopDisplay;
             CitadelSummonManager.OnGachaPullsCompleted += HandleGachaPullsCompleted;
             FantasyDefense.Localization.CitadelLocalizationManager.OnLanguageChanged += HandleLanguageChanged;
+            GameFlowManager.OnPanelChanged += HandlePanelChanged;
 
             ApplyResponsiveLayout();
             RefreshLocalization();
@@ -198,6 +199,7 @@ namespace FantasyDefense.UI
             CitadelLobbyManager.OnTurretConfigChanged -= RefreshTurretWorkshopDisplay;
             CitadelSummonManager.OnGachaPullsCompleted -= HandleGachaPullsCompleted;
             FantasyDefense.Localization.CitadelLocalizationManager.OnLanguageChanged -= HandleLanguageChanged;
+            GameFlowManager.OnPanelChanged -= HandlePanelChanged;
         }
 
         private void Start()
@@ -437,6 +439,67 @@ namespace FantasyDefense.UI
                         }
                     }
                 }
+            }
+
+            UpdateNavigationTabsVisual(GameFlowManager.Instance != null ? GameFlowManager.Instance.CurrentActivePanel : GamePanelType.None);
+        }
+
+        private void HandlePanelChanged(GamePanelType panelType)
+        {
+            UpdateNavigationTabsVisual(panelType);
+        }
+
+        public void UpdateNavigationTabsVisual(GamePanelType activePanel)
+        {
+            SetTabVisual(navStageMapButton, activePanel == GamePanelType.StageMap);
+            SetTabVisual(navHeroesButton, activePanel == GamePanelType.HeroUpgrade);
+            SetTabVisual(navSummonButton, activePanel == GamePanelType.SummonHall);
+            SetTabVisual(navStoreButton, activePanel == GamePanelType.Store);
+        }
+
+        private void SetTabVisual(Button btn, bool isActive)
+        {
+            if (btn == null) return;
+
+            var bgImg = btn.GetComponent<Image>();
+            if (bgImg != null)
+            {
+                // Active: kilau hangat emas kerajaan taktil; Inactive: andesit gelap benteng
+                bgImg.color = isActive 
+                    ? new Color(0.36f, 0.26f, 0.10f, 0.98f) 
+                    : new Color(0.10f, 0.13f, 0.20f, 0.90f);
+            }
+
+            var outline = btn.GetComponent<Outline>();
+            if (outline == null)
+            {
+                outline = btn.gameObject.AddComponent<Outline>();
+            }
+            if (outline != null)
+            {
+                outline.effectColor = isActive 
+                    ? new Color(1.0f, 0.88f, 0.32f, 1.0f) 
+                    : new Color(0.40f, 0.36f, 0.28f, 0.65f);
+                outline.effectDistance = isActive ? new Vector2(2.0f, -2.0f) : new Vector2(1.2f, -1.2f);
+            }
+
+            var iconTr = btn.transform.Find("TabIcon");
+            if (iconTr != null)
+            {
+                var iconImg = iconTr.GetComponent<Image>();
+                if (iconImg != null)
+                {
+                    iconImg.color = isActive ? Color.white : new Color(0.70f, 0.72f, 0.78f, 0.82f);
+                }
+                iconTr.localScale = isActive ? new Vector3(1.10f, 1.10f, 1f) : Vector3.one;
+            }
+
+            var txt = btn.GetComponentInChildren<Text>();
+            if (txt != null)
+            {
+                txt.color = isActive 
+                    ? new Color(1.0f, 0.94f, 0.45f, 1.0f) 
+                    : new Color(0.72f, 0.76f, 0.82f, 0.85f);
             }
         }
 

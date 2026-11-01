@@ -66,7 +66,18 @@ namespace FantasyDefense.UI
 
         private void InitializeButtons()
         {
-            if (closeButton != null) closeButton.onClick.AddListener(CloseView);
+            if (closeButton == null)
+            {
+                closeButton = transform.Find("HeaderBanner/CloseButton")?.GetComponent<Button>()
+                           ?? transform.Find("CloseButton")?.GetComponent<Button>()
+                           ?? GetComponentInChildren<Button>(true);
+            }
+            if (closeButton != null)
+            {
+                closeButton.onClick.RemoveListener(CloseView);
+                closeButton.onClick.AddListener(CloseView);
+                closeButton.transform.SetAsLastSibling();
+            }
             if (restorePurchasesButton != null) restorePurchasesButton.onClick.AddListener(OnRestorePurchasesClicked);
 
             if (buyStarterPackButton != null) buyStarterPackButton.onClick.AddListener(() => OnBuyClicked("starter_pack"));
