@@ -9,6 +9,7 @@ using FantasyDefense.Core;
 using FantasyDefense.Data;
 using FantasyDefense.Economy;
 using FantasyDefense.GridSystem;
+using FantasyDefense.Summon;
 
 namespace FantasyDefense.UI
 {
@@ -408,7 +409,7 @@ namespace FantasyDefense.UI
             }
 
             OnHeroRecycled?.Invoke(unit, refundGems);
-            Debug.Log($"[HeroRecycleBin] Unit {unit.HeroType} T{(int)unit.CurrentTier} berhasil didaur ulang. Refund: {refundGems} Gems.");
+            Debug.Log($"[HeroRecycleBin] Unit {unit.UnitType} T{(int)unit.CurrentTier} berhasil didaur ulang. Refund: {refundGems} Gems.");
 
             // Aktifkan jendela waktu Urungkan (Undo Window 3 Detik)
             ActivateUndoWindow(originData, originTier, originCell, refundGems);

@@ -191,7 +191,7 @@ namespace FantasyDefense.UI
                 if (heroNameText != null) heroNameText.font = defaultFont;
                 if (heroStarRankText != null) heroStarRankText.font = defaultFont;
                 if (shardProgressText != null) shardProgressText.font = defaultFont;
-                if (promoteStatusText != null) promoteStatusText.font = defaultFont;
+                if (promoteButtonText != null) promoteButtonText.font = defaultFont;
                 if (resultSummaryText != null) resultSummaryText.font = defaultFont;
                 if (singleSummonButton != null)
                 {
@@ -585,13 +585,16 @@ namespace FantasyDefense.UI
             backObj.SetActive(true);
 
             // Daftarkan aksi instant reveal jika tombol Skip ditekan
+            var localCard = cardObj;
+            var localBack = backObj;
+            var localFront = frontObj;
             cardInstantRevealers.Add(() =>
             {
-                if (cardObj != null)
+                if (localCard != null)
                 {
-                    cardObj.transform.localScale = Vector3.one;
-                    if (backObj != null) backObj.SetActive(false);
-                    if (frontObj != null) frontObj.SetActive(true);
+                    localCard.transform.localScale = Vector3.one;
+                    if (localBack != null) localBack.SetActive(false);
+                    if (localFront != null) localFront.SetActive(true);
                 }
             });
 

@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 using FantasyDefense.Data;
 using FantasyDefense.Core;
 
@@ -51,8 +53,8 @@ namespace FantasyDefense.Combat
         {
             if (monster == null) return;
             Vector3 pos = monster.transform.position;
-            MonsterType mType = monster.MonsterData != null ? monster.MonsterData.monsterType : MonsterType.Creep;
-            Color theme = monster.MonsterData != null ? monster.MonsterData.themeColor : Color.white;
+            MonsterType mType = monster.Data != null ? monster.Data.monsterType : MonsterType.Creep;
+            Color theme = monster.Data != null ? monster.Data.themeColor : Color.white;
             SpawnMonsterDeathPoof(pos, mType, theme);
         }
 
@@ -1465,7 +1467,7 @@ namespace FantasyDefense.Combat
             // Jika pahlawan memiliki aura tier tinggi (Tier 5/Tier 4), semburkan partikel kilau pendaran
             if (themeColor.a > 0.8f)
             {
-                SpawnProceduralParticleBurst(worldPos + Vector3.up * 0.2f, themeColor, 6, 0.45f, 0.6f, 507);
+                SpawnProceduralParticleBurst(worldPos + Vector3.up * 0.2f, themeColor, Color.white, 6, 0.45f, 507);
             }
 
             StartCoroutine(DefenderEmoteRoutine(emoteObj, bgRenderer, borderRenderer, tm));

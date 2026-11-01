@@ -116,28 +116,28 @@ namespace FantasyDefense.Metagame
                 else if (i == 7) // Stage 1-8 Mini-Boss Glacial Frost Wyrm
                 {
                     stage.firstClearShards = 30;
-                    stage.firstClearShardHero = UnitType.Rabbit;
+                    stage.firstClearShardHero = UnitType.RabbitMage;
                     stage.firstClearGear = new EquipmentItem("EQ_EPC_03", "Taring Kristal Frost Wyrm", EquipmentSlot.Relic, EquipmentRarity.Epic, 4, 18f, 80f, 0.08f, 0.10f);
                     stage.repeatClearShards = 3;
-                    stage.repeatClearShardHero = UnitType.Rabbit;
+                    stage.repeatClearShardHero = UnitType.RabbitMage;
                     stage.repeatClearGems = 25;
                 }
                 else if (i == 4) // Stage 1-5 Mini-boss checkpoint
                 {
                     stage.firstClearShards = 25;
-                    stage.firstClearShardHero = UnitType.Wind;
+                    stage.firstClearShardHero = UnitType.WindRanger;
                     stage.firstClearGear = new EquipmentItem("EQ_EPC_02", "Pedang Komandan Penjaga", EquipmentSlot.Weapon, EquipmentRarity.Epic, 3, 20f, 0f, 0.05f);
                     stage.repeatClearShards = 2;
-                    stage.repeatClearShardHero = UnitType.Wind;
+                    stage.repeatClearShardHero = UnitType.WindRanger;
                     stage.repeatClearGems = 20;
                 }
                 else if (i == 3) // Stage 1-4 Mini-Boss Ancient Ironwood Golem
                 {
                     stage.firstClearShards = 25;
-                    stage.firstClearShardHero = UnitType.Rose;
+                    stage.firstClearShardHero = UnitType.RoseTanker;
                     stage.firstClearGear = new EquipmentItem("EQ_RAR_02", "Amulet Getah Kayu Purba", EquipmentSlot.Relic, EquipmentRarity.Rare, 2, 8f, 50f, 0.04f, 0.06f);
                     stage.repeatClearShards = 2;
-                    stage.repeatClearShardHero = UnitType.Rose;
+                    stage.repeatClearShardHero = UnitType.RoseTanker;
                     stage.repeatClearGems = 18;
                 }
                 else if (i == 2) // Stage 1-3: Drop Zirah Pertama Pemain

@@ -102,10 +102,10 @@ namespace FantasyDefense.Combat
 
         public void ApplyAccountTurretConfig()
         {
-            if (FantasyDefense.Core.Metagame.CitadelLobbyManager.Instance != null &&
-                FantasyDefense.Core.Metagame.CitadelLobbyManager.Instance.AccountData != null)
+            if (FantasyDefense.Metagame.CitadelLobbyManager.Instance != null &&
+                FantasyDefense.Metagame.CitadelLobbyManager.Instance.AccountData != null)
             {
-                var acc = FantasyDefense.Core.Metagame.CitadelLobbyManager.Instance.AccountData;
+                var acc = FantasyDefense.Metagame.CitadelLobbyManager.Instance.AccountData;
                 bool isLeft = transform.localPosition.x < 0f;
                 int typeIdx = isLeft ? acc.leftTurretTypeIndex : acc.rightTurretTypeIndex;
                 int tier = isLeft ? acc.leftTurretTier : acc.rightTurretTier;

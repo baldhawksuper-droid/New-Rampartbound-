@@ -226,4 +226,30 @@ namespace FantasyDefense.UI
             activeRoutine = null;
         }
     }
+
+    /// <summary>
+    /// Alias manager untuk memudahkan pemanggilan toast UI di seluruh proyek.
+    /// </summary>
+    public class UIToastManager : MonoBehaviour
+    {
+        private static UIToastManager _instance;
+        public static UIToastManager Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    var go = new GameObject("UIToastManager");
+                    _instance = go.AddComponent<UIToastManager>();
+                    DontDestroyOnLoad(go);
+                }
+                return _instance;
+            }
+        }
+
+        public void ShowToast(string message)
+        {
+            CitadelToastNotice.Show(message);
+        }
+    }
 }

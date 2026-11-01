@@ -393,7 +393,7 @@ namespace FantasyDefense.UI
 
             if (battleModeText != null)
             {
-                string modeIcon = (stage.battleMode == BattleModeType.BossRush) ? "💀" : ((stage.battleMode == BattleModeType.PuzzleOnly) ? "🧩" : "⚔️");
+                string modeIcon = (stage.battleMode == FantasyDefense.Data.BattleMode.PuzzlePreparation) ? "🧩" : "⚔️";
                 battleModeText.text = $"{modeIcon} <color=#FFD700><b>{stage.GetBattleModeLabel().ToUpper()}</b></color>";
             }
 
@@ -444,7 +444,7 @@ namespace FantasyDefense.UI
                 else
                 {
                     string firstLabel = FantasyDefense.Localization.CitadelLocalizationManager.Text("🎁 HADIAH PERTAMA", "🎁 FIRST REWARD");
-                    firstClearRewardsText.text = $"{firstLabel}: <color=#FFD700>🪙 +{stage.firstClearGoldReward:N0}</color>  |  <color=#00FFFF>💎 +{stage.firstClearGemReward:N0}</color>";
+                    firstClearRewardsText.text = $"{firstLabel}: <color=#FFD700>🪙 +{stage.firstClearGold:N0}</color>  |  <color=#00FFFF>💎 +{stage.firstClearGems:N0}</color>";
                 }
             }
 

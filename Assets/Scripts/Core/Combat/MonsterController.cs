@@ -472,7 +472,7 @@ namespace FantasyDefense.Combat
             float scaleModX = 1f;
             float scaleModY = 1f;
 
-            MonsterType mType = data != null ? data.monsterType : MonsterType.Creep;
+            MonsterType mType = monsterData != null ? monsterData.monsterType : MonsterType.Creep;
             if (mType == MonsterType.Creep)
             {
                 // Slime: Bouncing Hop dengan Squash-and-Stretch elastis khas jeli/lendir
@@ -674,7 +674,7 @@ namespace FantasyDefense.Combat
             // Hentakan Debu & Pukulan saat menghantam gerbang benteng (Divisi Art & Visual - Point 5)
             if (SkillVfxManager.Instance != null)
             {
-                if (monsterType == MonsterType.Boss)
+                if ((monsterData != null ? monsterData.monsterType : MonsterType.Creep) == MonsterType.Boss)
                 {
                     SkillVfxManager.Instance.SpawnBossGroundSmashDebris(transform.position + Vector3.down * 0.25f);
                 }
@@ -818,7 +818,7 @@ namespace FantasyDefense.Combat
         public virtual Color GetEffectiveThemeColor()
         {
             Color baseCol = monsterData != null && monsterData.themeColor != default ? monsterData.themeColor : Color.white;
-            if (eliteAffix != null && eliteAffix.CurrentAffix != EliteAffixType.None)
+            if (eliteAffix != null && eliteAffix.AffixType != EliteAffixType.None)
             {
                 return Color.Lerp(baseCol, eliteAffix.GetAffixThemeColor(), 0.35f);
             }

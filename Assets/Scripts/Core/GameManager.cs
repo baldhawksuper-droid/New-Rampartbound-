@@ -229,9 +229,9 @@ namespace FantasyDefense.Core
                     HeroSummoner.Instance.RegisterHeroData(hero);
                 }
 
-                if (FantasyDefense.Citadel.CitadelLobbyManager.Instance != null)
+                if (FantasyDefense.Metagame.CitadelLobbyManager.Instance != null)
                 {
-                    var deployed = FantasyDefense.Citadel.CitadelLobbyManager.Instance.GetDeployedFormation();
+                    var deployed = FantasyDefense.Metagame.CitadelLobbyManager.Instance.GetDeployedFormation();
                     if (deployed != null && deployed.Count > 0)
                     {
                         HeroSummoner.Instance.SynchronizeWithFormation(deployed);

@@ -37,6 +37,7 @@ namespace FantasyDefense.Data
 
         [Header("Visual & Scaling")]
         public Sprite monsterSprite;
+        public Sprite idleSprite => monsterSprite;
         [Tooltip("Sprite pose melangkah kedua untuk animasi berjalan 2-frame (Sprint 44 Poin 4)")]
         public Sprite monsterWalkSprite;
         [Tooltip("Sprite pose menyerang / menerjang saat memukul benteng atau hero")]

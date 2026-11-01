@@ -5,6 +5,7 @@ using FantasyDefense.Economy;
 using FantasyDefense.GridSystem;
 using FantasyDefense.Summon;
 using FantasyDefense.Localization;
+using FantasyDefense.Data;
 
 namespace FantasyDefense.UI
 {

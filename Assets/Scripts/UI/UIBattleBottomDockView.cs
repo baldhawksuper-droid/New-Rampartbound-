@@ -40,6 +40,7 @@ namespace FantasyDefense.UI
             public RectTransform starsContainer;
             public readonly List<Image> starImages = new List<Image>();
             public Image glowOverlayImg;
+            public Image cardFrameImg;
         }
 
         private void Awake()
@@ -365,6 +366,7 @@ namespace FantasyDefense.UI
             {
                 cardImg.color = new Color(0.10f, 0.14f, 0.22f, 0.95f);
             }
+            widgets.cardFrameImg = cardImg;
 
             // Glow Overlay for elemental level-up flash
             var glowObj = new GameObject("GlowOverlay", typeof(RectTransform), typeof(Image));

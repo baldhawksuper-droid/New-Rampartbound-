@@ -10,7 +10,8 @@ namespace FantasyDefense.Mobile
         Heavy,
         Success,
         Warning,
-        Failure
+        Failure,
+        Selection
     }
 
     /// <summary>
@@ -176,6 +177,7 @@ namespace FantasyDefense.Mobile
                     case HapticFeedbackType.Success: milliseconds = 40; break;
                     case HapticFeedbackType.Warning: milliseconds = 80; break;
                     case HapticFeedbackType.Failure: milliseconds = 110; break;
+                    case HapticFeedbackType.Selection: milliseconds = 15; break;
                 }
                 vibrator.Call("vibrate", milliseconds);
                 return;
