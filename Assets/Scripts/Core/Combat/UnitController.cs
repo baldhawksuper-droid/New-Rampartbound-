@@ -1575,6 +1575,31 @@ namespace FantasyDefense.Combat
             return bestTarget;
         }
 
+        /// <summary>
+        /// Efek Crowd Control dari Mini-Boss/Boss (Root Tangle, Frost Chill, Stun Stagger) yang mendisrupsi ritme serang hero.
+        /// </summary>
+        public virtual void ApplyCrowdControl(float delaySeconds, string statusLabel = null)
+        {
+            if (!IsAlive) return;
+
+            attackCooldownTimer += delaySeconds;
+
+            if (visualAnimator != null)
+            {
+                visualAnimator.PlayHitRecoil();
+            }
+
+            if (!string.IsNullOrEmpty(statusLabel) && FantasyDefense.Combat.SkillVfxManager.Instance != null)
+            {
+                FantasyDefense.Combat.SkillVfxManager.Instance.SpawnFloatingText(
+                    transform.position + Vector3.up * 0.45f,
+                    statusLabel,
+                    statusLabel.Contains("❄️") ? new Color(0.5f, 0.9f, 1f) : new Color(0.4f, 0.9f, 0.4f),
+                    0.95f
+                );
+            }
+        }
+
         public virtual void TakeDamage(float damageAmount)
         {
             if (!IsAlive) return;

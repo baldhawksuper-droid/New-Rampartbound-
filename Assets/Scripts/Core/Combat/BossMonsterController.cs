@@ -8,19 +8,33 @@ using FantasyDefense.Core;
 
 namespace FantasyDefense.Combat
 {
+    public enum BossArchetype
+    {
+        TitanWarlord,   // Stage 10 Volcanic Final Boss (Malakor, The Void Tyrant / Titan Warlord)
+        ForestGolem,    // Stage 4 Forest Mini-Boss (Ancient Ironwood Golem)
+        FrostWyrm,      // Stage 8 Mountain Mini-Boss (Glacial Frost Wyrm)
+        ObsidianMaw     // Stage 5 Checkpoint Mini-Boss (Abyssal Obsidian Maw)
+    }
+
     /// <summary>
-    /// Specialized Controller untuk Boss Monster (Stage 1-5 Mini-Boss & Stage 1-10 Abyssal Drake Final Boss).
-    /// Mengekstensi MonsterController dengan AI perilaku khusus:
-    /// 1. Bilah HP Boss Raksasa & multi-phase tracking
-    /// 2. Skill Ground Smash: menghentak tanah, mengguncang arena, dan men-stun pahlawan terdepan
-    /// 3. Abyssal Roar & Enrage: saat sisa HP <= 35%, kecepatan meningkat +40%, aura merah menyala, dan memanggil minion pelindung
-    /// 4. Dragon Firestorm / Flame Breath khusus Final Boss Drake
+    /// Specialized Controller untuk Boss Monster (Stage 1-4 Forest Golem, Stage 1-8 Frost Wyrm, Stage 1-10 Titan Warlord).
+    /// Mengekstensi MonsterController dengan AI perilaku dan variasi serangan khusus:
+    /// 1. Forest Golem: Entangling Bramble (stagger/root) & Barkskin Fortification (-40% damage resistance pada 50% HP).
+    /// 2. Frost Wyrm: Glacial Blizzard Breath (chill/slow ke hero) & Permafrost Shards ground slam.
+    /// 3. Titan Warlord: Ground Smash dengan Charred Fissure saat enrage & Dragon Firestorm.
     /// </summary>
     public class BossMonsterController : MonsterController
     {
         [Header("Boss Identity")]
+        [SerializeField] private BossArchetype bossArchetype = BossArchetype.TitanWarlord;
         [SerializeField] private string bossTitle = "Panglima Orc Kegelapan";
         [SerializeField] private bool isFinalBoss = false;
+
+        [Header("Mini-Boss Specific State")]
+        private bool isBarkskinActive = false;
+        private bool hasTriggeredBarkskin = false;
+        private GameObject barkskinShieldObj;
+        private Coroutine barkskinCoroutine;
 
         [Header("Boss AI Timers & Thresholds")]
         [SerializeField] private float groundSmashCooldown = 7.0f;
@@ -38,6 +52,7 @@ namespace FantasyDefense.Combat
         private Coroutine magmaPulseCoroutine;
         private Coroutine magmaEmberCoroutine;
 
+        public BossArchetype Archetype => bossArchetype;
         public string BossTitle => bossTitle;
         public bool IsFinalBoss => isFinalBoss;
         public bool IsEnraged => isEnraged;
@@ -60,18 +75,32 @@ namespace FantasyDefense.Combat
         {
             base.Initialize(data, pathWaypoints, lateralOffset);
 
-            // Deteksi apakah ini Final Boss berdasarkan nama atau data
+            // Deteksi arketipe boss berdasarkan nama atau data
             if (data != null)
             {
-                if (data.monsterName.Contains("Drake") || data.monsterName.Contains("Naga") || data.maxHealth >= 800f)
+                if (data.monsterName.Contains("Golem") || data.monsterName.Contains("Ironwood") || data.monsterName.Contains("Forest"))
                 {
-                    isFinalBoss = true;
-                    bossTitle = "Raja Kegelapan Api Purba";
+                    bossArchetype = BossArchetype.ForestGolem;
+                    isFinalBoss = false;
+                    bossTitle = "Pelindung Hutan Purba (Ironwood Golem)";
+                }
+                else if (data.monsterName.Contains("Wyrm") || data.monsterName.Contains("Frost") || data.monsterName.Contains("Glacial"))
+                {
+                    bossArchetype = BossArchetype.FrostWyrm;
+                    isFinalBoss = false;
+                    bossTitle = "Naga Es Abadi Puncak Salju (Frost Wyrm)";
+                }
+                else if (data.monsterName.Contains("Obsidian") || data.monsterName.Contains("Maw"))
+                {
+                    bossArchetype = BossArchetype.ObsidianMaw;
+                    isFinalBoss = false;
+                    bossTitle = "Monster Magma Lembah Vulkanik (Obsidian Maw)";
                 }
                 else
                 {
-                    isFinalBoss = false;
-                    bossTitle = "Panglima Orc Penakluk";
+                    bossArchetype = BossArchetype.TitanWarlord;
+                    isFinalBoss = true;
+                    bossTitle = "Penguasa Kehampaan (Titan Warlord Malakor)";
                 }
             }
 
@@ -115,6 +144,53 @@ namespace FantasyDefense.Combat
 
         private void HandleBossAI()
         {
+            switch (bossArchetype)
+            {
+                case BossArchetype.ForestGolem:
+                    HandleForestGolemAI();
+                    break;
+                case BossArchetype.FrostWyrm:
+                    HandleFrostWyrmAI();
+                    break;
+                case BossArchetype.ObsidianMaw:
+                case BossArchetype.TitanWarlord:
+                default:
+                    HandleTitanWarlordAI();
+                    break;
+            }
+        }
+
+        private void HandleForestGolemAI()
+        {
+            groundSmashTimer -= Time.deltaTime;
+            if (groundSmashTimer <= 0f)
+            {
+                groundSmashTimer = isEnraged ? (groundSmashCooldown * 0.70f) : groundSmashCooldown;
+                ExecuteForestGolemEntanglingBramble();
+            }
+        }
+
+        private void HandleFrostWyrmAI()
+        {
+            // 1. Skill Permafrost Shards
+            groundSmashTimer -= Time.deltaTime;
+            if (groundSmashTimer <= 0f)
+            {
+                groundSmashTimer = isEnraged ? (groundSmashCooldown * 0.70f) : groundSmashCooldown;
+                ExecuteFrostWyrmPermafrostShards();
+            }
+
+            // 2. Skill Glacial Blizzard Breath
+            flameBreathTimer -= Time.deltaTime;
+            if (flameBreathTimer <= 0f)
+            {
+                flameBreathTimer = isEnraged ? (flameBreathCooldown * 0.75f) : flameBreathCooldown;
+                ExecuteFrostWyrmGlacialBlizzard();
+            }
+        }
+
+        private void HandleTitanWarlordAI()
+        {
             // 1. Skill Ground Smash
             groundSmashTimer -= Time.deltaTime;
             if (groundSmashTimer <= 0f)
@@ -137,11 +213,23 @@ namespace FantasyDefense.Combat
 
         public override void TakeDamage(float damage, bool isCrit = false)
         {
-            base.TakeDamage(damage, isCrit);
+            float finalDamage = damage;
+            if (isBarkskinActive)
+            {
+                finalDamage *= 0.60f; // 40% damage resistance saat Barkskin Fortification aktif
+            }
+
+            base.TakeDamage(finalDamage, isCrit);
 
             if (!isDead)
             {
                 OnBossHealthChanged?.Invoke(this, currentHealth, MaxHealth);
+
+                // Forest Golem Barkskin Fortification aktif saat HP <= 50%
+                if (bossArchetype == BossArchetype.ForestGolem && !hasTriggeredBarkskin && HealthPercent <= 0.50f)
+                {
+                    TriggerBarkskinShield();
+                }
 
                 // Cek aktivasi fase Enrage saat sisa HP turun di bawah threshold
                 if (!isEnraged && HealthPercent <= enrageThreshold)
@@ -364,6 +452,229 @@ namespace FantasyDefense.Combat
             }
         }
 
+        #region Forest Golem Mini-Boss Skills
+
+        private void ExecuteForestGolemEntanglingBramble()
+        {
+            Debug.Log($"[BossMonsterController] Forest Golem melancarkan Entangling Bramble!");
+            OnBossSkillUsed?.Invoke(this, "ENTANGLING BRAMBLE!");
+
+            if (attackSprite != null && spriteRenderer != null)
+            {
+                StartCoroutine(BossSkillAttackPoseRoutine());
+            }
+
+            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null && FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+            {
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Medium);
+            }
+
+            if (MobileCameraAdapter.Instance != null)
+            {
+                MobileCameraAdapter.Instance.TriggerBossScreenShake(0.35f, 0.25f, 0.60f);
+            }
+
+            if (SkillVfxManager.Instance != null)
+            {
+                SkillVfxManager.Instance.SpawnProceduralParticleBurst(
+                    transform.position,
+                    new Color(0.18f, 0.65f, 0.22f), // Forest vine emerald
+                    new Color(0.60f, 0.90f, 0.40f), // Leaf green
+                    28,
+                    3.2f
+                );
+                SkillVfxManager.Instance.SpawnFloatingText(transform.position + Vector3.up * 1.2f, "🌿 ENTANGLING BRAMBLE! 🌿", new Color(0.25f, 0.85f, 0.35f), 1.35f);
+            }
+
+            if (Audio.AudioManager.Instance != null)
+            {
+                Audio.AudioManager.Instance.PlaySound(Audio.SoundType.AltarWhooshClose, 0.85f);
+            }
+
+            // Disrupsi hero terdekat dengan root tangle
+            float rootRadius = 2.8f;
+            foreach (var hero in UnitController.ActiveUnits)
+            {
+                if (hero != null && Vector3.Distance(transform.position, hero.transform.position) <= rootRadius)
+                {
+                    hero.ApplyCrowdControl(1.6f, "🌿 ENTANGLED!");
+                }
+            }
+
+            if (CastleBarricade.Instance != null && Vector3.Distance(transform.position, CastleBarricade.Instance.transform.position) <= 3.5f)
+            {
+                CastleBarricade.Instance.TakeDamage(12);
+            }
+        }
+
+        private void TriggerBarkskinShield()
+        {
+            hasTriggeredBarkskin = true;
+            Debug.Log($"[BossMonsterController] Forest Golem mengaktifkan Barkskin Fortification!");
+            OnBossSkillUsed?.Invoke(this, "BARKSKIN FORTIFICATION!");
+
+            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null && FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+            {
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Warning);
+            }
+
+            if (SkillVfxManager.Instance != null)
+            {
+                SkillVfxManager.Instance.SpawnProceduralParticleBurst(
+                    transform.position,
+                    new Color(0.85f, 0.65f, 0.20f), // Amber bark
+                    new Color(0.30f, 0.85f, 0.30f), // Jade glow
+                    35,
+                    3.5f
+                );
+                SkillVfxManager.Instance.SpawnFloatingText(transform.position + Vector3.up * 1.4f, "🛡️ BARKSKIN FORTIFICATION! (-40% DMG)", new Color(0.55f, 0.95f, 0.50f), 1.45f);
+            }
+
+            if (Audio.AudioManager.Instance != null)
+            {
+                Audio.AudioManager.Instance.PlaySound(Audio.SoundType.AltarWhooshOpen, 0.80f);
+            }
+
+            if (barkskinCoroutine != null) StopCoroutine(barkskinCoroutine);
+            barkskinCoroutine = StartCoroutine(BarkskinShieldRoutine());
+        }
+
+        private IEnumerator BarkskinShieldRoutine()
+        {
+            isBarkskinActive = true;
+
+            if (barkskinShieldObj == null)
+            {
+                barkskinShieldObj = new GameObject("BarkskinShieldAura");
+                barkskinShieldObj.transform.SetParent(transform, false);
+                barkskinShieldObj.transform.localPosition = new Vector3(0f, 0f, -0.05f);
+                barkskinShieldObj.transform.localScale = Vector3.one * 1.35f;
+
+                var sr = barkskinShieldObj.AddComponent<SpriteRenderer>();
+                sr.sprite = Resources.Load<Sprite>("Sprites/VFX/VFX_Aura_Magma_Ring");
+                sr.sortingLayerName = "Gem";
+                if (spriteRenderer != null) sr.sortingOrder = spriteRenderer.sortingOrder + 1;
+                sr.color = new Color(0.35f, 0.85f, 0.40f, 0.80f);
+            }
+
+            float duration = 5.0f;
+            float elapsed = 0f;
+            while (elapsed < duration && !isDead)
+            {
+                elapsed += Time.deltaTime;
+                if (barkskinShieldObj != null)
+                {
+                    float pulse = 1.30f + Mathf.PingPong(elapsed * 2.5f, 0.15f);
+                    barkskinShieldObj.transform.localScale = new Vector3(pulse, pulse, 1f);
+                }
+                yield return null;
+            }
+
+            isBarkskinActive = false;
+            if (barkskinShieldObj != null)
+            {
+                Destroy(barkskinShieldObj);
+                barkskinShieldObj = null;
+            }
+        }
+
+        #endregion
+
+        #region Frost Wyrm Mini-Boss Skills
+
+        private void ExecuteFrostWyrmGlacialBlizzard()
+        {
+            Debug.Log($"[BossMonsterController] Frost Wyrm menyemburkan Glacial Blizzard!");
+            OnBossSkillUsed?.Invoke(this, "GLACIAL BLIZZARD!");
+
+            if (SkillVfxManager.Instance != null)
+            {
+                SkillVfxManager.Instance.SpawnProceduralParticleBurst(
+                    transform.position,
+                    new Color(0.40f, 0.85f, 1.0f), // Glacial cyan
+                    new Color(0.90f, 0.98f, 1.0f), // Frost white
+                    36,
+                    4.2f
+                );
+                SkillVfxManager.Instance.SpawnFloatingText(transform.position + Vector3.up * 1.2f, "❄️ GLACIAL BLIZZARD! ❄️", new Color(0.45f, 0.90f, 1.0f), 1.4f);
+            }
+
+            if (Audio.AudioManager.Instance != null)
+            {
+                Audio.AudioManager.Instance.PlaySound(Audio.SoundType.BladeTempest, 1.25f);
+            }
+
+            // Perlambat ritme serang hero dengan hawa dingin beku
+            float blizzardRadius = 3.8f;
+            foreach (var hero in UnitController.ActiveUnits)
+            {
+                if (hero != null && Vector3.Distance(transform.position, hero.transform.position) <= blizzardRadius)
+                {
+                    hero.ApplyCrowdControl(1.4f, "❄️ CHILLED!");
+                }
+            }
+
+            if (CastleBarricade.Instance != null && Vector3.Distance(transform.position, CastleBarricade.Instance.transform.position) <= 4.0f)
+            {
+                CastleBarricade.Instance.TakeDamage(16);
+            }
+        }
+
+        private void ExecuteFrostWyrmPermafrostShards()
+        {
+            Debug.Log($"[BossMonsterController] Frost Wyrm menghempaskan Permafrost Shards!");
+            OnBossSkillUsed?.Invoke(this, "PERMAFROST SHARDS!");
+
+            if (attackSprite != null && spriteRenderer != null)
+            {
+                StartCoroutine(BossSkillAttackPoseRoutine());
+            }
+
+            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null && FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+            {
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Medium);
+            }
+
+            if (MobileCameraAdapter.Instance != null)
+            {
+                MobileCameraAdapter.Instance.TriggerBossScreenShake(0.38f, 0.30f, 0.75f);
+            }
+
+            if (SkillVfxManager.Instance != null)
+            {
+                SkillVfxManager.Instance.SpawnProceduralParticleBurst(
+                    transform.position,
+                    new Color(0.10f, 0.80f, 0.95f), // Cyan ice
+                    new Color(0.85f, 0.95f, 1.0f),  // Crystal shard
+                    30,
+                    3.8f
+                );
+                SkillVfxManager.Instance.SpawnFloatingText(transform.position + Vector3.up * 1.2f, "🧊 PERMAFROST SHARDS! 🧊", new Color(0.60f, 0.95f, 1.0f), 1.35f);
+            }
+
+            if (Audio.AudioManager.Instance != null)
+            {
+                Audio.AudioManager.Instance.PlaySound(Audio.SoundType.Earthshaker, 1.35f);
+            }
+
+            // Stun hero terdekat
+            float smashRadius = 2.6f;
+            foreach (var hero in UnitController.ActiveUnits)
+            {
+                if (hero != null && Vector3.Distance(transform.position, hero.transform.position) <= smashRadius)
+                {
+                    hero.ApplyCrowdControl(1.2f, "🧊 FROZEN!");
+                }
+            }
+
+            if (CastleBarricade.Instance != null && Vector3.Distance(transform.position, CastleBarricade.Instance.transform.position) <= 3.5f)
+            {
+                CastleBarricade.Instance.TakeDamage(14);
+            }
+        }
+
+        #endregion
+
         #region Magma Enrage Aura Systems
 
         private void SpawnMagmaEnrageAura()
@@ -382,7 +693,14 @@ namespace FantasyDefense.Combat
                 {
                     magmaAuraSr.sortingOrder = spriteRenderer.sortingOrder - 1;
                 }
-                magmaAuraSr.color = new Color(1f, 0.45f, 0.1f, 0.85f);
+
+                Color initialColor = bossArchetype switch
+                {
+                    BossArchetype.ForestGolem => new Color(0.25f, 0.85f, 0.35f, 0.85f),
+                    BossArchetype.FrostWyrm => new Color(0.35f, 0.85f, 1.0f, 0.85f),
+                    _ => new Color(1f, 0.45f, 0.1f, 0.85f)
+                };
+                magmaAuraSr.color = initialColor;
             }
 
             if (magmaPulseCoroutine != null) StopCoroutine(magmaPulseCoroutine);
@@ -395,6 +713,19 @@ namespace FantasyDefense.Combat
         private System.Collections.IEnumerator MagmaAuraPulseRoutine()
         {
             float timer = 0f;
+            Color lowColor = bossArchetype switch
+            {
+                BossArchetype.ForestGolem => new Color(0.15f, 0.65f, 0.20f, 0.70f),
+                BossArchetype.FrostWyrm => new Color(0.20f, 0.65f, 0.90f, 0.70f),
+                _ => new Color(1f, 0.35f, 0.05f, 0.75f)
+            };
+            Color highColor = bossArchetype switch
+            {
+                BossArchetype.ForestGolem => new Color(0.60f, 0.95f, 0.40f, 0.95f),
+                BossArchetype.FrostWyrm => new Color(0.70f, 0.95f, 1.0f, 0.95f),
+                _ => new Color(1f, 0.85f, 0.20f, 0.95f)
+            };
+
             while (isEnraged && !isDead)
             {
                 timer += Time.deltaTime * 5f;
@@ -406,8 +737,8 @@ namespace FantasyDefense.Combat
                 if (magmaAuraSr != null)
                 {
                     magmaAuraSr.color = Color.Lerp(
-                        new Color(1f, 0.35f, 0.05f, 0.75f),
-                        new Color(1f, 0.85f, 0.20f, 0.95f),
+                        lowColor,
+                        highColor,
                         (Mathf.Sin(timer) + 1f) * 0.5f
                     );
                 }
@@ -418,6 +749,19 @@ namespace FantasyDefense.Combat
         private System.Collections.IEnumerator MagmaEmberEruptionRoutine()
         {
             var wait = new WaitForSeconds(0.35f);
+            Color sparkMain = bossArchetype switch
+            {
+                BossArchetype.ForestGolem => new Color(0.25f, 0.80f, 0.25f),
+                BossArchetype.FrostWyrm => new Color(0.20f, 0.85f, 1.0f),
+                _ => new Color(1f, 0.3f, 0.05f)
+            };
+            Color sparkSec = bossArchetype switch
+            {
+                BossArchetype.ForestGolem => new Color(0.85f, 0.95f, 0.40f),
+                BossArchetype.FrostWyrm => new Color(0.90f, 0.98f, 1.0f),
+                _ => new Color(1f, 0.85f, 0.2f)
+            };
+
             while (isEnraged && !isDead)
             {
                 yield return wait;
@@ -426,8 +770,8 @@ namespace FantasyDefense.Combat
                     Vector3 sparkPos = transform.position + new Vector3(UnityEngine.Random.Range(-0.35f, 0.35f), -0.4f, 0);
                     SkillVfxManager.Instance.SpawnProceduralParticleBurst(
                         sparkPos,
-                        new Color(1f, 0.3f, 0.05f),
-                        new Color(1f, 0.85f, 0.2f),
+                        sparkMain,
+                        sparkSec,
                         5,
                         2.2f
                     );
@@ -443,6 +787,13 @@ namespace FantasyDefense.Combat
             {
                 Destroy(magmaAuraObj);
                 magmaAuraObj = null;
+            }
+
+            if (barkskinCoroutine != null) StopCoroutine(barkskinCoroutine);
+            if (barkskinShieldObj != null)
+            {
+                Destroy(barkskinShieldObj);
+                barkskinShieldObj = null;
             }
         }
 

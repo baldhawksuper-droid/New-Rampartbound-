@@ -74,14 +74,22 @@ namespace FantasyDefense.Metagame
                 stage.stageTitle = titles[i];
                 stage.recommendedCP = recCPs[i];
                 stage.staminaCost = 5;
-                stage.isBossStage = (i == 4 || i == 9);
+                stage.isBossStage = (i == 3 || i == 4 || i == 7 || i == 9);
                 if (i == 9)
                 {
                     stage.bossName = "Malakor, The Void Tyrant";
                 }
+                else if (i == 7)
+                {
+                    stage.bossName = "Glacial Frost Wyrm";
+                }
                 else if (i == 4)
                 {
-                    stage.bossName = "Abyssal Obsidian Maw (Golek Magma Vulkanik)";
+                    stage.bossName = "Abyssal Obsidian Maw";
+                }
+                else if (i == 3)
+                {
+                    stage.bossName = "Ancient Ironwood Golem";
                 }
                 else
                 {
@@ -351,22 +359,34 @@ namespace FantasyDefense.Metagame
                         }
                         break;
 
-                    case 4: // Stage 1-4: Menara Pantau Runtuh - Mode 2 Rawa Berat & Jangkar
+                    case 4: // Stage 1-4: Menara Pantau Runtuh [MINI-BOSS: Ancient Ironwood Golem]
                         {
-                            var swampColor = new Color(0.38f, 0.58f, 0.12f);
-                            wave.waveTitle = w switch {
-                                1 => "Wave 1: Sergapan Kilat Penyusup Rawa",
-                                2 => "Wave 2: Regu Penghancur Berpelindung",
-                                _ => "Wave 3: Barisan Algojo Mire Anchor Flailer"
-                            };
-
-                            var horned = CreateMonsterData(MonsterType.Creep, "Mire Horned Scrapper", 270f, 1.45f, 9, 6, swampColor, 0.21f);
-                            wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = horned, count = 7 + (w * 2), spawnInterval = 0.75f, initialDelay = 0.2f });
-
-                            if (w >= 2)
+                            var forestColor = new Color(0.28f, 0.65f, 0.22f); // Hijau Hutan Purba
+                            if (isFinalWave)
                             {
+                                wave.waveTitle = $"Wave 4: MINI-BOSS - {bossName}";
                                 var flailer = CreateMonsterData(MonsterType.Brute, "Mire Anchor Flailer", 780f, 1.05f, 16, 14, new Color(0.30f, 0.48f, 0.08f), 0.29f);
-                                wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = flailer, count = w, spawnInterval = 1.3f, initialDelay = 1.8f });
+                                wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = flailer, count = 2, spawnInterval = 1.0f, initialDelay = 0.2f });
+
+                                var miniBoss = CreateMonsterData(MonsterType.Boss, bossName, 1850f, 0.85f, 22, 30, forestColor, 0.45f);
+                                wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = miniBoss, count = 1, spawnInterval = 1.0f, initialDelay = 2.0f });
+                            }
+                            else
+                            {
+                                wave.waveTitle = w switch {
+                                    1 => "Wave 1: Sergapan Kilat Penyusup Rawa",
+                                    2 => "Wave 2: Regu Penghancur Berpelindung",
+                                    _ => "Wave 3: Barisan Pelindung Golem Hutan"
+                                };
+
+                                var horned = CreateMonsterData(MonsterType.Creep, "Mire Horned Scrapper", 270f, 1.45f, 9, 6, forestColor, 0.21f);
+                                wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = horned, count = 7 + (w * 2), spawnInterval = 0.75f, initialDelay = 0.2f });
+
+                                if (w >= 2)
+                                {
+                                    var flailer = CreateMonsterData(MonsterType.Brute, "Mire Anchor Flailer", 780f, 1.05f, 16, 14, new Color(0.30f, 0.48f, 0.08f), 0.29f);
+                                    wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = flailer, count = w, spawnInterval = 1.3f, initialDelay = 1.8f });
+                                }
                             }
                         }
                         break;
@@ -443,22 +463,34 @@ namespace FantasyDefense.Metagame
                         }
                         break;
 
-                    case 8: // Stage 1-8: Punggungan Bukit Karang - Mode 2 Swarm + Brute Campuran
+                    case 8: // Stage 1-8: Punggungan Bukit Karang [MINI-BOSS: Glacial Frost Wyrm]
                         {
-                            var cragColor = new Color(0.85f, 0.52f, 0.12f); // Kuning Amber / Perunggu Karang
-                            wave.waveTitle = w switch {
-                                1 => "Wave 1: Perayap Karang Crag Skitterer",
-                                2 => "Wave 2: Serbuan Serempak Karang Terjal",
-                                _ => "Wave 3: Benteng Hidup Cragridge Brute"
-                            };
-
-                            var skitterer = CreateMonsterData(MonsterType.Creep, "Crag Skitterer", 350f, 1.60f, 11, 7, cragColor, 0.22f);
-                            wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = skitterer, count = 9 + (w * 2), spawnInterval = 0.70f, initialDelay = 0.2f });
-
-                            if (w >= 2)
+                            var frostColor = new Color(0.45f, 0.82f, 0.98f); // Biru Es Gletser
+                            if (isFinalWave)
                             {
+                                wave.waveTitle = $"Wave 4: MINI-BOSS - {bossName}";
                                 var brute = CreateMonsterData(MonsterType.Brute, "Cragridge Brute", 1120f, 1.05f, 18, 15, new Color(0.70f, 0.40f, 0.08f), 0.30f);
-                                wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = brute, count = w, spawnInterval = 1.2f, initialDelay = 1.8f });
+                                wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = brute, count = 3, spawnInterval = 1.0f, initialDelay = 0.2f });
+
+                                var miniBoss = CreateMonsterData(MonsterType.Boss, bossName, 2600f, 0.95f, 32, 45, frostColor, 0.48f);
+                                wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = miniBoss, count = 1, spawnInterval = 1.0f, initialDelay = 2.2f });
+                            }
+                            else
+                            {
+                                wave.waveTitle = w switch {
+                                    1 => "Wave 1: Perayap Karang Crag Skitterer",
+                                    2 => "Wave 2: Serbuan Serempak Karang Terjal",
+                                    _ => "Wave 3: Benteng Hidup Cragridge Brute"
+                                };
+
+                                var skitterer = CreateMonsterData(MonsterType.Creep, "Crag Skitterer", 350f, 1.60f, 11, 7, frostColor, 0.22f);
+                                wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = skitterer, count = 9 + (w * 2), spawnInterval = 0.70f, initialDelay = 0.2f });
+
+                                if (w >= 2)
+                                {
+                                    var brute = CreateMonsterData(MonsterType.Brute, "Cragridge Brute", 1120f, 1.05f, 18, 15, new Color(0.70f, 0.40f, 0.08f), 0.30f);
+                                    wave.spawnGroups.Add(new WaveSpawnGroup { monsterData = brute, count = w, spawnInterval = 1.2f, initialDelay = 1.8f });
+                                }
                             }
                         }
                         break;
