@@ -16,7 +16,7 @@ namespace FantasyDefense.Combat
     /// serta input mouse untuk pengujian di Unity Editor.
     /// </summary>
     [RequireComponent(typeof(SpriteRenderer), typeof(Collider2D))]
-    public class UnitController : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler
+    public class UnitController : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler
     {
         // Global tracking unit aktif di grid arena
         public static readonly System.Collections.Generic.List<UnitController> ActiveUnits = new System.Collections.Generic.List<UnitController>();
@@ -202,6 +202,19 @@ namespace FantasyDefense.Combat
 
         protected virtual void OnDisable()
         {
+            if (isPointerHeld || isDragging)
+            {
+                isPointerHeld = false;
+                isDragging = false;
+                HighlightMergeCandidates(false);
+            }
+
+            if (twinFramePulseRoutine != null)
+            {
+                StopCoroutine(twinFramePulseRoutine);
+                twinFramePulseRoutine = null;
+            }
+
             if (CurrentlySelectedUnit == this)
                 DeselectCurrentUnit();
 
@@ -858,9 +871,32 @@ namespace FantasyDefense.Combat
             }
         }
 
+        private bool isPointerHeld = false;
+
         public void OnPointerDown(PointerEventData eventData)
         {
-            // Respon awal sentuhan mobile
+            // Hentikan petunjuk idle otomatis jika pemain menyentuh layar
+            GridMatchHintManager.Instance?.HandlePlayerActivity();
+
+            // Respon awal sentuhan/tahan mobile: aktifkan mode fokus sorot gem kembar (Twin Focus)
+            if (GameManager.Instance != null && GameManager.Instance.CurrentState == BattleState.Preparation)
+            {
+                isPointerHeld = true;
+                HighlightMergeCandidates(true);
+            }
+        }
+
+        public void OnPointerUp(PointerEventData eventData)
+        {
+            // Ketika jari diangkat, matikan mode fokus jika tidak sedang menyeret (drag)
+            if (isPointerHeld)
+            {
+                isPointerHeld = false;
+                if (!isDragging)
+                {
+                    HighlightMergeCandidates(false);
+                }
+            }
         }
 
         /// <summary>
@@ -1265,8 +1301,9 @@ namespace FantasyDefense.Combat
         #region Mobile Tactile Merge Candidate Highlight (Golden Pulse Glow)
 
         /// <summary>
-        /// Mengatur penyorotan seluruh hero sejenis & setier di papan arena saat aksi seret (drag) berlangsung.
-        /// Memberikan panduan visual intuitif pada perangkat mobile agar pemain langsung tahu pasangan fusi yang valid.
+        /// Mengatur penyorotan seluruh hero sejenis & setier di papan arena saat aksi tahan (hold) atau seret (drag) berlangsung.
+        /// Memberikan panduan visual intuitif: meredupkan papan (dimmed background) dan menyematkan bingkai bercahaya emas (focus frame)
+        /// pada gem yang disentuh beserta seluruh kembaran validnya di arena.
         /// </summary>
         private void HighlightMergeCandidates(bool active)
         {
@@ -1277,85 +1314,136 @@ namespace FantasyDefense.Combat
 
             foreach (var other in activeUnits)
             {
-                if (other != null && other != this)
+                if (other == null) continue;
+
+                if (active)
                 {
-                    if (active)
+                    bool isTwin = (other == this) || CanMergeWith(other);
+                    if (isTwin)
                     {
-                        if (CanMergeWith(other))
+                        other.SetMergeCandidateGlow(true);
+                        if (other.currentCell != null)
                         {
-                            other.SetMergeCandidateGlow(true);
-                            if (other.currentCell != null)
-                            {
-                                other.currentCell.SetHighlightState(TileHighlightState.ValidMerge);
-                            }
+                            other.currentCell.SetHighlightState(TileHighlightState.ValidMerge);
                         }
                     }
                     else
                     {
-                        other.SetMergeCandidateGlow(false);
+                        other.SetDimmedState(true);
                         if (other.currentCell != null)
                         {
                             other.currentCell.SetHighlightState(TileHighlightState.None);
                         }
                     }
                 }
+                else
+                {
+                    other.SetMergeCandidateGlow(false);
+                    other.SetDimmedState(false);
+                    if (other.currentCell != null)
+                    {
+                        other.currentCell.SetHighlightState(TileHighlightState.None);
+                    }
+                }
             }
         }
 
+        private GameObject twinFocusFrameObj;
+        private SpriteRenderer twinFocusFrameSr;
+        private Coroutine twinFramePulseRoutine;
+
         /// <summary>
-        /// Mengaktifkan atau mematikan efek pulsasi napas dan aura cahaya emas (Golden Glow Pulse)
-        /// pada unit hero yang menjadi target fusi valid.
+        /// Mengaktifkan atau mematikan bingkai emas bercahaya (Twin Focus Frame) dan sorotan fokus
+        /// pada pahlawan / gem yang menjadi kandidat kembar yang valid tanpa mengubah/mendistorsi skala fisik pahlawan.
         /// </summary>
         public void SetMergeCandidateGlow(bool active)
         {
             if (active)
             {
-                if (mergeCandidatePulseRoutine == null && gameObject.activeInHierarchy)
+                if (spriteRenderer != null)
                 {
-                    basePulseScale = transform.localScale;
-                    if (spriteRenderer != null)
+                    spriteRenderer.color = Color.white;
+                    spriteRenderer.sortingOrder = 120; // Mengangkat ke layer paling depan di atas background redup
+                }
+
+                EnsureTwinFocusFrame();
+                if (twinFocusFrameObj != null)
+                {
+                    twinFocusFrameObj.SetActive(true);
+                    if (twinFramePulseRoutine == null && gameObject.activeInHierarchy)
                     {
-                        baseSpriteColor = spriteRenderer.color;
+                        twinFramePulseRoutine = StartCoroutine(TwinFocusFramePulseRoutine());
                     }
-                    mergeCandidatePulseRoutine = StartCoroutine(MergeCandidatePulseRoutine());
                 }
             }
             else
             {
-                if (mergeCandidatePulseRoutine != null)
+                if (twinFramePulseRoutine != null)
                 {
-                    StopCoroutine(mergeCandidatePulseRoutine);
-                    mergeCandidatePulseRoutine = null;
+                    StopCoroutine(twinFramePulseRoutine);
+                    twinFramePulseRoutine = null;
                 }
+
+                if (twinFocusFrameObj != null)
+                {
+                    twinFocusFrameObj.SetActive(false);
+                }
+
                 if (spriteRenderer != null)
                 {
-                    spriteRenderer.color = baseSpriteColor;
+                    spriteRenderer.color = Color.white;
+                    spriteRenderer.sortingOrder = normalSortingOrder;
                 }
+
                 UpdateVisualAppearance();
             }
         }
 
-        private System.Collections.IEnumerator MergeCandidatePulseRoutine()
+        private void EnsureTwinFocusFrame()
+        {
+            if (twinFocusFrameObj != null) return;
+
+            twinFocusFrameObj = new GameObject("TwinFocusFrame");
+            twinFocusFrameObj.transform.SetParent(transform, false);
+            twinFocusFrameObj.transform.localPosition = new Vector3(0f, 0f, -0.04f);
+            twinFocusFrameObj.transform.localScale = new Vector3(0.55f, 0.55f, 1f);
+
+            twinFocusFrameSr = twinFocusFrameObj.AddComponent<SpriteRenderer>();
+            twinFocusFrameSr.sprite = Resources.Load<Sprite>("Sprites/UI/UI_Frame_Focus_Twin");
+            twinFocusFrameSr.sortingLayerName = spriteRenderer != null ? spriteRenderer.sortingLayerName : "Gem";
+            twinFocusFrameSr.sortingOrder = 119;
+            twinFocusFrameObj.SetActive(false);
+        }
+
+        private System.Collections.IEnumerator TwinFocusFramePulseRoutine()
         {
             float timer = 0f;
-            Color goldenGlow = new Color(1.0f, 0.90f, 0.40f, 1.0f);
-
             while (true)
             {
-                timer += Time.deltaTime * 5.0f;
-                float sinVal = (Mathf.Sin(timer) + 1f) * 0.5f; // 0.0 s/d 1.0
-
-                // Efek denyut napas taktil (Breathing scale 1.0x -> 1.12x)
-                float scaleFactor = Mathf.Lerp(1.0f, 1.12f, sinVal);
-                transform.localScale = basePulseScale * scaleFactor;
-
-                // Transisi warna aura emas menyala
-                if (spriteRenderer != null)
+                timer += Time.deltaTime * 3.8f;
+                // Denyut cahaya kemilau emas (0.78 - 1.0) tanpa mengubah ukuran atau skala gem
+                float alpha = 0.78f + Mathf.Sin(timer) * 0.22f;
+                if (twinFocusFrameSr != null)
                 {
-                    spriteRenderer.color = Color.Lerp(baseSpriteColor, goldenGlow, sinVal * 0.75f);
+                    twinFocusFrameSr.color = new Color(1f, 1f, 1f, alpha);
                 }
-
                 yield return null;
+            }
+        }
+
+        /// <summary>
+        /// Meredupkan visual pahlawan / permata yang bukan kembaran saat mode fokus aktif (Darken non-matching gems).
+        /// </summary>
+        public void SetDimmedState(bool dimmed)
+        {
+            if (spriteRenderer == null) return;
+            if (dimmed)
+            {
+                spriteRenderer.color = new Color(0.28f, 0.28f, 0.35f, 0.60f);
+            }
+            else
+            {
+                spriteRenderer.color = Color.white;
             }
         }
 

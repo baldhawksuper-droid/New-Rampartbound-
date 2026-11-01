@@ -371,8 +371,9 @@ namespace FantasyDefense.GridSystem
                     yield break;
                 }
 
-                float wave = (Mathf.Sin(Time.time * hintPulseSpeed) + 1f) * 0.5f; // 0.0 s/d 1.0
-                float scaleMod = Mathf.Lerp(1.0f, hintPulseScaleMultiplier, wave);
+                // Denyut halus taktil tanpa distorsi ukuran ekstrem (maksimum 1.025x)
+                float wave = (Mathf.Sin(Time.time * hintPulseSpeed) + 1f) * 0.5f;
+                float scaleMod = Mathf.Lerp(1.0f, 1.025f, wave);
 
                 unitA.transform.localScale = baseScaleA * scaleMod;
                 unitB.transform.localScale = baseScaleB * scaleMod;

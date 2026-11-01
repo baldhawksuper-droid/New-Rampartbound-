@@ -114,8 +114,8 @@ namespace FantasyDefense.Combat
 
                 if (backdropSr != null)
                 {
-                    backdropSr.sortingLayerName = "Default";
-                    backdropSr.sortingOrder = -50;
+                    backdropSr.sortingLayerName = "Background";
+                    backdropSr.sortingOrder = 0;
                 }
             }
 
@@ -138,8 +138,8 @@ namespace FantasyDefense.Combat
 
                 if (fadeBackdropSr != null)
                 {
-                    fadeBackdropSr.sortingLayerName = "Default";
-                    fadeBackdropSr.sortingOrder = -49;
+                    fadeBackdropSr.sortingLayerName = "Background";
+                    fadeBackdropSr.sortingOrder = 1;
                     fadeBackdropSr.color = new Color(1f, 1f, 1f, 0f);
                 }
             }
