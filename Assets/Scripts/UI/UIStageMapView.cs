@@ -249,6 +249,9 @@ namespace FantasyDefense.UI
             if (StageManager.Instance == null || CitadelLobbyManager.Instance == null) return;
             var accData = CitadelLobbyManager.Instance.AccountData;
             Font defaultFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+            Sprite nodeNormalSp = Resources.Load<Sprite>("Sprites/UI/UI_StageNode_Normal");
+            Sprite nodeMiniBossSp = Resources.Load<Sprite>("Sprites/UI/UI_StageNode_MiniBoss");
+            Sprite nodeFinalBossSp = Resources.Load<Sprite>("Sprites/UI/UI_StageNode_FinalBoss");
 
             for (int i = 0; i < stageNodeButtons.Count; i++)
             {
@@ -257,7 +260,6 @@ namespace FantasyDefense.UI
                 var btn = stageNodeButtons[i];
                 if (btn == null) continue;
 
-                var txt = btn.GetComponentInChildren<Text>();
                 bool isUnlocked = (StageManager.Instance != null && StageManager.Instance.IsStageUnlocked(stageId)) ||
                                   stageIdx == 1 ||
                                   (accData.GetStageRecord(stageId - 1)?.isCleared ?? false);
@@ -267,38 +269,53 @@ namespace FantasyDefense.UI
 
                 btn.interactable = isUnlocked;
 
-                if (txt != null)
+                // Pasang sprite medallion 3D fantasi beresolusi tinggi pada tombol node
+                var btnImg = btn.GetComponent<Image>();
+                if (btnImg != null)
                 {
-                    string starStr;
-                    if (isCleared)
+                    if (stageIdx == 10 && nodeFinalBossSp != null) btnImg.sprite = nodeFinalBossSp;
+                    else if (stageIdx == 5 && nodeMiniBossSp != null) btnImg.sprite = nodeMiniBossSp;
+                    else if (nodeNormalSp != null) btnImg.sprite = nodeNormalSp;
+
+                    btnImg.type = Image.Type.Simple;
+                    btnImg.preserveAspect = true;
+
+                    if (!isUnlocked)
                     {
-                        if (stars >= 3)
-                        {
-                            starStr = "<color=#FFD700>★★★</color>"; // Radiant gold 3-star
-                        }
-                        else if (stars == 2)
-                        {
-                            starStr = "<color=#FFD700>★★</color><color=#555555>★</color>";
-                        }
-                        else
-                        {
-                            starStr = "<color=#FFD700>★</color><color=#555555>★★</color>";
-                        }
+                        btnImg.color = new Color(0.35f, 0.40f, 0.50f, 0.85f);
                     }
-                    else if (isUnlocked)
+                    else if (isCleared)
                     {
-                        starStr = "<color=#00FFFF>READY</color>";
+                        btnImg.color = Color.white;
                     }
                     else
                     {
-                        starStr = "<color=#666666>🔒 LOCK</color>";
+                        btnImg.color = new Color(1f, 1f, 0.90f, 1f);
                     }
+                }
 
+                var txt = btn.GetComponentInChildren<Text>();
+                if (txt != null)
+                {
                     txt.font = defaultFont;
-                    string bossPrefix = (stageIdx == 5) ? "👑 1-5" : ((stageIdx == 10) ? "💀 1-10" : $"{stageIdx}");
-                    txt.text = $"<b>{bossPrefix}</b>\n{starStr}";
-                    txt.fontSize = (stageIdx == 5 || stageIdx == 10) ? 17 : 16;
-                    txt.color = (stageIdx == 10) ? new Color(1f, 0.4f, 0.4f) : ((stageIdx == 5) ? new Color(1f, 0.85f, 0.3f) : Color.white);
+                    if (!isUnlocked)
+                    {
+                        txt.text = $"<color=#CCCCCC>🔒\n{stageIdx}</color>";
+                        txt.fontSize = 15;
+                    }
+                    else if (isCleared)
+                    {
+                        string starsGlyph = (stars >= 3) ? "<color=#FFD700>★★★</color>" : ((stars == 2) ? "<color=#FFD700>★★</color><color=#555555>★</color>" : "<color=#FFD700>★</color><color=#555555>★★</color>");
+                        string label = (stageIdx == 10) ? "💀 10" : ((stageIdx == 5) ? "👑 5" : $"{stageIdx}");
+                        txt.text = $"<b>{label}</b>\n{starsGlyph}";
+                        txt.fontSize = 16;
+                    }
+                    else
+                    {
+                        string label = (stageIdx == 10) ? "💀 10" : ((stageIdx == 5) ? "👑 5" : $"{stageIdx}");
+                        txt.text = $"<b>{label}</b>\n<color=#00FFFF>GO</color>";
+                        txt.fontSize = 16;
+                    }
                 }
             }
         }

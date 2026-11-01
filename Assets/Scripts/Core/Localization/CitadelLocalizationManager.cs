@@ -36,17 +36,17 @@ namespace FantasyDefense.Localization
             { "LOBBY_TEAM_CP", ("Team CP", "Team CP") },
 
             // Bottom Navigation Dock
-            { "NAV_MAP", ("🗺️\nPeta", "🗺️\nMap") },
-            { "NAV_HEROES", ("🛡️\nHero", "🛡️\nHeroes") },
-            { "NAV_SUMMON", ("🔮\nGacha", "🔮\nSummon") },
-            { "NAV_FORGE", ("🔨\nTempa", "🔨\nForge") },
-            { "NAV_STORE", ("💎\nToko", "💎\nStore") },
-            { "NAV_TALENTS", ("✨\nTalenta", "✨\nTalents") },
-            { "NAV_QUESTS", ("📜\nMisi", "📜\nQuests") },
-            { "NAV_GUILD", ("🏰\nGuild", "🏰\nGuild") },
-            { "NAV_PASS", ("🎖️\nPass", "🎖️\nPass") },
-            { "NAV_EVENT", ("🔥\nEvent", "🔥\nEvent") },
-            { "NAV_ARTIFACTS", ("👑\nArtefak", "👑\nArtifacts") },
+            { "NAV_MAP", ("Peta", "Map") },
+            { "NAV_HEROES", ("Hero", "Heroes") },
+            { "NAV_SUMMON", ("Gacha", "Summon") },
+            { "NAV_FORGE", ("Tempa", "Forge") },
+            { "NAV_STORE", ("Toko", "Store") },
+            { "NAV_TALENTS", ("Talenta", "Talents") },
+            { "NAV_QUESTS", ("Misi", "Quests") },
+            { "NAV_GUILD", ("Guild", "Guild") },
+            { "NAV_PASS", ("Pass", "Pass") },
+            { "NAV_EVENT", ("Event", "Event") },
+            { "NAV_ARTIFACTS", ("Artefak", "Artifacts") },
 
             // Stage Map
             { "MAP_CHAPTER_1", ("Chapter 1: Pertahanan Pinggiran Kerajaan", "Chapter 1: Outskirts Citadel Defense") },

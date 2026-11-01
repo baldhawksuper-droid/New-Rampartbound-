@@ -250,25 +250,25 @@ namespace FantasyDefense.UI
             if (navStageMapButton != null)
             {
                 var txt = navStageMapButton.GetComponentInChildren<Text>();
-                if (txt != null) txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_MAP", "🗺️\nPeta", "🗺️\nMap");
+                if (txt != null) txt.text = $"<b>{FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_MAP", "Peta", "Map").ToUpper()}</b>";
             }
 
             if (navHeroesButton != null)
             {
                 var txt = navHeroesButton.GetComponentInChildren<Text>();
-                if (txt != null) txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_HEROES", "🛡️\nHero", "🛡️\nHeroes");
+                if (txt != null) txt.text = $"<b>{FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_HEROES", "Hero", "Heroes").ToUpper()}</b>";
             }
 
             if (navSummonButton != null)
             {
                 var txt = navSummonButton.GetComponentInChildren<Text>();
-                if (txt != null) txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_SUMMON", "🔮\nGacha", "🔮\nSummon");
+                if (txt != null) txt.text = $"<b>{FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_SUMMON", "Gacha", "Summon").ToUpper()}</b>";
             }
 
             if (navStoreButton != null)
             {
                 var txt = navStoreButton.GetComponentInChildren<Text>();
-                if (txt != null) txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_STORE", "💎\nToko", "💎\nStore");
+                if (txt != null) txt.text = $"<b>{FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_STORE", "Toko", "Store").ToUpper()}</b>";
             }
 
             if (navForgeButton != null)

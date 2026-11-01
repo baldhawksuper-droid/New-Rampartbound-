@@ -766,30 +766,72 @@ namespace Rampartbound.Editor
             dockHlg.spacing = 10f;
             dockHlg.padding = new RectOffset(12, 12, 6, 6);
 
-            var navStageBtn = CreateButton(dockObj.transform, "NavStageMap", "<b>🗺️</b>\n<b>Peta</b>", new Color(0.12f, 0.16f, 0.25f), new Color(1f, 0.95f, 0.85f), 17, defaultFont);
-            var navHeroBtn = CreateButton(dockObj.transform, "NavHeroes", "<b>🛡️</b>\n<b>Hero</b>", new Color(0.12f, 0.16f, 0.25f), new Color(1f, 0.95f, 0.85f), 17, defaultFont);
-            var navSummonBtn = CreateButton(dockObj.transform, "NavSummon", "<b>🔮</b>\n<b>Gacha</b>", new Color(0.12f, 0.16f, 0.25f), new Color(1f, 0.95f, 0.85f), 17, defaultFont);
+            Sprite iconNavMap = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Map.png");
+            Sprite iconNavHero = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Hero.png");
+            Sprite iconNavSummon = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Summon.png");
+            Sprite iconNavStore = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Store.png");
+
+            var navStageBtn = CreateButton(dockObj.transform, "NavStageMap", "PETA", Color.clear, Color.white, 14, defaultFont);
+            var navHeroBtn = CreateButton(dockObj.transform, "NavHeroes", "HERO", Color.clear, Color.white, 14, defaultFont);
+            var navSummonBtn = CreateButton(dockObj.transform, "NavSummon", "GACHA", Color.clear, Color.white, 14, defaultFont);
             CreateNotificationBadge(navSummonBtn.transform, NotificationBadgeType.DailySummonFree);
 
-            var navStoreBtn = CreateButton(dockObj.transform, "NavStore", "<b>💎</b>\n<b>Toko</b>", new Color(0.12f, 0.16f, 0.25f), new Color(1f, 0.95f, 0.85f), 17, defaultFont);
+            var navStoreBtn = CreateButton(dockObj.transform, "NavStore", "TOKO", Color.clear, Color.white, 14, defaultFont);
 
-            System.Action<GameObject> styleNav = (btn) => {
+            System.Action<GameObject, Sprite, string> setupFantasyNavTab = (btn, iconSp, label) => {
                 var bImg = btn.GetComponent<Image>();
-                if (bImg != null) { bImg.sprite = null; bImg.color = new Color(0.12f, 0.16f, 0.25f, 0.95f); }
+                if (bImg != null)
+                {
+                    if (_tabHeroInactive != null)
+                    {
+                        bImg.sprite = _tabHeroInactive;
+                        bImg.type = Image.Type.Sliced;
+                        bImg.color = Color.white;
+                    }
+                    else
+                    {
+                        bImg.color = new Color(0.12f, 0.16f, 0.25f, 0.95f);
+                    }
+                }
+
                 var bOutline = btn.AddComponent<Outline>();
-                bOutline.effectColor = new Color(0.75f, 0.60f, 0.25f, 0.85f);
+                bOutline.effectColor = new Color(0.85f, 0.70f, 0.25f, 0.85f);
                 bOutline.effectDistance = new Vector2(1.5f, -1.5f);
+
+                if (iconSp != null)
+                {
+                    var iconObj = new GameObject("TabIcon", typeof(RectTransform), typeof(Image));
+                    iconObj.transform.SetParent(btn.transform, false);
+                    PositionUI(iconObj, 0.22f, 0.40f, 0.78f, 0.94f);
+                    var icImg = iconObj.GetComponent<Image>();
+                    icImg.sprite = iconSp;
+                    icImg.type = Image.Type.Simple;
+                    icImg.preserveAspect = true;
+                    icImg.raycastTarget = false;
+                }
+
                 var bTxt = btn.GetComponentInChildren<Text>();
-                if (bTxt != null) {
+                if (bTxt != null)
+                {
+                    bTxt.text = $"<b>{label}</b>";
+                    bTxt.fontSize = 14;
+                    bTxt.font = defaultFont;
+                    bTxt.alignment = TextAnchor.MiddleCenter;
+                    bTxt.color = new Color(1f, 0.95f, 0.75f);
+                    var txtRt = bTxt.GetComponent<RectTransform>();
+                    txtRt.anchorMin = new Vector2(0.02f, 0.04f);
+                    txtRt.anchorMax = new Vector2(0.98f, 0.38f);
+                    txtRt.offsetMin = Vector2.zero;
+                    txtRt.offsetMax = Vector2.zero;
                     var tShadow = bTxt.gameObject.AddComponent<Shadow>();
-                    tShadow.effectColor = new Color(0f, 0f, 0f, 0.85f);
+                    tShadow.effectColor = new Color(0f, 0f, 0f, 0.95f);
                     tShadow.effectDistance = new Vector2(1.5f, -1.5f);
                 }
             };
-            styleNav(navStageBtn);
-            styleNav(navHeroBtn);
-            styleNav(navSummonBtn);
-            styleNav(navStoreBtn);
+            setupFantasyNavTab(navStageBtn, iconNavMap, "PETA");
+            setupFantasyNavTab(navHeroBtn, iconNavHero, "HERO");
+            setupFantasyNavTab(navSummonBtn, iconNavSummon, "GACHA");
+            setupFantasyNavTab(navStoreBtn, iconNavStore, "TOKO");
 
             var navForgeBtn = CreateButton(dockObj.transform, "NavForge", "🔨\nTempa", new Color(0.14f, 0.18f, 0.28f), Color.white, 20, defaultFont);
             navForgeBtn.SetActive(false);
