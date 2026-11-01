@@ -9,6 +9,7 @@ using FantasyDefense.Economy;
 using FantasyDefense.Metagame;
 using FantasyDefense.Wave;
 using FantasyDefense.Localization;
+using FantasyDefense.GridSystem;
 
 namespace FantasyDefense.UI
 {

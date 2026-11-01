@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using FantasyDefense.Combat;
 using FantasyDefense.Data;
 
 namespace FantasyDefense.GridSystem

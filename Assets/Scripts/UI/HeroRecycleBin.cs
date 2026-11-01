@@ -8,6 +8,7 @@ using FantasyDefense.Combat;
 using FantasyDefense.Core;
 using FantasyDefense.Data;
 using FantasyDefense.Economy;
+using FantasyDefense.GridSystem;
 
 namespace FantasyDefense.UI
 {

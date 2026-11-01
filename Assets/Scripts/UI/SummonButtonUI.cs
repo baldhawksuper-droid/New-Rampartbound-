@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using FantasyDefense.Economy;
@@ -255,7 +256,7 @@ namespace FantasyDefense.UI
             if (pulseCoroutine != null) StopCoroutine(pulseCoroutine);
         }
 
-        private void HandleSummonFailed(HeroSummoner.SummonFailureReason reason)
+        private void HandleSummonFailed(SummonFailureReason reason)
         {
             StartCoroutine(ShakeButtonRoutine());
         }

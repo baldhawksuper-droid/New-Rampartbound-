@@ -127,6 +127,10 @@ namespace FantasyDefense.Combat
             EconomyManager.OnBattleGoldChanged -= UpdateBountyHint;
         }
 
+        protected virtual void OnDestroy()
+        {
+        }
+
         [Header("Formation Spread & Depth Sorting")]
         [SerializeField] protected float laneOffset = 0f;
 
