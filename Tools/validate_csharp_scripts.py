@@ -50,6 +50,33 @@ def check_known_namespaces(path, content):
             errors.append("CS0103 'SkillVfxManager' referenced without 'using FantasyDefense.Combat;'")
     return errors
 
+def check_scope_shadowing(path, content):
+    errors = []
+    # Strip comments
+    code = re.sub(r'//.*', '', content)
+    code = re.sub(r'/\*.*?\*/', '', code, flags=re.DOTALL)
+    
+    lines = code.split('\n')
+    scope_stack = [{}]
+    var_re = re.compile(r'\bvar\s+([a-zA-Z_]\w*)\s*=')
+    
+    for line_num, line in enumerate(lines, 1):
+        for char in line:
+            if char == '{':
+                scope_stack.append({})
+            elif char == '}':
+                if len(scope_stack) > 1:
+                    scope_stack.pop()
+        
+        matches = var_re.findall(line)
+        for var_name in matches:
+            for scope in scope_stack[:-1]:
+                if var_name in scope and len(scope_stack) > 2:
+                    errors.append(f"Line {line_num}: CS0136 variable '{var_name}' already declared in enclosing scope at line {scope[var_name]}")
+            scope_stack[-1][var_name] = line_num
+            
+    return errors
+
 def main():
     if not os.path.isdir(SCRIPTS_DIR):
         print(f"Directory not found: {SCRIPTS_DIR}")
@@ -88,6 +115,12 @@ def main():
             # Check 3: Known namespace bindings
             ns_errs = check_known_namespaces(file_path, content)
             for err in ns_errs:
+                print(f"[FAIL] {rel_path}: {err}")
+                has_errors = True
+
+            # Check 4: Variable scope shadowing (CS0136)
+            shadow_errs = check_scope_shadowing(file_path, content)
+            for err in shadow_errs:
                 print(f"[FAIL] {rel_path}: {err}")
                 has_errors = True
 

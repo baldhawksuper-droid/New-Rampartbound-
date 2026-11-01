@@ -922,10 +922,10 @@ namespace Rampartbound.Editor
             var pauseBtnObj = CreateButton(topBarObj.transform, "PauseButton", "⏸️ MENU", new Color(0.45f, 0.25f, 0.6f), Color.white, 22, defaultFont);
             if (_btnHudPause != null)
             {
-                var pImg = pauseBtnObj.GetComponent<Image>();
-                pImg.sprite = _btnHudPause;
-                pImg.type = Image.Type.Sliced;
-                pImg.color = Color.white;
+                var pauseBtnImg = pauseBtnObj.GetComponent<Image>();
+                pauseBtnImg.sprite = _btnHudPause;
+                pauseBtnImg.type = Image.Type.Sliced;
+                pauseBtnImg.color = Color.white;
             }
             PositionUI(pauseBtnObj, 0.82f, 0.52f, 0.98f, 0.95f);
 
