@@ -147,8 +147,8 @@ namespace FantasyDefense.UI
                     bool anyQuickActive = showTalents || showQuests || showGuild || showBattlePass || showEventArena || showArtifacts;
                     if (!anyQuickActive && !showAbyssalTrial)
                     {
-                        rt.anchorMin = new Vector2(0.08f, 0.145f);
-                        rt.anchorMax = new Vector2(0.92f, 0.280f);
+                        rt.anchorMin = new Vector2(0.08f, 0.120f);
+                        rt.anchorMax = new Vector2(0.92f, 0.220f);
                         rt.offsetMin = Vector2.zero;
                         rt.offsetMax = Vector2.zero;
                     }
@@ -225,7 +225,7 @@ namespace FantasyDefense.UI
                 var txt = defendCitadelButton.GetComponentInChildren<Text>();
                 if (txt != null)
                 {
-                    txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("LOBBY_DEFEND_BTN", "⚔️ BATTLE (5 ⚡)", "⚔️ BATTLE (5 ⚡)");
+                    txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("LOBBY_DEFEND_BTN", "⚔️ BATTLE (5 STAMINA)", "⚔️ BATTLE (5 STAMINA)");
                 }
             }
 

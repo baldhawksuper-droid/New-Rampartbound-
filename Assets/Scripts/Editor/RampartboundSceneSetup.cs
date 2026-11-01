@@ -467,7 +467,8 @@ namespace Rampartbound.Editor
             {
                 var btnImg = startBtnObj.GetComponent<Image>();
                 btnImg.sprite = _titleBtnTap;
-                btnImg.type = Image.Type.Sliced;
+                btnImg.type = Image.Type.Simple;
+                btnImg.preserveAspect = true;
             }
 
             // Tambahkan Outline dan Shadow pada teks tombol agar terbaca sangat tajam dan kontras
@@ -484,20 +485,20 @@ namespace Rampartbound.Editor
                 shadow.effectDistance = new Vector2(3f, -3f);
             }
 
-            var pulseTxt = CreateText(titlePanelObj.transform, "PulsingHintText", "Ketuk Layar untuk Memulai Pertahanan", 24, FontStyle.Italic, TextAnchor.MiddleCenter, new Color(1f, 1f, 1f, 0.85f), defaultFont);
+            var pulseTxt = CreateText(titlePanelObj.transform, "PulsingHintText", "Ketuk Layar untuk Memulai Pertahanan", 22, FontStyle.Italic, TextAnchor.MiddleCenter, new Color(1f, 1f, 1f, 0.85f), defaultFont);
             var pulseRect = pulseTxt.GetComponent<RectTransform>();
-            pulseRect.anchorMin = new Vector2(0.1f, 0.035f);
-            pulseRect.anchorMax = new Vector2(0.9f, 0.085f);
+            pulseRect.anchorMin = new Vector2(0.05f, 0.046f);
+            pulseRect.anchorMax = new Vector2(0.95f, 0.086f);
             pulseRect.offsetMin = Vector2.zero;
             pulseRect.offsetMax = Vector2.zero;
 
             // Dual Heroes Title Screen (Pippin dan Cedric berdiri berdampingan kokoh di atas batu jalan setapak)
-            // A. Pippin Container & Ground Shadow (Diposisikan di koridor batu jalan setapak)
+            // A. Pippin Container & Ground Shadow (Diposisikan sejajar di koridor batu jalan setapak)
             var pippinGroup = new GameObject("Title_Hero_Pippin_Group", typeof(RectTransform));
             pippinGroup.transform.SetParent(titlePanelObj.transform, false);
             var pippinGroupRt = pippinGroup.GetComponent<RectTransform>();
-            pippinGroupRt.anchorMin = new Vector2(0.24f, 0.12f);
-            pippinGroupRt.anchorMax = new Vector2(0.58f, 0.48f);
+            pippinGroupRt.anchorMin = new Vector2(0.24f, 0.10f);
+            pippinGroupRt.anchorMax = new Vector2(0.58f, 0.46f);
             pippinGroupRt.offsetMin = Vector2.zero;
             pippinGroupRt.offsetMax = Vector2.zero;
 
@@ -580,10 +581,10 @@ namespace Rampartbound.Editor
             handShadow.effectColor = new Color(0, 0, 0, 0.75f);
             handShadow.effectDistance = new Vector2(3, -3);
 
-            var versionTxt = CreateText(titlePanelObj.transform, "VersionText", "Versi 1.2.11 (Google Play Edition)", 22, FontStyle.Normal, TextAnchor.MiddleCenter, new Color(0.6f, 0.6f, 0.6f), defaultFont);
+            var versionTxt = CreateText(titlePanelObj.transform, "VersionText", "Versi 1.2.11 (Google Play Edition)", 15, FontStyle.Normal, TextAnchor.MiddleCenter, new Color(0.62f, 0.72f, 0.85f, 0.75f), defaultFont);
             var verRect = versionTxt.GetComponent<RectTransform>();
-            verRect.anchorMin = new Vector2(0.1f, 0.04f);
-            verRect.anchorMax = new Vector2(0.9f, 0.08f);
+            verRect.anchorMin = new Vector2(0.05f, 0.012f);
+            verRect.anchorMax = new Vector2(0.95f, 0.038f);
             verRect.offsetMin = Vector2.zero;
             verRect.offsetMax = Vector2.zero;
 
@@ -672,7 +673,7 @@ namespace Rampartbound.Editor
 
             // Hero Courtyard Assembly: Wadah pahlawan di teras lantai batu datar depan kastil
             var heroesContainer = CreatePanel(lobbyPanelObj.transform, "HeroCourtyardAssembly", new Color(0f, 0f, 0f, 0f));
-            PositionUI(heroesContainer, 0.02f, 0.17f, 0.98f, 0.74f);
+            PositionUI(heroesContainer, 0.02f, 0.230f, 0.98f, 0.785f);
 
             // Formasi 4 Slot Hero Courtyard Assembly:
             // Pippin (Slot 1, Kiri): Lv.12, CP 1,600
@@ -694,15 +695,50 @@ namespace Rampartbound.Editor
             var windCard = CreateButton(heroesContainer.transform, "WindCard", "🔒 Gacha to Unlock", new Color(0f, 0f, 0f, 0f), Color.white, 14, defaultFont);
             PositionUI(windCard, 0.74f, 0.05f, 0.97f, 0.92f);
             SetupHeroCardPortrait(windCard, _heroWindSprite, null);
+            var windLockOverlay = new GameObject("LockOverlay", typeof(RectTransform), typeof(Image));
+            windLockOverlay.transform.SetParent(windCard.transform, false);
+            PositionUI(windLockOverlay, 0.08f, 0.32f, 0.92f, 0.68f);
+            var windLockImg = windLockOverlay.GetComponent<Image>();
+            windLockImg.color = new Color(0.08f, 0.12f, 0.20f, 0.88f);
+            var windLockBorder = windLockOverlay.AddComponent<Outline>();
+            windLockBorder.effectColor = new Color(0.85f, 0.70f, 0.25f, 0.95f);
+            windLockBorder.effectDistance = new Vector2(2f, -2f);
+            var windLockTxtObj = new GameObject("LockText", typeof(RectTransform), typeof(Text));
+            windLockTxtObj.transform.SetParent(windLockOverlay.transform, false);
+            PositionUI(windLockTxtObj, 0f, 0f, 1f, 1f);
+            var windLockTxt = windLockTxtObj.GetComponent<Text>();
+            windLockTxt.font = defaultFont;
+            windLockTxt.fontSize = 15;
+            windLockTxt.fontStyle = FontStyle.Bold;
+            windLockTxt.alignment = TextAnchor.MiddleCenter;
+            windLockTxt.color = new Color(1f, 0.88f, 0.35f);
+            windLockTxt.text = "🔒\nBUKA\nGACHA";
+            var windLockShadow = windLockTxtObj.AddComponent<Shadow>();
+            windLockShadow.effectColor = new Color(0f, 0f, 0f, 0.90f);
+            windLockShadow.effectDistance = new Vector2(1.5f, -1.5f);
             windCard.SetActive(true);
 
             // Core Battle Button (Crimson 3D Gold Frame with studs)
-            var defendBtn = CreateButton(lobbyPanelObj.transform, "DefendCitadelButton", "⚔️ BATTLE (5 ⚡)", new Color(0.85f, 0.15f, 0.15f), Color.white, 32, defaultFont);
-            PositionUI(defendBtn, 0.10f, 0.115f, 0.90f, 0.185f);
+            var defendBtn = CreateButton(lobbyPanelObj.transform, "DefendCitadelButton", "⚔️ BATTLE (5 STAMINA)", new Color(0.85f, 0.15f, 0.15f), Color.white, 28, defaultFont);
+            PositionUI(defendBtn, 0.08f, 0.120f, 0.92f, 0.220f);
 
             // Workshop Artileri Benteng Citadel (Modular Balista & Meriam)
-            var defenseTurretBtn = CreateButton(lobbyPanelObj.transform, "DefenseTurretWorkshopButton", "🏰 ARTILERI BENTENG", new Color(0.18f, 0.32f, 0.48f), new Color(1f, 0.92f, 0.45f), 16, defaultFont);
-            PositionUI(defenseTurretBtn, 0.20f, 0.77f, 0.80f, 0.825f);
+            var defenseTurretBtn = CreateButton(lobbyPanelObj.transform, "DefenseTurretWorkshopButton", "🏰 ARTILERI BENTENG", new Color(0.12f, 0.18f, 0.28f), new Color(1f, 0.92f, 0.40f), 18, defaultFont);
+            PositionUI(defenseTurretBtn, 0.20f, 0.785f, 0.80f, 0.840f);
+            var dtImg = defenseTurretBtn.GetComponent<Image>();
+            if (dtImg != null) { dtImg.sprite = null; dtImg.color = new Color(0.12f, 0.18f, 0.28f, 0.95f); }
+            var dtOutline = defenseTurretBtn.AddComponent<Outline>();
+            dtOutline.effectColor = new Color(0.85f, 0.70f, 0.25f, 0.95f);
+            dtOutline.effectDistance = new Vector2(2f, -2f);
+            var dtTxt = defenseTurretBtn.GetComponentInChildren<Text>();
+            if (dtTxt != null)
+            {
+                dtTxt.color = new Color(1f, 0.92f, 0.40f);
+                dtTxt.fontStyle = FontStyle.Bold;
+                var txtShadow = dtTxt.gameObject.AddComponent<Shadow>();
+                txtShadow.effectColor = new Color(0f, 0f, 0f, 0.90f);
+                txtShadow.effectDistance = new Vector2(1.5f, -1.5f);
+            }
 
             var trialBtn = CreateButton(lobbyPanelObj.transform, "AbyssalTrialButton", "🌌 UJIAN ABYSSAL", new Color(0.42f, 0.25f, 0.75f), Color.white, 24, defaultFont);
             trialBtn.SetActive(false);
@@ -730,12 +766,30 @@ namespace Rampartbound.Editor
             dockHlg.spacing = 10f;
             dockHlg.padding = new RectOffset(12, 12, 6, 6);
 
-            var navStageBtn = CreateButton(dockObj.transform, "NavStageMap", "🗺️\nPeta", new Color(0.14f, 0.18f, 0.28f), Color.white, 20, defaultFont);
-            var navHeroBtn = CreateButton(dockObj.transform, "NavHeroes", "🛡️\nHero", new Color(0.14f, 0.18f, 0.28f), Color.white, 20, defaultFont);
-            var navSummonBtn = CreateButton(dockObj.transform, "NavSummon", "🔮\nGacha", new Color(0.14f, 0.18f, 0.28f), Color.white, 20, defaultFont);
+            var navStageBtn = CreateButton(dockObj.transform, "NavStageMap", "<b>🗺️</b>\n<b>Peta</b>", new Color(0.12f, 0.16f, 0.25f), new Color(1f, 0.95f, 0.85f), 17, defaultFont);
+            var navHeroBtn = CreateButton(dockObj.transform, "NavHeroes", "<b>🛡️</b>\n<b>Hero</b>", new Color(0.12f, 0.16f, 0.25f), new Color(1f, 0.95f, 0.85f), 17, defaultFont);
+            var navSummonBtn = CreateButton(dockObj.transform, "NavSummon", "<b>🔮</b>\n<b>Gacha</b>", new Color(0.12f, 0.16f, 0.25f), new Color(1f, 0.95f, 0.85f), 17, defaultFont);
             CreateNotificationBadge(navSummonBtn.transform, NotificationBadgeType.DailySummonFree);
 
-            var navStoreBtn = CreateButton(dockObj.transform, "NavStore", "💎\nToko", new Color(0.2f, 0.35f, 0.25f), new Color(1f, 0.9f, 0.3f), 20, defaultFont);
+            var navStoreBtn = CreateButton(dockObj.transform, "NavStore", "<b>💎</b>\n<b>Toko</b>", new Color(0.12f, 0.16f, 0.25f), new Color(1f, 0.95f, 0.85f), 17, defaultFont);
+
+            System.Action<GameObject> styleNav = (btn) => {
+                var bImg = btn.GetComponent<Image>();
+                if (bImg != null) { bImg.sprite = null; bImg.color = new Color(0.12f, 0.16f, 0.25f, 0.95f); }
+                var bOutline = btn.AddComponent<Outline>();
+                bOutline.effectColor = new Color(0.75f, 0.60f, 0.25f, 0.85f);
+                bOutline.effectDistance = new Vector2(1.5f, -1.5f);
+                var bTxt = btn.GetComponentInChildren<Text>();
+                if (bTxt != null) {
+                    var tShadow = bTxt.gameObject.AddComponent<Shadow>();
+                    tShadow.effectColor = new Color(0f, 0f, 0f, 0.85f);
+                    tShadow.effectDistance = new Vector2(1.5f, -1.5f);
+                }
+            };
+            styleNav(navStageBtn);
+            styleNav(navHeroBtn);
+            styleNav(navSummonBtn);
+            styleNav(navStoreBtn);
 
             var navForgeBtn = CreateButton(dockObj.transform, "NavForge", "🔨\nTempa", new Color(0.14f, 0.18f, 0.28f), Color.white, 20, defaultFont);
             navForgeBtn.SetActive(false);
@@ -1276,20 +1330,20 @@ namespace Rampartbound.Editor
                 bastionTrailImg.type = Image.Type.Sliced;
                 bastionTrailImg.color = Color.white;
             }
-            PositionUI(stageTrailPanel, 0.02f, 0.45f, 0.98f, 0.84f);
+            PositionUI(stageTrailPanel, 0.02f, 0.02f, 0.98f, 0.84f);
 
             Vector4[] nodeRects = new Vector4[]
             {
-                new Vector4(0.04f, 0.05f, 0.22f, 0.23f),  // 1-1
-                new Vector4(0.28f, 0.12f, 0.46f, 0.30f),  // 1-2
-                new Vector4(0.53f, 0.06f, 0.71f, 0.24f),  // 1-3
-                new Vector4(0.76f, 0.18f, 0.94f, 0.36f),  // 1-4
-                new Vector4(0.48f, 0.38f, 0.72f, 0.58f),  // 1-5 (Mini-Boss Fortress Node)
-                new Vector4(0.20f, 0.45f, 0.38f, 0.63f),  // 1-6
-                new Vector4(0.04f, 0.64f, 0.22f, 0.82f),  // 1-7
-                new Vector4(0.28f, 0.74f, 0.46f, 0.92f),  // 1-8
-                new Vector4(0.53f, 0.68f, 0.71f, 0.86f),  // 1-9
-                new Vector4(0.74f, 0.75f, 0.98f, 0.97f)   // 1-10 (Final Boss Abyssal Drake Citadel)
+                new Vector4(0.08f, 0.05f, 0.28f, 0.16f),  // 1-1 (Gerbang Masuk)
+                new Vector4(0.38f, 0.13f, 0.58f, 0.24f),  // 1-2 (Jalan Setapak)
+                new Vector4(0.70f, 0.21f, 0.90f, 0.32f),  // 1-3 (Tepi Jurang)
+                new Vector4(0.40f, 0.30f, 0.60f, 0.41f),  // 1-4 (Pos Penjaga)
+                new Vector4(0.08f, 0.39f, 0.32f, 0.52f),  // 1-5 (👑 MINI-BOSS Golem Hutan)
+                new Vector4(0.40f, 0.50f, 0.60f, 0.61f),  // 1-6 (Lereng Es)
+                new Vector4(0.70f, 0.59f, 0.90f, 0.70f),  // 1-7 (Celah Badai)
+                new Vector4(0.40f, 0.69f, 0.60f, 0.80f),  // 1-8 (🐉 Sarang Wyrm)
+                new Vector4(0.10f, 0.78f, 0.30f, 0.89f),  // 1-9 (Puncak Berapi)
+                new Vector4(0.55f, 0.82f, 0.88f, 0.96f)   // 1-10 (💀 FINAL BOSS Titan Malakor)
             };
 
             // Waypoint stepping stones (titik-titik lintasan petualangan elegan tanpa kotak menumpuk)
@@ -1329,13 +1383,15 @@ namespace Rampartbound.Editor
 
             for (int i = 0; i < 10; i++)
             {
-                var sBtnObj = CreateButton(stageTrailPanel.transform, $"StageNode_{i + 1}", nodeTitles[i], Color.white, Color.white, (i == 4 || i == 9) ? 18 : 16, defaultFont);
+                var sBtnObj = CreateButton(stageTrailPanel.transform, $"StageNode_{i + 1}", nodeTitles[i], Color.white, Color.white, (i == 4 || i == 9) ? 20 : 18, defaultFont);
                 PositionUI(sBtnObj, nodeRects[i].x, nodeRects[i].y, nodeRects[i].z, nodeRects[i].w);
 
-                // Pasang sprite 3D medallion artistik menggantikan kotak oranye kaku
+                // Pasang sprite 3D medallion artistik
                 var nodeBtnImg = sBtnObj.GetComponent<Image>();
                 if (nodeBtnImg != null)
                 {
+                    nodeBtnImg.type = Image.Type.Simple;
+                    nodeBtnImg.preserveAspect = true;
                     if (i == 9 && nodeFinalBossSp != null)
                     {
                         nodeBtnImg.sprite = nodeFinalBossSp;
@@ -1353,11 +1409,19 @@ namespace Rampartbound.Editor
                     }
                 }
 
+                var nOutline = sBtnObj.AddComponent<Outline>();
+                nOutline.effectColor = new Color(0f, 0f, 0f, 0.90f);
+                nOutline.effectDistance = new Vector2(2f, -2f);
+
                 // Format teks label angka stage di dalam node
                 var nodeBtnTxt = sBtnObj.GetComponentInChildren<Text>();
                 if (nodeBtnTxt != null)
                 {
-                    nodeBtnTxt.color = (i == 9) ? new Color(1f, 0.35f, 0.35f) : ((i == 4) ? new Color(1f, 0.85f, 0.25f) : new Color(0.95f, 0.95f, 1f));
+                    nodeBtnTxt.fontStyle = FontStyle.Bold;
+                    nodeBtnTxt.color = (i == 9) ? new Color(1f, 0.45f, 0.45f) : ((i == 4) ? new Color(1f, 0.90f, 0.35f) : new Color(0.95f, 0.95f, 1f));
+                    var tShadow = nodeBtnTxt.gameObject.AddComponent<Shadow>();
+                    tShadow.effectColor = new Color(0f, 0f, 0f, 0.95f);
+                    tShadow.effectDistance = new Vector2(1.5f, -1.5f);
                 }
 
                 stageNodeButtonsList.Add(sBtnObj.GetComponent<Button>());
@@ -1371,7 +1435,7 @@ namespace Rampartbound.Editor
                 dImg.type = Image.Type.Sliced;
                 dImg.color = Color.white;
             }
-            PositionUI(detailPanel, 0.03f, 0.03f, 0.97f, 0.46f);
+            PositionUI(detailPanel, 0.04f, 0.04f, 0.96f, 0.52f);
 
             // Close button X di sudut kanan atas panel detail
             var closeDetailBtn = CreateButton(detailPanel.transform, "CloseDetailButton", "✕", new Color(0.6f, 0.2f, 0.2f), Color.white, 20, defaultFont);
