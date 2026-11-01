@@ -454,7 +454,13 @@ namespace FantasyDefense.Core
                 if (GridManager.Instance != null && GridManager.Instance.IsGridFull())
                     break;
 
-                HeroSummoner.Instance.TrySummonHero();
+                HeroSummoner.Instance.TrySummonFreeHero();
+            }
+
+            // Segarkan status tombol summon setelah pemanggilan gratis awal
+            if (FantasyDefense.UI.SummonButtonUI.Instance != null)
+            {
+                FantasyDefense.UI.SummonButtonUI.Instance.UpdateButtonState();
             }
         }
 
@@ -514,6 +520,12 @@ namespace FantasyDefense.Core
             }
 
             Debug.Log($"[GameManager] Populasi Mode 1 Puzzle selesai: {spawnedCount} permata T0 terpasang di arena (Garansi Bebas Match 3/4/5 Awal).");
+
+            // Segarkan status tombol summon/katalis setelah populasi papan puzzle
+            if (FantasyDefense.UI.SummonButtonUI.Instance != null)
+            {
+                FantasyDefense.UI.SummonButtonUI.Instance.UpdateButtonState();
+            }
         }
 
         public void SetState(BattleState newState)

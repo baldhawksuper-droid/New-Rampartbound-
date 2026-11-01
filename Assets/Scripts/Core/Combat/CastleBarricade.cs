@@ -69,6 +69,7 @@ namespace FantasyDefense.Combat
 
             currentHealth = maxHealth;
             EnsureCrackOverlay();
+            EnsureBastionMounts();
             UpdateDamageVisuals();
         }
 
@@ -76,6 +77,55 @@ namespace FantasyDefense.Combat
         {
             OnCastleHealthChanged?.Invoke(currentHealth, maxHealth);
             StartCoroutine(AegisRegenerationLoop());
+            StartCoroutine(CitadelBarricadeVitalityLoop());
+        }
+
+        private void EnsureBastionMounts()
+        {
+            // Dudukan Menara Bastion Kiri yang menyatu kokoh dengan pagar/benteng
+            if (transform.Find("Bastion_Platform_Left") == null)
+            {
+                var leftMount = new GameObject("Bastion_Platform_Left");
+                leftMount.transform.SetParent(transform, false);
+                leftMount.transform.localPosition = new Vector3(-2.15f, -0.05f, 0.05f);
+                leftMount.transform.localScale = new Vector3(0.70f, 0.45f, 1f);
+                var sr = leftMount.AddComponent<SpriteRenderer>();
+                sr.sprite = Resources.Load<Sprite>("Sprites/Combat/rampart_wall") ?? Resources.Load<Sprite>("Sprites/Combat/Plinth_Hero_Base_T5");
+                sr.sortingLayerName = spriteRenderer != null ? spriteRenderer.sortingLayerName : "Board";
+                sr.sortingOrder = 7;
+                sr.color = new Color(0.92f, 0.94f, 0.98f, 1f);
+            }
+
+            // Dudukan Menara Bastion Kanan yang menyatu kokoh dengan pagar/benteng
+            if (transform.Find("Bastion_Platform_Right") == null)
+            {
+                var rightMount = new GameObject("Bastion_Platform_Right");
+                rightMount.transform.SetParent(transform, false);
+                rightMount.transform.localPosition = new Vector3(2.15f, -0.05f, 0.05f);
+                rightMount.transform.localScale = new Vector3(0.70f, 0.45f, 1f);
+                var sr = rightMount.AddComponent<SpriteRenderer>();
+                sr.sprite = Resources.Load<Sprite>("Sprites/Combat/rampart_wall") ?? Resources.Load<Sprite>("Sprites/Combat/Plinth_Hero_Base_T5");
+                sr.sortingLayerName = spriteRenderer != null ? spriteRenderer.sortingLayerName : "Board";
+                sr.sortingOrder = 7;
+                sr.color = new Color(0.92f, 0.94f, 0.98f, 1f);
+            }
+        }
+
+        private IEnumerator CitadelBarricadeVitalityLoop()
+        {
+            float baseTime = 0f;
+            while (true)
+            {
+                baseTime += Time.deltaTime * 2.2f;
+                // Denyut halus cahaya pertahanan Citadel (Aura vitalitas benteng)
+                if (spriteRenderer != null && currentHealth > 0)
+                {
+                    float pulse = 0.95f + Mathf.Sin(baseTime) * 0.05f;
+                    Color targetColor = GetDamageStateColor();
+                    spriteRenderer.color = new Color(targetColor.r * pulse, targetColor.g * pulse, targetColor.b * pulse, 1f);
+                }
+                yield return null;
+            }
         }
 
         private IEnumerator AegisRegenerationLoop()

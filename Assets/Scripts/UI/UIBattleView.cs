@@ -375,6 +375,45 @@ namespace FantasyDefense.UI
 
                 InitializePauseVibrationButton();
             }
+
+            ApplyButtonStyling();
+        }
+
+        private void ApplyButtonStyling()
+        {
+            var btnGold = Resources.Load<Sprite>("Sprites/UI/Btn_Primary_Gold");
+            var btnStone = Resources.Load<Sprite>("Sprites/UI/Btn_Secondary_Stone");
+
+            void StyleButton(Button btn, Sprite sprite, Color tint)
+            {
+                if (btn == null || sprite == null) return;
+                var img = btn.GetComponent<Image>();
+                if (img != null && (img.sprite == null || img.sprite.name.Contains("UISprite") || img.sprite.name.Contains("Background")))
+                {
+                    img.sprite = sprite;
+                    img.type = Image.Type.Sliced;
+                    img.color = tint;
+                }
+            }
+
+            StyleButton(pauseButton, btnStone, Color.white);
+            StyleButton(speedToggleButton, btnStone, Color.white);
+            StyleButton(victoryReturnButton, btnGold, Color.white);
+            StyleButton(defeatRetryButton, btnGold, Color.white);
+            StyleButton(defeatReturnButton, btnStone, Color.white);
+            StyleButton(startDefenseNowButton, btnGold, Color.white);
+
+            if (pausePanel != null)
+            {
+                var resumeBtn = pausePanel.transform.Find("ResumeButton")?.GetComponent<Button>();
+                StyleButton(resumeBtn, btnGold, Color.white);
+
+                var vibBtn = pausePanel.transform.Find("VibrationButton")?.GetComponent<Button>();
+                StyleButton(vibBtn, btnStone, Color.white);
+
+                var surrenderBtn = pausePanel.transform.Find("SurrenderButton")?.GetComponent<Button>();
+                StyleButton(surrenderBtn, btnStone, Color.white);
+            }
         }
 
         #region Event Handlers

@@ -713,7 +713,7 @@ namespace FantasyDefense.Combat
             }
             else
             {
-                // Cari variasi sprite tempur aktif (Combat / Combat_North) jika tersedia di Resources
+                // Prioritaskan sprite tempur kanonikal 3/4 Front View resmi Rampartbound
                 string combatPath = unitData.unitType switch
                 {
                     UnitType.Cedric => $"Sprites/Heroes/Cedric_T{(int)currentTier}_Combat",
@@ -725,11 +725,10 @@ namespace FantasyDefense.Combat
 
                 if (!string.IsNullOrEmpty(combatPath))
                 {
-                    targetSprite = Resources.Load<Sprite>(combatPath)
-                                ?? Resources.Load<Sprite>($"{combatPath}_North");
+                    targetSprite = Resources.Load<Sprite>(combatPath);
                 }
 
-                // Fallback default: Gunakan master sprite kanonikal hero berdasarkan tier
+                // Fallback default: Gunakan master sprite kanonikal hero 3/4 Front View berdasarkan tier
                 if (targetSprite == null)
                 {
                     targetSprite = unitData.GetSpriteForTier(currentTier);
@@ -789,40 +788,15 @@ namespace FantasyDefense.Combat
             {
                 visualAnimator.SetBaseScale(transform.localScale);
 
-                // Modular 2.5D Rigging: Hanya aktif jika menggunakan aset modular terpisah dan tidak ada single-sprite combat kanonikal
+                // Standarisasi Kanonikal: Nonaktifkan rig modular North back-view agar seluruh hero konsisten menghadap 3/4 Front
                 if (visualAnimator is ModularHeroVisualAnimator modularAnim)
                 {
-                    bool hasDirectCombatSprite = targetSprite != null && (targetSprite.name.Contains("Combat") || targetSprite.name.Contains("Rose") || targetSprite.name.Contains("RabbitMage") || targetSprite.name.Contains("Cedric"));
+                    modularAnim.SetModularRigActive(false);
+                }
 
-                    if (!isPreparationToken && currentTier > UnitTier.Tier0 && unitData != null && unitData.unitType == UnitType.Cedric && !hasDirectCombatSprite)
-                    {
-                        int tNum = Mathf.Clamp((int)currentTier, 1, 5);
-                        Sprite torso = Resources.Load<Sprite>($"Sprites/Heroes/Modular/Cedric_T{tNum}_Torso_North")
-                                    ?? Resources.Load<Sprite>("Sprites/Heroes/Modular/Cedric_T1_Torso_North");
-                        Sprite head = Resources.Load<Sprite>($"Sprites/Heroes/Modular/Cedric_T{tNum}_Head_North")
-                                   ?? Resources.Load<Sprite>("Sprites/Heroes/Modular/Cedric_T1_Head_North");
-                        Sprite sword = Resources.Load<Sprite>($"Sprites/Heroes/Modular/Cedric_T{tNum}_Arm_Sword_North")
-                                    ?? Resources.Load<Sprite>("Sprites/Heroes/Modular/Cedric_T1_Arm_Sword_North");
-                        Sprite shield = Resources.Load<Sprite>($"Sprites/Heroes/Modular/Cedric_T{tNum}_Arm_Shield_North")
-                                     ?? Resources.Load<Sprite>("Sprites/Heroes/Modular/Cedric_T1_Arm_Shield_North");
-                        Sprite slash = Resources.Load<Sprite>("Sprites/VFX/VFX_Slash_Arc");
-
-                        if (torso != null && head != null)
-                        {
-                            modularAnim.ConfigureModularSprites(torso, head, sword, shield, slash);
-                            modularAnim.SetModularRigActive(true);
-                            spriteRenderer.color = new Color(1f, 1f, 1f, 0f);
-                        }
-                    }
-                    else
-                    {
-                        // Pastikan rig modular nonaktif dan spriteRenderer utama terlihat 100% utuh
-                        modularAnim.SetModularRigActive(false);
-                        if (spriteRenderer.color.a < 0.95f)
-                        {
-                            spriteRenderer.color = Color.white;
-                        }
-                    }
+                if (spriteRenderer != null && spriteRenderer.color.a < 0.95f)
+                {
+                    spriteRenderer.color = Color.white;
                 }
             }
 

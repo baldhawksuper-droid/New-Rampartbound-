@@ -187,26 +187,26 @@ namespace Rampartbound.Editor
             // Menara Pertahanan Kiri: Balista Sniper Benteng (Setup Ganda Balista - Meriam tersimpan di database aset untuk fitur penukaran & peningkatan masa depan)
             var cannonObj = new GameObject("Turret_Left_Defense");
             cannonObj.transform.SetParent(barricadeObj.transform);
-            cannonObj.transform.localPosition = new Vector3(-2.15f, 0.28f, 0);
+            cannonObj.transform.localPosition = new Vector3(-2.15f, 0.15f, 0);
             var cannonSr = cannonObj.AddComponent<SpriteRenderer>();
             var leftBallistaSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Combat/ballista_turret.png");
             if (leftBallistaSprite != null) cannonSr.sprite = leftBallistaSprite;
             cannonSr.sortingLayerName = "Board";
             cannonSr.sortingOrder = 15;
-            cannonObj.transform.localScale = Vector3.one * 0.70f;
+            cannonObj.transform.localScale = Vector3.one * 0.55f;
             var cannonTurret = cannonObj.AddComponent<CitadelDefenseTurret>();
             cannonTurret.Initialize(CitadelTurretType.Archer, leftBallistaSprite);
 
             // Menara Pertahanan Kanan: Balista Sniper Benteng (Bastion Ballista Turret - Modular)
             var archerObj = new GameObject("Turret_Right_Defense");
             archerObj.transform.SetParent(barricadeObj.transform);
-            archerObj.transform.localPosition = new Vector3(2.15f, 0.28f, 0);
+            archerObj.transform.localPosition = new Vector3(2.15f, 0.15f, 0);
             var archerSr = archerObj.AddComponent<SpriteRenderer>();
             var archerSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Combat/ballista_turret.png");
             if (archerSprite != null) archerSr.sprite = archerSprite;
             archerSr.sortingLayerName = "Board";
             archerSr.sortingOrder = 15;
-            archerObj.transform.localScale = Vector3.one * 0.70f;
+            archerObj.transform.localScale = Vector3.one * 0.55f;
             var archerTurret = archerObj.AddComponent<CitadelDefenseTurret>();
             archerTurret.Initialize(CitadelTurretType.Archer, archerSprite);
 

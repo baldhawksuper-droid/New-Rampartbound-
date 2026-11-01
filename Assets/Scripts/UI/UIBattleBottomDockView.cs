@@ -293,7 +293,7 @@ namespace FantasyDefense.UI
             // Hubungkan Summon Cube yang sudah ada di HUD jika ada
             if (summonCubeContainer == null)
             {
-                var existingSummonBtn = transform.parent != null ? transform.parent.Find("SummonButton") : null;
+                var existingSummonBtn = transform.Find("SummonButton") ?? (transform.parent != null ? transform.parent.Find("SummonButton") : null);
                 if (existingSummonBtn != null)
                 {
                     existingSummonBtn.SetParent(dockRoot, false);

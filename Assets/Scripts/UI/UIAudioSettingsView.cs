@@ -47,6 +47,50 @@ namespace FantasyDefense.UI
         private void Awake()
         {
             InitializeActionButtons();
+            ApplyButtonStyling();
+        }
+
+        private void ApplyButtonStyling()
+        {
+            var btnClose = Resources.Load<Sprite>("Sprites/UI/Btn_Close_X");
+            var btnGold = Resources.Load<Sprite>("Sprites/UI/Btn_Primary_Gold");
+            var btnStone = Resources.Load<Sprite>("Sprites/UI/Btn_Secondary_Stone");
+
+            if (closeButton != null && btnClose != null)
+            {
+                var img = closeButton.GetComponent<Image>();
+                if (img != null)
+                {
+                    img.sprite = btnClose;
+                    img.type = Image.Type.Simple;
+                    img.preserveAspect = true;
+                    img.color = Color.white;
+                }
+                var txt = closeButton.GetComponentInChildren<Text>();
+                if (txt != null) txt.text = "";
+            }
+
+            if (testSfxButton != null && btnGold != null)
+            {
+                var img = testSfxButton.GetComponent<Image>();
+                if (img != null && (img.sprite == null || img.sprite.name.Contains("UISprite")))
+                {
+                    img.sprite = btnGold;
+                    img.type = Image.Type.Sliced;
+                    img.color = Color.white;
+                }
+            }
+
+            if (languageToggleButton != null && btnStone != null)
+            {
+                var img = languageToggleButton.GetComponent<Image>();
+                if (img != null && (img.sprite == null || img.sprite.name.Contains("UISprite")))
+                {
+                    img.sprite = btnStone;
+                    img.type = Image.Type.Sliced;
+                    img.color = Color.white;
+                }
+            }
         }
 
         private void OnEnable()

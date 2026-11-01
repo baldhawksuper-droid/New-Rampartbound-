@@ -88,9 +88,11 @@ namespace FantasyDefense.Combat
             }
 
             originalLocalScale = transform.localScale;
-            if (originalLocalScale == Vector3.zero)
+            // Batasi skala default artileri benteng agar sleek, proporsional, dan tidak mendominasi layar
+            if (originalLocalScale.x > 0.65f || originalLocalScale == Vector3.zero)
             {
-                originalLocalScale = Vector3.one;
+                originalLocalScale = new Vector3(0.55f, 0.55f, 1f);
+                transform.localScale = originalLocalScale;
             }
             originalLocalPos = transform.localPosition;
         }
@@ -286,18 +288,18 @@ namespace FantasyDefense.Combat
             }
             else
             {
-                // Panah Tajam Balista Pemanah
+                // Panah Tajam Balista Pemanah (Skala diperkecil agar proporsional dan aerodinamis)
                 var ballistaBoltSprite = Resources.Load<Sprite>("Sprites/Combat/Projectile_Ballista_Bolt");
                 if (ballistaBoltSprite != null)
                 {
                     sr.sprite = ballistaBoltSprite;
                     sr.color = Color.white;
-                    projObj.transform.localScale = new Vector3(0.55f, 0.55f, 1f);
+                    projObj.transform.localScale = new Vector3(0.30f, 0.30f, 1f);
                 }
                 else
                 {
                     sr.color = new Color(0.9f, 0.95f, 1f);
-                    projObj.transform.localScale = new Vector3(0.35f, 0.65f, 1f);
+                    projObj.transform.localScale = new Vector3(0.22f, 0.40f, 1f);
                 }
                 proj.Initialize(target, baseDamage, aoeRadius: 0f, slow: 0f, slowTime: 0f, critical: false, meteor: false, arrow: false, cannon: false, ballista: true);
 

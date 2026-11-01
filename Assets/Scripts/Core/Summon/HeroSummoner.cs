@@ -310,6 +310,33 @@ namespace FantasyDefense.Summon
         }
 
         /// <summary>
+        /// Memanggil pahlawan awal secara gratis ke arena (Starter Free Heroes) tanpa memotong cadangan gems pemain,
+        /// sehingga cadangan gems awal pemain (100G) tetap utuh untuk digunakan pada tombol pemanggilan.
+        /// </summary>
+        public bool TrySummonFreeHero()
+        {
+            if (GridManager.Instance == null || !GridManager.Instance.IsInitialized)
+            {
+                return false;
+            }
+
+            if (GridManager.Instance.IsGridFull())
+            {
+                return false;
+            }
+
+            TileCell emptyCell = GridManager.Instance.GetRandomEmptyCell();
+            if (emptyCell == null) return false;
+
+            UnitDataSO chosenHero = GetRandomHeroFromPool();
+            if (chosenHero == null) return false;
+
+            UnitController spawnedUnit = SpawnUnitAtCell(chosenHero, emptyCell, UnitTier.Tier1);
+            OnHeroSummoned?.Invoke(spawnedUnit, emptyCell);
+            return true;
+        }
+
+        /// <summary>
         /// Memanggil pahlawan dengan tipe spesifik ke petak arena kosong (Mode 2 Real-Time Deploy).
         /// Memenuhi spesifikasi kanonikal Master Game Spec di mana pemain dapat memilih pahlawan
         /// tertentu dari deck bawah untuk strategi formasi terarah.

@@ -30,6 +30,7 @@ namespace FantasyDefense.UI
 
         [Header("Skip Option")]
         [SerializeField] private Button skipTutorialButton;
+        [SerializeField] private Text skipButtonText;
 
         private TutorialStepData currentStepData;
 
@@ -74,6 +75,11 @@ namespace FantasyDefense.UI
                           ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Frame_StoneBastion_9Slice.png")
 #endif
                           ;
+            var btnSecondary = Resources.Load<Sprite>("Sprites/UI/Btn_Secondary_Stone")
+#if UNITY_EDITOR
+                            ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Btn_Secondary_Stone.png")
+#endif
+                            ;
             var pointerSprite = Resources.Load<Sprite>("Sprites/UI/UI_Pointer_Hand")
 #if UNITY_EDITOR
                           ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Pointer_Hand.png")
@@ -99,7 +105,7 @@ namespace FantasyDefense.UI
                 pointerHand.sizeDelta = new Vector2(64f, 64f);
             }
 
-            // Pastikan tombol Skip Tutorial selalu ada, aktif, dan memiliki styling jelas
+            // Pastikan tombol Skip Tutorial selalu ada, aktif, dan memiliki styling jelas berbingkai batu fantasi
             if (skipTutorialButton == null)
             {
                 var skipObj = new GameObject("DynamicSkipButton", typeof(RectTransform), typeof(Image), typeof(Button));
@@ -110,12 +116,12 @@ namespace FantasyDefense.UI
                 rt.anchorMax = new Vector2(1f, 1f);
                 rt.pivot = new Vector2(1f, 1f);
                 rt.anchoredPosition = new Vector2(-20f, -25f);
-                rt.sizeDelta = new Vector2(130f, 42f);
+                rt.sizeDelta = new Vector2(140f, 44f);
 
                 var img = skipObj.GetComponent<Image>();
-                img.sprite = frame9Slice;
+                img.sprite = btnSecondary != null ? btnSecondary : frame9Slice;
                 img.type = Image.Type.Sliced;
-                img.color = new Color(0.28f, 0.12f, 0.15f, 0.95f); // Crimson dark stone
+                img.color = Color.white;
 
                 skipTutorialButton = skipObj.GetComponent<Button>();
                 skipTutorialButton.onClick.AddListener(OnSkipClicked);
@@ -128,13 +134,18 @@ namespace FantasyDefense.UI
                 textRt.offsetMin = Vector2.zero;
                 textRt.offsetMax = Vector2.zero;
 
-                var txt = txtObj.GetComponent<Text>();
-                txt.font = lilitaFont ?? Resources.GetBuiltinResource<Font>("Arial.ttf");
-                txt.fontSize = 14;
-                txt.alignment = TextAnchor.MiddleCenter;
-                txt.color = new Color(1f, 0.85f, 0.85f, 1f);
-                txt.text = "LEWATI (SKIP) ✕";
-                txt.raycastTarget = false;
+                skipButtonText = txtObj.GetComponent<Text>();
+                skipButtonText.font = lilitaFont ?? Resources.GetBuiltinResource<Font>("Arial.ttf");
+                skipButtonText.fontSize = 14;
+                skipButtonText.fontStyle = FontStyle.Bold;
+                skipButtonText.alignment = TextAnchor.MiddleCenter;
+                skipButtonText.color = new Color(1f, 0.92f, 0.70f, 1f);
+                skipButtonText.text = FantasyDefense.Localization.CitadelLocalizationManager.Text("LEWATI (SKIP) ✕", "SKIP ✕");
+                skipButtonText.raycastTarget = false;
+            }
+            else if (skipButtonText == null)
+            {
+                skipButtonText = skipTutorialButton.GetComponentInChildren<Text>();
             }
 
             // Pastikan Portrait Avatar Mentor BaldHawk terpasang di samping dialog
@@ -160,18 +171,45 @@ namespace FantasyDefense.UI
         {
             TutorialGuideManager.OnTutorialStepStarted += HandleStepStarted;
             TutorialGuideManager.OnTutorialCompleted += HandleTutorialCompleted;
+            FantasyDefense.Localization.CitadelLocalizationManager.OnLanguageChanged += HandleLanguageChanged;
+            RefreshLocalizedTexts();
         }
 
         private void OnDisable()
         {
             TutorialGuideManager.OnTutorialStepStarted -= HandleStepStarted;
             TutorialGuideManager.OnTutorialCompleted -= HandleTutorialCompleted;
+            FantasyDefense.Localization.CitadelLocalizationManager.OnLanguageChanged -= HandleLanguageChanged;
 
             // Pastikan raycast blocker dibersihkan saat objek dinonaktifkan / berganti scene
             if (canvasGroup != null)
             {
                 canvasGroup.blocksRaycasts = false;
                 canvasGroup.interactable = false;
+            }
+        }
+
+        private void HandleLanguageChanged(FantasyDefense.Localization.AppLanguage newLang)
+        {
+            RefreshLocalizedTexts();
+        }
+
+        private void RefreshLocalizedTexts()
+        {
+            if (currentStepData != null)
+            {
+                if (speakerNameText != null) speakerNameText.text = currentStepData.GetLocalizedSpeaker();
+                if (dialogueBodyText != null) dialogueBodyText.text = currentStepData.GetLocalizedDialogue();
+            }
+
+            if (skipButtonText != null)
+            {
+                skipButtonText.text = FantasyDefense.Localization.CitadelLocalizationManager.Text("LEWATI (SKIP) ✕", "SKIP ✕");
+            }
+
+            if (tapHintText != null)
+            {
+                tapHintText.text = FantasyDefense.Localization.CitadelLocalizationManager.Text("Ketuk di mana saja untuk lanjut...", "Tap anywhere to continue...");
             }
         }
 
@@ -190,13 +228,19 @@ namespace FantasyDefense.UI
             currentStepData = stepData;
             ShowOverlay(true);
 
-            if (speakerNameText != null) speakerNameText.text = stepData.speakerName;
-            if (dialogueBodyText != null) dialogueBodyText.text = stepData.dialogueText;
+            if (speakerNameText != null) speakerNameText.text = stepData.GetLocalizedSpeaker();
+            if (dialogueBodyText != null) dialogueBodyText.text = stepData.GetLocalizedDialogue();
 
             // Jika step butuh aksi klik tombol spesifik, hilangkan hint tap-anywhere
             if (tapHintText != null)
             {
                 tapHintText.gameObject.SetActive(!stepData.requireSpecificAction);
+                tapHintText.text = FantasyDefense.Localization.CitadelLocalizationManager.Text("Ketuk di mana saja untuk lanjut...", "Tap anywhere to continue...");
+            }
+
+            if (skipButtonText != null)
+            {
+                skipButtonText.text = FantasyDefense.Localization.CitadelLocalizationManager.Text("LEWATI (SKIP) ✕", "SKIP ✕");
             }
 
             // Posisikan pointer jika ada target UI

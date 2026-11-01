@@ -347,11 +347,82 @@ namespace FantasyDefense.UI
 
         private void OnSummonButtonClicked()
         {
+            if (EconomyManager.Instance == null) return;
+
+            int currentCost = EconomyManager.Instance.GetCurrentSummonCost();
+            int currentGems = EconomyManager.Instance.CurrentGems;
+
+            bool isPuzzle = FantasyDefense.Core.GameManager.Instance != null &&
+                            FantasyDefense.Core.GameManager.Instance.CurrentBattleMode == BattleMode.PuzzlePreparation;
+
+            if (currentGems < currentCost)
+            {
+                StartCoroutine(ShakeButtonRoutine());
+                if (SkillVfxManager.Instance != null)
+                {
+                    SkillVfxManager.Instance.SpawnFloatingText(
+                        transform.position + Vector3.up * 0.9f,
+                        CitadelLocalizationManager.Text($"⚠️ Butuh {currentCost} Gems!", $"⚠️ Need {currentCost} Gems!"),
+                        new Color(1f, 0.4f, 0.4f),
+                        1.4f,
+                        true
+                    );
+                }
+                if (Audio.AudioManager.Instance != null)
+                {
+                    Audio.AudioManager.Instance.PlaySfx(Audio.AudioSfxType.ButtonClick);
+                }
+                return;
+            }
+
+            if (!isPuzzle && GridManager.Instance != null && GridManager.Instance.IsGridFull())
+            {
+                StartCoroutine(ShakeButtonRoutine());
+                if (SkillVfxManager.Instance != null)
+                {
+                    SkillVfxManager.Instance.SpawnFloatingText(
+                        transform.position + Vector3.up * 0.9f,
+                        CitadelLocalizationManager.Text("⚠️ Arena Penuh! Gabungkan Hero!", "⚠️ Arena Full! Merge Heroes!"),
+                        new Color(1f, 0.55f, 0.2f),
+                        1.4f,
+                        true
+                    );
+                }
+                return;
+            }
+
+            if (isPuzzle && HeroSummoner.Instance != null && !HeroSummoner.Instance.HasCatalystCandidate())
+            {
+                StartCoroutine(ShakeButtonRoutine());
+                if (SkillVfxManager.Instance != null)
+                {
+                    SkillVfxManager.Instance.SpawnFloatingText(
+                        transform.position + Vector3.up * 0.9f,
+                        CitadelLocalizationManager.Text("⭐ Semua Token Telah Tier 5 (MAX)!", "⭐ All Tokens at Max Tier!"),
+                        new Color(1f, 0.85f, 0.2f),
+                        1.4f,
+                        true
+                    );
+                }
+                return;
+            }
+
             StartCoroutine(PunchScaleRoutine(transform, 1.15f, 0.18f));
 
             if (HeroSummoner.Instance != null)
             {
                 HeroSummoner.Instance.TrySummonHero();
+            }
+        }
+
+        private float nextStateCheckTime = 0f;
+
+        private void Update()
+        {
+            if (Time.unscaledTime >= nextStateCheckTime)
+            {
+                nextStateCheckTime = Time.unscaledTime + 0.5f;
+                UpdateButtonState();
             }
         }
 
@@ -402,11 +473,15 @@ namespace FantasyDefense.UI
                 ? (HeroSummoner.Instance == null || HeroSummoner.Instance.HasCatalystCandidate())
                 : (GridManager.Instance == null || !GridManager.Instance.IsGridFull());
 
-            bool isInteractable = canAfford && gridHasSpace;
-
+            // Tetap izinkan sentuhan tombol aktif agar pemain mendapatkan feedback suara & teks melayang edukatif
             if (button != null)
             {
-                button.interactable = isInteractable;
+                button.interactable = true;
+                var img = button.GetComponent<Image>();
+                if (img != null)
+                {
+                    img.color = (canAfford && gridHasSpace) ? Color.white : new Color(0.85f, 0.85f, 0.90f, 0.95f);
+                }
             }
 
             UpdateCostDisplay(currentCost);

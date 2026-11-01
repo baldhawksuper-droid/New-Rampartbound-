@@ -30,16 +30,32 @@ namespace FantasyDefense.Metagame
         public TutorialStep step;
         public string speakerName;
         public string dialogueText;
+        public string speakerNameEn;
+        public string dialogueTextEn;
         public string targetUiElementName; // Nama elemen UI atau tag untuk spotlight highlight
         public bool requireSpecificAction; // Jika true, pemain harus klik tombol target (bukan sembarang klik)
 
-        public TutorialStepData(TutorialStep s, string speaker, string dialogue, string targetUi = "", bool reqAction = false)
+        public TutorialStepData(TutorialStep s, string speakerId, string dialogueId, string speakerEn = "", string dialogueEn = "", string targetUi = "", bool reqAction = false)
         {
             step = s;
-            speakerName = speaker;
-            dialogueText = dialogue;
+            speakerName = speakerId;
+            dialogueText = dialogueId;
+            speakerNameEn = !string.IsNullOrEmpty(speakerEn) ? speakerEn : speakerId;
+            dialogueTextEn = !string.IsNullOrEmpty(dialogueEn) ? dialogueEn : dialogueId;
             targetUiElementName = targetUi;
             requireSpecificAction = reqAction;
+        }
+
+        public string GetLocalizedSpeaker()
+        {
+            bool isEn = FantasyDefense.Localization.CitadelLocalizationManager.CurrentLanguage == FantasyDefense.Localization.AppLanguage.English;
+            return (isEn && !string.IsNullOrEmpty(speakerNameEn)) ? speakerNameEn : speakerName;
+        }
+
+        public string GetLocalizedDialogue()
+        {
+            bool isEn = FantasyDefense.Localization.CitadelLocalizationManager.CurrentLanguage == FantasyDefense.Localization.AppLanguage.English;
+            return (isEn && !string.IsNullOrEmpty(dialogueTextEn)) ? dialogueTextEn : dialogueText;
         }
     }
 
@@ -90,6 +106,8 @@ namespace FantasyDefense.Metagame
                         TutorialStep.WelcomeGreeting,
                         "BaldHawk (Mentor)",
                         "Selamat datang di Citadel, Panglima! Monster dari jurang Abyssal semakin dekat. Kita harus segera bersiap!",
+                        "BaldHawk (Mentor)",
+                        "Welcome to the Citadel, Commander! Monsters from the Abyssal chasm are drawing near. We must prepare at once!",
                         "",
                         false
                     ),
@@ -97,6 +115,8 @@ namespace FantasyDefense.Metagame
                         TutorialStep.SummonFirstHero,
                         "BaldHawk (Mentor)",
                         "Tekan tombol 'Summon Hero' untuk memanggil pahlawan pertama kita ke medan perang!",
+                        "BaldHawk (Mentor)",
+                        "Tap the 'Summon Hero' button to call our first champion to the battlefield!",
                         "SummonButton",
                         true
                     ),
@@ -104,6 +124,8 @@ namespace FantasyDefense.Metagame
                         TutorialStep.SummonSecondHero,
                         "BaldHawk (Mentor)",
                         "Luar biasa! Sekarang panggil satu pahlawan lagi agar kita bisa menggabungkan kekuatan mereka.",
+                        "BaldHawk (Mentor)",
+                        "Splendid! Now summon one more hero so we can combine their forces.",
                         "SummonButton",
                         true
                     ),
@@ -111,6 +133,8 @@ namespace FantasyDefense.Metagame
                         TutorialStep.MergeTutorial,
                         "BaldHawk (Mentor)",
                         "Tarik (Drag) pahlawan yang bertipe sama ke atas pahlawan lainnya untuk melakukan Merge ke Tier 2!",
+                        "BaldHawk (Mentor)",
+                        "Drag a hero onto another of the same type and tier to merge them into Tier 2!",
                         "GridHeroUnit",
                         true
                     ),
@@ -118,6 +142,8 @@ namespace FantasyDefense.Metagame
                         TutorialStep.BarricadeDefense,
                         "BaldHawk (Mentor)",
                         "Hebat! Pahlawan Tier 2 memiliki serangan lebih dahsyat. Pertahankan barikade benteng dari gelombang monster!",
+                        "BaldHawk (Mentor)",
+                        "Magnificent! Tier 2 heroes possess devastating attacks. Defend the citadel barricade against incoming monster waves!",
                         "CastleBarricade",
                         false
                     ),
@@ -125,6 +151,8 @@ namespace FantasyDefense.Metagame
                         TutorialStep.TriggerHeroSkill,
                         "BaldHawk (Mentor)",
                         "Perhatikan bilah energi skill pahlawan! Pahlawan Tier 2 & 3 otomatis memicu jurus pamungkas saat penuh.",
+                        "BaldHawk (Mentor)",
+                        "Watch the hero's energy gauge! Higher tier heroes unleash their ultimate abilities when it is full.",
                         "SkillIndicator",
                         false
                     ),
@@ -132,6 +160,8 @@ namespace FantasyDefense.Metagame
                         TutorialStep.VictoryStage,
                         "BaldHawk (Mentor)",
                         "Pertahanan sempurna! Pasukan musuh dipukul mundur. Mari kita periksa markas benteng kita.",
+                        "BaldHawk (Mentor)",
+                        "Flawless defense! The enemy forces have been repelled. Let us inspect our citadel headquarters.",
                         "VictoryContinueBtn",
                         false
                     ),
@@ -139,6 +169,8 @@ namespace FantasyDefense.Metagame
                         TutorialStep.LobbyNavigation,
                         "BaldHawk (Mentor)",
                         "Ini adalah Citadel Lobby. Buka menu 'Hero Roster' untuk memperkuat atribut dan perlengkapan pahlawanmu.",
+                        "BaldHawk (Mentor)",
+                        "This is the Citadel Lobby. Open the 'Hero Roster' menu to empower your champions and inspect their gear.",
                         "LobbyHeroMenuBtn",
                         true
                     ),
@@ -146,6 +178,8 @@ namespace FantasyDefense.Metagame
                         TutorialStep.UpgradeHero,
                         "BaldHawk (Mentor)",
                         "Tingkatkan level Sir Cedric untuk meningkatkan Attack & Defense benteng kita!",
+                        "BaldHawk (Mentor)",
+                        "Upgrade Sir Cedric to bolster our citadel's Attack and Defense attributes!",
                         "HeroUpgradeBtn",
                         true
                     ),
@@ -153,6 +187,8 @@ namespace FantasyDefense.Metagame
                         TutorialStep.Completed,
                         "BaldHawk (Mentor)",
                         "Pelatihan selesai! Sekarang benteng berada di bawah komandomu. Pertahankan Citadel dengan segenap jiwamu!",
+                        "BaldHawk (Mentor)",
+                        "Training complete! The citadel is now under your command. Defend the Citadel with all your might!",
                         "",
                         false
                     )
