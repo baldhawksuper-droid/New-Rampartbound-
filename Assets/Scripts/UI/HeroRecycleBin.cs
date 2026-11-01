@@ -97,6 +97,11 @@ namespace FantasyDefense.UI
                           ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Frame_StoneBastion_9Slice.png")
 #endif
                           ;
+            var frameOrnateGold = Resources.Load<Sprite>("Sprites/UI/Frame_OrnateGold_9Slice")
+#if UNITY_EDITOR
+                          ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Frame_OrnateGold_9Slice.png")
+#endif
+                          ;
             var altarIconSprite = Resources.Load<Sprite>("Sprites/UI/UI_Altar_Recycle_Hero")
 #if UNITY_EDITOR
                           ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Altar_Recycle_Hero.png")
@@ -107,10 +112,14 @@ namespace FantasyDefense.UI
             {
                 binFrameImage = gameObject.GetComponent<Image>();
                 if (binFrameImage == null) binFrameImage = gameObject.AddComponent<Image>();
-                binFrameImage.sprite = frame9Slice;
+                binFrameImage.sprite = frameOrnateGold ?? frame9Slice;
                 binFrameImage.type = Image.Type.Sliced;
-                binFrameImage.color = new Color(0.18f, 0.08f, 0.10f, 0.88f); // Dark crimson slate
+                binFrameImage.color = new Color(0.22f, 0.12f, 0.14f, 0.95f); // Rich dark crimson obsidian
             }
+
+            var binOutline = gameObject.GetComponent<Outline>() ?? gameObject.AddComponent<Outline>();
+            binOutline.effectColor = new Color(0.85f, 0.72f, 0.28f, 0.85f);
+            binOutline.effectDistance = new Vector2(1.5f, -1.5f);
 
             // Ikon Grafis Altar Peleburan / Tungku Runic Recycle
             if (binIconImage == null)
@@ -471,9 +480,10 @@ namespace FantasyDefense.UI
             }
 
             var lilitaFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
-            var frame9Slice = Resources.Load<Sprite>("Sprites/UI/Frame_StoneBastion_9Slice")
+            var frameOrnate = Resources.Load<Sprite>("Sprites/UI/Frame_OrnateGold_9Slice")
+                           ?? Resources.Load<Sprite>("Sprites/UI/Frame_StoneBastion_9Slice")
 #if UNITY_EDITOR
-                          ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Frame_StoneBastion_9Slice.png")
+                          ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Frame_OrnateGold_9Slice.png")
 #endif
                           ;
 
@@ -484,13 +494,17 @@ namespace FantasyDefense.UI
             rt.anchorMin = rectTransform.anchorMin;
             rt.anchorMax = rectTransform.anchorMax;
             rt.pivot = rectTransform.pivot;
-            rt.sizeDelta = new Vector2(104f, 44f);
+            rt.sizeDelta = new Vector2(110f, 44f);
             UpdateUndoButtonPosition();
 
             var img = undoButtonObj.GetComponent<Image>();
-            img.sprite = frame9Slice;
+            img.sprite = frameOrnate;
             img.type = Image.Type.Sliced;
-            img.color = new Color(0.25f, 0.20f, 0.22f, 0.95f); // Dark stone backing
+            img.color = new Color(0.18f, 0.22f, 0.30f, 0.98f); // Rich dark andesite backing
+
+            var undoOutline = undoButtonObj.AddComponent<Outline>();
+            undoOutline.effectColor = new Color(0.35f, 0.95f, 0.55f, 0.90f);
+            undoOutline.effectDistance = new Vector2(1.5f, -1.5f);
 
             var btn = undoButtonObj.GetComponent<Button>();
             btn.onClick.AddListener(OnUndoButtonClicked);
@@ -696,9 +710,10 @@ namespace FantasyDefense.UI
             if (firstTimeTooltipObj == null)
             {
                 var lilitaFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
-                var frame9Slice = Resources.Load<Sprite>("Sprites/UI/Frame_StoneBastion_9Slice")
+                var frameOrnate = Resources.Load<Sprite>("Sprites/UI/Frame_OrnateGold_9Slice")
+                               ?? Resources.Load<Sprite>("Sprites/UI/Frame_StoneBastion_9Slice")
 #if UNITY_EDITOR
-                              ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Frame_StoneBastion_9Slice.png")
+                              ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Frame_OrnateGold_9Slice.png")
 #endif
                               ;
 
@@ -710,12 +725,16 @@ namespace FantasyDefense.UI
                 rt.anchorMax = rectTransform.anchorMax;
                 rt.pivot = new Vector2(1f, 0f);
                 rt.anchoredPosition = rectTransform.anchoredPosition + new Vector2(0f, 50f);
-                rt.sizeDelta = new Vector2(170f, 65f);
+                rt.sizeDelta = new Vector2(185f, 70f);
 
                 var img = firstTimeTooltipObj.GetComponent<Image>();
-                img.sprite = frame9Slice;
+                img.sprite = frameOrnate;
                 img.type = Image.Type.Sliced;
-                img.color = new Color(0.12f, 0.15f, 0.22f, 0.98f); // Deep fortress obsidian
+                img.color = new Color(0.10f, 0.14f, 0.22f, 0.98f); // Deep fortress obsidian
+
+                var tipOutline = firstTimeTooltipObj.AddComponent<Outline>();
+                tipOutline.effectColor = new Color(1f, 0.85f, 0.25f, 0.90f);
+                tipOutline.effectDistance = new Vector2(1.5f, -1.5f);
 
                 var textObj = new GameObject("HintText", typeof(RectTransform), typeof(Text));
                 textObj.transform.SetParent(firstTimeTooltipObj.transform, false);
@@ -729,8 +748,8 @@ namespace FantasyDefense.UI
                 txt.font = lilitaFont ?? Resources.GetBuiltinResource<Font>("Arial.ttf");
                 txt.fontSize = 11;
                 txt.alignment = TextAnchor.MiddleCenter;
-                txt.color = new Color(1.0f, 0.88f, 0.45f, 1f);
-                txt.text = "💡 LEPAS DI SINI UNTUK LEBUR HERO & REFUND 50% GEMS!";
+                txt.color = new Color(1.0f, 0.92f, 0.55f, 1f);
+                txt.text = "<b>💡 LEPAS DI SINI</b>\n<size=10>Lebur Hero & Refund 50% Gems!</size>";
                 txt.raycastTarget = false;
 
                 img.raycastTarget = false;

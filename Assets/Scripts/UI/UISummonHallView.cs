@@ -73,6 +73,68 @@ namespace FantasyDefense.UI
             Instance = this;
 
             InitializeButtons();
+            ApplySummonVisualStyling();
+        }
+
+        private void ApplySummonVisualStyling()
+        {
+            var bannerSprite = Resources.Load<Sprite>("Sprites/UI/UI_Gacha_Banner_WindRanger");
+            var btnSingleSprite = Resources.Load<Sprite>("Sprites/UI/UI_Btn_Gacha_Single");
+            var btnMultiSprite = Resources.Load<Sprite>("Sprites/UI/UI_Btn_Gacha_Multi");
+
+            // 1. Upgrade Altar Banner Panel
+            var bannerPanel = transform.Find("ContentContainer/AltarBannerPanel")
+                           ?? transform.Find("AltarBannerPanel");
+            if (bannerPanel != null)
+            {
+                var bImg = bannerPanel.GetComponent<Image>();
+                if (bImg != null && bannerSprite != null)
+                {
+                    bImg.sprite = bannerSprite;
+                    bImg.color = Color.white;
+                }
+                var bOutline = bannerPanel.GetComponent<Outline>() ?? bannerPanel.gameObject.AddComponent<Outline>();
+                bOutline.effectColor = new Color(0.85f, 0.72f, 0.28f, 0.75f);
+                bOutline.effectDistance = new Vector2(2f, -2f);
+            }
+
+            // 2. Upgrade Single Summon Button
+            if (singleSummonButton != null)
+            {
+                var sImg = singleSummonButton.GetComponent<Image>();
+                if (sImg != null && btnSingleSprite != null)
+                {
+                    sImg.sprite = btnSingleSprite;
+                    sImg.type = Image.Type.Sliced;
+                    sImg.color = Color.white;
+                }
+                var sOutline = singleSummonButton.GetComponent<Outline>() ?? singleSummonButton.gameObject.AddComponent<Outline>();
+                sOutline.effectColor = new Color(0.35f, 0.65f, 0.85f, 0.90f);
+                sOutline.effectDistance = new Vector2(1.5f, -1.5f);
+            }
+
+            // 3. Upgrade Multi Summon Button (Crown CTA)
+            if (multiSummonButton != null)
+            {
+                var mImg = multiSummonButton.GetComponent<Image>();
+                if (mImg != null && btnMultiSprite != null)
+                {
+                    mImg.sprite = btnMultiSprite;
+                    mImg.type = Image.Type.Sliced;
+                    mImg.color = Color.white;
+                }
+                var mOutline = multiSummonButton.GetComponent<Outline>() ?? multiSummonButton.gameObject.AddComponent<Outline>();
+                mOutline.effectColor = new Color(1.0f, 0.85f, 0.25f, 1.0f);
+                mOutline.effectDistance = new Vector2(2.0f, -2.0f);
+            }
+
+            // 4. Upgrade Rate Info Button
+            if (gachaRateInfoButton != null)
+            {
+                var rOutline = gachaRateInfoButton.GetComponent<Outline>() ?? gachaRateInfoButton.gameObject.AddComponent<Outline>();
+                rOutline.effectColor = new Color(0.9f, 0.75f, 0.25f, 0.85f);
+                rOutline.effectDistance = new Vector2(1.2f, -1.2f);
+            }
         }
 
         private void OnEnable()
@@ -158,6 +220,7 @@ namespace FantasyDefense.UI
                 cg.blocksRaycasts = true;
             }
 
+            ApplySummonVisualStyling();
             UpdateAllDisplays();
         }
 
@@ -257,15 +320,18 @@ namespace FantasyDefense.UI
             // 2b. Pity Counter Display
             UpdatePityDisplay();
 
-            // 3. Tombol Biaya
+            // 3. Tombol Biaya & Label
+            string singleLabel = FantasyDefense.Localization.CitadelLocalizationManager.Text("PANGGIL 1x", "SUMMON 1x");
+            string multiLabel = FantasyDefense.Localization.CitadelLocalizationManager.Text("★ PANGGIL 10x ★", "★ SUMMON 10x ★");
+            string discountTag = FantasyDefense.Localization.CitadelLocalizationManager.Text("HEMAT 10%", "SAVE 10%");
+
             if (singleSummonCostText != null)
             {
-                singleSummonCostText.text = "💎 100 GEMS";
+                singleSummonCostText.text = $"<b>{singleLabel}</b>\n<size=17><color=#60E6FF>💎 100 GEMS</color></size>";
             }
             if (multiSummonCostText != null)
             {
-                string discountTag = FantasyDefense.Localization.CitadelLocalizationManager.Text("HEMAT 10%", "SAVE 10%");
-                multiSummonCostText.text = $"💎 900 GEMS ({discountTag})";
+                multiSummonCostText.text = $"<b>{multiLabel}</b>\n<size=17><color=#FFF066>💎 900 GEMS</color> <color=#FFD54F><i>({discountTag})</i></color></size>";
             }
 
             UpdateStarPromotionDisplay();
@@ -280,9 +346,14 @@ namespace FantasyDefense.UI
             int remaining = Mathf.Max(0, threshold - currentPity);
 
             pityProgressText.text = FantasyDefense.Localization.CitadelLocalizationManager.Text(
-                $"🛡️ Jaminan Legendary: {remaining} tarikan lagi ({currentPity}/{threshold})",
-                $"🛡️ Guaranteed Legendary in: {remaining} pulls ({currentPity}/{threshold})"
+                $"🛡️ <b>JAMINAN LEGENDARY</b>: {remaining} tarikan lagi ({currentPity}/{threshold})",
+                $"🛡️ <b>GUARANTEED LEGENDARY</b>: {remaining} pulls left ({currentPity}/{threshold})"
             );
+            pityProgressText.color = new Color(1.0f, 0.90f, 0.40f, 1f);
+
+            var pityOutline = pityProgressText.GetComponent<Outline>() ?? pityProgressText.gameObject.AddComponent<Outline>();
+            pityOutline.effectColor = new Color(0f, 0f, 0f, 0.85f);
+            pityOutline.effectDistance = new Vector2(1.2f, -1.2f);
         }
 
         private void HandlePityCounterChanged(int newPity)

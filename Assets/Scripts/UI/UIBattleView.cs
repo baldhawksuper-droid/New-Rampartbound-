@@ -232,17 +232,23 @@ namespace FantasyDefense.UI
                 var titleTxt = pausePanel.transform.Find("Title")?.GetComponent<Text>();
                 if (titleTxt != null)
                 {
-                    titleTxt.text = CitadelLocalizationManager.Text("PERMAINAN DIHENTIKAN", "GAME PAUSED");
+                    titleTxt.text = "<b>⚔️ " + CitadelLocalizationManager.Text("PERMAINAN DIHENTIKAN", "BATTLE PAUSED") + " ⚔️</b>";
+                    titleTxt.color = new Color(1f, 0.88f, 0.35f);
+                    var tOutline = titleTxt.GetComponent<Outline>() ?? titleTxt.gameObject.AddComponent<Outline>();
+                    tOutline.effectColor = new Color(0f, 0f, 0f, 0.90f);
+                    tOutline.effectDistance = new Vector2(1.5f, -1.5f);
                 }
                 var resumeBtn = pausePanel.transform.Find("ResumeButton")?.GetComponentInChildren<Text>();
                 if (resumeBtn != null)
                 {
-                    resumeBtn.text = CitadelLocalizationManager.Text("LANJUTKAN (RESUME)", "RESUME");
+                    resumeBtn.text = "<b>▶ " + CitadelLocalizationManager.Text("LANJUTKAN TEMPUR", "RESUME BATTLE") + "</b>";
+                    resumeBtn.color = new Color(1f, 0.96f, 0.85f);
                 }
                 var surrenderBtn = pausePanel.transform.Find("SurrenderButton")?.GetComponentInChildren<Text>();
                 if (surrenderBtn != null)
                 {
-                    surrenderBtn.text = CitadelLocalizationManager.Text("MENYERAH & KEMBALI KE CITADEL", "SURRENDER & RETURN TO CITADEL");
+                    surrenderBtn.text = "<b>🏳️ " + CitadelLocalizationManager.Text("MENYERAH & KEMBALI", "SURRENDER & RETREAT") + "</b>";
+                    surrenderBtn.color = new Color(1f, 0.90f, 0.90f);
                 }
             }
 
@@ -418,14 +424,47 @@ namespace FantasyDefense.UI
 
             if (pausePanel != null)
             {
+                var frameOrnate = Resources.Load<Sprite>("Sprites/UI/Frame_OrnateGold_9Slice")
+                               ?? Resources.Load<Sprite>("Sprites/UI/Frame_StoneBastion_9Slice");
+                var btnCrimson = Resources.Load<Sprite>("Sprites/UI/UI_Btn_Battle_Crimson");
+
+                var pImg = pausePanel.GetComponent<Image>();
+                if (pImg != null && frameOrnate != null)
+                {
+                    pImg.sprite = frameOrnate;
+                    pImg.type = Image.Type.Sliced;
+                    pImg.color = Color.white;
+                }
+                var pOutline = pausePanel.GetComponent<Outline>() ?? pausePanel.gameObject.AddComponent<Outline>();
+                pOutline.effectColor = new Color(0.85f, 0.72f, 0.28f, 0.85f);
+                pOutline.effectDistance = new Vector2(2f, -2f);
+
                 var resumeBtn = pausePanel.transform.Find("ResumeButton")?.GetComponent<Button>();
                 StyleButton(resumeBtn, btnGold, Color.white);
+                if (resumeBtn != null)
+                {
+                    var rOut = resumeBtn.GetComponent<Outline>() ?? resumeBtn.gameObject.AddComponent<Outline>();
+                    rOut.effectColor = new Color(1.0f, 0.88f, 0.32f, 1.0f);
+                    rOut.effectDistance = new Vector2(2f, -2f);
+                }
 
                 var vibBtn = pausePanel.transform.Find("VibrationButton")?.GetComponent<Button>();
                 StyleButton(vibBtn, btnStone, Color.white);
+                if (vibBtn != null)
+                {
+                    var vOut = vibBtn.GetComponent<Outline>() ?? vibBtn.gameObject.AddComponent<Outline>();
+                    vOut.effectColor = new Color(0.40f, 0.45f, 0.55f, 0.85f);
+                    vOut.effectDistance = new Vector2(1.5f, -1.5f);
+                }
 
                 var surrenderBtn = pausePanel.transform.Find("SurrenderButton")?.GetComponent<Button>();
-                StyleButton(surrenderBtn, btnStone, Color.white);
+                StyleButton(surrenderBtn, btnCrimson ?? btnStone, Color.white);
+                if (surrenderBtn != null)
+                {
+                    var sOut = surrenderBtn.GetComponent<Outline>() ?? surrenderBtn.gameObject.AddComponent<Outline>();
+                    sOut.effectColor = new Color(0.95f, 0.28f, 0.28f, 0.95f);
+                    sOut.effectDistance = new Vector2(2f, -2f);
+                }
             }
         }
 

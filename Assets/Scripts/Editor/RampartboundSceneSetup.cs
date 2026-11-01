@@ -1221,16 +1221,25 @@ namespace Rampartbound.Editor
             // Pause Modal
             var pausePanel = CreatePanel(battleHudObj.transform, "PauseModal", new Color(0.04f, 0.06f, 0.1f, 0.95f));
             PositionUI(pausePanel, 0.12f, 0.26f, 0.88f, 0.74f);
-            if (_frameStoneBastion != null)
+            var pauseFrame = _frameOrnateGold ?? _frameStoneBastion;
+            if (pauseFrame != null)
             {
                 var pauseImg = pausePanel.GetComponent<Image>();
-                pauseImg.sprite = _frameStoneBastion;
+                pauseImg.sprite = pauseFrame;
                 pauseImg.type = Image.Type.Sliced;
                 pauseImg.color = Color.white;
             }
-            var pauseTitle = CreateText(pausePanel.transform, "Title", "PERMAINAN DIHENTIKAN", 36, FontStyle.Bold, TextAnchor.MiddleCenter, Color.white, defaultFont);
+            var pModalOutline = pausePanel.AddComponent<Outline>();
+            pModalOutline.effectColor = new Color(0.85f, 0.72f, 0.28f, 0.85f);
+            pModalOutline.effectDistance = new Vector2(2f, -2f);
+
+            var pauseTitle = CreateText(pausePanel.transform, "Title", "⚔️ PERMAINAN DIHENTIKAN ⚔️", 32, FontStyle.Bold, TextAnchor.MiddleCenter, new Color(1f, 0.88f, 0.35f), defaultFont);
+            var pTitleOutline = pauseTitle.gameObject.AddComponent<Outline>();
+            pTitleOutline.effectColor = new Color(0f, 0f, 0f, 0.90f);
+            pTitleOutline.effectDistance = new Vector2(1.5f, -1.5f);
             PositionUI(pauseTitle.gameObject, 0.05f, 0.80f, 0.95f, 0.95f);
-            var pauseResumeBtn = CreateButton(pausePanel.transform, "ResumeButton", "LANJUTKAN (RESUME)", new Color(0.2f, 0.65f, 0.35f), Color.white, 24, defaultFont);
+
+            var pauseResumeBtn = CreateButton(pausePanel.transform, "ResumeButton", "▶ LANJUTKAN TEMPUR", new Color(0.2f, 0.65f, 0.35f), Color.white, 24, defaultFont);
             if (_btnPrimaryGold != null)
             {
                 var prImg = pauseResumeBtn.GetComponent<Image>();
@@ -1238,7 +1247,11 @@ namespace Rampartbound.Editor
                 prImg.type = Image.Type.Sliced;
                 prImg.color = Color.white;
             }
+            var prOutline = pauseResumeBtn.AddComponent<Outline>();
+            prOutline.effectColor = new Color(1.0f, 0.88f, 0.32f, 1.0f);
+            prOutline.effectDistance = new Vector2(2f, -2f);
             PositionUI(pauseResumeBtn, 0.12f, 0.58f, 0.88f, 0.74f);
+
             var pauseVibBtn = CreateButton(pausePanel.transform, "VibrationButton", "📳 GETARAN: AKTIF", new Color(0.20f, 0.40f, 0.60f), Color.white, 22, defaultFont);
             if (_btnSecondaryStone != null)
             {
@@ -1247,15 +1260,23 @@ namespace Rampartbound.Editor
                 pvImg.type = Image.Type.Sliced;
                 pvImg.color = Color.white;
             }
+            var pvOutline = pauseVibBtn.AddComponent<Outline>();
+            pvOutline.effectColor = new Color(0.40f, 0.45f, 0.55f, 0.85f);
+            pvOutline.effectDistance = new Vector2(1.5f, -1.5f);
             PositionUI(pauseVibBtn, 0.12f, 0.38f, 0.88f, 0.54f);
-            var pauseSurrenderBtn = CreateButton(pausePanel.transform, "SurrenderButton", "MENYERAH & KEMBALI", new Color(0.65f, 0.25f, 0.25f), Color.white, 22, defaultFont);
-            if (_btnBattleCrimson != null)
+
+            var pauseSurrenderBtn = CreateButton(pausePanel.transform, "SurrenderButton", "🏳️ MENYERAH & KEMBALI", new Color(0.65f, 0.25f, 0.25f), Color.white, 22, defaultFont);
+            var surrenderSprite = _btnBattleCrimson ?? _btnSecondaryStone;
+            if (surrenderSprite != null)
             {
                 var psImg = pauseSurrenderBtn.GetComponent<Image>();
-                psImg.sprite = _btnBattleCrimson;
+                psImg.sprite = surrenderSprite;
                 psImg.type = Image.Type.Sliced;
                 psImg.color = Color.white;
             }
+            var psOutline = pauseSurrenderBtn.AddComponent<Outline>();
+            psOutline.effectColor = new Color(0.95f, 0.28f, 0.28f, 0.95f);
+            psOutline.effectDistance = new Vector2(2f, -2f);
             PositionUI(pauseSurrenderBtn, 0.12f, 0.16f, 0.88f, 0.32f);
             pausePanel.SetActive(false);
 
@@ -1842,42 +1863,54 @@ namespace Rampartbound.Editor
                 banImg.sprite = _gachaAltarBackdrop;
                 banImg.color = Color.white;
             }
-            else if (_keyVisualBanner != null)
-            {
-                var altarBannerImg = bannerPanel.GetComponent<Image>();
-                altarBannerImg.sprite = _keyVisualBanner;
-                altarBannerImg.color = new Color(0.9f, 0.9f, 1f, 1f);
-            }
-            var banTitle = CreateText(bannerPanel.transform, "BannerTitle", "PEMANGGILAN KHUSUS PAHLAWAN", 28, FontStyle.Bold, TextAnchor.MiddleCenter, new Color(1f, 0.85f, 0.35f), defaultFont);
-            PositionUI(banTitle.gameObject, 0.05f, 0.65f, 0.95f, 0.92f);
-            var banSub = CreateText(bannerPanel.transform, "BannerSubtitle", "Rate-Up 50%: Wind Ranger (Pemanah Angin)", 22, FontStyle.Normal, TextAnchor.MiddleCenter, new Color(0.7f, 0.95f, 0.8f), defaultFont);
-            PositionUI(banSub.gameObject, 0.05f, 0.46f, 0.95f, 0.64f);
+            var banOutline = bannerPanel.AddComponent<Outline>();
+            banOutline.effectColor = new Color(0.85f, 0.72f, 0.28f, 0.85f);
+            banOutline.effectDistance = new Vector2(2f, -2f);
 
-            var pityTxt = CreateText(bannerPanel.transform, "PityProgressText", "🛡️ Jaminan Legendary: 100 tarikan lagi (0/100)", 18, FontStyle.Bold, TextAnchor.MiddleCenter, new Color(1f, 0.88f, 0.35f), defaultFont);
-            PositionUI(pityTxt.gameObject, 0.05f, 0.30f, 0.82f, 0.44f);
+            var banTitle = CreateText(bannerPanel.transform, "BannerTitle", "PEMANGGILAN KHUSUS PAHLAWAN", 26, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(1f, 0.92f, 0.45f), defaultFont);
+            PositionUI(banTitle.gameObject, 0.05f, 0.82f, 0.65f, 0.94f);
+            var banSub = CreateText(bannerPanel.transform, "BannerSubtitle", "Rate-Up 50%: Wind Ranger (Pemanah Angin)", 20, FontStyle.Normal, TextAnchor.MiddleLeft, new Color(0.6f, 1f, 0.85f), defaultFont);
+            PositionUI(banSub.gameObject, 0.05f, 0.68f, 0.65f, 0.80f);
+
+            var pityTxt = CreateText(bannerPanel.transform, "PityProgressText", "🛡️ Jaminan Legendary: 100 tarikan lagi (0/100)", 17, FontStyle.Bold, TextAnchor.MiddleCenter, new Color(1f, 0.90f, 0.40f), defaultFont);
+            PositionUI(pityTxt.gameObject, 0.05f, 0.28f, 0.82f, 0.38f);
+            var pityOutline = pityTxt.gameObject.AddComponent<Outline>();
+            pityOutline.effectColor = new Color(0f, 0f, 0f, 0.85f);
+            pityOutline.effectDistance = new Vector2(1.2f, -1.2f);
 
             var rateInfoBtn = CreateButton(bannerPanel.transform, "RateInfoBtn", "❓", new Color(0.2f, 0.4f, 0.6f), Color.white, 20, defaultFont);
-            PositionUI(rateInfoBtn, 0.84f, 0.30f, 0.95f, 0.44f);
+            PositionUI(rateInfoBtn, 0.84f, 0.28f, 0.95f, 0.38f);
+            var rOutline = rateInfoBtn.AddComponent<Outline>();
+            rOutline.effectColor = new Color(0.9f, 0.75f, 0.25f, 0.85f);
+            rOutline.effectDistance = new Vector2(1.2f, -1.2f);
 
-            var s1Btn = CreateButton(bannerPanel.transform, "SingleSummonBtn", "PANGGIL 1x\n(100 Gems)", new Color(0.2f, 0.5f, 0.7f), Color.white, 22, defaultFont);
-            if (_btnSecondaryStone != null)
+            var s1Btn = CreateButton(bannerPanel.transform, "SingleSummonBtn", "PANGGIL 1x\n💎 100 GEMS", new Color(0.2f, 0.5f, 0.7f), Color.white, 20, defaultFont);
+            var s1Sprite = _btnGachaSingle ?? _btnSecondaryStone;
+            if (s1Sprite != null)
             {
                 var s1Img = s1Btn.GetComponent<Image>();
-                s1Img.sprite = _btnSecondaryStone;
+                s1Img.sprite = s1Sprite;
                 s1Img.type = Image.Type.Sliced;
                 s1Img.color = Color.white;
             }
-            PositionUI(s1Btn, 0.08f, 0.04f, 0.48f, 0.30f);
+            var s1Outline = s1Btn.AddComponent<Outline>();
+            s1Outline.effectColor = new Color(0.35f, 0.65f, 0.85f, 0.90f);
+            s1Outline.effectDistance = new Vector2(1.5f, -1.5f);
+            PositionUI(s1Btn, 0.05f, 0.03f, 0.48f, 0.24f);
 
-            var s10Btn = CreateButton(bannerPanel.transform, "MultiSummonBtn", "PANGGIL 10x\n(900 Gems)", new Color(0.85f, 0.6f, 0.15f), Color.white, 22, defaultFont);
-            if (_btnPrimaryGold != null)
+            var s10Btn = CreateButton(bannerPanel.transform, "MultiSummonBtn", "★ PANGGIL 10x ★\n💎 900 GEMS", new Color(0.85f, 0.6f, 0.15f), Color.white, 20, defaultFont);
+            var s10Sprite = _btnGachaMulti ?? _btnPrimaryGold;
+            if (s10Sprite != null)
             {
                 var s10Img = s10Btn.GetComponent<Image>();
-                s10Img.sprite = _btnPrimaryGold;
+                s10Img.sprite = s10Sprite;
                 s10Img.type = Image.Type.Sliced;
                 s10Img.color = Color.white;
             }
-            PositionUI(s10Btn, 0.52f, 0.04f, 0.92f, 0.30f);
+            var s10Outline = s10Btn.AddComponent<Outline>();
+            s10Outline.effectColor = new Color(1.0f, 0.85f, 0.25f, 1.0f);
+            s10Outline.effectDistance = new Vector2(2.0f, -2.0f);
+            PositionUI(s10Btn, 0.52f, 0.03f, 0.95f, 0.24f);
 
             var promoPanel = CreatePanel(summonContent, "StarPromotionPanel", new Color(0.08f, 0.1f, 0.16f, 0.9f));
             if (_frameStoneBastion != null)
@@ -2871,6 +2904,8 @@ namespace Rampartbound.Editor
         private static Sprite _tabHeroInactive;
         private static Sprite _btnHudSpeed;
         private static Sprite _btnHudPause;
+        private static Sprite _btnGachaSingle;
+        private static Sprite _btnGachaMulti;
 
         private static void LoadUISprites()
         {
@@ -2878,6 +2913,8 @@ namespace Rampartbound.Editor
             if (_frameStoneBastion == null) _frameStoneBastion = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Frame_StoneBastion_9Slice.png");
             if (_btnHudSpeed == null) _btnHudSpeed = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Btn_HUD_Speed.png");
             if (_btnHudPause == null) _btnHudPause = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Btn_HUD_Pause.png");
+            if (_btnGachaSingle == null) _btnGachaSingle = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Btn_Gacha_Single.png") ?? _btnSecondaryStone;
+            if (_btnGachaMulti == null) _btnGachaMulti = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Btn_Gacha_Multi.png") ?? _btnPrimaryGold;
             if (_bannerTacticalPhase == null) _bannerTacticalPhase = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Banner_Tactical_Phase.png");
             if (_iconTacticalMove == null) _iconTacticalMove = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Icon_Tactical_Move.png");
             if (_btnPrimaryGold == null) _btnPrimaryGold = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Btn_Primary_Gold.png");
@@ -2905,7 +2942,7 @@ namespace Rampartbound.Editor
             if (_plinthT1 == null) _plinthT1 = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Combat/Plinth_Hero_Base_T1.png");
             if (_lobbyBackdrop == null) _lobbyBackdrop = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Citadel_Lobby_Backdrop.png") ?? _titleBackdrop;
             if (_keyVisualBanner == null) _keyVisualBanner = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Rampartbound_KeyVisual_Banner.jpg");
-            if (_gachaAltarBackdrop == null) _gachaAltarBackdrop = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Summon_Altar_Backdrop.png") ?? _keyVisualBanner;
+            if (_gachaAltarBackdrop == null) _gachaAltarBackdrop = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Gacha_Banner_WindRanger.png") ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Summon_Altar_Backdrop.png") ?? _keyVisualBanner;
             if (_heroCedricSprite == null) _heroCedricSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Heroes/Cedric_T1.png");
             if (_heroRoseSprite == null) _heroRoseSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Heroes/Rose_T1.png");
             if (_heroRabbitSprite == null) _heroRabbitSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Heroes/RabbitMage_T1.png");
