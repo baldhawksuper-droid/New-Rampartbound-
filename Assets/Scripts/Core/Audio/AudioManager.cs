@@ -53,7 +53,8 @@ namespace FantasyDefense.Audio
         DialogueBlipChime,
         GolemFistSmash,
         FrostWyrmBlizzard,
-        PermafrostCrystalShatter
+        PermafrostCrystalShatter,
+        TwinFocusChime
     }
 
     public enum AudioSfxType
@@ -703,6 +704,9 @@ namespace FantasyDefense.Audio
             proceduralClipCache[SoundType.GolemFistSmash] = CreateToneClip("GolemFistSmash", 0.38f, 160f, 35f); // Hentakan tinju batu & kayu purba berbobot gempa
             proceduralClipCache[SoundType.FrostWyrmBlizzard] = CreateToneClip("FrostWyrmBlizzard", 0.45f, 680f, 180f); // Desisan hembusan badai salju kutub
             proceduralClipCache[SoundType.PermafrostCrystalShatter] = CreateArpeggioClip("PermafrostCrystalShatter", new float[] { 880f, 1318.5f, 1760f, 2637f }, 0.04f); // Pecahan kristal es tajam permafrost
+
+            // Audio Khusus Tactile Twin Gem Focus (Resonansi Lonceng Kristal Harmonis Emas)
+            proceduralClipCache[SoundType.TwinFocusChime] = CreateArpeggioClip("TwinFocusChime", new float[] { 783.99f, 1046.50f, 1318.51f, 1567.98f }, 0.038f);
         }
 
         private AudioClip CreateToneClip(string name, float duration, float startFreq, float endFreq)

@@ -622,6 +622,59 @@ namespace FantasyDefense.Combat
             SpawnProceduralParticleBurst(targetPos, roseGold, new Color(1f, 0.2f, 0.4f), burstCount, 2.4f);
         }
 
+        /// <summary>
+        /// Wind Ranger: Menembakkan proyektil panah angin badai (Gale Wind Arrow) yang melesat cepat ke target
+        /// </summary>
+        public void SpawnWindArrowShot(Vector3 startPos, Vector3 targetPos, UnitTier tier)
+        {
+            StartCoroutine(WindArrowShotRoutine(startPos, targetPos, tier));
+        }
+
+        private IEnumerator WindArrowShotRoutine(Vector3 startPos, Vector3 targetPos, UnitTier tier)
+        {
+            GameObject arrowObj = new GameObject("VFX_WindRanger_ArrowShot");
+            LineRenderer lr = arrowObj.AddComponent<LineRenderer>();
+
+            Shader shader = Shader.Find("Sprites/Default") ?? Shader.Find("Particles/Standard Unlit");
+            if (shader != null) lr.material = new Material(shader);
+
+            Color windEmerald = tier >= UnitTier.Tier4 ? new Color(0.15f, 1.0f, 0.75f) : new Color(0.25f, 0.95f, 0.45f);
+            Color windWhite = new Color(0.9f, 1.0f, 0.95f, 0.9f);
+
+            lr.startColor = windWhite;
+            lr.endColor = windEmerald;
+            float lineWidth = tier >= UnitTier.Tier3 ? 0.16f : 0.10f;
+            lr.startWidth = lineWidth;
+            lr.endWidth = 0.02f;
+            lr.positionCount = 2;
+            lr.sortingOrder = 60;
+
+            Vector3 origin = startPos + new Vector3(0f, 0.25f, 0f);
+            lr.SetPosition(0, origin);
+            lr.SetPosition(1, origin);
+
+            // Muzzle spark di busur panah
+            SpawnProceduralParticleBurst(origin, windEmerald, Color.white, 6, 2.2f);
+
+            float duration = 0.14f;
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float progress = elapsed / duration;
+                Vector3 headPos = Vector3.Lerp(origin, targetPos, progress);
+                Vector3 tailPos = Vector3.Lerp(origin, targetPos, Mathf.Max(0f, progress - 0.35f));
+
+                lr.SetPosition(0, tailPos);
+                lr.SetPosition(1, headPos);
+                yield return null;
+            }
+
+            // Impact burst di target
+            SpawnArrowImpactVfx(targetPos, tier >= UnitTier.Tier3);
+            Destroy(arrowObj);
+        }
+
         #endregion
 
         /// <summary>

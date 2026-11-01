@@ -883,6 +883,16 @@ namespace FantasyDefense.Combat
             {
                 isPointerHeld = true;
                 HighlightMergeCandidates(true);
+
+                // Multi-sensory feedback: Chime resonansi kristal emas & haptik halus
+                if (AudioManager.Instance != null)
+                {
+                    AudioManager.Instance.PlaySound(SoundType.TwinFocusChime, 1.0f);
+                }
+                if (DevicePerformanceManager.Instance != null && DevicePerformanceManager.Instance.IsHapticsEnabled)
+                {
+                    DevicePerformanceManager.Instance.TriggerHaptic(HapticFeedbackType.Light);
+                }
             }
         }
 

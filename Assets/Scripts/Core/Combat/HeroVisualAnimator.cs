@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using FantasyDefense.Data;
+using FantasyDefense.Audio;
 
 namespace FantasyDefense.Combat
 {
@@ -247,13 +248,33 @@ namespace FantasyDefense.Combat
                 yield return null;
             }
 
-            // 2. Fase Dynamic Slash / Ground Slam Impact (Berganti ke pose hantaman/tebasan pedang seketika saat menerjang)
+            // 2. Fase Dynamic Slash / Impact (Berganti ke pose hantaman/tebasan pedang seketika saat menerjang)
             if (attackFrames != null && attackFrames.Length > 1 && attackFrames[1] != null && spriteRenderer != null)
             {
                 spriteRenderer.sprite = attackFrames[1];
             }
 
-            // Spawn efek visual tebasan pedang sabit / gelombang kejut palu secara terintegrasi
+            // Audio sfx tebasan & lontaran serangan terkalibrasi per hero archetype
+            if (AudioManager.Instance != null && unitController != null)
+            {
+                switch (unitController.UnitType)
+                {
+                    case UnitType.Cedric:
+                        AudioManager.Instance.PlaySound(SoundType.Slash, 1.05f);
+                        break;
+                    case UnitType.RoseTanker:
+                        AudioManager.Instance.PlaySound(SoundType.ShieldSlam, 0.95f);
+                        break;
+                    case UnitType.WindRanger:
+                        AudioManager.Instance.PlaySound(SoundType.ArrowShot, 1.10f);
+                        break;
+                    case UnitType.RabbitMage:
+                        AudioManager.Instance.PlaySound(SoundType.MagicSpark, 1.15f);
+                        break;
+                }
+            }
+
+            // Spawn efek visual serangan terintegrasi (tebasan pedang, gelombang kejut, panah angin, atau berkas sihir bintang)
             if (SkillVfxManager.Instance != null && unitController != null)
             {
                 if (unitController.UnitType == UnitType.Cedric)
@@ -263,6 +284,14 @@ namespace FantasyDefense.Combat
                 else if (unitController.UnitType == UnitType.RoseTanker)
                 {
                     SkillVfxManager.Instance.SpawnUpwardRadiantShockwave(anchorPos, lungePos, unitController.CurrentTier);
+                }
+                else if (unitController.UnitType == UnitType.WindRanger)
+                {
+                    SkillVfxManager.Instance.SpawnWindArrowShot(anchorPos, lungePos + dir * 0.35f, unitController.CurrentTier);
+                }
+                else if (unitController.UnitType == UnitType.RabbitMage)
+                {
+                    SkillVfxManager.Instance.SpawnUpwardArcaneBeam(anchorPos, lungePos + dir * 0.35f, unitController.CurrentTier);
                 }
             }
 
