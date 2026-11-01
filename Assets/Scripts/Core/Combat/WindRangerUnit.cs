@@ -24,6 +24,7 @@ namespace FantasyDefense.Combat
 
         [Header("Attack Counter")]
         [SerializeField] private int shotCount = 0;
+        private float lastSkillAnnounceTime = -999f;
 
         [Header("Projectile Fallback (Optional)")]
         [SerializeField] private GameObject arrowPrefab;
@@ -64,7 +65,6 @@ namespace FantasyDefense.Combat
                 // T2: Piercing Gale setiap 2 tembakan
                 if (shotCount % 2 == 0)
                 {
-                    NotifySkillTriggered("Piercing Gale");
                     ExecutePiercingGale(target);
                 }
                 else
@@ -75,7 +75,11 @@ namespace FantasyDefense.Combat
             else if (currentTier >= UnitTier.Tier3)
             {
                 // T3, T4, T5: Tornado Barrage & Zephyr Whirlwind
-                NotifySkillTriggered("Tornado Barrage & Zephyr Whirlwind");
+                if (Time.time - lastSkillAnnounceTime >= 6.0f)
+                {
+                    lastSkillAnnounceTime = Time.time;
+                    NotifySkillTriggered("Tornado Barrage");
+                }
                 ExecuteTornadoBarrage(target);
             }
 

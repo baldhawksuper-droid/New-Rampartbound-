@@ -291,11 +291,12 @@ namespace FantasyDefense.Combat
         }
 
         /// <summary>
-        /// Override PlayAttack dari HeroVisualAnimator agar memicu animasi tebasan modular secara otomatis.
+        /// Override PlayAttack dari HeroVisualAnimator agar memicu animasi tebasan modular jika aktif,
+        /// atau mendelegasikan ke PlayAttack berbasis sprite tunggal kanonikal (Strike Frame + Slash Lunge).
         /// </summary>
         public override void PlayAttack(Vector3 targetWorldPos)
         {
-            if (isModularConfigured)
+            if (isModularConfigured && torsoBone != null && torsoBone.gameObject.activeSelf)
             {
                 PlayModularAttack(targetWorldPos, null);
             }

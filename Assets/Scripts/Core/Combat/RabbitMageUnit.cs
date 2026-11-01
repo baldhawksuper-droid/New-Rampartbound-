@@ -65,6 +65,7 @@ namespace FantasyDefense.Combat
 
         [Header("Projectile Reference (Optional)")]
         [SerializeField] private GameObject projectilePrefab;
+        private float lastSkillAnnounceTime = -999f;
 
         public override void UpdateVisualAppearance()
         {
@@ -75,21 +76,16 @@ namespace FantasyDefense.Combat
         {
             if (target == null || target.IsDead) return;
 
-            if (currentTier == UnitTier.Tier2)
+            if (currentTier >= UnitTier.Tier3 && (Time.time - lastSkillAnnounceTime >= 6.0f))
             {
-                NotifySkillTriggered("Mystic Burst");
-            }
-            else if (currentTier == UnitTier.Tier3)
-            {
-                NotifySkillTriggered("Meteor Strike & Arcane Fire");
-            }
-            else if (currentTier == UnitTier.Tier4)
-            {
-                NotifySkillTriggered("Astral Nova");
-            }
-            else if (currentTier >= UnitTier.Tier5)
-            {
-                NotifySkillTriggered("Celestial Singularity");
+                lastSkillAnnounceTime = Time.time;
+                string sName = currentTier switch
+                {
+                    UnitTier.Tier3 => "Meteor Strike",
+                    UnitTier.Tier4 => "Astral Nova",
+                    _ => "Celestial Singularity"
+                };
+                NotifySkillTriggered(sName);
             }
 
             SpawnAndFireProjectile(target);

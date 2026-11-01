@@ -41,6 +41,8 @@ namespace FantasyDefense.Combat
             base.UpdateVisualAppearance();
         }
 
+        private float lastSkillAnnounceTime = -999f;
+
         protected override void ExecuteAttack(MonsterController target)
         {
             if (target == null || target.IsDead) return;
@@ -58,7 +60,6 @@ namespace FantasyDefense.Combat
                 // Tier 2: Shield Slam setiap 3 kali serangan (Stun 1s + Shield Absorb 25%)
                 if (attackCounter % 3 == 0)
                 {
-                    NotifySkillTriggered("Shield Slam");
                     hasShieldAbsorb = true;
                     target.TakeDamage(damage * 1.25f);
                     target.ApplyStun(stunDurationT2);
@@ -71,7 +72,11 @@ namespace FantasyDefense.Combat
             else if (currentTier >= UnitTier.Tier3)
             {
                 // Tier 3, 4, 5: Earthshaker Impact (AoE Stun & Shockwave Damage)
-                NotifySkillTriggered("Earthshaker & Thorn Aegis");
+                if (Time.time - lastSkillAnnounceTime >= 6.0f)
+                {
+                    lastSkillAnnounceTime = Time.time;
+                    NotifySkillTriggered("Earthshaker");
+                }
                 ExecuteEarthshaker(target, damage);
             }
 

@@ -23,6 +23,9 @@ namespace FantasyDefense.Combat
         [SerializeField] private bool enableShockwaves = true;
         [SerializeField] private bool enableParticleEffects = true;
 
+        private readonly System.Collections.Generic.Dictionary<int, float> lastUnitSkillBannerTimes = new System.Collections.Generic.Dictionary<int, float>();
+        private const float MIN_SKILL_BANNER_COOLDOWN = 6.0f;
+
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -63,10 +66,23 @@ namespace FantasyDefense.Combat
             if (unit == null) return;
 
             Vector3 pos = unit.transform.position;
+            int unitId = unit.GetInstanceID();
+            float now = Time.time;
 
-            // 1. Tampilkan teks nama skill di atas pahlawan dengan banner perayaan taktil
-            if (enableFloatingText)
+            // Batasi teks floating agar tidak membanjiri layar pada auto-attack (internal cooldown 6 detik per unit)
+            bool allowBanner = (!lastUnitSkillBannerTimes.TryGetValue(unitId, out float lastTime) || (now - lastTime >= MIN_SKILL_BANNER_COOLDOWN));
+
+            // Serangan pasif minor atau basic attack tidak boleh menampilkan banner teks floating
+            string lowerName = skillName != null ? skillName.ToLowerInvariant() : string.Empty;
+            if (lowerName.Contains("slash") || lowerName.Contains("piercing") || lowerName.Contains("burst") || lowerName.Contains("hammer") || lowerName.Contains("slam"))
             {
+                allowBanner = false;
+            }
+
+            // 1. Tampilkan teks nama skill di atas pahlawan dengan banner perayaan taktil (hanya untuk jurus/ultimate)
+            if (enableFloatingText && allowBanner)
+            {
+                lastUnitSkillBannerTimes[unitId] = now;
                 Color skillColor = unit.CurrentTier >= UnitTier.Tier3 ? new Color(1f, 0.85f, 0.2f) : new Color(0.4f, 0.9f, 1f);
                 string heroIcon = unit.UnitType switch
                 {
@@ -79,8 +95,8 @@ namespace FantasyDefense.Combat
                 SpawnFloatingText(pos + Vector3.up * 0.7f, $"{heroIcon} {skillName.ToUpper()}!", skillColor, 1.35f, true);
             }
 
-            // 2. Tampilkan efek cincin kejut (Shockwave) jika diaktifkan
-            if (enableShockwaves)
+            // 2. Tampilkan efek cincin kejut (Shockwave) jika diaktifkan (hanya pada jurus ber-cooldown)
+            if (enableShockwaves && allowBanner)
             {
                 Color waveColor = unit.CurrentTier >= UnitTier.Tier3 ? new Color(1f, 0.6f, 0.1f, 0.8f) : new Color(0.2f, 0.8f, 1f, 0.7f);
                 float radius = unit.CurrentTier >= UnitTier.Tier3 ? 1.8f : 1.2f;

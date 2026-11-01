@@ -44,6 +44,8 @@ namespace FantasyDefense.Combat
             return dmg;
         }
 
+        private float lastSkillAnnounceTime = -999f;
+
         protected override void ExecuteAttack(MonsterController target)
         {
             if (target == null || target.IsDead) return;
@@ -81,8 +83,6 @@ namespace FantasyDefense.Combat
 
         private System.Collections.IEnumerator ExecuteDualSlashRoutine(MonsterController target)
         {
-            NotifySkillTriggered("Dual Slash");
-
             bool isCrit = Random.value < ((unitData != null ? unitData.criticalChance : 0.05f) + tier2CritBonus);
             float totalDmg = GetAttackDamage();
             float halfDmg = totalDmg * 0.5f;
@@ -120,7 +120,11 @@ namespace FantasyDefense.Combat
 
         private void ExecuteBladeTempest(MonsterController primaryTarget)
         {
-            NotifySkillTriggered("Blade Tempest & Heroic Surge");
+            if (Time.time - lastSkillAnnounceTime >= 6.0f)
+            {
+                lastSkillAnnounceTime = Time.time;
+                NotifySkillTriggered("Blade Tempest");
+            }
 
             bool isCrit = Random.value < ((unitData != null ? unitData.criticalChance : 0.05f) + tier2CritBonus);
             float baseDmg = GetAttackDamage();

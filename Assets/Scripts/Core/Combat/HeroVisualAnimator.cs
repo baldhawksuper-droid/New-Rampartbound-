@@ -42,12 +42,12 @@ namespace FantasyDefense.Combat
         [Header("Procedural Juice Settings")]
         [Tooltip("Aktifkan animasi nafas (breathing bobbing) saat posisi diam")]
         [SerializeField] private bool enableIdleBreathing = true;
-        [SerializeField] private float breatheSpeed = 3.5f;
-        [SerializeField] private float breatheAmplitude = 0.05f;
+        [SerializeField] private float breatheSpeed = 2.4f;
+        [SerializeField] private float breatheAmplitude = 0.020f;
 
         [Header("Combat Juice Timings")]
-        [SerializeField] private float attackLungeDistance = 0.22f;
-        [SerializeField] private float attackDuration = 0.16f;
+        [SerializeField] private float attackLungeDistance = 0.28f;
+        [SerializeField] private float attackDuration = 0.38f;
 
         private SpriteRenderer spriteRenderer;
         private UnitController unitController;
@@ -140,6 +140,7 @@ namespace FantasyDefense.Combat
         private IEnumerator IdleBreathingRoutine()
         {
             float seed = Random.Range(0f, 100f);
+            Vector3 anchorLocalPos = transform.localPosition;
             while (currentState == AnimationState.Idle)
             {
                 // Pada mode persiapan (Puzzle Preparation) atau saat ditarik, pertahankan ukuran matematis solid tanpa distorsi nafas
@@ -148,6 +149,7 @@ namespace FantasyDefense.Combat
                     if (baseScale.sqrMagnitude > 0.001f)
                     {
                         transform.localScale = baseScale;
+                        transform.localPosition = anchorLocalPos;
                         transform.localRotation = Quaternion.identity;
                     }
                     yield return null;
@@ -158,13 +160,17 @@ namespace FantasyDefense.Combat
                 {
                     float time = (Time.time + seed) * breatheSpeed;
                     float scaleModY = 1.0f + Mathf.Sin(time) * breatheAmplitude;
-                    float scaleModX = 1.0f - Mathf.Sin(time) * (breatheAmplitude * 0.6f);
+                    float scaleModX = 1.0f - Mathf.Sin(time) * (breatheAmplitude * 0.35f);
 
                     transform.localScale = new Vector3(baseScale.x * scaleModX, baseScale.y * scaleModY, baseScale.z);
 
-                    // Dynamic 2.5D Subtle Breathing Sway Tilt (Sprint 44 Poin 5)
-                    float tilt = Mathf.Sin(time * 0.75f) * 1.5f;
-                    transform.localRotation = Quaternion.Euler(0f, 0f, tilt);
+                    // Kompensasi jangkar kaki:
+                    // Karena pivot sprite berada di tengah, ekspansi tinggi Y akan mendorong kepala ke atas dan kaki ke bawah.
+                    // Untuk mengunci posisi telapak kaki agar 100% diam menapak di atas plinth (grounded),
+                    // kita angkat posisi Y sebesar setengah dari pertambahan tinggi dada.
+                    float footAnchorCompensation = (scaleModY - 1.0f) * (baseScale.y * 0.48f);
+                    transform.localPosition = anchorLocalPos + new Vector3(0f, footAnchorCompensation, 0f);
+                    transform.localRotation = Quaternion.identity;
                 }
                 yield return null;
             }
@@ -187,12 +193,13 @@ namespace FantasyDefense.Combat
                 StopCoroutine(activeAnimRoutine);
                 transform.position = GetAnchorPosition();
                 transform.localScale = baseScale;
+                transform.localRotation = Quaternion.identity;
             }
 
-            if (attackFrames != null && attackFrames.Length > 0)
+            if (frameAnimRoutine != null)
             {
-                if (frameAnimRoutine != null) StopCoroutine(frameAnimRoutine);
-                frameAnimRoutine = StartCoroutine(PlayFrameSequence(attackFrames, false));
+                StopCoroutine(frameAnimRoutine);
+                frameAnimRoutine = null;
             }
 
             activeAnimRoutine = StartCoroutine(AttackLungeRoutine(targetWorldPos));
@@ -214,11 +221,11 @@ namespace FantasyDefense.Combat
             Quaternion strikeRot = Quaternion.Euler(0f, 0f, attackTilt);
             Quaternion windupRot = Quaternion.Euler(0f, 0f, -attackTilt * 0.35f);
 
-            float totalDur = Mathf.Max(0.24f, attackDuration);
-            float tWindup = totalDur * 0.18f;
-            float tLunge = totalDur * 0.32f;
-            float tFollow = totalDur * 0.12f;
-            float tReturn = totalDur * 0.38f;
+            float totalDur = Mathf.Max(0.36f, attackDuration);
+            float tWindup = totalDur * 0.16f;
+            float tLunge = totalDur * 0.40f;
+            float tFollow = totalDur * 0.20f;
+            float tReturn = totalDur * 0.24f;
 
             // 1. Fase Windup / Tarikan Mundur (Mengumpulkan tenaga tebasan dengan squash halus)
             if (attackFrames != null && attackFrames.Length > 0 && attackFrames[0] != null && spriteRenderer != null)
@@ -240,10 +247,23 @@ namespace FantasyDefense.Combat
                 yield return null;
             }
 
-            // 2. Fase Dynamic Slash / Ground Slam Impact (Berganti ke pose hantaman/tebasan seketika saat menerjang)
+            // 2. Fase Dynamic Slash / Ground Slam Impact (Berganti ke pose hantaman/tebasan pedang seketika saat menerjang)
             if (attackFrames != null && attackFrames.Length > 1 && attackFrames[1] != null && spriteRenderer != null)
             {
                 spriteRenderer.sprite = attackFrames[1];
+            }
+
+            // Spawn efek visual tebasan pedang sabit / gelombang kejut palu secara terintegrasi
+            if (SkillVfxManager.Instance != null && unitController != null)
+            {
+                if (unitController.UnitType == UnitType.Cedric)
+                {
+                    SkillVfxManager.Instance.SpawnUpwardCrescentSlash(anchorPos, lungePos + dir * 0.15f, unitController.CurrentTier);
+                }
+                else if (unitController.UnitType == UnitType.RoseTanker)
+                {
+                    SkillVfxManager.Instance.SpawnUpwardRadiantShockwave(anchorPos, lungePos, unitController.CurrentTier);
+                }
             }
 
             elapsed = 0f;
@@ -260,10 +280,14 @@ namespace FantasyDefense.Combat
                 yield return null;
             }
 
-            // 3. Fase Follow-Through Apex (Menahan sejenak di puncak tebasan saat efek gempa/sabit api meledak)
+            // 3. Fase Follow-Through Apex (Menahan pose tebasan di puncak hantaman)
             if (attackFrames != null && attackFrames.Length > 2 && attackFrames[2] != null && spriteRenderer != null)
             {
                 spriteRenderer.sprite = attackFrames[2];
+            }
+            else if (attackFrames != null && attackFrames.Length > 1 && attackFrames[1] != null && spriteRenderer != null)
+            {
+                spriteRenderer.sprite = attackFrames[1];
             }
 
             elapsed = 0f;
