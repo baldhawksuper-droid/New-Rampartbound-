@@ -538,7 +538,7 @@ namespace FantasyDefense.Combat
             nextHeroEmoteTime = Time.time + 6.5f;
 
             // Cari pahlawan aktif terdekat dari gerbang benteng
-            UnitController[] allUnits = UnityEngine.Object.FindObjectsByType<UnitController>(FindObjectsSortMode.None);
+            UnitController[] allUnits = UnityEngine.Object.FindObjectsByType<UnitController>(FindObjectsInactive.Exclude);
             if (allUnits == null || allUnits.Length == 0) return;
 
             UnitController closestHero = null;

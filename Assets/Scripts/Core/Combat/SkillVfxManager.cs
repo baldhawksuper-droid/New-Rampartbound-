@@ -5,6 +5,8 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 using FantasyDefense.Data;
 using FantasyDefense.Core;
+using FantasyDefense.Audio;
+using FantasyDefense.Mobile;
 
 namespace FantasyDefense.Combat
 {
@@ -66,7 +68,7 @@ namespace FantasyDefense.Combat
             if (unit == null) return;
 
             Vector3 pos = unit.transform.position;
-            int unitId = unit.GetInstanceID();
+            int unitId = unit.GetHashCode();
             float now = Time.time;
 
             // Batasi teks floating agar tidak membanjiri layar pada auto-attack (internal cooldown 6 detik per unit)

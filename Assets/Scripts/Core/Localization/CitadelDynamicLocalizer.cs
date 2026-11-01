@@ -230,7 +230,7 @@ namespace FantasyDefense.Localization
         /// </summary>
         public static void RefreshSceneLocalization(AppLanguage lang)
         {
-            var allTexts = FindObjectsByType<Text>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            var allTexts = FindObjectsByType<Text>(FindObjectsInactive.Include);
             bool isEnglish = (lang == AppLanguage.English);
 
             foreach (var txt in allTexts)

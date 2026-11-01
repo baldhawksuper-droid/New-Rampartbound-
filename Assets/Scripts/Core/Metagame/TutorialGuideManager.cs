@@ -48,13 +48,13 @@ namespace FantasyDefense.Metagame
 
         public string GetLocalizedSpeaker()
         {
-            bool isEn = FantasyDefense.Localization.CitadelLocalizationManager.CurrentLanguage == FantasyDefense.Localization.AppLanguage.English;
+            bool isEn = FantasyDefense.Localization.CitadelLocalizationManager.ActiveLanguage == FantasyDefense.Localization.AppLanguage.English;
             return (isEn && !string.IsNullOrEmpty(speakerNameEn)) ? speakerNameEn : speakerName;
         }
 
         public string GetLocalizedDialogue()
         {
-            bool isEn = FantasyDefense.Localization.CitadelLocalizationManager.CurrentLanguage == FantasyDefense.Localization.AppLanguage.English;
+            bool isEn = FantasyDefense.Localization.CitadelLocalizationManager.ActiveLanguage == FantasyDefense.Localization.AppLanguage.English;
             return (isEn && !string.IsNullOrEmpty(dialogueTextEn)) ? dialogueTextEn : dialogueText;
         }
     }

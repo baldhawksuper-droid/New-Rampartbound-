@@ -140,7 +140,7 @@ namespace FantasyDefense.GridSystem
             }
         }
 
-        private void HandlePlayerActivity(UnitController unit)
+        public void HandlePlayerActivity(UnitController unit = null)
         {
             hasCompletedFirstTouch = true;
             ResetHintTimer();

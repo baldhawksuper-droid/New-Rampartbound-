@@ -6,6 +6,7 @@ using FantasyDefense.GridSystem;
 using FantasyDefense.Summon;
 using FantasyDefense.Localization;
 using FantasyDefense.Data;
+using FantasyDefense.Combat;
 
 namespace FantasyDefense.UI
 {
