@@ -435,7 +435,12 @@ namespace FantasyDefense.UI
                         var img = standeeButtons[i].transform.Find("HeroPortrait")?.GetComponent<Image>();
                         if (img != null)
                         {
-                            img.color = new Color(0.25f, 0.28f, 0.38f, 0.45f); // Siluet terkunci
+                            img.color = new Color(0.12f, 0.16f, 0.25f, 0.60f); // Siluet pahlawan berarsir elegan
+                            Sprite lockedHeroSprite = GetHeroSpriteForType(heroType, 1);
+                            if (lockedHeroSprite != null)
+                            {
+                                img.sprite = lockedHeroSprite;
+                            }
                         }
                     }
                 }
@@ -464,10 +469,10 @@ namespace FantasyDefense.UI
             var bgImg = btn.GetComponent<Image>();
             if (bgImg != null)
             {
-                // Active: kilau hangat emas kerajaan taktil; Inactive: andesit gelap benteng
+                // Active: kilau kapsul emas royal Gambar 3; Inactive: andesit dongker gelap
                 bgImg.color = isActive 
-                    ? new Color(0.36f, 0.26f, 0.10f, 0.98f) 
-                    : new Color(0.10f, 0.13f, 0.20f, 0.90f);
+                    ? new Color(0.96f, 0.76f, 0.22f, 0.98f) 
+                    : new Color(0.10f, 0.14f, 0.22f, 0.92f);
             }
 
             var outline = btn.GetComponent<Outline>();
@@ -478,9 +483,9 @@ namespace FantasyDefense.UI
             if (outline != null)
             {
                 outline.effectColor = isActive 
-                    ? new Color(1.0f, 0.88f, 0.32f, 1.0f) 
-                    : new Color(0.40f, 0.36f, 0.28f, 0.65f);
-                outline.effectDistance = isActive ? new Vector2(2.0f, -2.0f) : new Vector2(1.2f, -1.2f);
+                    ? new Color(1.0f, 0.90f, 0.35f, 1.0f) 
+                    : new Color(0.35f, 0.42f, 0.55f, 0.70f);
+                outline.effectDistance = isActive ? new Vector2(2.0f, -2.0f) : new Vector2(1.0f, -1.0f);
             }
 
             var iconTr = btn.transform.Find("TabIcon");
@@ -489,7 +494,7 @@ namespace FantasyDefense.UI
                 var iconImg = iconTr.GetComponent<Image>();
                 if (iconImg != null)
                 {
-                    iconImg.color = isActive ? Color.white : new Color(0.70f, 0.72f, 0.78f, 0.82f);
+                    iconImg.color = isActive ? Color.white : new Color(0.85f, 0.88f, 0.95f, 0.85f);
                 }
                 iconTr.localScale = isActive ? new Vector3(1.10f, 1.10f, 1f) : Vector3.one;
             }
@@ -498,8 +503,8 @@ namespace FantasyDefense.UI
             if (txt != null)
             {
                 txt.color = isActive 
-                    ? new Color(1.0f, 0.94f, 0.45f, 1.0f) 
-                    : new Color(0.72f, 0.76f, 0.82f, 0.85f);
+                    ? new Color(0.18f, 0.10f, 0.02f, 1.0f) 
+                    : new Color(0.85f, 0.88f, 0.95f, 0.85f);
             }
         }
 

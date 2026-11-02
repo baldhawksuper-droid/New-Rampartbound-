@@ -36,4 +36,4 @@ TextureImporter:
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 0
   alphaIsTransparency: 1
-  spriteMeshType: 1
+  spriteMeshType: 0

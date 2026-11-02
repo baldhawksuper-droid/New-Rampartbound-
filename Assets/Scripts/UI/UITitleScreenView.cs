@@ -233,11 +233,22 @@ namespace FantasyDefense.UI
 
         public void RefreshLocalization()
         {
-            if (gameTitleLogoImage != null && gameTitleLogoImage.sprite != null)
+            bool hasLogo = (gameTitleLogoImage != null && gameTitleLogoImage.sprite != null) 
+                        || Resources.Load<Sprite>("Sprites/UI/Title_Game_Logo_Rampartbound") != null;
+
+            if (hasLogo)
             {
-                // Jika sprite logo resmi terpasang, sembunyikan teks mentah agar tampilan mewah
-                if (gameTitleText != null) gameTitleText.gameObject.SetActive(false);
-                if (subtitleText != null) subtitleText.gameObject.SetActive(false);
+                // Jika sprite logo resmi terpasang, sembunyikan teks mentah agar tampilan mewah tanpa artefak garis
+                if (gameTitleText != null) 
+                {
+                    gameTitleText.text = "";
+                    gameTitleText.gameObject.SetActive(false);
+                }
+                if (subtitleText != null) 
+                {
+                    subtitleText.text = "";
+                    subtitleText.gameObject.SetActive(false);
+                }
             }
             else
             {

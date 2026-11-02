@@ -439,7 +439,7 @@ namespace Rampartbound.Editor
             }
             logoImg.raycastTarget = false;
 
-            var gameTitleTxt = CreateText(titlePanelObj.transform, "GameTitleText", "RAMPARTBOUND\nMERGE DEFENSE", 58, FontStyle.Bold, TextAnchor.MiddleCenter, new Color(1f, 0.85f, 0.35f), defaultFont);
+            var gameTitleTxt = CreateText(titlePanelObj.transform, "GameTitleText", _titleGameLogo != null ? "" : "RAMPARTBOUND\nMERGE DEFENSE", 58, FontStyle.Bold, TextAnchor.MiddleCenter, new Color(1f, 0.85f, 0.35f), defaultFont);
             var titleRect = gameTitleTxt.GetComponent<RectTransform>();
             titleRect.anchorMin = new Vector2(0.1f, 0.65f);
             titleRect.anchorMax = new Vector2(0.9f, 0.88f);
@@ -447,7 +447,7 @@ namespace Rampartbound.Editor
             titleRect.offsetMax = Vector2.zero;
             if (_titleGameLogo != null) gameTitleTxt.gameObject.SetActive(false); // Sembunyikan teks polos jika sprite logo ada
 
-            var subtitleTxt = CreateText(titlePanelObj.transform, "SubtitleText", "Pertahankan Gerbang Kerajaan dari Serbuan Abyssal", 28, FontStyle.Normal, TextAnchor.MiddleCenter, new Color(0.7f, 0.85f, 1f), defaultFont);
+            var subtitleTxt = CreateText(titlePanelObj.transform, "SubtitleText", _titleGameLogo != null ? "" : "Pertahankan Gerbang Kerajaan dari Serbuan Abyssal", 28, FontStyle.Normal, TextAnchor.MiddleCenter, new Color(0.7f, 0.85f, 1f), defaultFont);
             var subRect = subtitleTxt.GetComponent<RectTransform>();
             subRect.anchorMin = new Vector2(0.05f, 0.58f);
             subRect.anchorMax = new Vector2(0.95f, 0.64f);
@@ -678,44 +678,39 @@ namespace Rampartbound.Editor
             // Formasi 4 Slot Hero Courtyard Assembly:
             // Pippin (Slot 1, Kiri): Lv.12, CP 1,600
             var rabbitCard = CreateButton(heroesContainer.transform, "RabbitCard", "Lv.12 | CP 1,600", new Color(0f, 0f, 0f, 0f), Color.white, 15, defaultFont);
-            PositionUI(rabbitCard, 0.02f, 0.05f, 0.25f, 0.92f);
+            PositionUI(rabbitCard, 0.02f, 0.04f, 0.25f, 0.88f);
             SetupHeroCardPortrait(rabbitCard, _heroRabbitSprite, null);
 
             // Cedric (Slot 2, Tengah Kiri): Cedric, Lv.15, CP 1,850
             var cedricCard = CreateButton(heroesContainer.transform, "CedricCard", "Lv.15 | CP 1,850", new Color(0f, 0f, 0f, 0f), Color.white, 15, defaultFont);
-            PositionUI(cedricCard, 0.26f, 0.01f, 0.49f, 0.96f);
+            PositionUI(cedricCard, 0.26f, 0.01f, 0.49f, 0.92f);
             SetupHeroCardPortrait(cedricCard, _heroCedricSprite, null);
 
             // Rose (Slot 3, Tengah Kanan): Lv.14, CP 1,400 (Chibi Palu Emas Raksasa)
             var roseCard = CreateButton(heroesContainer.transform, "RoseCard", "Lv.14 | CP 1,400", new Color(0f, 0f, 0f, 0f), Color.white, 15, defaultFont);
-            PositionUI(roseCard, 0.50f, 0.05f, 0.73f, 0.92f);
+            PositionUI(roseCard, 0.50f, 0.04f, 0.73f, 0.88f);
             SetupHeroCardPortrait(roseCard, _heroRoseSprite, null);
 
-            // Slot Ke-4 (Slot Fleksibel / Expansion Slot Terkunci - Bisa diklik untuk Gacha)
-            var windCard = CreateButton(heroesContainer.transform, "WindCard", "🔒 Gacha to Unlock", new Color(0f, 0f, 0f, 0f), Color.white, 14, defaultFont);
-            PositionUI(windCard, 0.74f, 0.05f, 0.97f, 0.92f);
+            // Slot Ke-4 (Slot Fleksibel / Expansion Slot Terkunci - Menampilkan Siluet Hero Gelap)
+            var windCard = CreateButton(heroesContainer.transform, "WindCard", "🔒 BUKA GACHA", new Color(0f, 0f, 0f, 0f), new Color(1f, 0.88f, 0.35f), 14, defaultFont);
+            PositionUI(windCard, 0.74f, 0.04f, 0.97f, 0.88f);
             SetupHeroCardPortrait(windCard, _heroWindSprite, null);
-            var windLockOverlay = new GameObject("LockOverlay", typeof(RectTransform), typeof(Image));
-            windLockOverlay.transform.SetParent(windCard.transform, false);
-            PositionUI(windLockOverlay, 0.08f, 0.32f, 0.92f, 0.68f);
-            var windLockImg = windLockOverlay.GetComponent<Image>();
-            windLockImg.color = new Color(0.08f, 0.12f, 0.20f, 0.88f);
-            var windLockBorder = windLockOverlay.AddComponent<Outline>();
-            windLockBorder.effectColor = new Color(0.85f, 0.70f, 0.25f, 0.95f);
-            windLockBorder.effectDistance = new Vector2(2f, -2f);
-            var windLockTxtObj = new GameObject("LockText", typeof(RectTransform), typeof(Text));
-            windLockTxtObj.transform.SetParent(windLockOverlay.transform, false);
-            PositionUI(windLockTxtObj, 0f, 0f, 1f, 1f);
-            var windLockTxt = windLockTxtObj.GetComponent<Text>();
-            windLockTxt.font = defaultFont;
-            windLockTxt.fontSize = 15;
-            windLockTxt.fontStyle = FontStyle.Bold;
-            windLockTxt.alignment = TextAnchor.MiddleCenter;
-            windLockTxt.color = new Color(1f, 0.88f, 0.35f);
-            windLockTxt.text = "🔒\nBUKA\nGACHA";
-            var windLockShadow = windLockTxtObj.AddComponent<Shadow>();
-            windLockShadow.effectColor = new Color(0f, 0f, 0f, 0.90f);
-            windLockShadow.effectDistance = new Vector2(1.5f, -1.5f);
+            var windPortraitImg = windCard.transform.Find("HeroPortrait")?.GetComponent<Image>();
+            if (windPortraitImg != null)
+            {
+                windPortraitImg.color = new Color(0.12f, 0.16f, 0.25f, 0.60f); // Siluet gelap elegan
+            }
+            var windLockBadge = new GameObject("LockBadge", typeof(RectTransform), typeof(Text));
+            windLockBadge.transform.SetParent(windCard.transform, false);
+            PositionUI(windLockBadge, 0.25f, 0.45f, 0.75f, 0.65f);
+            var windLockBadgeTxt = windLockBadge.GetComponent<Text>();
+            windLockBadgeTxt.font = defaultFont;
+            windLockBadgeTxt.fontSize = 28;
+            windLockBadgeTxt.alignment = TextAnchor.MiddleCenter;
+            windLockBadgeTxt.text = "🔒";
+            var windLockBadgeShadow = windLockBadge.AddComponent<Shadow>();
+            windLockBadgeShadow.effectColor = new Color(0f, 0f, 0f, 0.90f);
+            windLockBadgeShadow.effectDistance = new Vector2(2f, -2f);
             windCard.SetActive(true);
 
             // Core Battle Button (Crimson 3D Gold Frame with studs)
@@ -767,42 +762,44 @@ namespace Rampartbound.Editor
             dockHlg.padding = new RectOffset(12, 12, 6, 6);
 
             Sprite iconNavMap = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Map.png");
-            Sprite iconNavHero = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Hero.png");
-            Sprite iconNavSummon = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Summon.png");
-            Sprite iconNavStore = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Store.png");
+            Sprite iconNavCitadel = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Citadel.png")
+                ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Map.png");
+            Sprite iconNavForge = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Forge.png");
+            Sprite iconNavHeroes = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Heroes.png")
+                ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Hero.png");
+            Sprite iconNavBag = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Bag.png")
+                ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Store.png");
 
-            var navStageBtn = CreateButton(dockObj.transform, "NavStageMap", "PETA", Color.clear, Color.white, 14, defaultFont);
-            var navHeroBtn = CreateButton(dockObj.transform, "NavHeroes", "HERO", Color.clear, Color.white, 14, defaultFont);
-            var navSummonBtn = CreateButton(dockObj.transform, "NavSummon", "GACHA", Color.clear, Color.white, 14, defaultFont);
-            CreateNotificationBadge(navSummonBtn.transform, NotificationBadgeType.DailySummonFree);
+            var navStageBtn = CreateButton(dockObj.transform, "NavStageMap", "< Citadel >", Color.clear, Color.white, 14, defaultFont);
+            var navForgeBtn = CreateButton(dockObj.transform, "NavForge", "Forge", Color.clear, Color.white, 14, defaultFont);
+            var navHeroBtn = CreateButton(dockObj.transform, "NavHeroes", "Heroes", Color.clear, Color.white, 14, defaultFont);
+            var navStoreBtn = CreateButton(dockObj.transform, "NavStore", "Bag", Color.clear, Color.white, 14, defaultFont);
 
-            var navStoreBtn = CreateButton(dockObj.transform, "NavStore", "TOKO", Color.clear, Color.white, 14, defaultFont);
-
-            System.Action<GameObject, Sprite, string> setupFantasyNavTab = (btn, iconSp, label) => {
+            System.Action<GameObject, Sprite, string, bool> setupFantasyNavTab = (btn, iconSp, label, isActive) => {
                 var bImg = btn.GetComponent<Image>();
                 if (bImg != null)
                 {
-                    if (_tabHeroInactive != null)
+                    if (isActive)
                     {
-                        bImg.sprite = _tabHeroInactive;
-                        bImg.type = Image.Type.Sliced;
-                        bImg.color = Color.white;
+                        bImg.color = new Color(0.96f, 0.76f, 0.22f, 0.98f); // Golden active capsule
                     }
                     else
                     {
-                        bImg.color = new Color(0.12f, 0.16f, 0.25f, 0.95f);
+                        bImg.color = new Color(0.10f, 0.14f, 0.22f, 0.92f); // Deep navy inactive
                     }
                 }
 
                 var bOutline = btn.AddComponent<Outline>();
-                bOutline.effectColor = new Color(0.85f, 0.70f, 0.25f, 0.85f);
-                bOutline.effectDistance = new Vector2(1.5f, -1.5f);
+                bOutline.effectColor = isActive 
+                    ? new Color(1.0f, 0.90f, 0.35f, 1.0f) 
+                    : new Color(0.35f, 0.42f, 0.55f, 0.70f);
+                bOutline.effectDistance = isActive ? new Vector2(2f, -2f) : new Vector2(1f, -1f);
 
                 if (iconSp != null)
                 {
                     var iconObj = new GameObject("TabIcon", typeof(RectTransform), typeof(Image));
                     iconObj.transform.SetParent(btn.transform, false);
-                    PositionUI(iconObj, 0.22f, 0.40f, 0.78f, 0.94f);
+                    PositionUI(iconObj, 0.20f, 0.40f, 0.80f, 0.94f);
                     var icImg = iconObj.GetComponent<Image>();
                     icImg.sprite = iconSp;
                     icImg.type = Image.Type.Simple;
@@ -817,24 +814,24 @@ namespace Rampartbound.Editor
                     bTxt.fontSize = 14;
                     bTxt.font = defaultFont;
                     bTxt.alignment = TextAnchor.MiddleCenter;
-                    bTxt.color = new Color(1f, 0.95f, 0.75f);
+                    bTxt.color = isActive ? new Color(0.18f, 0.10f, 0.02f) : new Color(0.85f, 0.88f, 0.95f);
                     var txtRt = bTxt.GetComponent<RectTransform>();
                     txtRt.anchorMin = new Vector2(0.02f, 0.04f);
                     txtRt.anchorMax = new Vector2(0.98f, 0.38f);
                     txtRt.offsetMin = Vector2.zero;
                     txtRt.offsetMax = Vector2.zero;
-                    var tShadow = bTxt.gameObject.AddComponent<Shadow>();
-                    tShadow.effectColor = new Color(0f, 0f, 0f, 0.95f);
-                    tShadow.effectDistance = new Vector2(1.5f, -1.5f);
+                    if (!isActive)
+                    {
+                        var tShadow = bTxt.gameObject.AddComponent<Shadow>();
+                        tShadow.effectColor = new Color(0f, 0f, 0f, 0.95f);
+                        tShadow.effectDistance = new Vector2(1.5f, -1.5f);
+                    }
                 }
             };
-            setupFantasyNavTab(navStageBtn, iconNavMap, "PETA");
-            setupFantasyNavTab(navHeroBtn, iconNavHero, "HERO");
-            setupFantasyNavTab(navSummonBtn, iconNavSummon, "GACHA");
-            setupFantasyNavTab(navStoreBtn, iconNavStore, "TOKO");
-
-            var navForgeBtn = CreateButton(dockObj.transform, "NavForge", "🔨\nTempa", new Color(0.14f, 0.18f, 0.28f), Color.white, 20, defaultFont);
-            navForgeBtn.SetActive(false);
+            setupFantasyNavTab(navStageBtn, iconNavCitadel, "< Citadel >", true);
+            setupFantasyNavTab(navForgeBtn, iconNavForge, "Forge", false);
+            setupFantasyNavTab(navHeroBtn, iconNavHeroes, "Heroes", false);
+            setupFantasyNavTab(navStoreBtn, iconNavBag, "Bag", false);
 
             // Bind serialized properties ke UICitadelLobbyView
             var lobbySO = new SerializedObject(lobbyView);
@@ -2989,34 +2986,34 @@ namespace Rampartbound.Editor
         {
             if (cardObj == null) return;
 
-            // 1. Oval Ground Shadow (di bawah kaki hero standee tepat di atas teras batu)
+            // 1. Oval Ground Shadow (di bawah kaki hero standee tepat di atas lantai batu pelataran)
             var shadowObj = new GameObject("GroundShadow", typeof(RectTransform), typeof(Image));
             shadowObj.transform.SetParent(cardObj.transform, false);
-            PositionUI(shadowObj, 0.15f, 0.10f, 0.85f, 0.22f);
+            PositionUI(shadowObj, 0.10f, 0.14f, 0.90f, 0.24f);
             var shadowImg = shadowObj.GetComponent<Image>();
             if (_shadowOval != null)
             {
                 shadowImg.sprite = _shadowOval;
             }
-            shadowImg.color = new Color(0f, 0f, 0f, 0.55f);
+            shadowImg.color = new Color(0f, 0f, 0f, 0.60f);
             shadowImg.raycastTarget = false;
 
-            // 2. Hero Standee Portrait (Proporsional menapak di teras lantai batu)
+            // 2. Hero Standee Portrait (Proporsional menapak di lantai teras dengan jarak rapat ke badge nama)
             if (heroSprite != null)
             {
                 var portraitObj = new GameObject("HeroPortrait", typeof(RectTransform), typeof(Image));
                 portraitObj.transform.SetParent(cardObj.transform, false);
-                PositionUI(portraitObj, 0.02f, 0.14f, 0.98f, 0.98f);
+                PositionUI(portraitObj, 0.02f, 0.18f, 0.98f, 0.98f);
                 var img = portraitObj.GetComponent<Image>();
                 img.sprite = heroSprite;
                 img.preserveAspect = true;
                 img.raycastTarget = false;
             }
 
-            // 3. Info Badge Pill (Lv, CP) menempel rapi tepat di bawah kaki hero
+            // 3. Info Badge Pill (Lv, CP) menempel rapat tepat di bawah kaki hero (tanpa celah kosong)
             var badgeObj = new GameObject("BadgePill", typeof(RectTransform), typeof(Image));
             badgeObj.transform.SetParent(cardObj.transform, false);
-            PositionUI(badgeObj, 0.04f, 0.01f, 0.96f, 0.12f);
+            PositionUI(badgeObj, 0.02f, 0.01f, 0.98f, 0.16f);
             var badgeImg = badgeObj.GetComponent<Image>();
             if (_badgeHeroPill != null)
             {
@@ -3027,7 +3024,7 @@ namespace Rampartbound.Editor
             }
             else
             {
-                badgeImg.color = new Color(0.08f, 0.12f, 0.2f, 0.9f);
+                badgeImg.color = new Color(0.08f, 0.12f, 0.2f, 0.95f);
             }
             badgeImg.raycastTarget = false;
 
@@ -3037,8 +3034,8 @@ namespace Rampartbound.Editor
                 var rt = txtTrans.GetComponent<RectTransform>();
                 if (rt != null)
                 {
-                    rt.anchorMin = new Vector2(0.04f, 0.01f);
-                    rt.anchorMax = new Vector2(0.96f, 0.12f);
+                    rt.anchorMin = new Vector2(0.02f, 0.01f);
+                    rt.anchorMax = new Vector2(0.98f, 0.16f);
                     rt.offsetMin = Vector2.zero;
                     rt.offsetMax = Vector2.zero;
                 }
@@ -3046,12 +3043,12 @@ namespace Rampartbound.Editor
                 if (txt != null)
                 {
                     txt.alignment = TextAnchor.MiddleCenter;
-                    txt.fontSize = 17;
+                    txt.fontSize = 15;
                     txt.fontStyle = FontStyle.Bold;
                     txt.color = Color.white;
                 }
                 var shadow = txtTrans.gameObject.GetComponent<Shadow>() ?? txtTrans.gameObject.AddComponent<Shadow>();
-                shadow.effectColor = new Color(0f, 0f, 0f, 0.85f);
+                shadow.effectColor = new Color(0f, 0f, 0f, 0.90f);
                 shadow.effectDistance = new Vector2(1.5f, -1.5f);
                 txtTrans.SetAsLastSibling();
             }
