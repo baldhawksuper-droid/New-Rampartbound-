@@ -432,6 +432,11 @@ namespace FantasyDefense.UI
                     }
                     if (standeeButtons[i] != null)
                     {
+                        var namePlate = standeeButtons[i].transform.Find("HeroNamePlate")?.GetComponent<Text>();
+                        if (namePlate != null)
+                        {
+                            namePlate.text = "<b>Terkunci</b>";
+                        }
                         var img = standeeButtons[i].transform.Find("HeroPortrait")?.GetComponent<Image>();
                         if (img != null)
                         {
@@ -532,6 +537,12 @@ namespace FantasyDefense.UI
 
             if (btn != null)
             {
+                var namePlate = btn.transform.Find("HeroNamePlate")?.GetComponent<Text>();
+                if (namePlate != null)
+                {
+                    namePlate.text = $"<b>{profile?.heroName ?? defaultName}</b>";
+                }
+
                 var img = btn.transform.Find("HeroPortrait")?.GetComponent<Image>();
                 if (img != null)
                 {

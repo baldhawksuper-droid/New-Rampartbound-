@@ -638,8 +638,16 @@ namespace Rampartbound.Editor
             var cmdNameTxt = lvlTxt;
 
             Text energyTxt;
-            var energyPill = CreateResourcePill(lobbyHeaderObj.transform, "EnergyPill", _iconEnergyCyan, "30/30", new Color(0.2f, 0.95f, 0.4f), ResourceCommodityType.Energy, defaultFont, out energyTxt);
+            var energyPill = CreateResourcePill(lobbyHeaderObj.transform, "EnergyPill", _iconEnergyCyan, "30/30", new Color(0.25f, 0.75f, 1.0f), ResourceCommodityType.Energy, defaultFont, out energyTxt);
             PositionUI(energyPill, 0.38f, 0.15f, 0.62f, 0.85f);
+            var energyBgImg = energyPill.GetComponent<Image>();
+            if (energyBgImg != null)
+            {
+                energyBgImg.color = new Color(0.08f, 0.16f, 0.32f, 0.95f); // Deep Royal Blue Pill
+            }
+            var energyBorder = energyPill.AddComponent<Outline>();
+            energyBorder.effectColor = new Color(0.35f, 0.65f, 0.95f, 0.80f); // Bright Cyan / Royal Blue Glow
+            energyBorder.effectDistance = new Vector2(1.2f, -1.2f);
             CreateNotificationBadge(energyPill.transform, NotificationBadgeType.EnergyFull);
 
             Text goldTxt;
@@ -679,22 +687,22 @@ namespace Rampartbound.Editor
             // Pippin (Slot 1, Kiri): Lv.12, CP 1,600
             var rabbitCard = CreateButton(heroesContainer.transform, "RabbitCard", "Lv.12 | CP 1,600", new Color(0f, 0f, 0f, 0f), Color.white, 15, defaultFont);
             PositionUI(rabbitCard, 0.02f, 0.04f, 0.25f, 0.88f);
-            SetupHeroCardPortrait(rabbitCard, _heroRabbitSprite, null);
+            SetupHeroCardPortrait(rabbitCard, _heroRabbitSprite, "Pippin");
 
             // Cedric (Slot 2, Tengah Kiri): Cedric, Lv.15, CP 1,850
             var cedricCard = CreateButton(heroesContainer.transform, "CedricCard", "Lv.15 | CP 1,850", new Color(0f, 0f, 0f, 0f), Color.white, 15, defaultFont);
             PositionUI(cedricCard, 0.26f, 0.01f, 0.49f, 0.92f);
-            SetupHeroCardPortrait(cedricCard, _heroCedricSprite, null);
+            SetupHeroCardPortrait(cedricCard, _heroCedricSprite, "Cedric");
 
             // Rose (Slot 3, Tengah Kanan): Lv.14, CP 1,400 (Chibi Palu Emas Raksasa)
             var roseCard = CreateButton(heroesContainer.transform, "RoseCard", "Lv.14 | CP 1,400", new Color(0f, 0f, 0f, 0f), Color.white, 15, defaultFont);
             PositionUI(roseCard, 0.50f, 0.04f, 0.73f, 0.88f);
-            SetupHeroCardPortrait(roseCard, _heroRoseSprite, null);
+            SetupHeroCardPortrait(roseCard, _heroRoseSprite, "Rose");
 
             // Slot Ke-4 (Slot Fleksibel / Expansion Slot Terkunci - Menampilkan Siluet Hero Gelap)
             var windCard = CreateButton(heroesContainer.transform, "WindCard", "🔒 BUKA GACHA", new Color(0f, 0f, 0f, 0f), new Color(1f, 0.88f, 0.35f), 14, defaultFont);
             PositionUI(windCard, 0.74f, 0.04f, 0.97f, 0.88f);
-            SetupHeroCardPortrait(windCard, _heroWindSprite, null);
+            SetupHeroCardPortrait(windCard, _heroWindSprite, "Terkunci");
             var windPortraitImg = windCard.transform.Find("HeroPortrait")?.GetComponent<Image>();
             if (windPortraitImg != null)
             {
@@ -717,18 +725,18 @@ namespace Rampartbound.Editor
             var defendBtn = CreateButton(lobbyPanelObj.transform, "DefendCitadelButton", "⚔️ BATTLE (5 STAMINA)", new Color(0.85f, 0.15f, 0.15f), Color.white, 28, defaultFont);
             PositionUI(defendBtn, 0.08f, 0.120f, 0.92f, 0.220f);
 
-            // Workshop Artileri Benteng Citadel (Modular Balista & Meriam)
-            var defenseTurretBtn = CreateButton(lobbyPanelObj.transform, "DefenseTurretWorkshopButton", "🏰 ARTILERI BENTENG", new Color(0.12f, 0.18f, 0.28f), new Color(1f, 0.92f, 0.40f), 18, defaultFont);
+            // Workshop Artileri Benteng Citadel (Modular Balista & Meriam - Harmonis Kayu & Emas Kerajaan)
+            var defenseTurretBtn = CreateButton(lobbyPanelObj.transform, "DefenseTurretWorkshopButton", "🏰 ARTILERI BENTENG", new Color(0.18f, 0.14f, 0.10f), new Color(1f, 0.92f, 0.45f), 18, defaultFont);
             PositionUI(defenseTurretBtn, 0.20f, 0.785f, 0.80f, 0.840f);
             var dtImg = defenseTurretBtn.GetComponent<Image>();
-            if (dtImg != null) { dtImg.sprite = null; dtImg.color = new Color(0.12f, 0.18f, 0.28f, 0.95f); }
+            if (dtImg != null) { dtImg.sprite = null; dtImg.color = new Color(0.20f, 0.15f, 0.10f, 0.95f); }
             var dtOutline = defenseTurretBtn.AddComponent<Outline>();
-            dtOutline.effectColor = new Color(0.85f, 0.70f, 0.25f, 0.95f);
+            dtOutline.effectColor = new Color(0.95f, 0.78f, 0.28f, 0.95f);
             dtOutline.effectDistance = new Vector2(2f, -2f);
             var dtTxt = defenseTurretBtn.GetComponentInChildren<Text>();
             if (dtTxt != null)
             {
-                dtTxt.color = new Color(1f, 0.92f, 0.40f);
+                dtTxt.color = new Color(1f, 0.94f, 0.50f);
                 dtTxt.fontStyle = FontStyle.Bold;
                 var txtShadow = dtTxt.gameObject.AddComponent<Shadow>();
                 txtShadow.effectColor = new Color(0f, 0f, 0f, 0.90f);
@@ -832,6 +840,18 @@ namespace Rampartbound.Editor
             setupFantasyNavTab(navForgeBtn, iconNavForge, "Forge", false);
             setupFantasyNavTab(navHeroBtn, iconNavHeroes, "Heroes", false);
             setupFantasyNavTab(navStoreBtn, iconNavBag, "Bag", false);
+
+            // Shimmer Sweep Light pada Tab Aktif < Citadel >
+            var shimmerObj = new GameObject("ActiveShimmerSweep", typeof(RectTransform), typeof(Image));
+            shimmerObj.transform.SetParent(navStageBtn.transform, false);
+            PositionUI(shimmerObj, 0.05f, 0.05f, 0.95f, 0.95f);
+            var shimmerImg = shimmerObj.GetComponent<Image>();
+            shimmerImg.color = new Color(1f, 1f, 1f, 0.22f);
+            shimmerImg.raycastTarget = false;
+
+            // Notification Badges (Red Dots) pada tab Forge dan Heroes (Poin Rekomendasi 3)
+            CreateNotificationBadge(navForgeBtn.transform, NotificationBadgeType.DailySummonFree);
+            CreateNotificationBadge(navHeroBtn.transform, NotificationBadgeType.EnergyFull);
 
             // Bind serialized properties ke UICitadelLobbyView
             var lobbySO = new SerializedObject(lobbyView);
@@ -3027,6 +3047,22 @@ namespace Rampartbound.Editor
                 badgeImg.color = new Color(0.08f, 0.12f, 0.2f, 0.95f);
             }
             badgeImg.raycastTarget = false;
+
+            // 4. Hero Name Title Plate (teks nama emas di atas badge pill)
+            if (!string.IsNullOrEmpty(heroName))
+            {
+                var namePlateObj = new GameObject("HeroNamePlate", typeof(RectTransform), typeof(Text));
+                namePlateObj.transform.SetParent(cardObj.transform, false);
+                PositionUI(namePlateObj, 0.02f, 0.16f, 0.98f, 0.24f);
+                var nameTxt = namePlateObj.GetComponent<Text>();
+                nameTxt.text = $"<b>{heroName}</b>";
+                nameTxt.alignment = TextAnchor.MiddleCenter;
+                nameTxt.fontSize = 13;
+                nameTxt.color = new Color(1.0f, 0.90f, 0.40f, 1.0f);
+                var nShadow = namePlateObj.AddComponent<Shadow>();
+                nShadow.effectColor = new Color(0f, 0f, 0f, 0.95f);
+                nShadow.effectDistance = new Vector2(1f, -1f);
+            }
 
             var txtTrans = cardObj.transform.Find("Text");
             if (txtTrans != null)
