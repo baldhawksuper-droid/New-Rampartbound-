@@ -581,12 +581,18 @@ namespace Rampartbound.Editor
             handShadow.effectColor = new Color(0, 0, 0, 0.75f);
             handShadow.effectDistance = new Vector2(3, -3);
 
-            var versionTxt = CreateText(titlePanelObj.transform, "VersionText", "Versi 1.2.11 (Google Play Edition)", 15, FontStyle.Normal, TextAnchor.MiddleCenter, new Color(0.62f, 0.72f, 0.85f, 0.75f), defaultFont);
+            var versionTxt = CreateText(titlePanelObj.transform, "VersionText", "Versi 1.2.11 (Google Play Edition)", 15, FontStyle.Bold, TextAnchor.MiddleCenter, new Color(0.95f, 0.97f, 1.0f, 0.95f), defaultFont);
             var verRect = versionTxt.GetComponent<RectTransform>();
             verRect.anchorMin = new Vector2(0.05f, 0.012f);
             verRect.anchorMax = new Vector2(0.95f, 0.038f);
             verRect.offsetMin = Vector2.zero;
             verRect.offsetMax = Vector2.zero;
+            var verOutline = versionTxt.gameObject.AddComponent<Outline>();
+            verOutline.effectColor = new Color(0.02f, 0.04f, 0.08f, 0.95f);
+            verOutline.effectDistance = new Vector2(1.5f, -1.5f);
+            var verShadow = versionTxt.gameObject.AddComponent<Shadow>();
+            verShadow.effectColor = new Color(0f, 0f, 0f, 0.90f);
+            verShadow.effectDistance = new Vector2(2f, -2f);
 
             var titleSO = new SerializedObject(titleView);
             titleSO.FindProperty("titleScreenPanel").objectReferenceValue = titlePanelObj;

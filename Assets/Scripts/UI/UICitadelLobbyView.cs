@@ -158,10 +158,10 @@ namespace FantasyDefense.UI
 
         private void Update()
         {
-            // Animasi berdenyut halus (breathe animation) pada tombol Battle Crimson agar memandu mata pemain
+            // Animasi berdenyut halus (breathe animation) pada tombol Battle Crimson agar memandu mata pemain (skala 1.00f hingga 1.03f)
             if (defendCitadelButton != null && defendCitadelButton.gameObject.activeInHierarchy)
             {
-                float pulse = 1.0f + Mathf.Sin(Time.unscaledTime * 3.5f) * 0.035f;
+                float pulse = 1.0f + (Mathf.Sin(Time.unscaledTime * 3.0f) * 0.5f + 0.5f) * 0.03f;
                 defendCitadelButton.transform.localScale = new Vector3(pulse, pulse, 1f);
             }
         }
@@ -900,7 +900,15 @@ namespace FantasyDefense.UI
         {
             if (FantasyDefense.Audio.AudioManager.Instance != null)
             {
-                FantasyDefense.Audio.AudioManager.Instance.PlaySound(FantasyDefense.Audio.SoundType.AltarWhooshOpen, 1.25f);
+                // SFX Taktil Khas RPG Fantasi sesuai karakter tab navigasi
+                FantasyDefense.Audio.SoundType sfx = panelType switch
+                {
+                    GamePanelType.RelicForge => FantasyDefense.Audio.SoundType.GoblinBucklerClank, // Logam & tempaan pandai besi
+                    GamePanelType.HeroUpgrade => FantasyDefense.Audio.SoundType.ButtonClick, // Ksatria & zirah taktil
+                    GamePanelType.Store => FantasyDefense.Audio.SoundType.TileSlideSwish, // Gesekan kulit tas petualang
+                    _ => FantasyDefense.Audio.SoundType.ButtonClick
+                };
+                FantasyDefense.Audio.AudioManager.Instance.PlaySound(sfx, 1.10f);
             }
 
             if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null && FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)

@@ -287,6 +287,8 @@ namespace FantasyDefense.UI
             if (versionText != null)
             {
                 versionText.text = "Versi 1.2.11 (Google Play Edition)";
+                versionText.fontStyle = FontStyle.Bold;
+                versionText.color = new Color(0.95f, 0.97f, 1.0f, 0.95f);
             }
         }
 
