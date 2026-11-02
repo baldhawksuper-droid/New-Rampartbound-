@@ -1857,11 +1857,15 @@ namespace Rampartbound.Editor
 
             var bannerPanel = CreatePanel(summonContent, "AltarBannerPanel", new Color(0.12f, 0.15f, 0.22f, 0.95f));
             PositionUI(bannerPanel, 0.04f, 0.54f, 0.96f, 0.96f);
-            if (_gachaAltarBackdrop != null)
+            var banImg = bannerPanel.GetComponent<Image>();
+            if (banImg != null)
             {
-                var banImg = bannerPanel.GetComponent<Image>();
-                banImg.sprite = _gachaAltarBackdrop;
-                banImg.color = Color.white;
+                if (_gachaAltarBackdrop != null)
+                {
+                    banImg.sprite = _gachaAltarBackdrop;
+                    banImg.color = Color.white;
+                }
+                banImg.raycastTarget = false; // Standar Unity: Backdrop banner dekoratif tidak membebani GraphicRaycaster
             }
             var banOutline = bannerPanel.AddComponent<Outline>();
             banOutline.effectColor = new Color(0.85f, 0.72f, 0.28f, 0.85f);
@@ -3111,6 +3115,7 @@ namespace Rampartbound.Editor
                 headerImg.type = Image.Type.Sliced;
                 headerImg.color = Color.white;
             }
+            headerImg.raycastTarget = false; // Standar Unity: Pita header dekoratif tidak membebani GraphicRaycaster
 
             var titleTxt = CreateText(header.transform, "TitleText", headerTitle, 26, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(1f, 0.85f, 0.35f), font);
             PositionUI(titleTxt.gameObject, 0.04f, 0.1f, 0.80f, 0.9f);

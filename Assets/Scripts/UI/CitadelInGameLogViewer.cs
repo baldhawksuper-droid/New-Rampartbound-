@@ -770,6 +770,7 @@ namespace FantasyDefense.UI
             logContentText.text = "Menunggu log...";
 
             scrollRect.content = contentRect;
+            scrollRect.viewport = scrollRectTransform;
 
             // 3d. Footer Info Note
             var footerObj = new GameObject("FooterNote");

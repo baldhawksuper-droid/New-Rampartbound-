@@ -566,6 +566,7 @@ namespace FantasyDefense.UI
             {
                 backImg.color = new Color(0.12f, 0.16f, 0.24f, 0.98f);
             }
+            backImg.raycastTarget = false;
 
             // Simbol runik misterius di bagian belakang kartu
             var runeObj = new GameObject("RuneGlyph", typeof(RectTransform), typeof(Text));
@@ -576,6 +577,7 @@ namespace FantasyDefense.UI
             runeTxt.fontSize = 28;
             runeTxt.alignment = TextAnchor.MiddleCenter;
             runeTxt.color = new Color(1f, 0.85f, 0.35f, 0.85f);
+            runeTxt.raycastTarget = false;
             var runeRt = runeObj.GetComponent<RectTransform>();
             runeRt.anchorMin = Vector2.zero;
             runeRt.anchorMax = Vector2.one;
@@ -593,6 +595,7 @@ namespace FantasyDefense.UI
 
             var img = frontObj.GetComponent<Image>();
             img.color = new Color(0.08f, 0.10f, 0.16f, 0.95f);
+            img.raycastTarget = false;
 
             // Tentukan sprite border & warna kelangkaan
             string borderPath = "Border_Rarity_Common";
@@ -647,6 +650,7 @@ namespace FantasyDefense.UI
                 portImg.sprite = hSprite;
                 portImg.preserveAspect = true;
             }
+            portImg.raycastTarget = false;
             var pRt = portObj.GetComponent<RectTransform>();
             pRt.anchorMin = new Vector2(0.1f, 0.32f);
             pRt.anchorMax = new Vector2(0.9f, 0.88f);
@@ -663,6 +667,7 @@ namespace FantasyDefense.UI
             nameTxt.fontStyle = FontStyle.Bold;
             nameTxt.alignment = TextAnchor.MiddleCenter;
             nameTxt.color = rarityColor;
+            nameTxt.raycastTarget = false;
             var nRt = nameObj.GetComponent<RectTransform>();
             nRt.anchorMin = new Vector2(0.05f, 0.16f);
             nRt.anchorMax = new Vector2(0.95f, 0.32f);
@@ -679,6 +684,7 @@ namespace FantasyDefense.UI
             statTxt.fontStyle = FontStyle.Normal;
             statTxt.alignment = TextAnchor.MiddleCenter;
             statTxt.color = item.isNewUnlock ? new Color(1f, 0.95f, 0.3f) : new Color(0.75f, 0.95f, 0.85f);
+            statTxt.raycastTarget = false;
             var sRt = statObj.GetComponent<RectTransform>();
             sRt.anchorMin = new Vector2(0.05f, 0.02f);
             sRt.anchorMax = new Vector2(0.95f, 0.16f);

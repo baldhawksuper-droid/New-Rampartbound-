@@ -244,6 +244,21 @@ namespace Rampartbound.Editor
                 AddResult(cat, "CanvasScaler", QACheckStatus.Warning, "CanvasScaler tidak terpasang di Canvas.");
             }
 
+            // Audit GraphicRaycaster & Unity uGUI Standards
+            var raycaster = canvas.GetComponent<GraphicRaycaster>();
+            AddResult(cat, "GraphicRaycaster Presence", raycaster != null ? QACheckStatus.Pass : QACheckStatus.Fail,
+                raycaster != null ? "GraphicRaycaster aktif untuk penanganan event sentuhan." : "GraphicRaycaster tidak ditemukan di Canvas!");
+
+            // Audit ScrollViews for Unity Hierarchy Standards (Viewport + Content)
+            var scrollRects = canvas.GetComponentsInChildren<ScrollRect>(true);
+            foreach (var sr in scrollRects)
+            {
+                bool hasViewport = sr.viewport != null;
+                bool hasContent = sr.content != null;
+                AddResult(cat, $"ScrollView Hierarchy ({sr.gameObject.name})", (hasViewport && hasContent) ? QACheckStatus.Pass : QACheckStatus.Warning,
+                    (hasViewport && hasContent) ? "Memenuhi standar hierarki uGUI resmi: Viewport dan Content terpasang." : $"Peringatan: Viewport={hasViewport}, Content={hasContent}");
+            }
+
             // Audit UI Views
             CheckComponentOnCanvas<UITitleScreenView>(canvas, cat, "UITitleScreenView (Title Screen & Splash)");
             CheckComponentOnCanvas<UICitadelLobbyView>(canvas, cat, "UICitadelLobbyView (Metagame Hub)");
