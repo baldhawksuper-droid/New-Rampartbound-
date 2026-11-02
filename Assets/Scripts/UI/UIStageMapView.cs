@@ -47,6 +47,8 @@ namespace FantasyDefense.UI
 
         [Header("Stage Node Buttons (Optional Inspector Slots)")]
         [SerializeField] private List<Button> stageNodeButtons = new List<Button>();
+        private Coroutine activePulseRoutine;
+        private Transform activePulseTarget;
 
         private StageDataSO currentStage;
 
@@ -78,6 +80,12 @@ namespace FantasyDefense.UI
             CitadelLobbyManager.OnEnergyChanged -= HandleEnergyChanged;
             CitadelLobbyManager.OnTeamCPUpdated -= HandleTeamCPUpdated;
             FantasyDefense.Localization.CitadelLocalizationManager.OnLanguageChanged -= HandleLanguageChanged;
+
+            if (activePulseRoutine != null)
+            {
+                StopCoroutine(activePulseRoutine);
+                activePulseRoutine = null;
+            }
         }
 
         private void HandleLanguageChanged(FantasyDefense.Localization.AppLanguage lang)
@@ -321,6 +329,7 @@ namespace FantasyDefense.UI
             if (nodeFinalBossSp == null) nodeFinalBossSp = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_StageNode_FinalBoss.png");
 #endif
 
+            Transform nextTargetToPulse = null;
             for (int i = 0; i < stageNodeButtons.Count; i++)
             {
                 int stageIdx = i + 1;
@@ -359,6 +368,10 @@ namespace FantasyDefense.UI
                     else
                     {
                         btnImg.color = new Color(1f, 1f, 0.90f, 1f);
+                        if (nextTargetToPulse == null)
+                        {
+                            nextTargetToPulse = btn.transform;
+                        }
                     }
                 }
 
@@ -385,6 +398,40 @@ namespace FantasyDefense.UI
                         txt.fontSize = 16;
                     }
                 }
+            }
+
+            StartPulseEffectOnActiveNode(nextTargetToPulse);
+        }
+
+        private void StartPulseEffectOnActiveNode(Transform target)
+        {
+            if (activePulseRoutine != null)
+            {
+                StopCoroutine(activePulseRoutine);
+                activePulseRoutine = null;
+            }
+
+            if (activePulseTarget != null)
+            {
+                activePulseTarget.localScale = Vector3.one;
+                activePulseTarget = null;
+            }
+
+            if (target != null && gameObject.activeInHierarchy)
+            {
+                activePulseTarget = target;
+                activePulseRoutine = StartCoroutine(PulseNodeRoutine(target));
+            }
+        }
+
+        private System.Collections.IEnumerator PulseNodeRoutine(Transform target)
+        {
+            float speed = 3.2f;
+            while (target != null)
+            {
+                float scale = 1.0f + 0.08f * (0.5f + 0.5f * Mathf.Sin(Time.time * speed));
+                target.localScale = new Vector3(scale, scale, 1f);
+                yield return null;
             }
         }
 
@@ -430,7 +477,14 @@ namespace FantasyDefense.UI
 
                 if (AudioManager.Instance != null)
                 {
-                    AudioManager.Instance.PlaySound(SoundType.ButtonClick);
+                    // Efek suara taktis medali stage (pitch responsif berbobot)
+                    AudioManager.Instance.PlaySound(SoundType.ButtonClick, 1.15f);
+                }
+
+                if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
+                    FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+                {
+                    FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Selection);
                 }
             }
             else

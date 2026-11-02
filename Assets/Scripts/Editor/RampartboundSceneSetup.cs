@@ -1442,18 +1442,20 @@ namespace Rampartbound.Editor
             }
             PositionUI(stageTrailPanel, 0.02f, 0.02f, 0.98f, 0.84f);
 
+            // Koordinat 10 Node Petualangan S-Curve beresolusi adaptif
+            // Rentang Y diperluas (0.04f s.d. 0.94f) dengan aspek rasio seimbang untuk rasio modern 16:9, 19.5:9 & 20:9
             Vector4[] nodeRects = new Vector4[]
             {
-                new Vector4(0.08f, 0.05f, 0.28f, 0.16f),  // 1-1 (Gerbang Masuk)
-                new Vector4(0.38f, 0.13f, 0.58f, 0.24f),  // 1-2 (Jalan Setapak)
-                new Vector4(0.70f, 0.21f, 0.90f, 0.32f),  // 1-3 (Tepi Jurang)
-                new Vector4(0.40f, 0.30f, 0.60f, 0.41f),  // 1-4 (Pos Penjaga)
-                new Vector4(0.08f, 0.39f, 0.32f, 0.52f),  // 1-5 (👑 MINI-BOSS Golem Hutan)
-                new Vector4(0.40f, 0.50f, 0.60f, 0.61f),  // 1-6 (Lereng Es)
-                new Vector4(0.70f, 0.59f, 0.90f, 0.70f),  // 1-7 (Celah Badai)
-                new Vector4(0.40f, 0.69f, 0.60f, 0.80f),  // 1-8 (🐉 Sarang Wyrm)
-                new Vector4(0.10f, 0.78f, 0.30f, 0.89f),  // 1-9 (Puncak Berapi)
-                new Vector4(0.55f, 0.82f, 0.88f, 0.96f)   // 1-10 (💀 FINAL BOSS Titan Malakor)
+                new Vector4(0.08f, 0.04f, 0.28f, 0.14f),  // 1-1 (Gerbang Masuk)
+                new Vector4(0.38f, 0.13f, 0.58f, 0.23f),  // 1-2 (Jalan Setapak)
+                new Vector4(0.70f, 0.22f, 0.90f, 0.32f),  // 1-3 (Tepi Jurang)
+                new Vector4(0.40f, 0.32f, 0.60f, 0.42f),  // 1-4 (Pos Penjaga)
+                new Vector4(0.08f, 0.42f, 0.32f, 0.53f),  // 1-5 (👑 MINI-BOSS Golem Hutan)
+                new Vector4(0.40f, 0.53f, 0.60f, 0.63f),  // 1-6 (Lereng Es)
+                new Vector4(0.70f, 0.63f, 0.90f, 0.73f),  // 1-7 (Celah Badai)
+                new Vector4(0.40f, 0.73f, 0.60f, 0.83f),  // 1-8 (🐉 Sarang Wyrm)
+                new Vector4(0.10f, 0.81f, 0.30f, 0.91f),  // 1-9 (Puncak Berapi)
+                new Vector4(0.55f, 0.83f, 0.88f, 0.95f)   // 1-10 (💀 FINAL BOSS Titan Malakor)
             };
 
             // Waypoint stepping stones (titik-titik lintasan petualangan elegan tanpa kotak menumpuk)
