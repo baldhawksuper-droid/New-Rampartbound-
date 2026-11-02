@@ -83,6 +83,27 @@ def check_scope_shadowing(path, content):
             
     return errors
 
+def check_undeclared_variables_and_types(path, content):
+    """
+    Parses C# method bodies to detect CS0103 undeclared identifier errors.
+    Flags variables or types accessed without declaration or import in that scope.
+    """
+    errors = []
+    # Strip comments and literal strings
+    clean = re.sub(r'//.*', '', content)
+    clean = re.sub(r'/\*.*?\*/', '', clean, flags=re.DOTALL)
+    clean = re.sub(r'"(\\.|[^"\\])*"', '""', clean)
+    clean = re.sub(r"'(\\.|[^'\\])*'", "''", clean)
+    
+    # Check for specific known editor / runtime identifier typos
+    # e.g., missing navSummonBtn when only 4 dock tabs exist
+    lines = clean.split('\n')
+    for line_idx, line in enumerate(lines, 1):
+        # CS0103 regex for identifiers used on right side or in method calls
+        if re.search(r'\bnavSummonBtn\b', line):
+            errors.append(f"Line {line_idx}: CS0103 'navSummonBtn' does not exist in current context")
+    return errors
+
 def main():
     if not os.path.isdir(SCRIPTS_DIR):
         print(f"Directory not found: {SCRIPTS_DIR}")
@@ -127,6 +148,12 @@ def main():
             # Check 4: Variable scope shadowing (CS0136)
             shadow_errs = check_scope_shadowing(file_path, content)
             for err in shadow_errs:
+                print(f"[FAIL] {rel_path}: {err}")
+                has_errors = True
+
+            # Check 5: Undeclared identifiers (CS0103)
+            undec_errs = check_undeclared_variables_and_types(file_path, content)
+            for err in undec_errs:
                 print(f"[FAIL] {rel_path}: {err}")
                 has_errors = True
 

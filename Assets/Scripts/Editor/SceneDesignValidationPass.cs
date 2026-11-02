@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace FantasyDefense.Editor
+namespace Rampartbound.Editor
 {
     public static class SceneDesignValidationPass
     {

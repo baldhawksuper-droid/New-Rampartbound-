@@ -894,7 +894,8 @@ namespace Rampartbound.Editor
             // 11 Navigation Buttons
             lobbySO.FindProperty("navStageMapButton").objectReferenceValue = navStageBtn.GetComponent<Button>();
             lobbySO.FindProperty("navHeroesButton").objectReferenceValue = navHeroBtn.GetComponent<Button>();
-            lobbySO.FindProperty("navSummonButton").objectReferenceValue = navSummonBtn.GetComponent<Button>();
+            var summonProp = lobbySO.FindProperty("navSummonButton");
+            if (summonProp != null) summonProp.objectReferenceValue = null;
             lobbySO.FindProperty("navForgeButton").objectReferenceValue = navForgeBtn.GetComponent<Button>();
             lobbySO.FindProperty("navStoreButton").objectReferenceValue = navStoreBtn.GetComponent<Button>();
             lobbySO.FindProperty("navTalentsButton").objectReferenceValue = navTalentBtn.GetComponent<Button>();
