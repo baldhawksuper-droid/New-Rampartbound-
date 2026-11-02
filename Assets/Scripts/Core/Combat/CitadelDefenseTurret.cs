@@ -150,7 +150,8 @@ namespace FantasyDefense.Combat
                 turretRenderer.sprite = Resources.Load<Sprite>("Sprites/Combat/ballista_turret");
             }
 
-            turretRenderer.sortingOrder = 15; // Di atas barikade
+            turretRenderer.sortingLayerName = "Board";
+            turretRenderer.sortingOrder = 15; // Di atas barikade (layer Board, tidak pernah tumpang tindih dengan layer Gem hero/token)
 
             if (type == CitadelTurretType.Cannon)
             {

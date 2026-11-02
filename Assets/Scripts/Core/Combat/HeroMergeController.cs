@@ -123,14 +123,17 @@ namespace FantasyDefense.Combat
 
             if (DevicePerformanceManager.Instance != null)
             {
-                DevicePerformanceManager.Instance.TriggerHaptic(tier >= UnitTier.Tier3 ? HapticFeedbackType.Heavy : HapticFeedbackType.Success);
+                if (DevicePerformanceManager.Instance.IsHapticsEnabled)
+                {
+                    DevicePerformanceManager.Instance.TriggerHaptic(tier >= UnitTier.Tier3 ? HapticFeedbackType.Heavy : HapticFeedbackType.Success);
+                }
                 return;
             }
 
 #if UNITY_ANDROID || UNITY_IOS
             try
             {
-                // Handheld.Vibrate memberikan respon getaran haptic standar di perangkat Android/iOS
+                // Handheld.Vibrate fallback hanya jika tidak ada manager
                 Handheld.Vibrate();
             }
             catch (Exception)

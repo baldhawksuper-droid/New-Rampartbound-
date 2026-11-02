@@ -470,6 +470,7 @@ namespace FantasyDefense.Combat
             if (spriteRenderer != null)
                 spriteRenderer.color = glowColor;
 
+            bool hasLandedHaptic = false;
             while (elapsed < duration)
             {
                 elapsed += Time.deltaTime;
@@ -482,6 +483,16 @@ namespace FantasyDefense.Combat
                 // Squash saat mendarat dan stretch saat melompat
                 if (t > 0.85f)
                 {
+                    if (!hasLandedHaptic)
+                    {
+                        hasLandedHaptic = true;
+                        if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
+                            FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+                        {
+                            FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(
+                                newTier >= UnitTier.Tier3 ? FantasyDefense.Mobile.HapticFeedbackType.Heavy : FantasyDefense.Mobile.HapticFeedbackType.Light);
+                        }
+                    }
                     float landT = (t - 0.85f) / 0.15f;
                     float squashX = Mathf.Lerp(1.25f, 1.0f, landT);
                     float squashY = Mathf.Lerp(0.78f, 1.0f, landT);
