@@ -332,6 +332,7 @@ namespace Rampartbound.Editor
             weatherObj.AddComponent<BattlefieldWeatherManager>();
 
             var envObj = new GameObject("BattlefieldEnvironmentManager");
+            envObj.transform.SetParent(arenaWorldObj.transform);
             envObj.AddComponent<BattlefieldEnvironmentManager>();
 
             var autoMergeObj = new GameObject("AutoMergeAssistant");
@@ -2975,7 +2976,11 @@ namespace Rampartbound.Editor
             if (_titleGameLogo == null) _titleGameLogo = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Title_Game_Logo_Rampartbound.png");
             if (_titleBtnTap == null) _titleBtnTap = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Title_Btn_Tap_To_Start_V2.png") ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Title_Btn_Tap_To_Start.png");
             if (_handCursor == null) _handCursor = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Hand_Cursor.png");
-            if (_shadowOval == null) _shadowOval = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Shadow_Ground_Oval.png");
+            if (_shadowOval == null)
+            {
+                _shadowOval = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Shadow_Ground_Oval.png")
+                           ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Shadow_Oval.png");
+            }
             if (_plinthT1 == null) _plinthT1 = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Combat/Plinth_Hero_Base_T1.png");
             if (_lobbyBackdrop == null) _lobbyBackdrop = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Citadel_Lobby_Backdrop.png") ?? _titleBackdrop;
             if (_keyVisualBanner == null) _keyVisualBanner = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Rampartbound_KeyVisual_Banner.jpg");

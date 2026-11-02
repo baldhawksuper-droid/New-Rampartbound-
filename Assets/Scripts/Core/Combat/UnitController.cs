@@ -685,7 +685,14 @@ namespace FantasyDefense.Combat
                     groundShadowObj.transform.SetParent(transform, false);
                     groundShadowObj.transform.localPosition = new Vector3(0f, -0.38f, 0.08f);
                     groundShadowSr = groundShadowObj.AddComponent<SpriteRenderer>();
-                    groundShadowSr.sprite = Resources.Load<Sprite>("Sprites/UI/Shadow_Ground_Oval");
+                    groundShadowSr.sprite = Resources.Load<Sprite>("Sprites/UI/Shadow_Ground_Oval") ?? Resources.Load<Sprite>("Sprites/UI/UI_Shadow_Oval");
+#if UNITY_EDITOR
+                    if (groundShadowSr.sprite == null)
+                    {
+                        groundShadowSr.sprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Shadow_Ground_Oval.png")
+                                             ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Shadow_Oval.png");
+                    }
+#endif
                     groundShadowSr.sortingLayerName = "Gem";
                     groundShadowSr.color = new Color(0f, 0f, 0f, 0.38f);
                     groundShadowObj.transform.localScale = new Vector3(0.98f, 0.46f, 1f);
