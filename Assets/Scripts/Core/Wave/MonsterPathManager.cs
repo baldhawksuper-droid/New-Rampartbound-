@@ -75,7 +75,11 @@ namespace FantasyDefense.Wave
             float barricadeY = -3.5f;
             if (CastleBarricade.Instance != null)
             {
-                barricadeY = CastleBarricade.Instance.transform.position.y + 0.1f;
+                barricadeY = CastleBarricade.Instance.transform.position.y + 0.1f + bottomBarricadeOffsetY;
+            }
+            else
+            {
+                barricadeY = centerY - halfH + bottomBarricadeOffsetY;
             }
 
             // Hitung posisi spawn di puncak layar (Top Edge of Screen) agar monster senantiasa berbaris

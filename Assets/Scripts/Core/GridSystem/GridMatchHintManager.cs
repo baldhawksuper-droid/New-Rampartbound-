@@ -371,9 +371,9 @@ namespace FantasyDefense.GridSystem
                     yield break;
                 }
 
-                // Denyut halus taktil tanpa distorsi ukuran ekstrem (maksimum 1.025x)
+                // Denyut halus taktil tanpa distorsi ukuran ekstrem (menggunakan parameter konfigurasi hintPulseScaleMultiplier)
                 float wave = (Mathf.Sin(Time.time * hintPulseSpeed) + 1f) * 0.5f;
-                float scaleMod = Mathf.Lerp(1.0f, 1.025f, wave);
+                float scaleMod = Mathf.Lerp(1.0f, Mathf.Max(1.01f, hintPulseScaleMultiplier), wave);
 
                 unitA.transform.localScale = baseScaleA * scaleMod;
                 unitB.transform.localScale = baseScaleB * scaleMod;
