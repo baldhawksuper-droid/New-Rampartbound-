@@ -48,6 +48,12 @@ def check_known_namespaces(path, content):
     if 'SkillVfxManager' in content and 'namespace FantasyDefense.Combat' not in content:
         if 'using FantasyDefense.Combat;' not in content and 'FantasyDefense.Combat.SkillVfxManager' not in content:
             errors.append("CS0103 'SkillVfxManager' referenced without 'using FantasyDefense.Combat;'")
+    if 'AudioManager' in content and 'namespace FantasyDefense.Audio' not in content:
+        if 'using FantasyDefense.Audio;' not in content and 'Audio.AudioManager' not in content and 'FantasyDefense.Audio.AudioManager' not in content:
+            errors.append("CS0103 'AudioManager' referenced without 'using FantasyDefense.Audio;' or 'Audio.AudioManager'")
+    if 'SoundType' in content and 'namespace FantasyDefense.Audio' not in content:
+        if 'using FantasyDefense.Audio;' not in content and 'Audio.SoundType' not in content and 'FantasyDefense.Audio.SoundType' not in content:
+            errors.append("CS0103 'SoundType' referenced without 'using FantasyDefense.Audio;' or 'Audio.SoundType'")
     return errors
 
 def check_scope_shadowing(path, content):
