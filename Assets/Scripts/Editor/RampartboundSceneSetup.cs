@@ -657,8 +657,16 @@ namespace Rampartbound.Editor
             CreateNotificationBadge(energyPill.transform, NotificationBadgeType.EnergyFull);
 
             Text goldTxt;
-            var goldPill = CreateResourcePill(lobbyHeaderObj.transform, "GoldPill", _iconGoldCoin, "500", new Color(1f, 0.85f, 0.2f), ResourceCommodityType.Gold, defaultFont, out goldTxt);
+            var goldPill = CreateResourcePill(lobbyHeaderObj.transform, "GoldPill", _iconGoldCoin, "500", new Color(1.0f, 0.88f, 0.25f), ResourceCommodityType.Gold, defaultFont, out goldTxt);
             PositionUI(goldPill, 0.64f, 0.15f, 0.86f, 0.85f);
+            var goldBgImg = goldPill.GetComponent<Image>();
+            if (goldBgImg != null)
+            {
+                goldBgImg.color = new Color(0.20f, 0.15f, 0.08f, 0.95f); // Deep Warm Amber/Bronze Pill
+            }
+            var goldBorder = goldPill.AddComponent<Outline>();
+            goldBorder.effectColor = new Color(0.95f, 0.78f, 0.25f, 0.85f); // Rich Gold Glow
+            goldBorder.effectDistance = new Vector2(1.2f, -1.2f);
 
             Text gemsTxt = null;
 
@@ -3259,13 +3267,25 @@ namespace Rampartbound.Editor
             txtRt.offsetMax = Vector2.zero;
 
             var txt = textObj.GetComponent<Text>();
-            if (font != null) txt.font = font;
+            if (font != null)
+            {
+                txt.font = font;
+            }
+            else
+            {
+                var lilita = AssetDatabase.LoadAssetAtPath<Font>("Assets/Resources/Fonts/LilitaOne-Regular.ttf")
+                    ?? Resources.Load<Font>("Fonts/LilitaOne-Regular");
+                if (lilita != null) txt.font = lilita;
+            }
             txt.text = initialText;
             txt.fontSize = 20;
             txt.fontStyle = FontStyle.Bold;
             txt.alignment = TextAnchor.MiddleLeft;
             txt.color = textColor;
             txt.raycastTarget = false;
+            var tShadow = textObj.AddComponent<Shadow>();
+            tShadow.effectColor = new Color(0f, 0f, 0f, 0.90f);
+            tShadow.effectDistance = new Vector2(1.5f, -1.5f);
 
             outText = txt;
             return pillObj;

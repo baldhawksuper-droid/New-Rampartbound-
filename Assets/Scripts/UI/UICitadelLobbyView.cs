@@ -392,17 +392,27 @@ namespace FantasyDefense.UI
             {
                 citadelLevelText.text = $"Citadel Lv.{data.citadelLevel}";
             }
+            var lilitaFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
             if (energyText != null)
             {
+                if (lilitaFont != null) energyText.font = lilitaFont;
                 energyText.text = $"{data.currentEnergy}/{data.maxEnergy}";
+                energyText.color = new Color(0.35f, 0.85f, 1.0f);
+                energyText.fontStyle = FontStyle.Bold;
             }
             if (goldText != null)
             {
+                if (lilitaFont != null) goldText.font = lilitaFont;
                 goldText.text = $"{data.goldCoins:N0}";
+                goldText.color = new Color(1.0f, 0.88f, 0.25f);
+                goldText.fontStyle = FontStyle.Bold;
             }
             if (gemsText != null)
             {
+                if (lilitaFont != null) gemsText.font = lilitaFont;
                 gemsText.text = $"{data.accountGems:N0}";
+                gemsText.color = new Color(0.40f, 0.95f, 1.0f);
+                gemsText.fontStyle = FontStyle.Bold;
             }
             if (teamCpText != null)
             {
@@ -768,19 +778,41 @@ namespace FantasyDefense.UI
 
         private IEnumerator StandeeTapJuiceRoutine(Transform tr)
         {
+            if (tr == null) yield break;
             Vector3 originalScale = tr.localScale;
-            float duration = 0.22f;
+            float duration = 0.28f;
             float elapsed = 0f;
 
             // Spawn micro sparkle burst
             SpawnTapSparkleBurst(tr);
 
+            // Squash-and-stretch respons lembut: 1.0 -> 0.95 (squash) -> 1.02 (stretch) -> 1.0 (settle)
             while (elapsed < duration)
             {
                 elapsed += Time.unscaledDeltaTime;
-                float t = elapsed / duration;
-                float bounce = Mathf.Sin(t * Mathf.PI) * 0.16f;
-                tr.localScale = new Vector3(originalScale.x * (1f + bounce * 0.8f), originalScale.y * (1f + bounce), originalScale.z);
+                float t = Mathf.Clamp01(elapsed / duration);
+                float scaleFactor;
+
+                if (t < 0.35f)
+                {
+                    // Phase 1: Squash lembut ke 0.95f
+                    float p = t / 0.35f;
+                    scaleFactor = Mathf.Lerp(1.0f, 0.95f, Mathf.Sin(p * Mathf.PI * 0.5f));
+                }
+                else if (t < 0.70f)
+                {
+                    // Phase 2: Overshoot stretch ke 1.02f
+                    float p = (t - 0.35f) / 0.35f;
+                    scaleFactor = Mathf.Lerp(0.95f, 1.02f, Mathf.Sin(p * Mathf.PI * 0.5f));
+                }
+                else
+                {
+                    // Phase 3: Settle kembali ke 1.00f
+                    float p = (t - 0.70f) / 0.30f;
+                    scaleFactor = Mathf.Lerp(1.02f, 1.0f, Mathf.Sin(p * Mathf.PI * 0.5f));
+                }
+
+                tr.localScale = new Vector3(originalScale.x * scaleFactor, originalScale.y * scaleFactor, originalScale.z);
                 yield return null;
             }
 
