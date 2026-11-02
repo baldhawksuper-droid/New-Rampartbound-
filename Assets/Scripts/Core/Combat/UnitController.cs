@@ -1281,7 +1281,7 @@ namespace FantasyDefense.Combat
             // Cek apakah swap ini memicu Match-3 (kunci petak cellB dan this sebagai target swap mutlak)
             if (GridMatch3Solver.Instance != null)
             {
-                GridMatch3Solver.Instance.SetPlayerInteraction(this, cellB);
+                GridMatch3Solver.Instance.SetPlayerInteraction(this, cellB, otherUnit);
                 GridMatch3Solver.Instance.CheckAndResolveMatches(cellB);
             }
         }

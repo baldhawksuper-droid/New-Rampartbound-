@@ -42,14 +42,16 @@ namespace FantasyDefense.GridSystem
         public bool IsResolving => isResolving;
 
         private UnitController explicitPlayerUnit;
+        private UnitController secondaryPlayerUnit;
 
         /// <summary>
         /// Mengunci unit dan petak yang secara eksplisit digerakkan oleh jari pemain
         /// sebagai episentrum evolusi Tx+1 (Point 4).
         /// </summary>
-        public void SetPlayerInteraction(UnitController unit, TileCell cell)
+        public void SetPlayerInteraction(UnitController unit, TileCell cell, UnitController swappedPartner = null)
         {
             explicitPlayerUnit = unit;
+            secondaryPlayerUnit = swappedPartner;
             lastInteractionCell = cell;
         }
 
@@ -309,6 +311,13 @@ namespace FantasyDefense.GridSystem
                             sourceCell.ClearOccupant();
                             targetCell.SetOccupant(unitToShift);
                             unitToShift.SetCurrentCell(targetCell);
+
+                            // Matikan animasi loncatan sisa fusi secara tuntas agar visual tidak tumpang tindih sebelum bergeser
+                            if (unitToShift.VisualAnimator != null)
+                            {
+                                unitToShift.VisualAnimator.StopActiveAnimationAndResetAnchor();
+                            }
+
                             unitToShift.SmoothSnapTo(targetCell.transform.position, slideDuration);
 
                             anyMovement = true;
@@ -697,6 +706,11 @@ namespace FantasyDefense.GridSystem
                 {
                     playerInteractedUnit = explicitPlayerUnit;
                 }
+                else if (secondaryPlayerUnit != null && cluster.allUnits.Contains(secondaryPlayerUnit))
+                {
+                    // Unit pasangan yang tertukar ke posisi asal jari pemain (misal bintang yang digeser ke petak asal)
+                    playerInteractedUnit = secondaryPlayerUnit;
+                }
                 else if (lastInteractionCell != null && lastInteractionCell.CurrentUnit != null && cluster.allUnits.Contains(lastInteractionCell.CurrentUnit))
                 {
                     playerInteractedUnit = lastInteractionCell.CurrentUnit;
@@ -746,13 +760,31 @@ namespace FantasyDefense.GridSystem
                 else if (playerInteractedUnit != null)
                 {
                     // PRIORITAS UTAMA FUSI HORIZONTAL: Petak interaksi jari pemain ("Tx+1 udh benar sesuai jari").
-                    // Bidak yang digeser/disentuh pemain langsung berevolusi menjadi Tx+1 tepat di posisi jari pemain.
-                    cluster.promotedUnits.Add(playerInteractedUnit);
-
+                    // Bidak yang digeser/disentuh pemain langsung berevolusi menjadi Tx+1 tepat di posisi aksi pemain.
                     if (cluster.allUnits.Count >= 5)
                     {
-                        // 5 Kembar (Supa Merge): Berikan 2 unit tambahan di sekitar petak aksi pemain
-                        foreach (var u in cluster.allUnits)
+                        // 5 Kembar (Supa Merge 5-match):
+                        // Urutkan unit secara spasial (X lalu Y)
+                        var spatialUnits = new List<UnitController>(cluster.allUnits);
+                        spatialUnits.Sort((a, b) => {
+                            if (a.CurrentCell == null || b.CurrentCell == null) return 0;
+                            int compX = a.CurrentCell.X.CompareTo(b.CurrentCell.X);
+                            return compX != 0 ? compX : a.CurrentCell.Y.CompareTo(b.CurrentCell.Y);
+                        });
+
+                        int pIdx = spatialUnits.IndexOf(playerInteractedUnit);
+                        // Tempatkan Tx+1 pertama persis pada posisi interaksi/pendaratan jari
+                        cluster.promotedUnits.Add(playerInteractedUnit);
+
+                        // Ambil 2 unit di sekitarnya agar playerInteractedUnit menjadi titik tengah atau ujung tengah
+                        UnitController leftNeighbor = (pIdx > 0) ? spatialUnits[pIdx - 1] : null;
+                        UnitController rightNeighbor = (pIdx < spatialUnits.Count - 1) ? spatialUnits[pIdx + 1] : null;
+
+                        if (leftNeighbor != null) cluster.promotedUnits.Add(leftNeighbor);
+                        if (rightNeighbor != null) cluster.promotedUnits.Add(rightNeighbor);
+
+                        // Lengkapi hingga tepat 3 unit jika di ujung
+                        foreach (var u in spatialUnits)
                         {
                             if (cluster.promotedUnits.Count >= 3) break;
                             if (!cluster.promotedUnits.Contains(u)) cluster.promotedUnits.Add(u);
@@ -760,6 +792,7 @@ namespace FantasyDefense.GridSystem
                     }
                     else if (cluster.allUnits.Count == 4)
                     {
+                        cluster.promotedUnits.Add(playerInteractedUnit);
                         // 4 Kembar: Berikan 1 unit pasangan terdekat di deretan
                         int pIdx = cluster.allUnits.IndexOf(playerInteractedUnit);
                         int partnerIdx = (pIdx == 0) ? 1 : (pIdx == 3 ? 2 : (pIdx == 1 ? 2 : 1));
@@ -767,6 +800,11 @@ namespace FantasyDefense.GridSystem
                         {
                             cluster.promotedUnits.Add(cluster.allUnits[partnerIdx]);
                         }
+                    }
+                    else
+                    {
+                        // Match-3 standar: persis pada petak aksi pemain
+                        cluster.promotedUnits.Add(playerInteractedUnit);
                     }
                 }
                 else if (cluster.allUnits.Count >= 5)
@@ -810,6 +848,7 @@ namespace FantasyDefense.GridSystem
             if (cluster == null || cluster.promotedUnit == null || cluster.allUnits.Count < 3) yield break;
 
             explicitPlayerUnit = null;
+            secondaryPlayerUnit = null;
             UnitController promotedUnit = cluster.promotedUnit;
             // Standar Game Swap & Merge: Fusi berbentuk L / T / + (Cross) adalah fusi 5-unit istimewa yang melompatkan 2 Tier (T0 -> T2 atau T1 -> T3)!
             int tierBoost = cluster.isIntersection ? 2 : 1;

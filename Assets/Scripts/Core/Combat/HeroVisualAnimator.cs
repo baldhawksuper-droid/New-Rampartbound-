@@ -517,7 +517,37 @@ namespace FantasyDefense.Combat
             if (spriteRenderer != null)
                 spriteRenderer.color = defaultColor;
 
+            if (unitController != null)
+            {
+                unitController.UpdateDepthSorting();
+            }
+
             StartIdleAnimation();
+        }
+
+        /// <summary>
+        /// Menghentikan animasi aktif (misal loncatan selebrasi) secara instan dan mengunci visual ke posisi anchor petak.
+        /// Sangat krusial sebelum unit dipindahkan / dinaikkan (cascade) agar tidak ada glitch tumpang tindih visual.
+        /// </summary>
+        public void StopActiveAnimationAndResetAnchor()
+        {
+            if (activeAnimRoutine != null)
+            {
+                StopCoroutine(activeAnimRoutine);
+                activeAnimRoutine = null;
+            }
+            Vector3 anchor = GetAnchorPosition();
+            transform.position = anchor;
+            transform.localScale = baseScale;
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.color = defaultColor;
+            }
+            if (unitController != null)
+            {
+                unitController.UpdateDepthSorting();
+            }
+            currentState = AnimationState.Idle;
         }
 
         #endregion

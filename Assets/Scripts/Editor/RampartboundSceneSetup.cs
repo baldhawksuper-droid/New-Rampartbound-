@@ -790,12 +790,14 @@ namespace Rampartbound.Editor
             Sprite iconNavForge = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Forge.png");
             Sprite iconNavHeroes = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Heroes.png")
                 ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Hero.png");
+            Sprite iconNavSummon = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Summon.png");
             Sprite iconNavBag = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Bag.png")
                 ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Store.png");
 
             var navStageBtn = CreateButton(dockObj.transform, "NavStageMap", "< Citadel >", Color.clear, Color.white, 14, defaultFont);
             var navForgeBtn = CreateButton(dockObj.transform, "NavForge", "Forge", Color.clear, Color.white, 14, defaultFont);
             var navHeroBtn = CreateButton(dockObj.transform, "NavHeroes", "Heroes", Color.clear, Color.white, 14, defaultFont);
+            var navSummonBtn = CreateButton(dockObj.transform, "NavSummon", "Gacha", Color.clear, Color.white, 14, defaultFont);
             var navStoreBtn = CreateButton(dockObj.transform, "NavStore", "Bag", Color.clear, Color.white, 14, defaultFont);
 
             System.Action<GameObject, Sprite, string, bool> setupFantasyNavTab = (btn, iconSp, label, isActive) => {
@@ -854,6 +856,7 @@ namespace Rampartbound.Editor
             setupFantasyNavTab(navStageBtn, iconNavCitadel, "< Citadel >", true);
             setupFantasyNavTab(navForgeBtn, iconNavForge, "Forge", false);
             setupFantasyNavTab(navHeroBtn, iconNavHeroes, "Heroes", false);
+            setupFantasyNavTab(navSummonBtn, iconNavSummon, "Gacha", false);
             setupFantasyNavTab(navStoreBtn, iconNavBag, "Bag", false);
 
             // Shimmer Sweep Light pada Tab Aktif < Citadel >
@@ -896,7 +899,7 @@ namespace Rampartbound.Editor
             lobbySO.FindProperty("navStageMapButton").objectReferenceValue = navStageBtn.GetComponent<Button>();
             lobbySO.FindProperty("navHeroesButton").objectReferenceValue = navHeroBtn.GetComponent<Button>();
             var summonProp = lobbySO.FindProperty("navSummonButton");
-            if (summonProp != null) summonProp.objectReferenceValue = null;
+            if (summonProp != null) summonProp.objectReferenceValue = navSummonBtn.GetComponent<Button>();
             lobbySO.FindProperty("navForgeButton").objectReferenceValue = navForgeBtn.GetComponent<Button>();
             lobbySO.FindProperty("navStoreButton").objectReferenceValue = navStoreBtn.GetComponent<Button>();
             lobbySO.FindProperty("navTalentsButton").objectReferenceValue = navTalentBtn.GetComponent<Button>();
