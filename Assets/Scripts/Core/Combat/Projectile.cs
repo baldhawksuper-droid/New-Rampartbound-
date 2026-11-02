@@ -35,7 +35,8 @@ namespace FantasyDefense.Combat
             bool meteor = false,
             bool arrow = false,
             bool cannon = false,
-            bool ballista = false)
+            bool ballista = false,
+            float speedOverride = -1f)
         {
             target = targetMonster;
             damage = damageAmount;
@@ -47,6 +48,21 @@ namespace FantasyDefense.Combat
             isArrow = arrow;
             isCannon = cannon;
             isBallista = ballista;
+
+            if (speedOverride > 0f)
+            {
+                flightSpeed = speedOverride;
+            }
+            else if (ballista)
+            {
+                // Kecepatan balista bolt benteng ditingkatkan agar melesat tajam dan lurus
+                flightSpeed = 15.0f;
+            }
+            else if (cannon)
+            {
+                // Kecepatan mortir peluru meriam berbobot
+                flightSpeed = 11.0f;
+            }
 
             if (target != null)
                 lastTargetPos = target.transform.position;

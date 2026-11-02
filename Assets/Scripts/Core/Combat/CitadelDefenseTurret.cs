@@ -36,6 +36,8 @@ namespace FantasyDefense.Combat
         private Vector3 originalLocalScale;
         private Vector3 originalLocalPos;
         private Coroutine recoilCoroutine;
+        private static float lastGlobalTurretSfxTime = -1f;
+        private const float MIN_TURRET_SFX_INTERVAL = 0.18f;
 
         public CitadelTurretType TurretType => turretType;
         public string TurretId => turretId;
@@ -255,6 +257,7 @@ namespace FantasyDefense.Combat
             projObj.transform.position = spawnPos;
 
             var sr = projObj.AddComponent<SpriteRenderer>();
+            sr.sortingLayerName = "Board";
             sr.sortingOrder = 24;
 
             var proj = projObj.AddComponent<Projectile>();
@@ -276,8 +279,9 @@ namespace FantasyDefense.Combat
                 }
                 proj.Initialize(target, baseDamage, aoeRadius: splashRadius, slow: 0.15f, slowTime: 1.5f, critical: false, meteor: false, arrow: false, cannon: true, ballista: false);
 
-                if (AudioManager.Instance != null)
+                if (AudioManager.Instance != null && (Time.time - lastGlobalTurretSfxTime >= MIN_TURRET_SFX_INTERVAL))
                 {
+                    lastGlobalTurretSfxTime = Time.time;
                     AudioManager.Instance.PlaySound(SoundType.CannonFire);
                 }
 
@@ -304,8 +308,9 @@ namespace FantasyDefense.Combat
                 }
                 proj.Initialize(target, baseDamage, aoeRadius: 0f, slow: 0f, slowTime: 0f, critical: false, meteor: false, arrow: false, cannon: false, ballista: true);
 
-                if (AudioManager.Instance != null)
+                if (AudioManager.Instance != null && (Time.time - lastGlobalTurretSfxTime >= MIN_TURRET_SFX_INTERVAL))
                 {
+                    lastGlobalTurretSfxTime = Time.time;
                     AudioManager.Instance.PlaySound(SoundType.ArrowShot);
                 }
 
