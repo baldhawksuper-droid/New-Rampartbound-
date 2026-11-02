@@ -454,8 +454,8 @@ namespace FantasyDefense.Combat
         private IEnumerator MergeJumpRoutine(UnitTier newTier)
         {
             Vector3 anchorPos = GetAnchorPosition();
-            float jumpHeight = newTier == UnitTier.Tier5 ? 1.35f : (newTier == UnitTier.Tier4 ? 1.15f : (newTier == UnitTier.Tier3 ? 0.95f : 0.65f));
-            float duration = 0.65f; // Diperlambat dari 0.42f agar fusi evolusi terlihat megah, realistis, dan memuaskan
+            float jumpHeight = newTier == UnitTier.Tier5 ? 0.95f : (newTier == UnitTier.Tier4 ? 0.80f : (newTier == UnitTier.Tier3 ? 0.65f : 0.45f));
+            float duration = 0.38f; // Cepat, responsif, snappier arcade game feel tanpa jeda lama
             float elapsed = 0f;
 
             // Flash pendar fusi dramatis

@@ -65,7 +65,7 @@ namespace FantasyDefense.Combat
         [Header("Visual Components")]
         [SerializeField] protected SpriteRenderer spriteRenderer;
         [SerializeField] protected int normalSortingOrder = 30;
-        [SerializeField] protected int dragSortingOrder = 70;
+        [SerializeField] protected int dragSortingOrder = 150;
 
         [Header("2.5D Contact Ground Shadow (Sprint 44 Poin 5)")]
         [SerializeField] protected GameObject groundShadowObj;
@@ -79,7 +79,7 @@ namespace FantasyDefense.Combat
 
         [Header("Mobile Ergonomics")]
         [Tooltip("Offset posisi token saat disentuh agar tidak tertutup ibu jari pemain")]
-        [SerializeField] protected Vector3 touchDragOffset = new Vector3(0f, 0.45f, 0f);
+        [SerializeField] protected Vector3 touchDragOffset = Vector3.zero;
 
         [Header("Drag State")]
         protected bool isDragging = false;
@@ -202,6 +202,12 @@ namespace FantasyDefense.Combat
 
         protected virtual void OnDisable()
         {
+            if (holdFocusRoutine != null)
+            {
+                StopCoroutine(holdFocusRoutine);
+                holdFocusRoutine = null;
+            }
+
             if (isPointerHeld || isDragging)
             {
                 isPointerHeld = false;
@@ -879,19 +885,35 @@ namespace FantasyDefense.Combat
         }
 
         private bool isPointerHeld = false;
+        private Coroutine holdFocusRoutine;
+        private const float HOLD_FOCUS_DELAY = 0.5f;
 
         public void OnPointerDown(PointerEventData eventData)
         {
             // Hentikan petunjuk idle otomatis jika pemain menyentuh layar
             GridMatchHintManager.Instance?.HandlePlayerActivity();
 
-            // Respon awal sentuhan/tahan mobile: aktifkan mode fokus sorot gem kembar (Twin Focus)
             if (GameManager.Instance != null && GameManager.Instance.CurrentState == BattleState.Preparation)
             {
                 isPointerHeld = true;
+                if (holdFocusRoutine != null)
+                {
+                    StopCoroutine(holdFocusRoutine);
+                }
+                holdFocusRoutine = StartCoroutine(HoldFocusDetectionRoutine());
+            }
+        }
+
+        private System.Collections.IEnumerator HoldFocusDetectionRoutine()
+        {
+            // Tahan sentuhan selama beberapa saat (0.5 detik) sebelum memunculkan sorotan gem kembar
+            yield return new WaitForSeconds(HOLD_FOCUS_DELAY);
+
+            if (isPointerHeld && !isDragging)
+            {
                 HighlightMergeCandidates(true);
 
-                // Multi-sensory feedback: Chime resonansi kristal emas & haptik halus
+                // Multi-sensory feedback: Chime resonansi kristal emas & haptik halus saat mode fokus aktif
                 if (AudioManager.Instance != null)
                 {
                     AudioManager.Instance.PlaySound(SoundType.TwinFocusChime, 1.0f);
@@ -901,10 +923,17 @@ namespace FantasyDefense.Combat
                     DevicePerformanceManager.Instance.TriggerHaptic(HapticFeedbackType.Light);
                 }
             }
+            holdFocusRoutine = null;
         }
 
         public void OnPointerUp(PointerEventData eventData)
         {
+            if (holdFocusRoutine != null)
+            {
+                StopCoroutine(holdFocusRoutine);
+                holdFocusRoutine = null;
+            }
+
             // Ketika jari diangkat, matikan mode fokus jika tidak sedang menyeret (drag)
             if (isPointerHeld)
             {
@@ -983,6 +1012,12 @@ namespace FantasyDefense.Combat
 
         public void OnBeginDrag(PointerEventData eventData)
         {
+            if (holdFocusRoutine != null)
+            {
+                StopCoroutine(holdFocusRoutine);
+                holdFocusRoutine = null;
+            }
+
             // Jika grid sedang memproses pergeseran/fusi otomatis (Cascade Refill), tahan aksi seret
             if (GridMatch3Solver.Instance != null && GridMatch3Solver.Instance.IsResolving)
             {
@@ -1104,12 +1139,12 @@ namespace FantasyDefense.Combat
             TileCell targetCell = null;
             if (GridManager.Instance != null)
             {
-                // Prioritas 1: Posisi token visual saat dilepas
-                targetCell = GridManager.Instance.GetClosestCell(transform.position, GridManager.Instance.CellSize * 0.95f);
-                // Prioritas 2: Posisi jari sentuhan saat dilepas
+                // Prioritas 1: Posisi jari sentuhan saat dilepas (dropWorldPos) dengan toleransi snapping penuh (CellSize * 1.25f)
+                targetCell = GridManager.Instance.GetClosestCell(dropWorldPos, GridManager.Instance.CellSize * 1.25f);
+                // Prioritas 2: Posisi token visual saat dilepas
                 if (targetCell == null)
                 {
-                    targetCell = GridManager.Instance.GetClosestCell(dropWorldPos, GridManager.Instance.CellSize * 0.95f);
+                    targetCell = GridManager.Instance.GetClosestCell(transform.position, GridManager.Instance.CellSize * 1.25f);
                 }
             }
 
@@ -1236,7 +1271,7 @@ namespace FantasyDefense.Combat
 
             if (AudioManager.Instance != null)
             {
-                AudioManager.Instance.PlaySound(SoundType.ButtonClick);
+                AudioManager.Instance.PlaySound(SoundType.TileSlideSwish, 1.05f);
             }
 
             // PENTING: Kunci petak tujuan jari pemain (cellB) sebagai pusat fusi interaksi pemain!
@@ -1295,14 +1330,7 @@ namespace FantasyDefense.Combat
             // Siarkan event keberhasilan merge
             OnUnitMerged?.Invoke(this, targetUnit, nextTier);
 
-            // Respon Haptic Vibration pada perangkat ponsel
-            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null)
-            {
-                var hapticType = nextTier >= UnitTier.Tier4 ? FantasyDefense.Mobile.HapticFeedbackType.Heavy :
-                                 (nextTier == UnitTier.Tier3 ? FantasyDefense.Mobile.HapticFeedbackType.Medium : FantasyDefense.Mobile.HapticFeedbackType.Light);
-                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(hapticType);
-            }
-
+            // Respon Haptic Vibration pada perangkat ponsel dikelola terpusat oleh HeroMergeController & HeroVisualAnimator
             // Hancurkan unit yang digeser (melebur ke unit tujuan)
             Destroy(gameObject);
 
