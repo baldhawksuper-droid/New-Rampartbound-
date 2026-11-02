@@ -28,6 +28,8 @@ namespace FantasyDefense.UI
 
         [Header("Selected Stage Detail Panel")]
         [SerializeField] private GameObject stageDetailPanel;
+        [SerializeField] private GameObject bossWarningBanner;
+        [SerializeField] private Text bossWarningText;
         [SerializeField] private Text stageCodeText;
         [SerializeField] private Text stageTitleText;
         [SerializeField] private Text stageDescriptionText;
@@ -49,6 +51,8 @@ namespace FantasyDefense.UI
         [SerializeField] private List<Button> stageNodeButtons = new List<Button>();
         private Coroutine activePulseRoutine;
         private Transform activePulseTarget;
+        private Coroutine stageUnlockAnimRoutine;
+        private int lastSeenHighestStageId = -1;
 
         private StageDataSO currentStage;
 
@@ -85,6 +89,12 @@ namespace FantasyDefense.UI
             {
                 StopCoroutine(activePulseRoutine);
                 activePulseRoutine = null;
+            }
+
+            if (stageUnlockAnimRoutine != null)
+            {
+                StopCoroutine(stageUnlockAnimRoutine);
+                stageUnlockAnimRoutine = null;
             }
         }
 
@@ -338,8 +348,7 @@ namespace FantasyDefense.UI
                 if (btn == null) continue;
 
                 bool isUnlocked = (StageManager.Instance != null && StageManager.Instance.IsStageUnlocked(stageId)) ||
-                                  stageIdx == 1 ||
-                                  (accData.GetStageRecord(stageId - 1)?.isCleared ?? false);
+                                  (stageIdx == 1);
                 var record = accData.GetStageRecord(stageId);
                 bool isCleared = record != null && record.isCleared;
                 int stars = record != null ? record.starsEarned : 0;
@@ -401,6 +410,58 @@ namespace FantasyDefense.UI
             }
 
             StartPulseEffectOnActiveNode(nextTargetToPulse);
+            FocusOnActiveNodePosition(nextTargetToPulse);
+
+            // Cek apakah ada stage baru yang baru saja terbuka untuk animasi reveal
+            int currentHighest = accData != null ? accData.highestStageCleared : 101;
+            if (lastSeenHighestStageId != -1 && currentHighest > lastSeenHighestStageId)
+            {
+                int newlyUnlockedIdx = (currentHighest % 100) - 1;
+                if (newlyUnlockedIdx >= 0 && newlyUnlockedIdx < stageNodeButtons.Count)
+                {
+                    var unlockedNode = stageNodeButtons[newlyUnlockedIdx];
+                    if (unlockedNode != null && gameObject.activeInHierarchy)
+                    {
+                        if (stageUnlockAnimRoutine != null) StopCoroutine(stageUnlockAnimRoutine);
+                        stageUnlockAnimRoutine = StartCoroutine(AnimateStageUnlockReveal(unlockedNode.transform));
+                    }
+                }
+            }
+            lastSeenHighestStageId = currentHighest;
+        }
+
+        private System.Collections.IEnumerator AnimateStageUnlockReveal(Transform nodeTf)
+        {
+            if (nodeTf == null) yield break;
+
+            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+            {
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Success);
+            }
+
+            Vector3 startScale = Vector3.zero;
+            Vector3 peakScale = new Vector3(1.35f, 1.35f, 1f);
+            Vector3 normalScale = Vector3.one;
+
+            float elapsed = 0f;
+            float dur = 0.45f;
+            while (elapsed < dur)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = Mathf.Clamp01(elapsed / dur);
+                if (t < 0.6f)
+                {
+                    nodeTf.localScale = Vector3.Lerp(startScale, peakScale, t / 0.6f);
+                }
+                else
+                {
+                    nodeTf.localScale = Vector3.Lerp(peakScale, normalScale, (t - 0.6f) / 0.4f);
+                }
+                yield return null;
+            }
+            nodeTf.localScale = normalScale;
+            stageUnlockAnimRoutine = null;
         }
 
         private void StartPulseEffectOnActiveNode(Transform target)
@@ -421,6 +482,25 @@ namespace FantasyDefense.UI
             {
                 activePulseTarget = target;
                 activePulseRoutine = StartCoroutine(PulseNodeRoutine(target));
+            }
+        }
+
+        private void FocusOnActiveNodePosition(Transform target)
+        {
+            if (target == null) return;
+            var scrollRect = GetComponentInChildren<ScrollRect>();
+            if (scrollRect != null && scrollRect.content != null)
+            {
+                // Auto-center scroll jika map ditempatkan dalam scrollable canvas
+                Canvas.ForceUpdateCanvases();
+                RectTransform contentRect = scrollRect.content;
+                RectTransform targetRect = target as RectTransform;
+                if (targetRect != null)
+                {
+                    Vector2 targetLocal = contentRect.InverseTransformPoint(targetRect.position);
+                    float normalizedY = Mathf.Clamp01(1f - ((targetLocal.y - contentRect.rect.yMin) / contentRect.rect.height));
+                    scrollRect.verticalNormalizedPosition = normalizedY;
+                }
             }
         }
 
@@ -535,6 +615,31 @@ namespace FantasyDefense.UI
                 stageCodeText.text = $"<b>STAGE {cleanCode}</b>";
             }
             if (stageTitleText != null) stageTitleText.text = $"<b>{stage.GetLocalizedTitle().ToUpper()}</b>";
+
+            // Tampilkan Boss Warning Banner jika Stage adalah Mini-Boss (Stage 5) atau Final Boss (Stage 10)
+            int stageNum = stage.stageId % 100;
+            bool isBossStage = (stageNum == 5 || stageNum == 10);
+            if (bossWarningBanner != null)
+            {
+                bossWarningBanner.SetActive(isBossStage);
+                if (isBossStage && bossWarningText != null)
+                {
+                    if (stageNum == 10)
+                    {
+                        bossWarningText.text = FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                            "⚠️ PERINGATAN: FINAL BOSS ABYSSAL TELAH BANGKIT!",
+                            "⚠️ WARNING: FINAL ABYSSAL BOSS HAS AWAKENED!");
+                        bossWarningText.color = new Color(1f, 0.25f, 0.25f);
+                    }
+                    else
+                    {
+                        bossWarningText.text = FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                            "👑 WASPADA: ELITE MINI-BOSS MENUNGGU!",
+                            "👑 ALERT: ELITE MINI-BOSS ENCOUNTER!");
+                        bossWarningText.color = new Color(1f, 0.85f, 0.2f);
+                    }
+                }
+            }
 
             if (battleModeText != null)
             {

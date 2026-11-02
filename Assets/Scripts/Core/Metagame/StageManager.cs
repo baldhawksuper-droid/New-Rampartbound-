@@ -645,7 +645,7 @@ namespace FantasyDefense.Metagame
 
         [Header("Development / Review Mode")]
         [Tooltip("Buka seluruh level yang ada di game tanpa syarat progres (untuk review & testing)")]
-        [SerializeField] private bool unlockAllStages = true;
+        [SerializeField] private bool unlockAllStages = false; // Wajib urut: Pemain harus memenangkan stage secara bertahap
         public bool UnlockAllStages => unlockAllStages;
 
         /// <summary>

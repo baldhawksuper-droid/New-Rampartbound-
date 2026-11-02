@@ -1563,10 +1563,17 @@ namespace Rampartbound.Editor
             var titleTxt = CreateText(detailPanel.transform, "StageTitleText", "Gerbang Pinggiran Kerajaan", 24, FontStyle.Bold, TextAnchor.MiddleLeft, Color.white, defaultFont);
             PositionUI(titleTxt.gameObject, 0.44f, 0.86f, 0.88f, 0.96f);
 
+            // Boss Warning Banner (Waspada Mini-Boss / Peringatan Final Boss)
+            var warningBanner = CreatePanel(detailPanel.transform, "BossWarningBanner", new Color(0.35f, 0.05f, 0.05f, 0.85f));
+            PositionUI(warningBanner, 0.05f, 0.76f, 0.95f, 0.84f);
+            var warningTxt = CreateText(warningBanner.transform, "BossWarningText", "⚠️ PERINGATAN: BOS TELAH BANGKIT!", 18, FontStyle.Bold, TextAnchor.MiddleCenter, new Color(1f, 0.85f, 0.2f), defaultFont);
+            PositionUI(warningTxt.gameObject, 0.02f, 0.05f, 0.98f, 0.95f);
+            warningBanner.SetActive(false);
+
             var modeTxt = CreateText(detailPanel.transform, "BattleModeText", "Mode: Real-Time Deploy", 20, FontStyle.Normal, TextAnchor.MiddleLeft, new Color(1f, 0.85f, 0.3f), defaultFont);
-            PositionUI(modeTxt.gameObject, 0.05f, 0.74f, 0.50f, 0.84f);
+            PositionUI(modeTxt.gameObject, 0.05f, 0.65f, 0.50f, 0.75f);
             var diffTxt = CreateText(detailPanel.transform, "DifficultyStatusText", "Status: Normal", 20, FontStyle.Bold, TextAnchor.MiddleRight, Color.green, defaultFont);
-            PositionUI(diffTxt.gameObject, 0.52f, 0.74f, 0.95f, 0.84f);
+            PositionUI(diffTxt.gameObject, 0.52f, 0.65f, 0.95f, 0.75f);
 
             var descTxt = CreateText(detailPanel.transform, "StageDescriptionText", "Hadapi gelombang monster Abyssal awal yang mengancam pinggiran benteng.", 19, FontStyle.Normal, TextAnchor.UpperLeft, new Color(0.85f, 0.9f, 0.95f), defaultFont);
             PositionUI(descTxt.gameObject, 0.05f, 0.50f, 0.95f, 0.72f);
@@ -1600,6 +1607,8 @@ namespace Rampartbound.Editor
             stageSO.FindProperty("claim20StarButton").objectReferenceValue = m20Btn.GetComponent<Button>();
             stageSO.FindProperty("claim30StarButton").objectReferenceValue = m30Btn.GetComponent<Button>();
             stageSO.FindProperty("stageDetailPanel").objectReferenceValue = detailPanel;
+            stageSO.FindProperty("bossWarningBanner").objectReferenceValue = warningBanner;
+            stageSO.FindProperty("bossWarningText").objectReferenceValue = warningTxt;
             stageSO.FindProperty("stageCodeText").objectReferenceValue = codeTxt;
             stageSO.FindProperty("stageTitleText").objectReferenceValue = titleTxt;
             stageSO.FindProperty("stageDescriptionText").objectReferenceValue = descTxt;
