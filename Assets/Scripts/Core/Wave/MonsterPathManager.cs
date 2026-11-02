@@ -35,9 +35,24 @@ namespace FantasyDefense.Wave
             Instance = this;
         }
 
+        private int lastScreenWidth;
+        private int lastScreenHeight;
+
         private void Start()
         {
+            lastScreenWidth = Screen.width;
+            lastScreenHeight = Screen.height;
             BuildWaypoints();
+        }
+
+        private void Update()
+        {
+            if (Screen.width != lastScreenWidth || Screen.height != lastScreenHeight)
+            {
+                lastScreenWidth = Screen.width;
+                lastScreenHeight = Screen.height;
+                BuildWaypoints();
+            }
         }
 
         /// <summary>

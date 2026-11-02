@@ -209,6 +209,15 @@ namespace FantasyDefense.GridSystem
             }
         }
 
+        public void SetNormalColor(Color color)
+        {
+            normalColor = color;
+            if (currentUnit == null && spriteRenderer != null)
+            {
+                spriteRenderer.color = normalColor;
+            }
+        }
+
         public void UpdateRarityVisual()
         {
             if (spriteRenderer == null || currentUnit == null) return;

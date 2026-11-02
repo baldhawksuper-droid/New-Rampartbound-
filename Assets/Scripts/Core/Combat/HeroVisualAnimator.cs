@@ -383,10 +383,10 @@ namespace FantasyDefense.Combat
                 frameAnimRoutine = StartCoroutine(PlayFrameSequence(skillFrames, false));
             }
 
-            activeAnimRoutine = StartCoroutine(SkillCastRoutine(auraColor));
+            activeAnimRoutine = StartCoroutine(SkillCastRoutine(auraColor, spriteRenderer != null ? spriteRenderer.sprite : null));
         }
 
-        private IEnumerator SkillCastRoutine(Color auraColor)
+        private IEnumerator SkillCastRoutine(Color auraColor, Sprite baseSprite = null)
         {
             Vector3 anchorPos = GetAnchorPosition();
             Vector3 hoverPos = anchorPos + Vector3.up * 0.25f;
@@ -410,7 +410,13 @@ namespace FantasyDefense.Combat
             }
 
             if (spriteRenderer != null)
+            {
                 spriteRenderer.color = defaultColor;
+                if (baseSprite != null)
+                {
+                    spriteRenderer.sprite = baseSprite;
+                }
+            }
 
             transform.position = anchorPos;
             transform.localScale = baseScale;

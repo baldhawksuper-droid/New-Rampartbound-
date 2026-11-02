@@ -60,11 +60,57 @@ namespace FantasyDefense.GridSystem
         private void OnEnable()
         {
             FantasyDefense.Core.GameManager.OnBattleStateChanged += HandleBattleStateChanged;
+            FantasyDefense.Combat.BattlefieldEnvironmentManager.OnEnvironmentChanged += HandleEnvironmentChanged;
         }
 
         private void OnDisable()
         {
             FantasyDefense.Core.GameManager.OnBattleStateChanged -= HandleBattleStateChanged;
+            FantasyDefense.Combat.BattlefieldEnvironmentManager.OnEnvironmentChanged -= HandleEnvironmentChanged;
+        }
+
+        private void HandleEnvironmentChanged(FantasyDefense.Combat.BattlefieldEnvironmentTheme theme)
+        {
+            ApplyBiomeGridTint(theme);
+        }
+
+        public void ApplyBiomeGridTint(FantasyDefense.Combat.BattlefieldEnvironmentTheme theme)
+        {
+            Color boardTint = theme switch
+            {
+                FantasyDefense.Combat.BattlefieldEnvironmentTheme.Forest => new Color(0.92f, 0.98f, 0.92f, 1f),
+                FantasyDefense.Combat.BattlefieldEnvironmentTheme.Mountain => new Color(0.88f, 0.92f, 0.98f, 1f),
+                FantasyDefense.Combat.BattlefieldEnvironmentTheme.Volcanic => new Color(0.98f, 0.88f, 0.85f, 1f),
+                _ => Color.white
+            };
+
+            Color tileTint = theme switch
+            {
+                FantasyDefense.Combat.BattlefieldEnvironmentTheme.Forest => new Color(0.95f, 1f, 0.95f, 1f),
+                FantasyDefense.Combat.BattlefieldEnvironmentTheme.Mountain => new Color(0.92f, 0.95f, 1f, 1f),
+                FantasyDefense.Combat.BattlefieldEnvironmentTheme.Volcanic => new Color(1f, 0.93f, 0.90f, 1f),
+                _ => Color.white
+            };
+
+            if (boardRenderer != null)
+            {
+                Color cur = boardRenderer.color;
+                boardRenderer.color = new Color(boardTint.r, boardTint.g, boardTint.b, cur.a);
+            }
+
+            if (gridMatrix != null)
+            {
+                for (int x = 0; x < currentWidth; x++)
+                {
+                    for (int y = 0; y < currentHeight; y++)
+                    {
+                        if (gridMatrix[x, y] != null)
+                        {
+                            gridMatrix[x, y].SetNormalColor(tileTint);
+                        }
+                    }
+                }
+            }
         }
 
         private void HandleBattleStateChanged(FantasyDefense.Core.BattleState state)
