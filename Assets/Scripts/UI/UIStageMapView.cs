@@ -94,9 +94,10 @@ namespace FantasyDefense.UI
             EnsureStageManagerExists();
             RefreshMapView();
 
-            if (StageManager.Instance != null)
+            // Default panel detail ditutup saat awal agar seluruh jalur 10 node terlihat bersih
+            if (stageDetailPanel != null)
             {
-                SelectStage(StageManager.Instance.GetSelectedStage());
+                stageDetailPanel.SetActive(false);
             }
         }
 
@@ -171,6 +172,20 @@ namespace FantasyDefense.UI
             if (claim30StarButton != null)
                 claim30StarButton.onClick.AddListener(() => ClaimMilestone(30));
 
+            // Wire tombol silang (✕) pada StageDetailPanel agar pemain bisa menutup panel dan melihat seluruh peta kapan saja
+            var closeDetailBtn = stageDetailPanel != null
+                ? stageDetailPanel.transform.Find("CloseDetailButton")?.GetComponent<Button>()
+                : null;
+            if (closeDetailBtn != null)
+            {
+                closeDetailBtn.onClick.RemoveAllListeners();
+                closeDetailBtn.onClick.AddListener(() =>
+                {
+                    if (stageDetailPanel != null) stageDetailPanel.SetActive(false);
+                    if (AudioManager.Instance != null) AudioManager.Instance.PlaySound(SoundType.ButtonClick);
+                });
+            }
+
             BindStageNodeButtons();
         }
 
@@ -194,18 +209,23 @@ namespace FantasyDefense.UI
             BindStageNodeButtons();
             RefreshMapView();
 
-            StageDataSO targetStage = null;
+            // Sembunyikan panel detail saat pertama dibuka agar seluruh 10 stage terlihat jelas
+            if (stageDetailPanel != null)
+            {
+                stageDetailPanel.SetActive(false);
+            }
+
             if (StageManager.Instance != null)
             {
-                targetStage = StageManager.Instance.GetSelectedStage();
+                var targetStage = StageManager.Instance.GetSelectedStage();
                 if (targetStage == null && StageManager.Instance.ChapterStages != null && StageManager.Instance.ChapterStages.Count > 0)
                 {
                     targetStage = StageManager.Instance.ChapterStages[0];
                 }
-            }
-            if (targetStage != null)
-            {
-                SelectStage(targetStage);
+                if (targetStage != null)
+                {
+                    currentStage = targetStage;
+                }
             }
         }
 
@@ -270,6 +290,11 @@ namespace FantasyDefense.UI
             Sprite nodeNormalSp = Resources.Load<Sprite>("Sprites/UI/UI_StageNode_Normal");
             Sprite nodeMiniBossSp = Resources.Load<Sprite>("Sprites/UI/UI_StageNode_MiniBoss");
             Sprite nodeFinalBossSp = Resources.Load<Sprite>("Sprites/UI/UI_StageNode_FinalBoss");
+#if UNITY_EDITOR
+            if (nodeNormalSp == null) nodeNormalSp = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_StageNode_Normal.png");
+            if (nodeMiniBossSp == null) nodeMiniBossSp = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_StageNode_MiniBoss.png");
+            if (nodeFinalBossSp == null) nodeFinalBossSp = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_StageNode_FinalBoss.png");
+#endif
 
             for (int i = 0; i < stageNodeButtons.Count; i++)
             {

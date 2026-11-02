@@ -89,9 +89,10 @@ namespace FantasyDefense.Combat
             }
 
             SpawnAndFireProjectile(target);
-            if (SkillVfxManager.Instance != null)
+
+            if (AudioManager.Instance != null)
             {
-                SkillVfxManager.Instance.SpawnUpwardArcaneBeam(transform.position, target.transform.position, currentTier);
+                AudioManager.Instance.PlaySound(SoundType.MagicSpark, 1.15f);
             }
 
             if (visualAnimator != null)
@@ -114,18 +115,24 @@ namespace FantasyDefense.Combat
         private void SpawnAndFireProjectile(MonsterController target)
         {
             GameObject projObj;
+            Vector3 originPos = transform.position + new Vector3(0.12f, 0.35f, 0f); // Dari ujung tongkat bintang Pippin
+
             if (projectilePrefab != null)
             {
-                projObj = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+                projObj = Instantiate(projectilePrefab, originPos, Quaternion.identity);
             }
             else
             {
                 // Dynamic clean fallback: buat proyektil sihir kristal secara runtime
                 projObj = new GameObject($"MagicProjectile_T{(int)currentTier}");
-                projObj.transform.position = transform.position;
+                projObj.transform.position = originPos;
 
                 var sr = projObj.AddComponent<SpriteRenderer>();
-                sr.sortingOrder = 25;
+                sr.sortingOrder = 200; // Prioritas tinggi di atas hero (120) dan monster (25)
+
+                Shader shader = Shader.Find("Universal Render Pipeline/2D/Sprite-Unlit") 
+                             ?? Shader.Find("Sprites/Default");
+                if (shader != null) sr.material = new Material(shader);
 
                 Sprite orbSprite = Resources.Load<Sprite>("Sprites/Combat/Projectile_Magic_Orb");
 #if UNITY_EDITOR
@@ -137,21 +144,28 @@ namespace FantasyDefense.Combat
                 if (orbSprite != null)
                 {
                     sr.sprite = orbSprite;
-                    sr.color = currentTier >= UnitTier.Tier3 ? new Color(1f, 0.75f, 1f) : Color.white;
+                    sr.color = currentTier >= UnitTier.Tier3 ? new Color(1f, 0.90f, 1f) : Color.white;
                 }
                 else
                 {
                     sr.sprite = GetOrCreateProceduralOrbSprite();
-                    sr.color = currentTier >= UnitTier.Tier3 ? new Color(0.9f, 0.4f, 1f) : new Color(0.2f, 0.8f, 1f);
+                    sr.color = currentTier >= UnitTier.Tier3 ? new Color(0.95f, 0.45f, 1f) : new Color(0.25f, 0.85f, 1f);
                 }
 
-                projObj.transform.localScale = Vector3.one * (currentTier >= UnitTier.Tier3 ? 0.75f : 0.55f);
+                // Skala proyektil tajam dan jelas terlihat di layar mobile
+                projObj.transform.localScale = Vector3.one * (currentTier >= UnitTier.Tier3 ? 1.15f : 0.85f);
             }
 
             var proj = projObj.GetComponent<Projectile>();
             if (proj == null)
             {
                 proj = projObj.AddComponent<Projectile>();
+            }
+
+            var pSr = projObj.GetComponent<SpriteRenderer>();
+            if (pSr != null && pSr.sortingOrder < 150)
+            {
+                pSr.sortingOrder = 200;
             }
 
             bool isMeteor = currentTier >= UnitTier.Tier3;

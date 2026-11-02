@@ -213,7 +213,8 @@ namespace FantasyDefense.Combat
             if (dir == Vector3.zero) dir = Vector3.up;
 
             Vector3 windupPos = anchorPos - dir * 0.08f;
-            Vector3 lungePos = anchorPos + dir * attackLungeDistance;
+            float effectiveLungeDist = (unitController != null && unitController.UnitType == UnitType.RabbitMage) ? 0.04f : attackLungeDistance;
+            Vector3 lungePos = anchorPos + dir * effectiveLungeDist;
 
             Sprite defaultSprite = spriteRenderer != null ? spriteRenderer.sprite : null;
 
@@ -291,7 +292,7 @@ namespace FantasyDefense.Combat
                 }
                 else if (unitController.UnitType == UnitType.RabbitMage)
                 {
-                    SkillVfxManager.Instance.SpawnUpwardArcaneBeam(anchorPos, lungePos + dir * 0.35f, unitController.CurrentTier);
+                    // Pippin menembakkan bola sihir kristal (MagicProjectile) dari RabbitMageUnit, tidak perlu beam pendek redundan
                 }
             }
 

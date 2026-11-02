@@ -1513,6 +1513,7 @@ namespace Rampartbound.Editor
                 dImg.color = Color.white;
             }
             PositionUI(detailPanel, 0.04f, 0.04f, 0.96f, 0.52f);
+            detailPanel.SetActive(false); // Default tertutup agar tidak menutupi node 1-6 saat pemain membuka peta
 
             // Close button X di sudut kanan atas panel detail (slate/gold kompak, tidak menduplikasi tombol X modal utama)
             var closeDetailBtn = CreateButton(detailPanel.transform, "CloseDetailButton", "✕", new Color(0.14f, 0.18f, 0.28f, 0.95f), new Color(1f, 0.90f, 0.70f), 18, defaultFont);
