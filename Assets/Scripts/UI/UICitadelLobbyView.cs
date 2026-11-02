@@ -34,6 +34,14 @@ namespace FantasyDefense.UI
         [SerializeField] private Text teamCpText;
         [SerializeField] private Button settingsButton;
 
+        private int _displayedGold = -1;
+        private int _displayedEnergy = -1;
+        private int _maxEnergy = 30;
+        private int _displayedGems = -1;
+        private Coroutine _goldTickerRoutine;
+        private Coroutine _energyTickerRoutine;
+        private Coroutine _gemsTickerRoutine;
+
         [Header("Courtyard Hero Assembly (Max 4 Slots)")]
         [SerializeField] private Transform courtyardContainer;
         [SerializeField] private Button cedricCardButton;
@@ -188,6 +196,10 @@ namespace FantasyDefense.UI
 
         private void OnDisable()
         {
+            if (_goldTickerRoutine != null) { StopCoroutine(_goldTickerRoutine); _goldTickerRoutine = null; }
+            if (_energyTickerRoutine != null) { StopCoroutine(_energyTickerRoutine); _energyTickerRoutine = null; }
+            if (_gemsTickerRoutine != null) { StopCoroutine(_gemsTickerRoutine); _gemsTickerRoutine = null; }
+
             CitadelLobbyManager.OnEnergyChanged -= HandleEnergyChanged;
             CitadelLobbyManager.OnGoldChanged -= HandleGoldChanged;
             CitadelLobbyManager.OnAccountGemsChanged -= HandleGemsChanged;
@@ -396,23 +408,66 @@ namespace FantasyDefense.UI
             if (energyText != null)
             {
                 if (lilitaFont != null) energyText.font = lilitaFont;
-                energyText.text = $"{data.currentEnergy}/{data.maxEnergy}";
                 energyText.color = new Color(0.35f, 0.85f, 1.0f);
                 energyText.fontStyle = FontStyle.Bold;
+
+                _maxEnergy = data.maxEnergy;
+                if (_displayedEnergy < 0)
+                {
+                    _displayedEnergy = data.currentEnergy;
+                    energyText.text = $"{_displayedEnergy}/{_maxEnergy}";
+                }
+                else if (_displayedEnergy != data.currentEnergy && gameObject.activeInHierarchy)
+                {
+                    if (_energyTickerRoutine != null) StopCoroutine(_energyTickerRoutine);
+                    _energyTickerRoutine = StartCoroutine(AnimateRollingEnergy(_displayedEnergy, data.currentEnergy, _maxEnergy));
+                }
+                else
+                {
+                    energyText.text = $"{_displayedEnergy}/{_maxEnergy}";
+                }
             }
             if (goldText != null)
             {
                 if (lilitaFont != null) goldText.font = lilitaFont;
-                goldText.text = $"{data.goldCoins:N0}";
                 goldText.color = new Color(1.0f, 0.88f, 0.25f);
                 goldText.fontStyle = FontStyle.Bold;
+
+                if (_displayedGold < 0)
+                {
+                    _displayedGold = data.goldCoins;
+                    goldText.text = $"{_displayedGold:N0}";
+                }
+                else if (_displayedGold != data.goldCoins && gameObject.activeInHierarchy)
+                {
+                    if (_goldTickerRoutine != null) StopCoroutine(_goldTickerRoutine);
+                    _goldTickerRoutine = StartCoroutine(AnimateRollingGold(_displayedGold, data.goldCoins));
+                }
+                else
+                {
+                    goldText.text = $"{_displayedGold:N0}";
+                }
             }
             if (gemsText != null)
             {
                 if (lilitaFont != null) gemsText.font = lilitaFont;
-                gemsText.text = $"{data.accountGems:N0}";
                 gemsText.color = new Color(0.40f, 0.95f, 1.0f);
                 gemsText.fontStyle = FontStyle.Bold;
+
+                if (_displayedGems < 0)
+                {
+                    _displayedGems = data.accountGems;
+                    gemsText.text = $"{_displayedGems:N0}";
+                }
+                else if (_displayedGems != data.accountGems && gameObject.activeInHierarchy)
+                {
+                    if (_gemsTickerRoutine != null) StopCoroutine(_gemsTickerRoutine);
+                    _gemsTickerRoutine = StartCoroutine(AnimateRollingGems(_displayedGems, data.accountGems));
+                }
+                else
+                {
+                    gemsText.text = $"{_displayedGems:N0}";
+                }
             }
             if (teamCpText != null)
             {
@@ -640,7 +695,22 @@ namespace FantasyDefense.UI
 
             if (AudioManager.Instance != null)
             {
-                AudioManager.Instance.PlaySound(SoundType.MergeSuccess, 1.35f);
+                // Thematic chibi voice / weapon sound effect per archetype
+                SoundType heroSound = type switch
+                {
+                    UnitType.Cedric => SoundType.Slash, // Ksatria berpedang: tebasan pedang taktil
+                    UnitType.RabbitMage => SoundType.MagicSpark, // Kelinci penyihir: kilau mistis peri
+                    UnitType.RoseTanker => SoundType.ShieldSlam, // Paladin palu: dentuman perisai kokoh
+                    UnitType.WindRanger => SoundType.PiercingGale, // Pemanah angin: desau panah angin
+                    _ => SoundType.ButtonClick
+                };
+                AudioManager.Instance.PlaySound(heroSound, 1.25f);
+                AudioManager.Instance.PlaySound(SoundType.DialogueBlipChime, 1.15f);
+            }
+
+            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null && FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+            {
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Selection);
             }
 
             float now = Time.unscaledTime;
@@ -872,6 +942,81 @@ namespace FantasyDefense.UI
             }
 
             Destroy(obj);
+        }
+
+        private IEnumerator AnimateRollingGold(int fromVal, int toVal)
+        {
+            float duration = 0.40f;
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+                float easeOut = Mathf.Sin(t * Mathf.PI * 0.5f);
+                int current = Mathf.RoundToInt(Mathf.Lerp(fromVal, toVal, easeOut));
+                _displayedGold = current;
+                if (goldText != null)
+                {
+                    goldText.text = $"{current:N0}";
+                }
+                yield return null;
+            }
+            _displayedGold = toVal;
+            if (goldText != null)
+            {
+                goldText.text = $"{toVal:N0}";
+            }
+            _goldTickerRoutine = null;
+        }
+
+        private IEnumerator AnimateRollingEnergy(int fromVal, int toVal, int maxVal)
+        {
+            float duration = 0.35f;
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+                float easeOut = Mathf.Sin(t * Mathf.PI * 0.5f);
+                int current = Mathf.RoundToInt(Mathf.Lerp(fromVal, toVal, easeOut));
+                _displayedEnergy = current;
+                if (energyText != null)
+                {
+                    energyText.text = $"{current}/{maxVal}";
+                }
+                yield return null;
+            }
+            _displayedEnergy = toVal;
+            if (energyText != null)
+            {
+                energyText.text = $"{toVal}/{maxVal}";
+            }
+            _energyTickerRoutine = null;
+        }
+
+        private IEnumerator AnimateRollingGems(int fromVal, int toVal)
+        {
+            float duration = 0.40f;
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+                float easeOut = Mathf.Sin(t * Mathf.PI * 0.5f);
+                int current = Mathf.RoundToInt(Mathf.Lerp(fromVal, toVal, easeOut));
+                _displayedGems = current;
+                if (gemsText != null)
+                {
+                    gemsText.text = $"{current:N0}";
+                }
+                yield return null;
+            }
+            _displayedGems = toVal;
+            if (gemsText != null)
+            {
+                gemsText.text = $"{toVal:N0}";
+            }
+            _gemsTickerRoutine = null;
         }
 
         private void OpenHeroUpgrade(UnitType heroType)
