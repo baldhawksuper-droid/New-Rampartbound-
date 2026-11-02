@@ -280,6 +280,31 @@ namespace FantasyDefense.UI
 
             UpdateMilestoneButtons(totalStars);
             UpdateStageNodesVisuals();
+            EnsureMapBackdropVisual();
+        }
+
+        private void EnsureMapBackdropVisual()
+        {
+            var trailPanel = transform.Find("ContentContainer/StageMapTrailPanel") ?? transform.Find("StageMapTrailPanel");
+            if (trailPanel != null)
+            {
+                var trailImg = trailPanel.GetComponent<Image>();
+                if (trailImg != null && trailImg.sprite == null)
+                {
+                    Sprite mapBackdrop = Resources.Load<Sprite>("Sprites/UI/WorldMap_Chapter1_Backdrop");
+#if UNITY_EDITOR
+                    if (mapBackdrop == null)
+                    {
+                        mapBackdrop = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/WorldMap_Chapter1_Backdrop.png");
+                    }
+#endif
+                    if (mapBackdrop != null)
+                    {
+                        trailImg.sprite = mapBackdrop;
+                        trailImg.color = Color.white;
+                    }
+                }
+            }
         }
 
         private void UpdateStageNodesVisuals()
