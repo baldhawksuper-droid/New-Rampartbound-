@@ -720,51 +720,35 @@ namespace Rampartbound.Editor
                 txtShadow.effectDistance = new Vector2(1.5f, -1.5f);
             }
 
-            // Hero Courtyard Assembly: Wadah pahlawan di teras lantai batu datar depan kastil (ruang pandang lapang)
+            // Hero Courtyard Assembly: Wadah pahlawan di teras batu alami depan kastil (ruang pandang lapang)
             var heroesContainer = CreatePanel(lobbyPanelObj.transform, "HeroCourtyardAssembly", new Color(0f, 0f, 0f, 0f));
-            PositionUI(heroesContainer, 0.02f, 0.225f, 0.98f, 0.810f);
+            PositionUI(heroesContainer, 0.02f, 0.220f, 0.98f, 0.835f);
 
-            // Formasi 4 Slot Hero Courtyard Assembly (Sejajar sempurna tanpa pergeseran ketinggian)
-            // Pippin (Slot 1, Kiri): Lv.12, CP 1,600
-            var rabbitCard = CreateButton(heroesContainer.transform, "RabbitCard", "Pippin\nLv.12 • CP 1,600", new Color(0f, 0f, 0f, 0f), Color.white, 14, defaultFont);
-            PositionUI(rabbitCard, 0.02f, 0.04f, 0.25f, 0.92f);
+            // Formasi Segitiga Dinamis (Sesuai Referensi Mockup: Pahlawan Berdiri Bebas, Besar & Gagah)
+            // Pippin (Slot 1, Kiri, Sayap Kiri): Lv.12, CP 1,600
+            var rabbitCard = CreateButton(heroesContainer.transform, "RabbitCard", "<b><color=#00FFFF>•</color> Lv.12 | CP 1,600</b>", new Color(0f, 0f, 0f, 0f), Color.white, 14, defaultFont);
+            PositionUI(rabbitCard, 0.04f, 0.09f, 0.38f, 0.89f);
             SetupHeroCardPortrait(rabbitCard, _heroRabbitSprite, "Pippin");
 
-            // Cedric (Slot 2, Tengah Kiri): Cedric, Lv.15, CP 1,850
-            var cedricCard = CreateButton(heroesContainer.transform, "CedricCard", "Cedric\nLv.15 • CP 1,850", new Color(0f, 0f, 0f, 0f), Color.white, 14, defaultFont);
-            PositionUI(cedricCard, 0.26f, 0.04f, 0.49f, 0.92f);
+            // Cedric (Slot 2, Tengah, Maju ke Depan): Cedric, Lv.15, CP 1,850
+            var cedricCard = CreateButton(heroesContainer.transform, "CedricCard", "<b>Cedric</b>\n<color=#00FFFF>•</color> Lv.15 | CP 1,850", new Color(0f, 0f, 0f, 0f), Color.white, 14, defaultFont);
+            PositionUI(cedricCard, 0.30f, 0.01f, 0.70f, 0.91f);
             SetupHeroCardPortrait(cedricCard, _heroCedricSprite, "Cedric");
 
-            // Rose (Slot 3, Tengah Kanan): Lv.14, CP 1,400 (Chibi Palu Emas Raksasa)
-            var roseCard = CreateButton(heroesContainer.transform, "RoseCard", "Rose\nLv.14 • CP 1,400", new Color(0f, 0f, 0f, 0f), Color.white, 14, defaultFont);
-            PositionUI(roseCard, 0.50f, 0.04f, 0.73f, 0.92f);
+            // Rose (Slot 3, Kanan, Sayap Kanan): Lv.14, CP 1,400 (Chibi Palu Emas Raksasa)
+            var roseCard = CreateButton(heroesContainer.transform, "RoseCard", "<b><color=#00FFFF>•</color> Lv.14 | CP 1,400</b>", new Color(0f, 0f, 0f, 0f), Color.white, 14, defaultFont);
+            PositionUI(roseCard, 0.62f, 0.09f, 0.96f, 0.89f);
             SetupHeroCardPortrait(roseCard, _heroRoseSprite, "Rose");
 
-            // Slot Ke-4 (Slot Fleksibel / Expansion Slot Terkunci - Menampilkan Siluet Hero Gelap)
-            var windCard = CreateButton(heroesContainer.transform, "WindCard", "SLOT 4\n🔒 Buka Gacha", new Color(0f, 0f, 0f, 0f), new Color(1f, 0.88f, 0.35f), 13, defaultFont);
+            // Slot Ke-4 (Slot Cadangan/Ekspansi): Disembunyikan secara default saat 3 hero aktif berlaga agar lobi tetap bersih
+            var windCard = CreateButton(heroesContainer.transform, "WindCard", "SLOT 4", new Color(0f, 0f, 0f, 0f), new Color(1f, 0.88f, 0.35f), 13, defaultFont);
             PositionUI(windCard, 0.74f, 0.04f, 0.97f, 0.92f);
             SetupHeroCardPortrait(windCard, _heroWindSprite, "Terkunci");
-            var windPortraitImg = windCard.transform.Find("HeroPortrait")?.GetComponent<Image>();
-            if (windPortraitImg != null)
-            {
-                windPortraitImg.color = new Color(0.12f, 0.16f, 0.25f, 0.60f); // Siluet gelap elegan
-            }
-            var windLockBadge = new GameObject("LockBadge", typeof(RectTransform), typeof(Text));
-            windLockBadge.transform.SetParent(windCard.transform, false);
-            PositionUI(windLockBadge, 0.25f, 0.45f, 0.75f, 0.65f);
-            var windLockBadgeTxt = windLockBadge.GetComponent<Text>();
-            windLockBadgeTxt.font = defaultFont;
-            windLockBadgeTxt.fontSize = 28;
-            windLockBadgeTxt.alignment = TextAnchor.MiddleCenter;
-            windLockBadgeTxt.text = "🔒";
-            var windLockBadgeShadow = windLockBadge.AddComponent<Shadow>();
-            windLockBadgeShadow.effectColor = new Color(0f, 0f, 0f, 0.90f);
-            windLockBadgeShadow.effectDistance = new Vector2(2f, -2f);
-            windCard.SetActive(true);
+            windCard.SetActive(false);
 
             // Core Battle Button (Crimson 3D Gold Frame with studs)
-            var defendBtn = CreateButton(lobbyPanelObj.transform, "DefendCitadelButton", "⚔️ BATTLE (5 STAMINA)", new Color(0.85f, 0.15f, 0.15f), Color.white, 28, defaultFont);
-            PositionUI(defendBtn, 0.08f, 0.120f, 0.92f, 0.220f);
+            var defendBtn = CreateButton(lobbyPanelObj.transform, "DefendCitadelButton", "⚔️ BATTLE  (5 ⚡)", new Color(0.78f, 0.10f, 0.12f), Color.white, 26, defaultFont);
+            PositionUI(defendBtn, 0.12f, 0.125f, 0.88f, 0.205f);
 
             var trialBtn = CreateButton(lobbyPanelObj.transform, "AbyssalTrialButton", "🌌 UJIAN ABYSSAL", new Color(0.42f, 0.25f, 0.75f), Color.white, 24, defaultFont);
             trialBtn.SetActive(false);

@@ -116,7 +116,7 @@ namespace FantasyDefense.UI
             if (navForgeButton != null) navForgeButton.gameObject.SetActive(showForge);
             if (navStageMapButton != null) navStageMapButton.gameObject.SetActive(true);
             if (navHeroesButton != null) navHeroesButton.gameObject.SetActive(true);
-            if (navSummonButton != null) navSummonButton.gameObject.SetActive(true);
+            if (navSummonButton != null) navSummonButton.gameObject.SetActive(false); // 4-Tab Dock Kanonikal (Citadel, Forge, Heroes, Bag)
             if (navStoreButton != null) navStoreButton.gameObject.SetActive(true);
 
             // Jika quick action bar semua disembunyikan, sembunyikan bar container-nya
@@ -125,6 +125,45 @@ namespace FantasyDefense.UI
                 var quickBar = navTalentsButton.transform.parent.gameObject;
                 bool anyQuickActive = showTalents || showQuests || showGuild || showBattlePass || showEventArena || showArtifacts;
                 quickBar.SetActive(anyQuickActive);
+            }
+
+            // Formasi Segitiga Dinamis 3 Pahlawan (Sesuai Referensi Mockup: Pippin Kiri, Cedric Tengah Maju, Rose Kanan)
+            if (rabbitCardButton != null)
+            {
+                var rt = rabbitCardButton.GetComponent<RectTransform>();
+                if (rt != null)
+                {
+                    rt.anchorMin = new Vector2(0.04f, 0.09f);
+                    rt.anchorMax = new Vector2(0.38f, 0.89f);
+                    rt.offsetMin = Vector2.zero;
+                    rt.offsetMax = Vector2.zero;
+                }
+            }
+            if (cedricCardButton != null)
+            {
+                var rt = cedricCardButton.GetComponent<RectTransform>();
+                if (rt != null)
+                {
+                    rt.anchorMin = new Vector2(0.30f, 0.01f);
+                    rt.anchorMax = new Vector2(0.70f, 0.91f);
+                    rt.offsetMin = Vector2.zero;
+                    rt.offsetMax = Vector2.zero;
+                }
+            }
+            if (roseCardButton != null)
+            {
+                var rt = roseCardButton.GetComponent<RectTransform>();
+                if (rt != null)
+                {
+                    rt.anchorMin = new Vector2(0.62f, 0.09f);
+                    rt.anchorMax = new Vector2(0.96f, 0.89f);
+                    rt.offsetMin = Vector2.zero;
+                    rt.offsetMax = Vector2.zero;
+                }
+            }
+            if (windRangerCardButton != null)
+            {
+                windRangerCardButton.gameObject.SetActive(false);
             }
 
             // Pastikan dock bawah memiliki HorizontalLayoutGroup agar 4 tombol tersisa otomatis merenggang penuh
@@ -146,20 +185,16 @@ namespace FantasyDefense.UI
                 LayoutRebuilder.ForceRebuildLayoutImmediate(dock.GetComponent<RectTransform>());
             }
 
-            // Anti-Menumpuk: Posisi dinamis tombol Defend Citadel agar tidak bertabrakan dengan elemen lain
+            // Anti-Menumpuk: Posisi dinamis tombol Defend Citadel (Crimson 3D Pill)
             if (defendCitadelButton != null)
             {
                 var rt = defendCitadelButton.GetComponent<RectTransform>();
                 if (rt != null)
                 {
-                    bool anyQuickActive = showTalents || showQuests || showGuild || showBattlePass || showEventArena || showArtifacts;
-                    if (!anyQuickActive && !showAbyssalTrial)
-                    {
-                        rt.anchorMin = new Vector2(0.08f, 0.120f);
-                        rt.anchorMax = new Vector2(0.92f, 0.220f);
-                        rt.offsetMin = Vector2.zero;
-                        rt.offsetMax = Vector2.zero;
-                    }
+                    rt.anchorMin = new Vector2(0.12f, 0.125f);
+                    rt.anchorMax = new Vector2(0.88f, 0.205f);
+                    rt.offsetMin = Vector2.zero;
+                    rt.offsetMax = Vector2.zero;
                 }
             }
         }
@@ -256,7 +291,7 @@ namespace FantasyDefense.UI
                 var txt = defendCitadelButton.GetComponentInChildren<Text>();
                 if (txt != null)
                 {
-                    txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("LOBBY_DEFEND_BTN", "⚔️ BATTLE (5 STAMINA)", "⚔️ BATTLE (5 STAMINA)");
+                    txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("LOBBY_DEFEND_BTN", "⚔️ BATTLE  (5 ⚡)", "⚔️ BATTLE  (5 ⚡)");
                 }
             }
 
@@ -607,8 +642,15 @@ namespace FantasyDefense.UI
             int lvl = profile?.level ?? defaultLvl;
             int cp = profile != null ? profile.CalculateHeroCP() : 1500;
 
-            // Format bersih terpadu: Nama pahlawan di baris 1, Lv & CP di baris 2 (tanpa kotak nama tumpang tindih)
-            infoText.text = $"<b>{heroName}</b>\n<color=#FFD700>Lv.{lvl} • CP {cp:N0}</color>";
+            // Format bersih terpadu sesuai mockup: Cedric memiliki nama, Pippin & Rose ringkas elegan
+            if (type == UnitType.Knight)
+            {
+                infoText.text = $"<b>{heroName}</b>\n<color=#00FFFF>•</color> Lv.{lvl} | CP {cp:N0}";
+            }
+            else
+            {
+                infoText.text = $"<b><color=#00FFFF>•</color> Lv.{lvl} | CP {cp:N0}</b>";
+            }
             infoText.fontSize = 13;
             infoText.alignment = TextAnchor.MiddleCenter;
 
