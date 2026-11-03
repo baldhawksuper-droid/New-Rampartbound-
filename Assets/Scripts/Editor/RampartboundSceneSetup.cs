@@ -694,14 +694,22 @@ namespace Rampartbound.Editor
             cpOutline.effectColor = new Color(0.25f, 0.12f, 0.02f, 0.95f);
             cpOutline.effectDistance = new Vector2(1.5f, -1.5f);
 
-            // Workshop Artileri Benteng Citadel: Ditempatkan elegan di sayap kiri atas sejajar TEAM CP (tidak lagi menumpuk menutupi kastil & pahlawan)
+            // Workshop Artileri Benteng Citadel: Ditempatkan elegan di sayap kiri atas sejajar TEAM CP dengan aksen batu pahat
             var defenseTurretBtn = CreateButton(lobbyPanelObj.transform, "DefenseTurretWorkshopButton", "🏰 ARTILERI", new Color(0.18f, 0.14f, 0.10f), new Color(1f, 0.92f, 0.45f), 14, defaultFont);
             PositionUI(defenseTurretBtn, 0.03f, 0.845f, 0.22f, 0.905f);
             var dtImg = defenseTurretBtn.GetComponent<Image>();
-            if (dtImg != null) { dtImg.sprite = null; dtImg.color = new Color(0.20f, 0.15f, 0.10f, 0.95f); }
+            if (dtImg != null) 
+            { 
+                dtImg.sprite = _frameStoneBastion; 
+                dtImg.type = (_frameStoneBastion != null) ? Image.Type.Sliced : Image.Type.Simple;
+                dtImg.color = new Color(0.24f, 0.19f, 0.14f, 0.98f); 
+            }
             var dtOutline = defenseTurretBtn.AddComponent<Outline>();
             dtOutline.effectColor = new Color(0.95f, 0.78f, 0.28f, 0.95f);
             dtOutline.effectDistance = new Vector2(1.5f, -1.5f);
+            var dtShadow = defenseTurretBtn.AddComponent<Shadow>();
+            dtShadow.effectColor = new Color(0.05f, 0.04f, 0.02f, 0.85f);
+            dtShadow.effectDistance = new Vector2(2.0f, -2.0f);
             var dtTxt = defenseTurretBtn.GetComponentInChildren<Text>();
             if (dtTxt != null)
             {
@@ -1387,7 +1395,7 @@ namespace Rampartbound.Editor
                 stageTopImg.color = Color.white;
             }
             PositionUI(stageTop, 0.02f, 0.85f, 0.98f, 0.98f);
-            var chapterTxt = CreateText(stageTop.transform, "ChapterTitle", "Chapter 1: Pertahanan Pinggiran Kerajaan", 24, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(1f, 0.85f, 0.3f), defaultFont);
+            var chapterTxt = CreateText(stageTop.transform, "ChapterTitle", "👑 CHAPTER 1 • Pertahanan Lembah Berbisik", 24, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(1f, 0.88f, 0.40f), defaultFont);
             PositionUI(chapterTxt.gameObject, 0.03f, 0.52f, 0.65f, 0.95f);
             var starsTxt = CreateText(stageTop.transform, "TotalStarsText", "Total Bintang: 0 / 30 ★", 22, FontStyle.Bold, TextAnchor.MiddleRight, Color.white, defaultFont);
             PositionUI(starsTxt.gameObject, 0.65f, 0.52f, 0.97f, 0.95f);
@@ -1538,23 +1546,31 @@ namespace Rampartbound.Editor
                     tShadow.effectDistance = new Vector2(1.5f, -1.5f);
                 }
 
-                // Dedicated Stars Badge Plate di BAWAH lingkaran node (bebas dari sumbatan di dalam lingkaran)
-                var starBadgeObj = new GameObject("StarsBadge", typeof(RectTransform), typeof(Text));
-                starBadgeObj.transform.SetParent(sBtnObj.transform, false);
-                var srt = starBadgeObj.GetComponent<RectTransform>();
-                srt.anchorMin = new Vector2(-0.25f, -0.45f);
-                srt.anchorMax = new Vector2(1.25f, -0.05f);
-                srt.offsetMin = Vector2.zero;
-                srt.offsetMax = Vector2.zero;
-                var starBadgeTxt = starBadgeObj.GetComponent<Text>();
-                starBadgeTxt.font = defaultFont;
-                starBadgeTxt.alignment = TextAnchor.MiddleCenter;
-                starBadgeTxt.fontSize = 13;
-                starBadgeTxt.text = "<color=#8899AA>☆☆☆</color>";
-                starBadgeTxt.raycastTarget = false;
-                var sOutline = starBadgeObj.AddComponent<Outline>();
-                sOutline.effectColor = new Color(0.08f, 0.08f, 0.12f, 0.95f);
-                sOutline.effectDistance = new Vector2(1.5f, -1.5f);
+                // 3 Lingkaran Kecil Fisik pada Sprite Node diisi bintang sesuai jumlah bintang yang didapatkan
+                Vector2[] socketCenters = new Vector2[]
+                {
+                    new Vector2(0.352f, 0.215f), // Lingkaran Kecil Kiri
+                    new Vector2(0.500f, 0.176f), // Lingkaran Kecil Tengah
+                    new Vector2(0.648f, 0.215f)  // Lingkaran Kecil Kanan
+                };
+                float halfSize = 0.068f;
+                Sprite starBadgeSp = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Star_Badge_Gold.png");
+
+                for (int s = 0; s < 3; s++)
+                {
+                    var socketObj = new GameObject($"StarSocket_{s}", typeof(RectTransform), typeof(Image));
+                    socketObj.transform.SetParent(sBtnObj.transform, false);
+                    var srt = socketObj.GetComponent<RectTransform>();
+                    srt.anchorMin = new Vector2(socketCenters[s].x - halfSize, socketCenters[s].y - halfSize);
+                    srt.anchorMax = new Vector2(socketCenters[s].x + halfSize, socketCenters[s].y + halfSize);
+                    srt.offsetMin = Vector2.zero;
+                    srt.offsetMax = Vector2.zero;
+                    var socketImg = socketObj.GetComponent<Image>();
+                    socketImg.raycastTarget = false;
+                    socketImg.preserveAspect = true;
+                    if (starBadgeSp != null) socketImg.sprite = starBadgeSp;
+                    socketObj.SetActive(false); // Default kosong/alami
+                }
 
                 stageNodeButtonsList.Add(sBtnObj.GetComponent<Button>());
             }
@@ -3057,10 +3073,22 @@ namespace Rampartbound.Editor
         {
             if (cardObj == null) return;
 
-            // 1. Oval Ground Shadow (di bawah kaki hero standee tepat di atas lantai batu pelataran)
+            // 1. Hero Standee Portrait (Proporsional menapak dekat dengan pelat nama tanpa celah kosong)
+            if (heroSprite != null)
+            {
+                var portraitObj = new GameObject("HeroPortrait", typeof(RectTransform), typeof(Image));
+                portraitObj.transform.SetParent(cardObj.transform, false);
+                PositionUI(portraitObj, 0.02f, 0.12f, 0.98f, 0.98f);
+                var img = portraitObj.GetComponent<Image>();
+                img.sprite = heroSprite;
+                img.preserveAspect = true;
+                img.raycastTarget = false;
+            }
+
+            // 2. Oval Ground Shadow (di bawah kaki hero standee tepat di atas pelat nama)
             var shadowObj = new GameObject("GroundShadow", typeof(RectTransform), typeof(Image));
             shadowObj.transform.SetParent(cardObj.transform, false);
-            PositionUI(shadowObj, 0.10f, 0.14f, 0.90f, 0.20f);
+            PositionUI(shadowObj, 0.12f, 0.11f, 0.88f, 0.17f);
             var shadowImg = shadowObj.GetComponent<Image>();
             if (_shadowOval != null)
             {
@@ -3069,22 +3097,10 @@ namespace Rampartbound.Editor
             shadowImg.color = new Color(0f, 0f, 0f, 0.60f);
             shadowImg.raycastTarget = false;
 
-            // 2. Hero Standee Portrait (Proporsional menapak di lantai teras dengan ruang pandang bersih)
-            if (heroSprite != null)
-            {
-                var portraitObj = new GameObject("HeroPortrait", typeof(RectTransform), typeof(Image));
-                portraitObj.transform.SetParent(cardObj.transform, false);
-                PositionUI(portraitObj, 0.02f, 0.18f, 0.98f, 0.98f);
-                var img = portraitObj.GetComponent<Image>();
-                img.sprite = heroSprite;
-                img.preserveAspect = true;
-                img.raycastTarget = false;
-            }
-
-            // 3. Info Badge Pill (Pill terintegrasi rapi di dasar kartu tanpa teks menumpuk)
+            // 3. Info Badge Pill (Pill terintegrasi rapi rapat di bawah kaki pahlawan)
             var badgeObj = new GameObject("BadgePill", typeof(RectTransform), typeof(Image));
             badgeObj.transform.SetParent(cardObj.transform, false);
-            PositionUI(badgeObj, 0.02f, 0.01f, 0.98f, 0.15f);
+            PositionUI(badgeObj, 0.02f, 0.00f, 0.98f, 0.13f);
             var badgeImg = badgeObj.GetComponent<Image>();
             if (_badgeHeroPill != null)
             {
@@ -3105,8 +3121,8 @@ namespace Rampartbound.Editor
                 var rt = txtTrans.GetComponent<RectTransform>();
                 if (rt != null)
                 {
-                    rt.anchorMin = new Vector2(0.02f, 0.01f);
-                    rt.anchorMax = new Vector2(0.98f, 0.15f);
+                    rt.anchorMin = new Vector2(0.02f, 0.00f);
+                    rt.anchorMax = new Vector2(0.98f, 0.13f);
                     rt.offsetMin = Vector2.zero;
                     rt.offsetMax = Vector2.zero;
                 }

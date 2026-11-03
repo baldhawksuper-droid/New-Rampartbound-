@@ -280,8 +280,8 @@ namespace FantasyDefense.UI
             if (chapterTitleText != null)
             {
                 chapterTitleText.text = FantasyDefense.Localization.CitadelLocalizationManager.Text(
-                    "Chapter 1: Pertahanan Pinggiran Kerajaan",
-                    "Chapter 1: Outskirts Citadel Defense");
+                    "<b>👑 CHAPTER 1</b>  •  <color=#FFE066>Pertahanan Lembah Berbisik</color>",
+                    "<b>👑 CHAPTER 1</b>  •  <color=#FFE066>Whispering Valley Bastion</color>");
             }
 
             if (totalStarsText != null)
@@ -482,58 +482,59 @@ namespace FantasyDefense.UI
                     }
                 }
 
-                // Dedicated Star Badge tepat di 3 soket bintang fisik pada busur bawah lingkaran node
-                var starBadgeTr = btn.transform.Find("StarsBadge");
-                Text starBadgeTxt = null;
-                if (starBadgeTr != null)
-                {
-                    starBadgeTxt = starBadgeTr.GetComponent<Text>();
-                }
-                else
-                {
-                    var starBadgeObj = new GameObject("StarsBadge", typeof(RectTransform), typeof(Text));
-                    starBadgeObj.transform.SetParent(btn.transform, false);
-                    starBadgeTxt = starBadgeObj.GetComponent<Text>();
-                    starBadgeTxt.font = defaultFont;
-                    starBadgeTxt.alignment = TextAnchor.MiddleCenter;
-                    starBadgeTxt.raycastTarget = false;
-                    var sOutline = starBadgeObj.AddComponent<Outline>();
-                    sOutline.effectColor = new Color(0.08f, 0.08f, 0.12f, 0.95f);
-                    sOutline.effectDistance = new Vector2(1.2f, -1.2f);
-                }
+                // Nonaktifkan teks StarsBadge lama agar tidak ada teks yang menimpa
+                var oldBadge = btn.transform.Find("StarsBadge");
+                if (oldBadge != null) oldBadge.gameObject.SetActive(false);
 
-                if (starBadgeTxt != null)
+                // 3 Lingkaran Kecil Fisik pada Sprite Node diisi bintang sesuai jumlah bintang yang didapatkan
+                Sprite starBadgeSp = Resources.Load<Sprite>("Sprites/UI/UI_Star_Badge_Gold");
+                Vector2[] socketCenters = new Vector2[]
                 {
-                    var srt = starBadgeTxt.GetComponent<RectTransform>();
-                    if (srt != null)
-                    {
-                        // Posisi pas di atas 3 soket bintang di busur bawah lingkaran node
-                        srt.anchorMin = new Vector2(0.08f, 0.06f);
-                        srt.anchorMax = new Vector2(0.92f, 0.30f);
-                        srt.offsetMin = Vector2.zero;
-                        srt.offsetMax = Vector2.zero;
-                    }
-                    starBadgeTxt.fontSize = 14;
+                    new Vector2(0.352f, 0.215f), // Lingkaran Kecil Kiri
+                    new Vector2(0.500f, 0.176f), // Lingkaran Kecil Tengah
+                    new Vector2(0.648f, 0.215f)  // Lingkaran Kecil Kanan
+                };
+                float halfSize = 0.068f;
 
-                    if (!isUnlocked)
+                for (int s = 0; s < 3; s++)
+                {
+                    string socketName = $"StarSocket_{s}";
+                    var socketTr = btn.transform.Find(socketName);
+                    Image socketImg = null;
+                    if (socketTr != null)
                     {
-                        starBadgeTxt.text = "";
-                        starBadgeTxt.gameObject.SetActive(false);
-                    }
-                    else if (isCleared)
-                    {
-                        // 3 Soket bintang terisi emas berkilau
-                        string starsGlyph = (stars >= 3) ? "<color=#FFD700>★  ★  ★</color>" : 
-                                            ((stars == 2) ? "<color=#FFD700>★  ★</color>  <color=#444444>★</color>" : 
-                                             "<color=#FFD700>★</color>  <color=#444444>★  ★</color>");
-                        starBadgeTxt.text = $"<b>{starsGlyph}</b>";
-                        starBadgeTxt.gameObject.SetActive(true);
+                        socketImg = socketTr.GetComponent<Image>();
                     }
                     else
                     {
-                        // Stage aktif (ada tulisan GO): Tetap tampilkan 3 bintang target di soket bawah tulisan GO!
-                        starBadgeTxt.text = "<b><color=#778899>☆  ☆  ☆</color></b>";
-                        starBadgeTxt.gameObject.SetActive(true);
+                        var socketObj = new GameObject(socketName, typeof(RectTransform), typeof(Image));
+                        socketObj.transform.SetParent(btn.transform, false);
+                        socketImg = socketObj.GetComponent<Image>();
+                        socketImg.raycastTarget = false;
+                        socketImg.preserveAspect = true;
+                    }
+
+                    if (socketImg != null)
+                    {
+                        var srt = socketImg.GetComponent<RectTransform>();
+                        srt.anchorMin = new Vector2(socketCenters[s].x - halfSize, socketCenters[s].y - halfSize);
+                        srt.anchorMax = new Vector2(socketCenters[s].x + halfSize, socketCenters[s].y + halfSize);
+                        srt.offsetMin = Vector2.zero;
+                        srt.offsetMax = Vector2.zero;
+
+                        if (starBadgeSp != null) socketImg.sprite = starBadgeSp;
+
+                        if (isCleared && s < stars)
+                        {
+                            // Lingkaran kecil terisi emas berkilau sesuai bintang yang didapatkan
+                            socketImg.color = Color.white;
+                            socketImg.gameObject.SetActive(true);
+                        }
+                        else
+                        {
+                            // Belum didapatkan, aktif (GO), atau stage terkunci: lingkaran kecil tetap kosong alami
+                            socketImg.gameObject.SetActive(false);
+                        }
                     }
                 }
             }

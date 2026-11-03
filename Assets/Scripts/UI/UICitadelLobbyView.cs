@@ -216,9 +216,26 @@ namespace FantasyDefense.UI
 
         private void Start()
         {
+            EnsureLobbyBackdropVisual();
             ApplyResponsiveLayout();
             RefreshLocalization();
             RefreshDisplays();
+        }
+
+        private void EnsureLobbyBackdropVisual()
+        {
+            var lobbyImg = GetComponent<Image>();
+            if (lobbyImg != null)
+            {
+                if (lobbyImg.sprite == null)
+                {
+                    lobbyImg.sprite = Resources.Load<Sprite>("Sprites/UI/Citadel_Lobby_Backdrop")
+                                   ?? Resources.Load<Sprite>("Art/Sprites/UI/Citadel_Lobby_Backdrop");
+                }
+                lobbyImg.color = Color.white;
+                lobbyImg.type = Image.Type.Simple;
+                lobbyImg.preserveAspect = false;
+            }
         }
 
         private void HandleLanguageChanged(FantasyDefense.Localization.AppLanguage lang)
@@ -614,6 +631,43 @@ namespace FantasyDefense.UI
                         img.sprite = heroSprite;
                     }
                 }
+
+                // Penyelarasan jarak: Rapatkan hero portrait, ground shadow, dan badge pill tanpa celah renggang
+                var portraitRt = btn.transform.Find("HeroPortrait")?.GetComponent<RectTransform>();
+                if (portraitRt != null)
+                {
+                    portraitRt.anchorMin = new Vector2(0.02f, 0.12f);
+                    portraitRt.anchorMax = new Vector2(0.98f, 0.98f);
+                    portraitRt.offsetMin = Vector2.zero;
+                    portraitRt.offsetMax = Vector2.zero;
+                }
+                var shadowRt = btn.transform.Find("GroundShadow")?.GetComponent<RectTransform>();
+                if (shadowRt != null)
+                {
+                    shadowRt.anchorMin = new Vector2(0.12f, 0.11f);
+                    shadowRt.anchorMax = new Vector2(0.88f, 0.17f);
+                    shadowRt.offsetMin = Vector2.zero;
+                    shadowRt.offsetMax = Vector2.zero;
+                }
+                var badgeRt = btn.transform.Find("BadgePill")?.GetComponent<RectTransform>();
+                if (badgeRt != null)
+                {
+                    badgeRt.anchorMin = new Vector2(0.02f, 0.00f);
+                    badgeRt.anchorMax = new Vector2(0.98f, 0.13f);
+                    badgeRt.offsetMin = Vector2.zero;
+                    badgeRt.offsetMax = Vector2.zero;
+                }
+                if (infoText != null)
+                {
+                    var textRt = infoText.GetComponent<RectTransform>();
+                    if (textRt != null)
+                    {
+                        textRt.anchorMin = new Vector2(0.02f, 0.00f);
+                        textRt.anchorMax = new Vector2(0.98f, 0.13f);
+                        textRt.offsetMin = Vector2.zero;
+                        textRt.offsetMax = Vector2.zero;
+                    }
+                }
             }
         }
 
@@ -738,7 +792,23 @@ namespace FantasyDefense.UI
             activeGreetingBubble.transform.SetParent(parentTr, false);
 
             var rt = activeGreetingBubble.GetComponent<RectTransform>();
-            rt.position = targetTr.position + new Vector3(0f, 95f, 0f);
+            var cardRt = targetTr.GetComponent<RectTransform>();
+            float bubbleYOffset = (cardRt != null && cardRt.rect.height > 10f) 
+                ? (cardRt.rect.height * 0.52f + 48f) 
+                : 260f;
+            Vector3 worldTargetPos = targetTr.position + new Vector3(0f, bubbleYOffset, 0f);
+
+            // Batasi agar gelembung ucapan berada rapi di atas kepala hero tanpa menabrak Header Panel atas
+            if (canvas != null)
+            {
+                var canvasRt = canvas.GetComponent<RectTransform>();
+                if (canvasRt != null)
+                {
+                    float maxY = canvas.transform.position.y + (canvasRt.rect.height * 0.5f) - 130f;
+                    if (worldTargetPos.y > maxY) worldTargetPos.y = maxY;
+                }
+            }
+            rt.position = worldTargetPos;
             rt.sizeDelta = new Vector2(250, 75);
 
             var img = activeGreetingBubble.GetComponent<Image>();
