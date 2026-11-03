@@ -724,20 +724,20 @@ namespace Rampartbound.Editor
             var heroesContainer = CreatePanel(lobbyPanelObj.transform, "HeroCourtyardAssembly", new Color(0f, 0f, 0f, 0f));
             PositionUI(heroesContainer, 0.02f, 0.220f, 0.98f, 0.835f);
 
-            // Formasi Segitiga Dinamis (Sesuai Referensi Mockup: Pahlawan Berdiri Bebas, Besar & Gagah)
-            // Pippin (Slot 1, Kiri, Sayap Kiri): Lv.12, CP 1,600
+            // Formasi Sejajar Teras Batu (Tinggi Sama, Skala Chibi Seragam, Menapak Penuh di Atas Lantai Batu Pelataran)
+            // Pippin (Slot 1, Kiri): Lv.12, CP 1,600
             var rabbitCard = CreateButton(heroesContainer.transform, "RabbitCard", "<b><color=#00FFFF>•</color> Lv.12 | CP 1,600</b>", new Color(0f, 0f, 0f, 0f), Color.white, 14, defaultFont);
-            PositionUI(rabbitCard, 0.04f, 0.09f, 0.38f, 0.89f);
+            PositionUI(rabbitCard, 0.04f, 0.03f, 0.36f, 0.88f);
             SetupHeroCardPortrait(rabbitCard, _heroRabbitSprite, "Pippin");
 
-            // Cedric (Slot 2, Tengah, Maju ke Depan): Cedric, Lv.15, CP 1,850
+            // Cedric (Slot 2, Tengah): Cedric, Lv.15, CP 1,850
             var cedricCard = CreateButton(heroesContainer.transform, "CedricCard", "<b>Cedric</b>\n<color=#00FFFF>•</color> Lv.15 | CP 1,850", new Color(0f, 0f, 0f, 0f), Color.white, 14, defaultFont);
-            PositionUI(cedricCard, 0.30f, 0.01f, 0.70f, 0.91f);
+            PositionUI(cedricCard, 0.34f, 0.03f, 0.66f, 0.88f);
             SetupHeroCardPortrait(cedricCard, _heroCedricSprite, "Cedric");
 
-            // Rose (Slot 3, Kanan, Sayap Kanan): Lv.14, CP 1,400 (Chibi Palu Emas Raksasa)
+            // Rose (Slot 3, Kanan): Lv.14, CP 1,400 (Chibi Palu Emas Raksasa)
             var roseCard = CreateButton(heroesContainer.transform, "RoseCard", "<b><color=#00FFFF>•</color> Lv.14 | CP 1,400</b>", new Color(0f, 0f, 0f, 0f), Color.white, 14, defaultFont);
-            PositionUI(roseCard, 0.62f, 0.09f, 0.96f, 0.89f);
+            PositionUI(roseCard, 0.64f, 0.03f, 0.96f, 0.88f);
             SetupHeroCardPortrait(roseCard, _heroRoseSprite, "Rose");
 
             // Slot Ke-4 (Slot Cadangan/Ekspansi): Disembunyikan secara default saat 3 hero aktif berlaga agar lobi tetap bersih

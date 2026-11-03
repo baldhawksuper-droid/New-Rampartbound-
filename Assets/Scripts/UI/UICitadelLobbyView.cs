@@ -127,14 +127,14 @@ namespace FantasyDefense.UI
                 quickBar.SetActive(anyQuickActive);
             }
 
-            // Formasi Segitiga Dinamis 3 Pahlawan (Sesuai Referensi Mockup: Pippin Kiri, Cedric Tengah Maju, Rose Kanan)
+            // Formasi Sejajar Teras Batu (Tinggi Sama, Skala Chibi Seragam, Menapak Penuh di Atas Lantai Batu Pelataran)
             if (rabbitCardButton != null)
             {
                 var rt = rabbitCardButton.GetComponent<RectTransform>();
                 if (rt != null)
                 {
-                    rt.anchorMin = new Vector2(0.04f, 0.09f);
-                    rt.anchorMax = new Vector2(0.38f, 0.89f);
+                    rt.anchorMin = new Vector2(0.04f, 0.03f);
+                    rt.anchorMax = new Vector2(0.36f, 0.88f);
                     rt.offsetMin = Vector2.zero;
                     rt.offsetMax = Vector2.zero;
                 }
@@ -144,8 +144,8 @@ namespace FantasyDefense.UI
                 var rt = cedricCardButton.GetComponent<RectTransform>();
                 if (rt != null)
                 {
-                    rt.anchorMin = new Vector2(0.30f, 0.01f);
-                    rt.anchorMax = new Vector2(0.70f, 0.91f);
+                    rt.anchorMin = new Vector2(0.34f, 0.03f);
+                    rt.anchorMax = new Vector2(0.66f, 0.88f);
                     rt.offsetMin = Vector2.zero;
                     rt.offsetMax = Vector2.zero;
                 }
@@ -155,8 +155,8 @@ namespace FantasyDefense.UI
                 var rt = roseCardButton.GetComponent<RectTransform>();
                 if (rt != null)
                 {
-                    rt.anchorMin = new Vector2(0.62f, 0.09f);
-                    rt.anchorMax = new Vector2(0.96f, 0.89f);
+                    rt.anchorMin = new Vector2(0.64f, 0.03f);
+                    rt.anchorMax = new Vector2(0.96f, 0.88f);
                     rt.offsetMin = Vector2.zero;
                     rt.offsetMax = Vector2.zero;
                 }
