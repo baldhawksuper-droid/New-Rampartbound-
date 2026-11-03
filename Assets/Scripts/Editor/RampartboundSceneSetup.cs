@@ -724,27 +724,27 @@ namespace Rampartbound.Editor
             var heroesContainer = CreatePanel(lobbyPanelObj.transform, "HeroCourtyardAssembly", new Color(0f, 0f, 0f, 0f));
             PositionUI(heroesContainer, 0.02f, 0.220f, 0.98f, 0.835f);
 
-            // Formasi Sejajar Teras Batu (Tinggi Sama, Skala Chibi Seragam, Menapak Penuh di Atas Lantai Batu Pelataran)
+            // Formasi 4 Slot Pahlawan Teras Batu (Pippin, Cedric, Rose, & Wind Ranger Terkunci)
             // Pippin (Slot 1, Kiri): Lv.12, CP 1,600
-            var rabbitCard = CreateButton(heroesContainer.transform, "RabbitCard", "<b><color=#00FFFF>•</color> Lv.12 | CP 1,600</b>", new Color(0f, 0f, 0f, 0f), Color.white, 14, defaultFont);
-            PositionUI(rabbitCard, 0.04f, 0.03f, 0.36f, 0.88f);
+            var rabbitCard = CreateButton(heroesContainer.transform, "RabbitCard", "<b><color=#00FFFF>•</color> Lv.12 | CP 1,600</b>", new Color(0f, 0f, 0f, 0f), Color.white, 13, defaultFont);
+            PositionUI(rabbitCard, 0.02f, 0.03f, 0.26f, 0.88f);
             SetupHeroCardPortrait(rabbitCard, _heroRabbitSprite, "Pippin");
 
-            // Cedric (Slot 2, Tengah): Cedric, Lv.15, CP 1,850
-            var cedricCard = CreateButton(heroesContainer.transform, "CedricCard", "<b>Cedric</b>\n<color=#00FFFF>•</color> Lv.15 | CP 1,850", new Color(0f, 0f, 0f, 0f), Color.white, 14, defaultFont);
-            PositionUI(cedricCard, 0.34f, 0.03f, 0.66f, 0.88f);
+            // Cedric (Slot 2, Tengah-Kiri): Cedric, Lv.15, CP 1,850
+            var cedricCard = CreateButton(heroesContainer.transform, "CedricCard", "<b>Cedric</b>\n<color=#00FFFF>•</color> Lv.15 | CP 1,850", new Color(0f, 0f, 0f, 0f), Color.white, 13, defaultFont);
+            PositionUI(cedricCard, 0.26f, 0.03f, 0.50f, 0.88f);
             SetupHeroCardPortrait(cedricCard, _heroCedricSprite, "Cedric");
 
-            // Rose (Slot 3, Kanan): Lv.14, CP 1,400 (Chibi Palu Emas Raksasa)
-            var roseCard = CreateButton(heroesContainer.transform, "RoseCard", "<b><color=#00FFFF>•</color> Lv.14 | CP 1,400</b>", new Color(0f, 0f, 0f, 0f), Color.white, 14, defaultFont);
-            PositionUI(roseCard, 0.64f, 0.03f, 0.96f, 0.88f);
+            // Rose (Slot 3, Tengah-Kanan): Lv.14, CP 1,400 (Chibi Palu Emas Raksasa)
+            var roseCard = CreateButton(heroesContainer.transform, "RoseCard", "<b><color=#00FFFF>•</color> Lv.14 | CP 1,400</b>", new Color(0f, 0f, 0f, 0f), Color.white, 13, defaultFont);
+            PositionUI(roseCard, 0.50f, 0.03f, 0.74f, 0.88f);
             SetupHeroCardPortrait(roseCard, _heroRoseSprite, "Rose");
 
-            // Slot Ke-4 (Slot Cadangan/Ekspansi): Disembunyikan secara default saat 3 hero aktif berlaga agar lobi tetap bersih
-            var windCard = CreateButton(heroesContainer.transform, "WindCard", "SLOT 4", new Color(0f, 0f, 0f, 0f), new Color(1f, 0.88f, 0.35f), 13, defaultFont);
-            PositionUI(windCard, 0.74f, 0.04f, 0.97f, 0.92f);
+            // Slot Ke-4: Wind Ranger (Status Terkunci - Akun Baru)
+            var windCard = CreateButton(heroesContainer.transform, "WindCard", "<b><color=#FFAA00>🔒 TERKUNCI</color></b>", new Color(0f, 0f, 0f, 0f), new Color(1f, 0.88f, 0.35f), 13, defaultFont);
+            PositionUI(windCard, 0.74f, 0.03f, 0.98f, 0.88f);
             SetupHeroCardPortrait(windCard, _heroWindSprite, "Terkunci");
-            windCard.SetActive(false);
+            windCard.SetActive(true);
 
             // Core Battle Button (Crimson 3D Gold Frame with studs)
             var defendBtn = CreateButton(lobbyPanelObj.transform, "DefendCitadelButton", "⚔️ BATTLE  (5 ⚡)", new Color(0.78f, 0.10f, 0.12f), Color.white, 26, defaultFont);

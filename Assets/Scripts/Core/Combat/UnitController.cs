@@ -79,7 +79,7 @@ namespace FantasyDefense.Combat
 
         [Header("Mobile Ergonomics")]
         [Tooltip("Offset posisi token saat disentuh agar tidak tertutup ibu jari pemain")]
-        [SerializeField] protected Vector3 touchDragOffset = Vector3.zero;
+        [SerializeField] protected Vector3 touchDragOffset = new Vector3(0f, 0.40f, 0f);
 
         [Header("Drag State")]
         protected bool isDragging = false;
@@ -886,7 +886,7 @@ namespace FantasyDefense.Combat
 
         private bool isPointerHeld = false;
         private Coroutine holdFocusRoutine;
-        private const float HOLD_FOCUS_DELAY = 0.5f;
+        private const float HOLD_FOCUS_DELAY = 5.0f; // Tahan diam ~5 detik sebelum memunculkan sorotan kembar sejenis
 
         public void OnPointerDown(PointerEventData eventData)
         {
@@ -1038,10 +1038,10 @@ namespace FantasyDefense.Combat
                 spriteRenderer.sortingOrder = dragSortingOrder;
 
             // Visual feedback: Token terangkat sedikit membesar saat disentuh/diseret
-            transform.localScale = transform.localScale * 1.15f;
+            transform.localScale = transform.localScale * 1.18f;
 
-            // Highlight seluruh kandidat fusi sejenis & setier di papan arena (Golden Pulse Glow)
-            HighlightMergeCandidates(true);
+            // Jangan nyalakan highlight kembar saat geser biasa (hanya aktif jika ditahan ~5 detik)
+            HighlightMergeCandidates(false);
 
             OnUnitDragStarted?.Invoke(this);
         }
