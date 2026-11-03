@@ -384,27 +384,73 @@ namespace FantasyDefense.UI
                     }
                 }
 
-                var txt = btn.GetComponentInChildren<Text>();
-                if (txt != null)
+                var mainTxt = btn.transform.Find("Text")?.GetComponent<Text>() ?? btn.GetComponentInChildren<Text>();
+                if (mainTxt != null)
                 {
-                    txt.font = defaultFont;
+                    mainTxt.font = defaultFont;
                     if (!isUnlocked)
                     {
-                        txt.text = $"<color=#CCCCCC>🔒\n{stageIdx}</color>";
-                        txt.fontSize = 15;
+                        mainTxt.text = "<color=#CCCCCC>🔒</color>";
+                        mainTxt.fontSize = 18;
                     }
                     else if (isCleared)
                     {
-                        string starsGlyph = (stars >= 3) ? "<color=#FFD700>★★★</color>" : ((stars == 2) ? "<color=#FFD700>★★</color><color=#555555>★</color>" : "<color=#FFD700>★</color><color=#555555>★★</color>");
                         string label = (stageIdx == 10) ? "💀 10" : ((stageIdx == 5) ? "👑 5" : $"{stageIdx}");
-                        txt.text = $"<b>{label}</b>\n{starsGlyph}";
-                        txt.fontSize = 16;
+                        mainTxt.text = $"<b>{label}</b>";
+                        mainTxt.fontSize = 18;
                     }
                     else
                     {
                         string label = (stageIdx == 10) ? "💀 10" : ((stageIdx == 5) ? "👑 5" : $"{stageIdx}");
-                        txt.text = $"<b>{label}</b>\n<color=#00FFFF>GO</color>";
-                        txt.fontSize = 16;
+                        mainTxt.text = $"<b>{label}</b>\n<color=#00FFFF>GO</color>";
+                        mainTxt.fontSize = 15;
+                    }
+                }
+
+                // Dedicated Star Badge Plate di BAWAH lingkaran node (bebas sumbatan & tetap tampil di bawah GO)
+                var starBadgeTr = btn.transform.Find("StarsBadge");
+                Text starBadgeTxt = null;
+                if (starBadgeTr != null)
+                {
+                    starBadgeTxt = starBadgeTr.GetComponent<Text>();
+                }
+                else
+                {
+                    var starBadgeObj = new GameObject("StarsBadge", typeof(RectTransform), typeof(Text));
+                    starBadgeObj.transform.SetParent(btn.transform, false);
+                    var srt = starBadgeObj.GetComponent<RectTransform>();
+                    srt.anchorMin = new Vector2(-0.25f, -0.45f);
+                    srt.anchorMax = new Vector2(1.25f, -0.05f);
+                    srt.offsetMin = Vector2.zero;
+                    srt.offsetMax = Vector2.zero;
+                    starBadgeTxt = starBadgeObj.GetComponent<Text>();
+                    starBadgeTxt.font = defaultFont;
+                    starBadgeTxt.alignment = TextAnchor.MiddleCenter;
+                    starBadgeTxt.fontSize = 13;
+                    starBadgeTxt.raycastTarget = false;
+                    var sOutline = starBadgeObj.AddComponent<Outline>();
+                    sOutline.effectColor = new Color(0.08f, 0.08f, 0.12f, 0.95f);
+                    sOutline.effectDistance = new Vector2(1.5f, -1.5f);
+                }
+
+                if (starBadgeTxt != null)
+                {
+                    if (!isUnlocked)
+                    {
+                        starBadgeTxt.text = "";
+                        starBadgeTxt.gameObject.SetActive(false);
+                    }
+                    else if (isCleared)
+                    {
+                        string starsGlyph = (stars >= 3) ? "<color=#FFD700>★★★</color>" : ((stars == 2) ? "<color=#FFD700>★★</color><color=#555555>★</color>" : "<color=#FFD700>★</color><color=#555555>★★</color>");
+                        starBadgeTxt.text = starsGlyph;
+                        starBadgeTxt.gameObject.SetActive(true);
+                    }
+                    else
+                    {
+                        // Stage aktif (ada tulisan GO): Tetap tampilkan 3 bintang target di bawah tulisan GO!
+                        starBadgeTxt.text = "<color=#8899AA>☆☆☆</color>";
+                        starBadgeTxt.gameObject.SetActive(true);
                     }
                 }
             }

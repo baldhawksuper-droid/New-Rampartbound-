@@ -493,14 +493,16 @@ namespace FantasyDefense.UI
                 {
                     if (infoTexts[i] != null)
                     {
-                        infoTexts[i].text = $"<b><color=#AAAAAA>[SLOT {i + 1}]</color></b>\n<color=#FFD700>🔒 Gacha to Unlock</color>";
+                        infoTexts[i].text = $"<b><color=#AAAAAA>SLOT {i + 1}</color></b>\n<color=#FFD700>🔒 Gacha</color>";
+                        infoTexts[i].fontSize = 13;
+                        infoTexts[i].alignment = TextAnchor.MiddleCenter;
                     }
                     if (standeeButtons[i] != null)
                     {
-                        var namePlate = standeeButtons[i].transform.Find("HeroNamePlate")?.GetComponent<Text>();
+                        var namePlate = standeeButtons[i].transform.Find("HeroNamePlate");
                         if (namePlate != null)
                         {
-                            namePlate.text = "<b>Terkunci</b>";
+                            namePlate.gameObject.SetActive(false);
                         }
                         var img = standeeButtons[i].transform.Find("HeroPortrait")?.GetComponent<Image>();
                         if (img != null)
@@ -584,28 +586,21 @@ namespace FantasyDefense.UI
 
             var lobby = CitadelLobbyManager.Instance;
             var profile = lobby != null ? lobby.GetHeroProfile(type) : null;
-            string rarityTag = type switch
-            {
-                UnitType.WindRanger => "<color=#FFD700>★ LEGENDARY</color>\n",
-                UnitType.RabbitMage => "<color=#C070FF>★ EPIC</color>\n",
-                _ => "<color=#40C0FF>★ RARE</color>\n"
-            };
+            string heroName = profile?.heroName ?? defaultName;
+            int lvl = profile?.level ?? defaultLvl;
+            int cp = profile != null ? profile.CalculateHeroCP() : 1500;
 
-            if (profile != null)
-            {
-                infoText.text = $"{rarityTag}<b>Lv.{profile.level} | CP {profile.CalculateHeroCP():N0}</b>";
-            }
-            else
-            {
-                infoText.text = $"{rarityTag}<b>Lv.{defaultLvl} | CP 1,500</b>";
-            }
+            // Format bersih terpadu: Nama pahlawan di baris 1, Lv & CP di baris 2 (tanpa kotak nama tumpang tindih)
+            infoText.text = $"<b>{heroName}</b>\n<color=#FFD700>Lv.{lvl} • CP {cp:N0}</color>";
+            infoText.fontSize = 13;
+            infoText.alignment = TextAnchor.MiddleCenter;
 
             if (btn != null)
             {
-                var namePlate = btn.transform.Find("HeroNamePlate")?.GetComponent<Text>();
+                var namePlate = btn.transform.Find("HeroNamePlate");
                 if (namePlate != null)
                 {
-                    namePlate.text = $"<b>{profile?.heroName ?? defaultName}</b>";
+                    namePlate.gameObject.SetActive(false); // Sembunyikan label lama agar tidak tumpang tindih
                 }
 
                 var img = btn.transform.Find("HeroPortrait")?.GetComponent<Image>();
