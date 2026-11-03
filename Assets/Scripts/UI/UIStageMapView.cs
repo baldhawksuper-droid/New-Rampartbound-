@@ -297,8 +297,73 @@ namespace FantasyDefense.UI
             }
 
             UpdateMilestoneButtons(totalStars);
+            EnsureStageNodesAlignedToRoad();
             UpdateStageNodesVisuals();
             EnsureMapBackdropVisual();
+        }
+
+        private static readonly Vector4[] RoadAlignedNodeRects = new Vector4[]
+        {
+            new Vector4(0.14f, 0.035f, 0.30f, 0.125f), // 1-1 (Awal Jalan Setapak Lembah Kiri)
+            new Vector4(0.24f, 0.135f, 0.40f, 0.225f), // 1-2 (Kelokan Jalan Tanah Lembah)
+            new Vector4(0.17f, 0.245f, 0.33f, 0.335f), // 1-3 (Tikungan Menara Penjaga)
+            new Vector4(0.34f, 0.345f, 0.50f, 0.435f), // 1-4 (Pintu Masuk Dek Jembatan Batu Kuno)
+            new Vector4(0.47f, 0.375f, 0.67f, 0.485f), // 1-5 (👑 MINI-BOSS Tengah Jembatan Lengkung Batu)
+            new Vector4(0.63f, 0.435f, 0.79f, 0.525f), // 1-6 (Pintu Keluar Jembatan & Lereng Timur)
+            new Vector4(0.68f, 0.535f, 0.84f, 0.625f), // 1-7 (Dataran Perkebunan Lereng Kastil)
+            new Vector4(0.60f, 0.635f, 0.76f, 0.725f), // 1-8 (Lekukan Sungai Atas & Kaki Tebing)
+            new Vector4(0.52f, 0.725f, 0.68f, 0.815f), // 1-9 (Punggung Bukit Menuju Puncak)
+            new Vector4(0.61f, 0.800f, 0.83f, 0.920f)  // 1-10 (💀 FINAL BOSS Gerbang Utama Citadel Cliff)
+        };
+
+        private void EnsureStageNodesAlignedToRoad()
+        {
+            if (stageNodeButtons == null || stageNodeButtons.Count < 10) return;
+            for (int i = 0; i < 10; i++)
+            {
+                var btn = stageNodeButtons[i];
+                if (btn == null) continue;
+                var rt = btn.GetComponent<RectTransform>();
+                if (rt != null)
+                {
+                    rt.anchorMin = new Vector2(RoadAlignedNodeRects[i].x, RoadAlignedNodeRects[i].y);
+                    rt.anchorMax = new Vector2(RoadAlignedNodeRects[i].z, RoadAlignedNodeRects[i].w);
+                    rt.offsetMin = Vector2.zero;
+                    rt.offsetMax = Vector2.zero;
+                }
+            }
+
+            // Reposisi titik jejak (TrailDots) agar selalu mengikuti alur jalan baru antar node
+            var trailPanel = transform.Find("ContentContainer/StageMapTrailPanel") ?? transform.Find("StageMapTrailPanel");
+            if (trailPanel != null)
+            {
+                for (int r = 0; r < 9; r++)
+                {
+                    float x1 = (RoadAlignedNodeRects[r].x + RoadAlignedNodeRects[r].z) * 0.5f;
+                    float y1 = (RoadAlignedNodeRects[r].y + RoadAlignedNodeRects[r].w) * 0.5f;
+                    float x2 = (RoadAlignedNodeRects[r + 1].x + RoadAlignedNodeRects[r + 1].z) * 0.5f;
+                    float y2 = (RoadAlignedNodeRects[r + 1].y + RoadAlignedNodeRects[r + 1].w) * 0.5f;
+
+                    for (int s = 1; s <= 3; s++)
+                    {
+                        var dotTr = trailPanel.Find($"TrailDot_{r + 1}_{s}");
+                        if (dotTr != null)
+                        {
+                            float t = s * 0.25f;
+                            float dotX = Mathf.Lerp(x1, x2, t);
+                            float dotY = Mathf.Lerp(y1, y2, t);
+                            var dotRt = dotTr.GetComponent<RectTransform>();
+                            if (dotRt != null)
+                            {
+                                dotRt.anchorMin = new Vector2(dotX - 0.008f, dotY - 0.012f);
+                                dotRt.anchorMax = new Vector2(dotX + 0.008f, dotY + 0.012f);
+                                dotRt.offsetMin = Vector2.zero;
+                                dotRt.offsetMax = Vector2.zero;
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private void EnsureMapBackdropVisual()
@@ -387,17 +452,27 @@ namespace FantasyDefense.UI
                 var mainTxt = btn.transform.Find("Text")?.GetComponent<Text>() ?? btn.GetComponentInChildren<Text>();
                 if (mainTxt != null)
                 {
+                    var mrt = mainTxt.GetComponent<RectTransform>();
+                    if (mrt != null)
+                    {
+                        // Area kubah permata tengah di atas soket bintang
+                        mrt.anchorMin = new Vector2(0.12f, 0.28f);
+                        mrt.anchorMax = new Vector2(0.88f, 0.88f);
+                        mrt.offsetMin = Vector2.zero;
+                        mrt.offsetMax = Vector2.zero;
+                    }
+
                     mainTxt.font = defaultFont;
                     if (!isUnlocked)
                     {
                         mainTxt.text = "<color=#CCCCCC>🔒</color>";
-                        mainTxt.fontSize = 18;
+                        mainTxt.fontSize = 20;
                     }
                     else if (isCleared)
                     {
                         string label = (stageIdx == 10) ? "💀 10" : ((stageIdx == 5) ? "👑 5" : $"{stageIdx}");
                         mainTxt.text = $"<b>{label}</b>";
-                        mainTxt.fontSize = 18;
+                        mainTxt.fontSize = (stageIdx == 10 || stageIdx == 5) ? 20 : 22;
                     }
                     else
                     {
@@ -407,7 +482,7 @@ namespace FantasyDefense.UI
                     }
                 }
 
-                // Dedicated Star Badge Plate di BAWAH lingkaran node (bebas sumbatan & tetap tampil di bawah GO)
+                // Dedicated Star Badge tepat di 3 soket bintang fisik pada busur bawah lingkaran node
                 var starBadgeTr = btn.transform.Find("StarsBadge");
                 Text starBadgeTxt = null;
                 if (starBadgeTr != null)
@@ -418,23 +493,28 @@ namespace FantasyDefense.UI
                 {
                     var starBadgeObj = new GameObject("StarsBadge", typeof(RectTransform), typeof(Text));
                     starBadgeObj.transform.SetParent(btn.transform, false);
-                    var srt = starBadgeObj.GetComponent<RectTransform>();
-                    srt.anchorMin = new Vector2(-0.25f, -0.45f);
-                    srt.anchorMax = new Vector2(1.25f, -0.05f);
-                    srt.offsetMin = Vector2.zero;
-                    srt.offsetMax = Vector2.zero;
                     starBadgeTxt = starBadgeObj.GetComponent<Text>();
                     starBadgeTxt.font = defaultFont;
                     starBadgeTxt.alignment = TextAnchor.MiddleCenter;
-                    starBadgeTxt.fontSize = 13;
                     starBadgeTxt.raycastTarget = false;
                     var sOutline = starBadgeObj.AddComponent<Outline>();
                     sOutline.effectColor = new Color(0.08f, 0.08f, 0.12f, 0.95f);
-                    sOutline.effectDistance = new Vector2(1.5f, -1.5f);
+                    sOutline.effectDistance = new Vector2(1.2f, -1.2f);
                 }
 
                 if (starBadgeTxt != null)
                 {
+                    var srt = starBadgeTxt.GetComponent<RectTransform>();
+                    if (srt != null)
+                    {
+                        // Posisi pas di atas 3 soket bintang di busur bawah lingkaran node
+                        srt.anchorMin = new Vector2(0.08f, 0.06f);
+                        srt.anchorMax = new Vector2(0.92f, 0.30f);
+                        srt.offsetMin = Vector2.zero;
+                        srt.offsetMax = Vector2.zero;
+                    }
+                    starBadgeTxt.fontSize = 14;
+
                     if (!isUnlocked)
                     {
                         starBadgeTxt.text = "";
@@ -442,14 +522,17 @@ namespace FantasyDefense.UI
                     }
                     else if (isCleared)
                     {
-                        string starsGlyph = (stars >= 3) ? "<color=#FFD700>★★★</color>" : ((stars == 2) ? "<color=#FFD700>★★</color><color=#555555>★</color>" : "<color=#FFD700>★</color><color=#555555>★★</color>");
-                        starBadgeTxt.text = starsGlyph;
+                        // 3 Soket bintang terisi emas berkilau
+                        string starsGlyph = (stars >= 3) ? "<color=#FFD700>★  ★  ★</color>" : 
+                                            ((stars == 2) ? "<color=#FFD700>★  ★</color>  <color=#444444>★</color>" : 
+                                             "<color=#FFD700>★</color>  <color=#444444>★  ★</color>");
+                        starBadgeTxt.text = $"<b>{starsGlyph}</b>";
                         starBadgeTxt.gameObject.SetActive(true);
                     }
                     else
                     {
-                        // Stage aktif (ada tulisan GO): Tetap tampilkan 3 bintang target di bawah tulisan GO!
-                        starBadgeTxt.text = "<color=#8899AA>☆☆☆</color>";
+                        // Stage aktif (ada tulisan GO): Tetap tampilkan 3 bintang target di soket bawah tulisan GO!
+                        starBadgeTxt.text = "<b><color=#778899>☆  ☆  ☆</color></b>";
                         starBadgeTxt.gameObject.SetActive(true);
                     }
                 }
