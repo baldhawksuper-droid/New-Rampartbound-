@@ -212,24 +212,26 @@ namespace FantasyDefense.Combat
             Vector3 dir = (targetWorldPos - anchorPos).normalized;
             if (dir == Vector3.zero) dir = Vector3.up;
 
-            Vector3 windupPos = anchorPos - dir * 0.08f;
+            Vector3 windupPos = anchorPos - dir * 0.06f;
             float effectiveLungeDist = (unitController != null && unitController.UnitType == UnitType.RabbitMage) ? 0.04f : attackLungeDistance;
             Vector3 lungePos = anchorPos + dir * effectiveLungeDist;
 
             Sprite defaultSprite = spriteRenderer != null ? spriteRenderer.sprite : null;
 
             // Orientasi serangan: Kemiringan hero condong halus ke arah lintasan tebasan monster
-            float attackTilt = Mathf.Clamp(-dir.x * 22f, -25f, 25f);
+            float attackTilt = Mathf.Clamp(-dir.x * 16f, -20f, 20f);
             Quaternion strikeRot = Quaternion.Euler(0f, 0f, attackTilt);
             Quaternion windupRot = Quaternion.Euler(0f, 0f, -attackTilt * 0.35f);
 
-            float totalDur = Mathf.Max(0.36f, attackDuration);
-            float tWindup = totalDur * 0.16f;
-            float tLunge = totalDur * 0.40f;
-            float tFollow = totalDur * 0.20f;
-            float tReturn = totalDur * 0.24f;
+            // Kalibrasi Timing Animasi Serangan 3-Sprite Kanonikal:
+            // Memberi jendela waktu tayang yang tegas dan jelas bagi mata pemain pada setiap frame sprite
+            float tWindup = 0.08f;      // Frame 0 (Combat Ready stance)
+            float tLunge = 0.12f;       // Gerakan maju menerjang
+            float tStrikeHold = 0.18f;  // Freeze-frame pada pose tebasan puncak (Strike)
+            float tFollow = 0.16f;      // Frame 2 (Follow-through / Recovery pose)
+            float tReturn = 0.10f;      // Kembali mulus ke tatakan plinth
 
-            // 1. Fase Windup / Tarikan Mundur (Mengumpulkan tenaga tebasan dengan squash halus)
+            // 1. Fase Windup / Tarikan Mundur (Mengumpulkan tenaga tebasan dengan squash sangat halus)
             if (attackFrames != null && attackFrames.Length > 0 && attackFrames[0] != null && spriteRenderer != null)
             {
                 spriteRenderer.sprite = attackFrames[0];
@@ -242,8 +244,8 @@ namespace FantasyDefense.Combat
                 float t = Mathf.Clamp01(elapsed / tWindup);
                 float ease = Mathf.SmoothStep(0f, 1f, t);
                 transform.position = Vector3.Lerp(anchorPos, windupPos, ease);
-                transform.localScale = new Vector3(baseScale.x * Mathf.Lerp(1.0f, 1.08f, ease),
-                                                   baseScale.y * Mathf.Lerp(1.0f, 0.92f, ease),
+                transform.localScale = new Vector3(baseScale.x * Mathf.Lerp(1.0f, 1.03f, ease),
+                                                   baseScale.y * Mathf.Lerp(1.0f, 0.97f, ease),
                                                    baseScale.z);
                 transform.localRotation = Quaternion.Slerp(Quaternion.identity, windupRot, ease);
                 yield return null;
@@ -303,14 +305,22 @@ namespace FantasyDefense.Combat
                 float t = Mathf.Clamp01(elapsed / tLunge);
                 float ease = 1f - Mathf.Pow(1f - t, 3f); // Cubic ease-out
                 transform.position = Vector3.Lerp(windupPos, lungePos, ease);
-                transform.localScale = new Vector3(baseScale.x * Mathf.Lerp(1.08f, 0.92f, ease),
-                                                   baseScale.y * Mathf.Lerp(0.92f, 1.15f, ease),
+                transform.localScale = new Vector3(baseScale.x * Mathf.Lerp(1.03f, 0.98f, ease),
+                                                   baseScale.y * Mathf.Lerp(0.97f, 1.04f, ease),
                                                    baseScale.z);
                 transform.localRotation = Quaternion.Slerp(windupRot, strikeRot, ease);
                 yield return null;
             }
 
-            // 3. Fase Follow-Through Apex (Menahan pose tebasan di puncak hantaman)
+            // 2b. Freeze-Frame Strike Hold (Tahan frame strike selama 0.18s agar pose serang terlihat jelas dan tajam oleh mata pemain)
+            elapsed = 0f;
+            while (elapsed < tStrikeHold)
+            {
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            // 3. Fase Follow-Through Apex (Menahan pose recovery / pelepasan tebasan)
             if (attackFrames != null && attackFrames.Length > 2 && attackFrames[2] != null && spriteRenderer != null)
             {
                 spriteRenderer.sprite = attackFrames[2];
@@ -326,7 +336,7 @@ namespace FantasyDefense.Combat
                 elapsed += Time.deltaTime;
                 float t = Mathf.Clamp01(elapsed / tFollow);
                 transform.position = Vector3.Lerp(lungePos, lungePos + dir * 0.02f, t);
-                transform.localScale = Vector3.Lerp(new Vector3(baseScale.x * 0.92f, baseScale.y * 1.15f, baseScale.z), baseScale, t);
+                transform.localScale = Vector3.Lerp(new Vector3(baseScale.x * 0.98f, baseScale.y * 1.04f, baseScale.z), baseScale, t);
                 yield return null;
             }
 
@@ -341,7 +351,7 @@ namespace FantasyDefense.Combat
                 float ease = Mathf.SmoothStep(0f, 1f, t);
                 transform.position = Vector3.Lerp(peakPos, anchorPos, ease);
 
-                float bounceSquash = Mathf.Sin(t * Mathf.PI) * 0.05f;
+                float bounceSquash = Mathf.Sin(t * Mathf.PI) * 0.03f;
                 transform.localScale = new Vector3(baseScale.x * (1f + bounceSquash),
                                                    baseScale.y * (1f - bounceSquash),
                                                    baseScale.z);

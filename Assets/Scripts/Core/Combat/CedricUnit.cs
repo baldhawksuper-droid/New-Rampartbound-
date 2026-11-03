@@ -101,7 +101,7 @@ namespace FantasyDefense.Combat
                 }
             }
 
-            yield return new WaitForSeconds(0.12f);
+            yield return new WaitForSeconds(0.28f);
 
             // Hit 2
             if (target != null && !target.IsDead)

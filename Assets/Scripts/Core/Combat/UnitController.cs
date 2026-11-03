@@ -886,7 +886,64 @@ namespace FantasyDefense.Combat
 
         private bool isPointerHeld = false;
         private Coroutine holdFocusRoutine;
+        private Coroutine holdFlashRoutine;
         private const float HOLD_FOCUS_DELAY = 5.0f; // Tahan diam ~5 detik sebelum memunculkan sorotan kembar sejenis
+
+        private GameObject holdProgressRingObj;
+        private LineRenderer holdProgressLine;
+
+        private void EnsureHoldProgressRing()
+        {
+            if (holdProgressRingObj != null) return;
+
+            holdProgressRingObj = new GameObject("HoldProgressRing");
+            holdProgressRingObj.transform.SetParent(transform, false);
+            holdProgressRingObj.transform.localPosition = new Vector3(0f, 0f, -0.05f);
+
+            holdProgressLine = holdProgressRingObj.AddComponent<LineRenderer>();
+            holdProgressLine.useWorldSpace = false;
+            holdProgressLine.loop = false;
+            holdProgressLine.startWidth = 0.055f;
+            holdProgressLine.endWidth = 0.055f;
+            var shader = Shader.Find("Sprites/Default");
+            if (shader != null)
+            {
+                holdProgressLine.material = new Material(shader);
+            }
+            holdProgressLine.startColor = new Color(1.0f, 0.84f, 0.25f, 0.95f);
+            holdProgressLine.endColor = new Color(1.0f, 0.95f, 0.45f, 0.95f);
+            holdProgressLine.sortingLayerName = spriteRenderer != null ? spriteRenderer.sortingLayerName : "Gem";
+            holdProgressLine.sortingOrder = 135;
+            holdProgressLine.positionCount = 0;
+            holdProgressRingObj.SetActive(false);
+        }
+
+        private void UpdateHoldProgressVisual(float progress)
+        {
+            EnsureHoldProgressRing();
+            if (holdProgressRingObj == null || holdProgressLine == null) return;
+
+            if (progress <= 0.001f)
+            {
+                holdProgressLine.positionCount = 0;
+                holdProgressRingObj.SetActive(false);
+                return;
+            }
+
+            holdProgressRingObj.SetActive(true);
+            int totalSegments = 48;
+            int segmentsToDraw = Mathf.Max(2, Mathf.CeilToInt(totalSegments * Mathf.Clamp01(progress)));
+            holdProgressLine.positionCount = segmentsToDraw;
+
+            float radius = 0.44f;
+            for (int i = 0; i < segmentsToDraw; i++)
+            {
+                float angle = (90f - (360f * (float)i / (totalSegments - 1))) * Mathf.Deg2Rad;
+                float x = Mathf.Cos(angle) * radius;
+                float y = Mathf.Sin(angle) * radius;
+                holdProgressLine.SetPosition(i, new Vector3(x, y, 0f));
+            }
+        }
 
         public void OnPointerDown(PointerEventData eventData)
         {
@@ -900,17 +957,34 @@ namespace FantasyDefense.Combat
                 {
                     StopCoroutine(holdFocusRoutine);
                 }
+                UpdateHoldProgressVisual(0f);
                 holdFocusRoutine = StartCoroutine(HoldFocusDetectionRoutine());
             }
         }
 
         private System.Collections.IEnumerator HoldFocusDetectionRoutine()
         {
-            // Tahan sentuhan selama beberapa saat (0.5 detik) sebelum memunculkan sorotan gem kembar
-            yield return new WaitForSeconds(HOLD_FOCUS_DELAY);
+            float elapsed = 0f;
+            while (elapsed < HOLD_FOCUS_DELAY)
+            {
+                if (!isPointerHeld || isDragging)
+                {
+                    UpdateHoldProgressVisual(0f);
+                    yield break;
+                }
 
+                elapsed += Time.deltaTime;
+                float progress = Mathf.Clamp01(elapsed / HOLD_FOCUS_DELAY);
+                UpdateHoldProgressVisual(progress);
+                yield return null;
+            }
+
+            // Durasi 5.0 detik penuh tercapai! Pemicu sorotan gem kembar & kilau emas cincin
             if (isPointerHeld && !isDragging)
             {
+                if (holdFlashRoutine != null) StopCoroutine(holdFlashRoutine);
+                holdFlashRoutine = StartCoroutine(HoldCompleteFlashRoutine());
+
                 HighlightMergeCandidates(true);
 
                 // Multi-sensory feedback: Chime resonansi kristal emas & haptik halus saat mode fokus aktif
@@ -923,7 +997,32 @@ namespace FantasyDefense.Combat
                     DevicePerformanceManager.Instance.TriggerHaptic(HapticFeedbackType.Light);
                 }
             }
+            else
+            {
+                UpdateHoldProgressVisual(0f);
+            }
             holdFocusRoutine = null;
+        }
+
+        private System.Collections.IEnumerator HoldCompleteFlashRoutine()
+        {
+            if (holdProgressLine != null)
+            {
+                holdProgressLine.startColor = Color.white;
+                holdProgressLine.endColor = new Color(1f, 1f, 0.8f, 1f);
+                holdProgressLine.startWidth = 0.085f;
+                holdProgressLine.endWidth = 0.085f;
+            }
+            yield return new WaitForSeconds(0.22f);
+            UpdateHoldProgressVisual(0f);
+            if (holdProgressLine != null)
+            {
+                holdProgressLine.startColor = new Color(1.0f, 0.84f, 0.25f, 0.95f);
+                holdProgressLine.endColor = new Color(1.0f, 0.95f, 0.45f, 0.95f);
+                holdProgressLine.startWidth = 0.055f;
+                holdProgressLine.endWidth = 0.055f;
+            }
+            holdFlashRoutine = null;
         }
 
         public void OnPointerUp(PointerEventData eventData)
@@ -933,6 +1032,7 @@ namespace FantasyDefense.Combat
                 StopCoroutine(holdFocusRoutine);
                 holdFocusRoutine = null;
             }
+            UpdateHoldProgressVisual(0f);
 
             // Ketika jari diangkat, matikan mode fokus jika tidak sedang menyeret (drag)
             if (isPointerHeld)
@@ -1017,6 +1117,7 @@ namespace FantasyDefense.Combat
                 StopCoroutine(holdFocusRoutine);
                 holdFocusRoutine = null;
             }
+            UpdateHoldProgressVisual(0f);
 
             // Jika grid sedang memproses pergeseran/fusi otomatis (Cascade Refill), tahan aksi seret
             if (GridMatch3Solver.Instance != null && GridMatch3Solver.Instance.IsResolving)
@@ -1806,6 +1907,11 @@ namespace FantasyDefense.Combat
             }
 
             target.TakeDamage(damage, isCrit);
+
+            if (visualAnimator == null)
+            {
+                visualAnimator = GetComponent<HeroVisualAnimator>();
+            }
 
             if (visualAnimator != null)
             {

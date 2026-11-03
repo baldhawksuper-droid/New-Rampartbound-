@@ -133,8 +133,8 @@ namespace FantasyDefense.UI
                 var rt = rabbitCardButton.GetComponent<RectTransform>();
                 if (rt != null)
                 {
-                    rt.anchorMin = new Vector2(0.02f, 0.03f);
-                    rt.anchorMax = new Vector2(0.26f, 0.88f);
+                    rt.anchorMin = new Vector2(0.02f, 0.04f);
+                    rt.anchorMax = new Vector2(0.25f, 0.72f);
                     rt.offsetMin = Vector2.zero;
                     rt.offsetMax = Vector2.zero;
                 }
@@ -144,8 +144,8 @@ namespace FantasyDefense.UI
                 var rt = cedricCardButton.GetComponent<RectTransform>();
                 if (rt != null)
                 {
-                    rt.anchorMin = new Vector2(0.26f, 0.03f);
-                    rt.anchorMax = new Vector2(0.50f, 0.88f);
+                    rt.anchorMin = new Vector2(0.26f, 0.04f);
+                    rt.anchorMax = new Vector2(0.49f, 0.72f);
                     rt.offsetMin = Vector2.zero;
                     rt.offsetMax = Vector2.zero;
                 }
@@ -155,8 +155,8 @@ namespace FantasyDefense.UI
                 var rt = roseCardButton.GetComponent<RectTransform>();
                 if (rt != null)
                 {
-                    rt.anchorMin = new Vector2(0.50f, 0.03f);
-                    rt.anchorMax = new Vector2(0.74f, 0.88f);
+                    rt.anchorMin = new Vector2(0.51f, 0.04f);
+                    rt.anchorMax = new Vector2(0.74f, 0.72f);
                     rt.offsetMin = Vector2.zero;
                     rt.offsetMax = Vector2.zero;
                 }
@@ -167,8 +167,8 @@ namespace FantasyDefense.UI
                 var rt = windRangerCardButton.GetComponent<RectTransform>();
                 if (rt != null)
                 {
-                    rt.anchorMin = new Vector2(0.74f, 0.03f);
-                    rt.anchorMax = new Vector2(0.98f, 0.88f);
+                    rt.anchorMin = new Vector2(0.75f, 0.04f);
+                    rt.anchorMax = new Vector2(0.98f, 0.72f);
                     rt.offsetMin = Vector2.zero;
                     rt.offsetMax = Vector2.zero;
                 }
@@ -679,12 +679,28 @@ namespace FantasyDefense.UI
                 var img = btn.transform.Find("HeroPortrait")?.GetComponent<Image>();
                 if (img != null)
                 {
-                    img.color = isLocked ? new Color(0.18f, 0.22f, 0.32f, 0.85f) : Color.white;
-                    int heroTier = profile != null ? Mathf.Clamp(profile.starRank, 1, 5) : 1;
-                    Sprite heroSprite = GetHeroSpriteForType(type, heroTier);
-                    if (heroSprite != null)
+                    if (isLocked)
                     {
-                        img.sprite = heroSprite;
+                        var lockedSprite = Resources.Load<Sprite>("Sprites/UI/UI_Hero_Locked_Silhouette");
+                        if (lockedSprite != null)
+                        {
+                            img.sprite = lockedSprite;
+                            img.color = Color.white;
+                        }
+                        else
+                        {
+                            img.color = new Color(0.35f, 0.38f, 0.45f, 0.90f);
+                        }
+                    }
+                    else
+                    {
+                        img.color = Color.white;
+                        int heroTier = profile != null ? Mathf.Clamp(profile.starRank, 1, 5) : 1;
+                        Sprite heroSprite = GetHeroSpriteForType(type, heroTier);
+                        if (heroSprite != null)
+                        {
+                            img.sprite = heroSprite;
+                        }
                     }
                 }
 

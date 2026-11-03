@@ -724,26 +724,26 @@ namespace Rampartbound.Editor
             var heroesContainer = CreatePanel(lobbyPanelObj.transform, "HeroCourtyardAssembly", new Color(0f, 0f, 0f, 0f));
             PositionUI(heroesContainer, 0.02f, 0.220f, 0.98f, 0.835f);
 
-            // Formasi 4 Slot Pahlawan Teras Batu (Pippin, Cedric, Rose, & Wind Ranger Terkunci)
+            // Formasi 4 Slot Pahlawan Teras Batu (Pippin, Cedric, Rose, & Hero Terkunci)
             // Pippin (Slot 1, Kiri): Lv.12, CP 1,600
             var rabbitCard = CreateButton(heroesContainer.transform, "RabbitCard", "<b><color=#00FFFF>•</color> Lv.12 | CP 1,600</b>", new Color(0f, 0f, 0f, 0f), Color.white, 13, defaultFont);
-            PositionUI(rabbitCard, 0.02f, 0.03f, 0.26f, 0.88f);
+            PositionUI(rabbitCard, 0.02f, 0.04f, 0.25f, 0.72f);
             SetupHeroCardPortrait(rabbitCard, _heroRabbitSprite, "Pippin");
 
             // Cedric (Slot 2, Tengah-Kiri): Cedric, Lv.15, CP 1,850
             var cedricCard = CreateButton(heroesContainer.transform, "CedricCard", "<b>Cedric</b>\n<color=#00FFFF>•</color> Lv.15 | CP 1,850", new Color(0f, 0f, 0f, 0f), Color.white, 13, defaultFont);
-            PositionUI(cedricCard, 0.26f, 0.03f, 0.50f, 0.88f);
+            PositionUI(cedricCard, 0.26f, 0.04f, 0.49f, 0.72f);
             SetupHeroCardPortrait(cedricCard, _heroCedricSprite, "Cedric");
 
             // Rose (Slot 3, Tengah-Kanan): Lv.14, CP 1,400 (Chibi Palu Emas Raksasa)
             var roseCard = CreateButton(heroesContainer.transform, "RoseCard", "<b><color=#00FFFF>•</color> Lv.14 | CP 1,400</b>", new Color(0f, 0f, 0f, 0f), Color.white, 13, defaultFont);
-            PositionUI(roseCard, 0.50f, 0.03f, 0.74f, 0.88f);
+            PositionUI(roseCard, 0.51f, 0.04f, 0.74f, 0.72f);
             SetupHeroCardPortrait(roseCard, _heroRoseSprite, "Rose");
 
-            // Slot Ke-4: Wind Ranger (Status Terkunci - Akun Baru)
+            // Slot Ke-4: Hero Terkunci (Siluet Abu-abu Netral Mannequin - Akun Baru)
             var windCard = CreateButton(heroesContainer.transform, "WindCard", "<b><color=#FFAA00>🔒 TERKUNCI</color></b>", new Color(0f, 0f, 0f, 0f), new Color(1f, 0.88f, 0.35f), 13, defaultFont);
-            PositionUI(windCard, 0.74f, 0.03f, 0.98f, 0.88f);
-            SetupHeroCardPortrait(windCard, _heroWindSprite, "Terkunci");
+            PositionUI(windCard, 0.75f, 0.04f, 0.98f, 0.72f);
+            SetupHeroCardPortrait(windCard, _heroLockedSilhouette != null ? _heroLockedSilhouette : _heroWindSprite, "Terkunci");
             windCard.SetActive(true);
 
             // Core Battle Button (Crimson 3D Gold Frame with studs)
@@ -2955,6 +2955,7 @@ namespace Rampartbound.Editor
         private static Sprite _heroRoseSprite;
         private static Sprite _heroRabbitSprite;
         private static Sprite _heroWindSprite;
+        private static Sprite _heroLockedSilhouette;
         private static Sprite _bannerTacticalPhase;
         private static Sprite _iconTacticalMove;
         private static Sprite _btnBattleCrimson;
@@ -3020,6 +3021,7 @@ namespace Rampartbound.Editor
             if (_heroRoseSprite == null) _heroRoseSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Heroes/Rose_T1.png");
             if (_heroRabbitSprite == null) _heroRabbitSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Heroes/RabbitMage_T1.png");
             if (_heroWindSprite == null) _heroWindSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Heroes/WindRanger_T1.png");
+            if (_heroLockedSilhouette == null) _heroLockedSilhouette = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Hero_Locked_Silhouette.png");
             if (_btnBattleCrimson == null) _btnBattleCrimson = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Btn_Battle_Crimson.png");
             if (_bannerTeamCP == null) _bannerTeamCP = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Banner_Team_CP.png");
             if (_badgeHeroPill == null) _badgeHeroPill = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Badge_Hero_Pill.png");
