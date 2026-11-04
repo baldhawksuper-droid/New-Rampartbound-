@@ -149,9 +149,19 @@ namespace FantasyDefense.Wave
                     int currentBatch = Mathf.Min(squadSize, group.count - spawnedInGroup);
                     for (int b = 0; b < currentBatch; b++)
                     {
-                        // Sebar ke 3 lajur horizontal (-0.75m, 0m, +0.75m)
-                        int lane = ((monsterCounter + b) % 3) - 1;
-                        float laneOffset = (lane * 0.75f) + UnityEngine.Random.Range(-0.08f, 0.08f);
+                        // Sebar dinamis ke 5 variasi lajur horizontal: tengah (0m), sayap dalam (±0.65m), dan pinggir (±1.35m)
+                        // Monster tidak selalu muncul di tengah, tetapi bervariasi secara taktis ke sisi pinggir arena
+                        int lanePattern = (monsterCounter + b) % 5;
+                        float laneOffset = lanePattern switch
+                        {
+                            0 => 0f,                                  // Tengah
+                            1 => -0.65f,                              // Sayap Kiri Dalam
+                            2 => 0.65f,                               // Sayap Kanan Dalam
+                            3 => -1.35f,                              // Pinggir Kiri
+                            4 => 1.35f,                               // Pinggir Kanan
+                            _ => 0f
+                        };
+                        laneOffset += UnityEngine.Random.Range(-0.10f, 0.10f);
 
                         SpawnMonster(group.monsterData, waypoints, EliteAffixType.None, laneOffset);
                         if (currentBatch > 1) yield return new WaitForSeconds(0.18f); // Jeda stagger sangat singkat antar anggota skuad

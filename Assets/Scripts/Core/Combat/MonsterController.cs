@@ -259,9 +259,58 @@ namespace FantasyDefense.Combat
                 transform.position = waypoints[0] + new Vector3(laneOffset, 0f, 0f);
             }
 
+            // Animasi kemunculan elastis (Spawn Entrance): fade-in transparan dan scale-pop halus
+            // agar monster tidak muncul mendadak secara tiba-tiba
+            StartCoroutine(SpawnEntranceRoutine(baseScale));
+
+            // Efek visual partikel kepulan debu/energi di titik kemunculan monster
+            if (SkillVfxManager.Instance != null && data != null)
+            {
+                SkillVfxManager.Instance.SpawnMonsterEntranceVfx(transform.position, data.monsterType, data.themeColor);
+            }
+
             UpdateSortingOrder();
 
             OnMonsterSpawned?.Invoke(this);
+        }
+
+        /// <summary>
+        /// Animasi kemunculan halus (Smooth Entrance Routine):
+        /// Memulai dengan skala 0.3x dan alpha 0, lalu bertransisi secara elastis ke skala penuh dalam 0.28s.
+        /// </summary>
+        private System.Collections.IEnumerator SpawnEntranceRoutine(Vector3 targetScale)
+        {
+            float duration = 0.28f;
+            float elapsed = 0f;
+            Color baseCol = spriteRenderer != null ? spriteRenderer.color : Color.white;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float progress = Mathf.Clamp01(elapsed / duration);
+
+                // Kurva elastis pop-in (Ease-Out Back)
+                float c1 = 1.70158f;
+                float c3 = c1 + 1f;
+                float pMinusOne = progress - 1f;
+                float easeBack = 1f + c3 * pMinusOne * pMinusOne * pMinusOne + c1 * pMinusOne * pMinusOne;
+                float currentScaleMultiplier = Mathf.Lerp(0.35f, 1.0f, Mathf.Clamp01(easeBack));
+
+                transform.localScale = targetScale * currentScaleMultiplier;
+
+                if (spriteRenderer != null)
+                {
+                    spriteRenderer.color = new Color(baseCol.r, baseCol.g, baseCol.b, baseCol.a * progress);
+                }
+
+                yield return null;
+            }
+
+            transform.localScale = targetScale;
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.color = baseCol;
+            }
         }
 
         public virtual void Initialize(MonsterDataSO data, Vector3[] pathWaypoints)
@@ -742,7 +791,14 @@ namespace FantasyDefense.Combat
             float finalDamage = defenseDebuff > 0f ? damage * (1f + defenseDebuff) : damage;
 
             currentHealth -= finalDamage;
-            StartCoroutine(FlashDamageColor(isCrit ? Color.yellow : Color.red));
+            // Rekomendasi 2: Hit Impact Sparks & Flash White pada monster saat menerima damage
+            StartCoroutine(FlashDamageColor(isCrit ? new Color(1f, 0.95f, 0.4f) : Color.white));
+            if (SkillVfxManager.Instance != null)
+            {
+                Color sparkA = isCrit ? new Color(1f, 0.85f, 0.2f) : new Color(1f, 0.45f, 0.2f);
+                Color sparkB = Color.white;
+                SkillVfxManager.Instance.SpawnProceduralParticleBurst(transform.position, sparkA, sparkB, isCrit ? 8 : 4, isCrit ? 2.2f : 1.5f, sortingOrder: 60);
+            }
 
             UpdateMiniHpBar();
 

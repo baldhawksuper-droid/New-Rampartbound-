@@ -97,22 +97,24 @@ namespace FantasyDefense.Wave
                 barricadeY = centerY - halfH + bottomBarricadeOffsetY;
             }
 
-            // Hitung posisi spawn di puncak layar (Top Edge of Screen) agar monster senantiasa berbaris
-            // masuk dari atas ke bawah (Top to Bottom March) melintasi arena tanpa pernah muncul tiba-tiba di tengah layar
-            float topScreenY = 6.8f;
+            // Hitung posisi spawn masuk dari atas layar (Top Edge of Screen):
+            // Tidak boleh terlalu jauh di atas layar (agar tidak memakan waktu berbaris terlalu lama),
+            // dan tidak boleh muncul mendadak di tengah arena.
+            // Posisi spawn ideal: tepat di batas atas tampilan kamera (~orthographicSize + 0.15f)
+            float topScreenY = 4.8f;
             Camera mainCam = Camera.main;
             if (mainCam != null && mainCam.orthographic)
             {
-                topScreenY = mainCam.transform.position.y + mainCam.orthographicSize + 0.6f;
+                topScreenY = mainCam.transform.position.y + mainCam.orthographicSize + 0.15f;
             }
 
-            float upperPathY = Mathf.Max(3.8f, centerY + halfH + 0.8f);
-            float midMarchY = Mathf.Max(1.8f, centerY + halfH * 0.35f);
+            float upperPathY = Mathf.Max(3.2f, centerY + halfH + 0.5f);
+            float midMarchY = Mathf.Max(1.4f, centerY + halfH * 0.25f);
 
             cachedWaypoints = new Vector3[]
             {
-                new Vector3(0f, topScreenY, 0f),       // 0: Titik Kemunculan Puncak (Off-Screen Top Spawn Gate)
-                new Vector3(0f, topScreenY - 1.6f, 0f), // 1: Gerbang Masuk Medan Tempur Atas
+                new Vector3(0f, topScreenY, 0f),       // 0: Titik Kemunculan Puncak Layar (Top Spawn Gate)
+                new Vector3(0f, topScreenY - 0.9f, 0f), // 1: Gerbang Masuk Medan Tempur Atas
                 new Vector3(0f, upperPathY, 0f),       // 2: Jalan Batu Atas Mendekati Garis Pertahanan
                 new Vector3(0f, midMarchY, 0f),        // 3: Jalur Serbuan Garis Depan
                 new Vector3(0f, barricadeY, 0f)        // 4: Garis Pertahanan Benteng (Castle Barricade Gate)

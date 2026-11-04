@@ -25,6 +25,9 @@ namespace FantasyDefense.Combat
         private bool isBallista = false;
         private Vector3 lastTargetPos;
 
+        private Vector3 startPos;
+        private float totalDistance;
+
         public void Initialize(
             MonsterController targetMonster,
             float damageAmount,
@@ -48,6 +51,7 @@ namespace FantasyDefense.Combat
             isArrow = arrow;
             isCannon = cannon;
             isBallista = ballista;
+            startPos = transform.position;
 
             if (speedOverride > 0f)
             {
@@ -66,6 +70,8 @@ namespace FantasyDefense.Combat
 
             if (target != null)
                 lastTargetPos = target.transform.position;
+
+            totalDistance = Vector3.Distance(startPos, lastTargetPos);
 
             // Orientasi proyektil seketika pada frame inisialisasi agar sprite langsung menghadap target sejak frame 0
             Vector3 initDir = (lastTargetPos - transform.position).normalized;
@@ -87,9 +93,22 @@ namespace FantasyDefense.Combat
 
             Vector3 direction = (lastTargetPos - transform.position).normalized;
 
-            // Rotasi proyektil menghadap arah terbang diperbarui sebelum pergeseran posisi
-            if (direction != Vector3.zero)
+            // Rekomendasi 1: Balistik dinamis dengan elevasi busur halus (Subtle Ballistic Arc) untuk panah Wind Ranger & mortir meriam
+            if (isArrow || isCannon)
             {
+                float currentDist = Vector3.Distance(startPos, transform.position);
+                float progress = totalDistance > 0.01f ? Mathf.Clamp01(currentDist / totalDistance) : 0f;
+                // Sudut deviasi elevasi (naik sedikit di awal, melengkung turun mendekati target)
+                float arcAngleOffset = Mathf.Sin(progress * Mathf.PI) * (isCannon ? 18f : 8f) * (direction.x >= 0 ? 1f : -1f);
+                if (direction != Vector3.zero)
+                {
+                    float angle = (Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg) + arcAngleOffset;
+                    transform.rotation = Quaternion.Euler(0, 0, angle);
+                }
+            }
+            else if (direction != Vector3.zero)
+            {
+                // Rotasi proyektil lurus presisi untuk balista & sihir astral
                 float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
                 transform.rotation = Quaternion.Euler(0, 0, angle);
             }

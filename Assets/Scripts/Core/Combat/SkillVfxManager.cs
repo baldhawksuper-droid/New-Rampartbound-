@@ -947,6 +947,36 @@ namespace FantasyDefense.Combat
         }
 
         /// <summary>
+        /// Efek visual kedatangan monster saat spawn di puncak arena.
+        /// Menampilkan letupan kepulan asap/debu mistis, kilau portal mini, dan animasi fade-in elastis agar monster tidak muncul mendadak.
+        /// </summary>
+        public void SpawnMonsterEntranceVfx(Vector3 spawnPos, MonsterType monsterType, Color themeColor)
+        {
+            if (!enableParticleEffects) return;
+
+            // 1. Warna pendaran kedatangan monster sesuai tema/tipe
+            Color coreColor = monsterType switch
+            {
+                MonsterType.Boss => new Color(1f, 0.25f, 0.25f),
+                MonsterType.Brute => new Color(1f, 0.65f, 0.15f),
+                _ => themeColor != default ? themeColor : new Color(0.45f, 0.35f, 0.75f)
+            };
+            Color smokeColor = new Color(coreColor.r * 0.7f, coreColor.g * 0.7f, coreColor.b * 0.7f, 0.75f);
+
+            // 2. Hamburan partikel kepulan debu/energi di titik spawn
+            int count = monsterType == MonsterType.Boss ? 16 : (monsterType == MonsterType.Brute ? 10 : 6);
+            float burstSpeed = monsterType == MonsterType.Boss ? 2.2f : 1.4f;
+            SpawnProceduralParticleBurst(spawnPos, coreColor, smokeColor, count, burstSpeed, sortingOrder: 30);
+
+            // 3. Cincin gelombang kejut kecil (Shockwave Ring) di bawah kaki kemunculan monster
+            if (enableShockwaves)
+            {
+                float ringRadius = monsterType == MonsterType.Boss ? 0.95f : 0.55f;
+                StartCoroutine(SpawnShockwaveRingRoutine(spawnPos, ringRadius, coreColor));
+            }
+        }
+
+        /// <summary>
         /// Menampilkan letupan angin partikel zamrud saat panah Wind Ranger menembus musuh.
         /// </summary>
         public void SpawnArrowImpactVfx(Vector3 impactPos, bool isCrit)
