@@ -183,6 +183,12 @@ namespace FantasyDefense.UI
             {
                 AudioManager.Instance.PlaySound(SoundType.ButtonClick);
             }
+
+            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+            {
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Selection);
+            }
         }
 
         public void SetSelectedItem(EquipmentItem item, UnitType? owner = null)
@@ -357,6 +363,19 @@ namespace FantasyDefense.UI
         private void OnActionButtonClicked()
         {
             if (RelicForgeManager.Instance == null || selectedItem == null) return;
+
+            if (AudioManager.Instance != null)
+            {
+                // SFX denting palu pandai besi tempaan logam taktil
+                AudioManager.Instance.PlaySound(SoundType.GoblinBucklerClank, 1.25f);
+                AudioManager.Instance.PlaySound(SoundType.ButtonClick, 1.05f);
+            }
+
+            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+            {
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Medium);
+            }
 
             switch (currentTab)
             {

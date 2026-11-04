@@ -1579,6 +1579,12 @@ namespace FantasyDefense.UI
                 AudioManager.Instance.PlaySound(SoundType.ButtonClick);
             }
 
+            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+            {
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Light);
+            }
+
             if (GameFlowManager.Instance != null)
             {
                 GameFlowManager.Instance.OpenPanel(GamePanelType.HeroUpgrade);
@@ -1594,7 +1600,15 @@ namespace FantasyDefense.UI
         {
             if (AudioManager.Instance != null)
             {
-                AudioManager.Instance.PlaySound(SoundType.ButtonClick);
+                // SFX denting pedang bersilang taktil khas paladin citadel & button click
+                AudioManager.Instance.PlaySound(SoundType.DualSlash, 1.25f);
+                AudioManager.Instance.PlaySound(SoundType.ButtonClick, 1.05f);
+            }
+
+            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+            {
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Heavy);
             }
 
             if (CitadelLobbyManager.Instance != null && !CitadelLobbyManager.Instance.CanStartBattle())
@@ -1636,6 +1650,8 @@ namespace FantasyDefense.UI
                     GamePanelType.RelicForge => FantasyDefense.Audio.SoundType.GoblinBucklerClank, // Logam & tempaan pandai besi
                     GamePanelType.HeroUpgrade => FantasyDefense.Audio.SoundType.ButtonClick, // Ksatria & zirah taktil
                     GamePanelType.Store => FantasyDefense.Audio.SoundType.TileSlideSwish, // Gesekan kulit tas petualang
+                    GamePanelType.SummonHall => FantasyDefense.Audio.SoundType.SummonCard, // Kristal & resonansi altar magis
+                    GamePanelType.StageMap => FantasyDefense.Audio.SoundType.DualSlash, // Denting pedang ekspedisi
                     _ => FantasyDefense.Audio.SoundType.ButtonClick
                 };
                 FantasyDefense.Audio.AudioManager.Instance.PlaySound(sfx, 1.10f);

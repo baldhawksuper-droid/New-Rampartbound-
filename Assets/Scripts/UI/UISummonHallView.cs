@@ -255,6 +255,12 @@ namespace FantasyDefense.UI
                 AudioManager.Instance.PlaySound(SoundType.ButtonClick);
             }
 
+            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+            {
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Selection);
+            }
+
             UpdateStarPromotionDisplay();
         }
 
@@ -410,6 +416,17 @@ namespace FantasyDefense.UI
 
         private void OnSingleSummonClicked()
         {
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySound(SoundType.ButtonClick);
+            }
+
+            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+            {
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Medium);
+            }
+
             if (CitadelSummonManager.Instance != null)
             {
                 CitadelSummonManager.Instance.TrySingleSummon(out _);
@@ -418,6 +435,17 @@ namespace FantasyDefense.UI
 
         private void OnMultiSummonClicked()
         {
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySound(SoundType.ButtonClick);
+            }
+
+            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+            {
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Heavy);
+            }
+
             if (CitadelSummonManager.Instance != null)
             {
                 CitadelSummonManager.Instance.TryMultiSummon(out _);
@@ -430,6 +458,21 @@ namespace FantasyDefense.UI
             {
                 bool success = CitadelLobbyManager.Instance.TryPromoteHeroStar(currentSelectedHero, out string msg);
                 Debug.Log($"[UISummonHallView] {msg}");
+
+                if (success)
+                {
+                    if (AudioManager.Instance != null)
+                    {
+                        AudioManager.Instance.PlaySound(SoundType.HeroUpgrade);
+                    }
+
+                    if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
+                        FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+                    {
+                        FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Success);
+                    }
+                }
+
                 UpdateStarPromotionDisplay();
             }
         }

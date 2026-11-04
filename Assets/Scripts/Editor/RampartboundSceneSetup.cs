@@ -2010,6 +2010,22 @@ namespace Rampartbound.Editor
             banOutline.effectColor = new Color(0.85f, 0.72f, 0.28f, 0.85f);
             banOutline.effectDistance = new Vector2(2f, -2f);
 
+            // Ornamen Tactile Sudut Emas Altar Gacha
+            if (_decorGoldDiamond != null)
+            {
+                var sTl = CreatePanel(bannerPanel.transform, "GachaStudTL", Color.white);
+                PositionUI(sTl, 0.01f, 0.93f, 0.06f, 0.99f);
+                var imgTl = sTl.GetComponent<Image>();
+                imgTl.sprite = _decorGoldDiamond;
+                imgTl.raycastTarget = false;
+
+                var sTr = CreatePanel(bannerPanel.transform, "GachaStudTR", Color.white);
+                PositionUI(sTr, 0.94f, 0.93f, 0.99f, 0.99f);
+                var imgTr = sTr.GetComponent<Image>();
+                imgTr.sprite = _decorGoldDiamond;
+                imgTr.raycastTarget = false;
+            }
+
             var banTitle = CreateText(bannerPanel.transform, "BannerTitle", "PEMANGGILAN KHUSUS PAHLAWAN", 26, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(1f, 0.92f, 0.45f), defaultFont);
             PositionUI(banTitle.gameObject, 0.05f, 0.82f, 0.65f, 0.94f);
             var banSub = CreateText(bannerPanel.transform, "BannerSubtitle", "Rate-Up 50%: Wind Ranger (Pemanah Angin)", 20, FontStyle.Normal, TextAnchor.MiddleLeft, new Color(0.6f, 1f, 0.85f), defaultFont);
@@ -2332,6 +2348,22 @@ namespace Rampartbound.Editor
                 fipImg.color = Color.white;
             }
             PositionUI(fItemPanel, 0.04f, 0.26f, 0.96f, 0.74f);
+
+            // Ornamen Tactile Sudut Emas Wadah Pandai Besi
+            if (_decorGoldDiamond != null)
+            {
+                var fTl = CreatePanel(fItemPanel.transform, "ForgeStudTL", Color.white);
+                PositionUI(fTl, 0.01f, 0.93f, 0.06f, 0.99f);
+                var imgTl = fTl.GetComponent<Image>();
+                imgTl.sprite = _decorGoldDiamond;
+                imgTl.raycastTarget = false;
+
+                var fTr = CreatePanel(fItemPanel.transform, "ForgeStudTR", Color.white);
+                PositionUI(fTr, 0.94f, 0.93f, 0.99f, 0.99f);
+                var imgTr = fTr.GetComponent<Image>();
+                imgTr.sprite = _decorGoldDiamond;
+                imgTr.raycastTarget = false;
+            }
 
             // Wadah slot item landasan tempa semi-3D
             var fSlotBg = CreatePanel(fItemPanel.transform, "ForgeAnvilSlotBg", Color.white);
