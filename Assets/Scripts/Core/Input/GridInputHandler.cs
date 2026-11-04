@@ -25,7 +25,7 @@ namespace FantasyDefense.GridSystem
         [SerializeField] private float swipeThresholdRatio = 0.3f;
 
         [Tooltip("Durasi animasi pertukaran posisi (tween swap) dalam detik")]
-        [SerializeField] private float swapDuration = 0.15f;
+        [SerializeField] private float swapDuration = 0.12f;
 
         [Tooltip("Jika aktif, swap yang tidak menghasilkan match akan diputar balik (revert swap)")]
         [SerializeField] private bool requireMatchToSwap = true;
@@ -375,7 +375,7 @@ namespace FantasyDefense.GridSystem
                     // Umpan balik audio & getaran haptik peringatan (Invalid Move Feedback)
                     if (AudioManager.Instance != null)
                     {
-                        AudioManager.Instance.PlaySound(SoundType.ButtonClick, 0.65f);
+                        AudioManager.Instance.PlaySound(SoundType.TileReboundThud, 0.75f);
                     }
 
                     if (DevicePerformanceManager.Instance != null && DevicePerformanceManager.Instance.IsHapticsEnabled)
@@ -402,8 +402,16 @@ namespace FantasyDefense.GridSystem
                         yield return null;
                     }
 
-                    if (unitA != null) unitA.transform.position = posA;
-                    if (unitB != null) unitB.transform.position = posB;
+                    if (unitA != null)
+                    {
+                        unitA.transform.position = posA;
+                        unitA.UpdateDepthSorting();
+                    }
+                    if (unitB != null)
+                    {
+                        unitB.transform.position = posB;
+                        unitB.UpdateDepthSorting();
+                    }
 
                     cellA.SetOccupantInternal(unitA);
                     cellB.SetOccupantInternal(unitB);
@@ -423,10 +431,12 @@ namespace FantasyDefense.GridSystem
                 if (unitB != null)
                 {
                     cellA.SetOccupant(unitB);
+                    unitB.UpdateDepthSorting();
                 }
                 if (unitA != null)
                 {
                     cellB.SetOccupant(unitA);
+                    unitA.UpdateDepthSorting();
                 }
 
                 // Kurangi sisa langkah HANYA setelah swap sah
@@ -439,7 +449,7 @@ namespace FantasyDefense.GridSystem
                 // Audio & Haptic Feedback Swap Sukses
                 if (AudioManager.Instance != null)
                 {
-                    AudioManager.Instance.PlaySound(SoundType.ButtonClick, 1.15f);
+                    AudioManager.Instance.PlaySound(SoundType.TileSlideSwish, 0.85f);
                 }
 
                 if (DevicePerformanceManager.Instance != null && DevicePerformanceManager.Instance.IsHapticsEnabled)

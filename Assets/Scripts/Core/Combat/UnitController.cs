@@ -220,6 +220,8 @@ namespace FantasyDefense.Combat
                 DraggedUnit = null;
             }
 
+            DestroyOriginGhostSilhouette();
+
             if (twinFramePulseRoutine != null)
             {
                 StopCoroutine(twinFramePulseRoutine);
@@ -877,6 +879,36 @@ namespace FantasyDefense.Combat
 
         public static UnitController CurrentlySelectedUnit { get; private set; }
 
+        private GameObject ghostOriginObj;
+        private SpriteRenderer ghostOriginSr;
+
+        private void CreateOriginGhostSilhouette()
+        {
+            if (currentCell == null || spriteRenderer == null || spriteRenderer.sprite == null) return;
+            DestroyOriginGhostSilhouette();
+
+            ghostOriginObj = new GameObject("OriginGhostSilhouette");
+            ghostOriginObj.transform.position = currentCell.transform.position;
+            // Kembalikan skala basis visual tanpa pengali drag 1.18x
+            ghostOriginObj.transform.localScale = transform.localScale / 1.18f;
+
+            ghostOriginSr = ghostOriginObj.AddComponent<SpriteRenderer>();
+            ghostOriginSr.sprite = spriteRenderer.sprite;
+            // Siluet transparan lembut di petak asal agar pemain tahu ke mana permata akan kembali
+            ghostOriginSr.color = new Color(1f, 1f, 1f, 0.38f);
+            ghostOriginSr.sortingOrder = normalSortingOrder;
+        }
+
+        private void DestroyOriginGhostSilhouette()
+        {
+            if (ghostOriginObj != null)
+            {
+                Destroy(ghostOriginObj);
+                ghostOriginObj = null;
+                ghostOriginSr = null;
+            }
+        }
+
         public static void DeselectCurrentUnit()
         {
             if (CurrentlySelectedUnit != null)
@@ -1161,6 +1193,9 @@ namespace FantasyDefense.Combat
             // Visual feedback: Token terangkat sedikit membesar saat disentuh/diseret
             transform.localScale = transform.localScale * 1.18f;
 
+            // Tampilkan siluet ghost di petak asal agar pemain mengetahui titik kembali permata
+            CreateOriginGhostSilhouette();
+
             // Jangan nyalakan highlight kembar saat geser biasa (hanya aktif jika ditahan ~5 detik)
             HighlightMergeCandidates(false);
 
@@ -1306,6 +1341,10 @@ namespace FantasyDefense.Combat
 
             // Jika dilepas di luar grid atau di petak asal, kembalikan secara halus
             SnapBack();
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySound(SoundType.TileReboundThud, 0.70f);
+            }
         }
 
         public virtual void HandleDropOnCell(TileCell targetCell)
@@ -1349,7 +1388,7 @@ namespace FantasyDefense.Combat
 
                             if (AudioManager.Instance != null)
                             {
-                                AudioManager.Instance.PlaySound(SoundType.ButtonClick, 0.65f);
+                                AudioManager.Instance.PlaySound(SoundType.TileReboundThud, 0.75f);
                             }
 
                             if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
@@ -1364,8 +1403,13 @@ namespace FantasyDefense.Combat
                         }
 
                         // GERAKAN SAH (Membentuk Match-3):
+                        DestroyOriginGhostSilhouette();
                         ExecuteSwapWith(otherUnit);
                         GameManager.Instance.TryConsumeMove();
+                        if (AudioManager.Instance != null)
+                        {
+                            AudioManager.Instance.PlaySound(SoundType.TileSlideSwish, 0.85f);
+                        }
                         return;
                     }
                     else
@@ -1374,7 +1418,7 @@ namespace FantasyDefense.Combat
                         SnapBack();
                         if (AudioManager.Instance != null)
                         {
-                            AudioManager.Instance.PlaySound(SoundType.ButtonClick, 0.65f);
+                            AudioManager.Instance.PlaySound(SoundType.TileReboundThud, 0.75f);
                         }
                         return;
                     }
@@ -1706,14 +1750,15 @@ namespace FantasyDefense.Combat
         /// </summary>
         public void SnapBack()
         {
+            DestroyOriginGhostSilhouette();
             if (currentCell != null)
             {
                 transform.SetParent(currentCell.transform, true);
-                SmoothSnapTo(currentCell.transform.position, 0.14f);
+                SmoothSnapTo(currentCell.transform.position, 0.11f);
             }
             else
             {
-                SmoothSnapTo(initialPosition, 0.14f);
+                SmoothSnapTo(initialPosition, 0.11f);
             }
             UpdateVisualAppearance();
             UpdateDepthSorting();

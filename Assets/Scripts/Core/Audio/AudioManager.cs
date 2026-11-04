@@ -55,7 +55,8 @@ namespace FantasyDefense.Audio
         FrostWyrmBlizzard,
         PermafrostCrystalShatter,
         TwinFocusChime,
-        CriticalHitChime
+        CriticalHitChime,
+        TileReboundThud
     }
 
     public enum AudioSfxType
@@ -711,6 +712,9 @@ namespace FantasyDefense.Audio
 
             // Audio Khusus Critical Hit Chime (Resonansi Logam Emas Tajam Berkekuatan Tinggi)
             proceduralClipCache[SoundType.CriticalHitChime] = CreateArpeggioClip("CriticalHitChime", new float[] { 1046.50f, 1567.98f, 2093.00f, 3135.96f }, 0.024f);
+
+            // Audio Khusus Tactile Tile Rebound Thud (Benturan elastis lembut saat geseran batal/terlarang)
+            proceduralClipCache[SoundType.TileReboundThud] = CreateToneClip("TileReboundThud", 0.12f, 240f, 110f);
         }
 
         private AudioClip CreateToneClip(string name, float duration, float startFreq, float endFreq)
@@ -727,6 +731,7 @@ namespace FantasyDefense.Audio
             bool isZap = name == "CatalystThunderZap";
             bool isWhoosh = name == "ModeSwitchWhoosh";
             bool isTileSwish = name == "TileSlideSwish";
+            bool isTileRebound = name == "TileReboundThud";
 
             float filterNoise = 0f;
 
@@ -760,6 +765,15 @@ namespace FantasyDefense.Audio
                     float stoneBody = Mathf.Sin(2 * Mathf.PI * frictionFreq * t) * 0.35f +
                                       Mathf.Sin(4 * Mathf.PI * frictionFreq * t) * 0.15f;
                     samples[i] = (filterNoise * 0.50f + stoneBody) * env * 0.38f;
+                }
+                else if (isTileRebound)
+                {
+                    // Tactile rubber/felt board rebound thud with quick dampening
+                    float env = Mathf.Exp(-24f * progress);
+                    filterNoise += 0.12f * (Random.Range(-1f, 1f) - filterNoise);
+                    float thud = Mathf.Sin(2 * Mathf.PI * Mathf.Lerp(startFreq, endFreq, progress) * t) * 0.70f +
+                                 Mathf.Sin(Mathf.PI * 90f * t) * 0.30f;
+                    samples[i] = (thud + filterNoise * 0.10f) * env * 0.60f;
                 }
                 else if (isZap)
                 {
