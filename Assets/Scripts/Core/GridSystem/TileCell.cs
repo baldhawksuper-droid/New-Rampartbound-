@@ -29,9 +29,9 @@ namespace FantasyDefense.GridSystem
         [SerializeField] private Sprite highlightSprite;
         [SerializeField] private Color normalColor = Color.white;
         [SerializeField] private Color hoverColor = new Color(1f, 0.95f, 0.4f, 1f);
-        [SerializeField] private Color validMergeColor = new Color(0.3f, 1f, 0.45f, 1f); // Glowing Green (Mergeable)
-        [SerializeField] private Color validMoveColor = new Color(0.35f, 0.75f, 1f, 1f); // Cyan Blue (Empty Slot)
-        [SerializeField] private Color invalidColor = new Color(1f, 0.35f, 0.35f, 1f);   // Warning Red (Blocked)
+        [SerializeField] private Color validMergeColor = new Color(0.20f, 1f, 0.40f, 1f); // Vibrant Emerald Green (High Luminescence)
+        [SerializeField] private Color validMoveColor = new Color(0.18f, 0.78f, 1f, 1f);  // Electric Sky-Cyan (Crisp on Snow/Volcano)
+        [SerializeField] private Color invalidColor = new Color(1f, 0.22f, 0.28f, 1f);    // Punchy Ruby Crimson (High Contrast on Lava & Ice)
 
         [Header("Occupant Status")]
         [SerializeField] private UnitController currentUnit;
@@ -255,7 +255,8 @@ namespace FantasyDefense.GridSystem
             {
                 case TileHighlightState.None:
                     if (defaultSprite != null) spriteRenderer.sprite = defaultSprite;
-                    spriteRenderer.color = normalColor;
+                    if (currentUnit != null) UpdateRarityVisual();
+                    else spriteRenderer.color = normalColor;
                     break;
                 case TileHighlightState.Hover:
                     if (highlightSprite != null) spriteRenderer.sprite = highlightSprite;

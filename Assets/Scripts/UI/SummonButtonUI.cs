@@ -37,6 +37,9 @@ namespace FantasyDefense.UI
         [SerializeField] private Color disabledColor = new Color(0.6f, 0.6f, 0.6f, 0.7f);
 
         private Coroutine pulseCoroutine;
+        private string cachedBoardResolvingText;
+        private string cachedArenaFullText;
+        private string cachedTokensMaxText;
 
         private void Awake()
         {
@@ -52,6 +55,14 @@ namespace FantasyDefense.UI
 
             button.onClick.AddListener(OnSummonButtonClicked);
             EnsureCubeVisuals();
+            CacheLocalizedStrings();
+        }
+
+        private void CacheLocalizedStrings()
+        {
+            cachedBoardResolvingText = CitadelLocalizationManager.Text("⚠️ PAPAN SEDANG AKTIF!", "⚠️ BOARD IS RESOLVING!");
+            cachedArenaFullText = CitadelLocalizationManager.Text("⚠️ Arena Penuh! Gabungkan Hero!", "⚠️ Arena Full! Merge Heroes!");
+            cachedTokensMaxText = CitadelLocalizationManager.Text("⭐ Semua Token Telah Tier 5 (MAX)!", "⭐ All Tokens at Max Tier!");
         }
 
         private void EnsureCubeVisuals()
@@ -343,6 +354,7 @@ namespace FantasyDefense.UI
 
         private void HandleLanguageChanged(AppLanguage lang)
         {
+            CacheLocalizedStrings();
             UpdateButtonState();
         }
 
@@ -363,7 +375,7 @@ namespace FantasyDefense.UI
                 {
                     SkillVfxManager.Instance.SpawnFloatingText(
                         transform.position + Vector3.up * 0.9f,
-                        CitadelLocalizationManager.Text("⚠️ PAPAN SEDANG AKTIF!", "⚠️ BOARD IS RESOLVING!"),
+                        cachedBoardResolvingText,
                         new Color(1f, 0.75f, 0.2f),
                         1.2f,
                         true
@@ -408,7 +420,7 @@ namespace FantasyDefense.UI
                 {
                     SkillVfxManager.Instance.SpawnFloatingText(
                         transform.position + Vector3.up * 0.9f,
-                        CitadelLocalizationManager.Text("⚠️ Arena Penuh! Gabungkan Hero!", "⚠️ Arena Full! Merge Heroes!"),
+                        cachedArenaFullText,
                         new Color(1f, 0.55f, 0.2f),
                         1.4f,
                         true
@@ -424,7 +436,7 @@ namespace FantasyDefense.UI
                 {
                     SkillVfxManager.Instance.SpawnFloatingText(
                         transform.position + Vector3.up * 0.9f,
-                        CitadelLocalizationManager.Text("⭐ Semua Token Telah Tier 5 (MAX)!", "⭐ All Tokens at Max Tier!"),
+                        cachedTokensMaxText,
                         new Color(1f, 0.85f, 0.2f),
                         1.4f,
                         true
