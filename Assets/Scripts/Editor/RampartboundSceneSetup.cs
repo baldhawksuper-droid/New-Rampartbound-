@@ -3086,13 +3086,13 @@ namespace Rampartbound.Editor
             // 2. Oval Ground Shadow (di bawah kaki hero standee tepat di atas pelat nama)
             var shadowObj = new GameObject("GroundShadow", typeof(RectTransform), typeof(Image));
             shadowObj.transform.SetParent(cardObj.transform, false);
-            PositionUI(shadowObj, 0.12f, 0.11f, 0.88f, 0.17f);
+            PositionUI(shadowObj, 0.08f, 0.10f, 0.92f, 0.17f);
             var shadowImg = shadowObj.GetComponent<Image>();
             if (_shadowOval != null)
             {
                 shadowImg.sprite = _shadowOval;
             }
-            shadowImg.color = new Color(0f, 0f, 0f, 0.60f);
+            shadowImg.color = new Color(0.03f, 0.06f, 0.12f, 0.70f);
             shadowImg.raycastTarget = false;
 
             // 3. Info Badge Pill (Pill terintegrasi rapi rapat di bawah kaki pahlawan)
@@ -3109,7 +3109,7 @@ namespace Rampartbound.Editor
             }
             else
             {
-                badgeImg.color = new Color(0.08f, 0.12f, 0.2f, 0.95f);
+                badgeImg.color = new Color(0.06f, 0.09f, 0.16f, 0.94f);
             }
             badgeImg.raycastTarget = false;
 

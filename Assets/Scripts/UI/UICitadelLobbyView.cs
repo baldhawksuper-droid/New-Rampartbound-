@@ -720,10 +720,16 @@ namespace FantasyDefense.UI
                 var shadowRt = btn.transform.Find("GroundShadow")?.GetComponent<RectTransform>();
                 if (shadowRt != null)
                 {
-                    shadowRt.anchorMin = new Vector2(0.12f, 0.11f);
-                    shadowRt.anchorMax = new Vector2(0.88f, 0.17f);
+                    shadowRt.anchorMin = new Vector2(0.08f, 0.10f);
+                    shadowRt.anchorMax = new Vector2(0.92f, 0.17f);
                     shadowRt.offsetMin = Vector2.zero;
                     shadowRt.offsetMax = Vector2.zero;
+
+                    var shadowImg = shadowRt.GetComponent<Image>();
+                    if (shadowImg != null)
+                    {
+                        shadowImg.color = new Color(0.03f, 0.06f, 0.12f, 0.70f);
+                    }
                 }
                 var badgeRt = btn.transform.Find("BadgePill")?.GetComponent<RectTransform>();
                 if (badgeRt != null)
@@ -732,6 +738,14 @@ namespace FantasyDefense.UI
                     badgeRt.anchorMax = new Vector2(0.98f, 0.13f);
                     badgeRt.offsetMin = Vector2.zero;
                     badgeRt.offsetMax = Vector2.zero;
+
+                    var badgeImg = badgeRt.GetComponent<Image>();
+                    if (badgeImg != null && badgeImg.sprite == null)
+                    {
+                        badgeImg.color = isLocked 
+                            ? new Color(0.14f, 0.10f, 0.06f, 0.92f) 
+                            : new Color(0.06f, 0.09f, 0.16f, 0.94f);
+                    }
                 }
                 if (infoText != null)
                 {
@@ -743,6 +757,14 @@ namespace FantasyDefense.UI
                         textRt.offsetMin = Vector2.zero;
                         textRt.offsetMax = Vector2.zero;
                     }
+
+                    var textShadow = infoText.GetComponent<Shadow>();
+                    if (textShadow == null)
+                    {
+                        textShadow = infoText.gameObject.AddComponent<Shadow>();
+                    }
+                    textShadow.effectColor = new Color(0f, 0f, 0f, 0.95f);
+                    textShadow.effectDistance = new Vector2(1.5f, -1.5f);
                 }
             }
         }
