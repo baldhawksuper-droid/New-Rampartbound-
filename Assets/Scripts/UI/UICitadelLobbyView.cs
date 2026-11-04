@@ -56,6 +56,7 @@ namespace FantasyDefense.UI
         [Header("Hero Tier Preview Selector")]
         [SerializeField] private GameObject tierSelectorBar;
         [SerializeField] private Button[] tierSelectorButtons;
+        [SerializeField] private bool showTierSelector = false; // Simpan preview tier selector; sembunyikan dari lobi sesuai preferensi user
         private int currentPreviewTier = 1;
 
         [Header("Core Battle Action Buttons")]
@@ -85,7 +86,7 @@ namespace FantasyDefense.UI
         [SerializeField] private bool showBattlePass = false;
         [SerializeField] private bool showEventArena = false;
         [SerializeField] private bool showArtifacts = false;
-        [SerializeField] private bool showForge = false;
+        [SerializeField] private bool showForge = true; // 4-Tab Kanonikal Gambar 2: Citadel, Forge, Heroes, Bag
         [SerializeField] private bool showFeaturePreview = false;
 
         [Header("Citadel Courtyard Atmosphere & Standee VFX")]
@@ -191,10 +192,48 @@ namespace FantasyDefense.UI
                 }
             }
 
-            // Pastikan dock bawah memiliki HorizontalLayoutGroup agar 4 tombol tersisa otomatis merenggang penuh
+            // Sembunyikan Tier Preview Selector Bar sesuai preferensi user (disimpan di kode tapi tidak tampil)
+            if (tierSelectorBar != null)
+            {
+                tierSelectorBar.SetActive(showTierSelector);
+            }
+
+            // Redesign Dock Navigasi Bawah Gambar 2: Kompak (~0.082f screen), tembus pandang lembut (navy glass alpha 0.78), dan rel emas atas
             if (navStageMapButton != null && navStageMapButton.transform.parent != null)
             {
                 var dock = navStageMapButton.transform.parent.gameObject;
+                var dockRt = dock.GetComponent<RectTransform>();
+                if (dockRt != null)
+                {
+                    dockRt.anchorMin = new Vector2(0f, 0f);
+                    dockRt.anchorMax = new Vector2(1f, 0.082f);
+                    dockRt.offsetMin = Vector2.zero;
+                    dockRt.offsetMax = Vector2.zero;
+                }
+
+                // Background sebagian tembus (navy glass)
+                var dockImg = dock.GetComponent<Image>();
+                if (dockImg != null)
+                {
+                    dockImg.color = new Color(0.04f, 0.08f, 0.16f, 0.78f);
+                }
+
+                // Golden top rail (garis emas halus di sisi atas dock)
+                var topRailTr = dock.transform.Find("GoldenTopRail");
+                if (topRailTr == null)
+                {
+                    var railObj = new GameObject("GoldenTopRail", typeof(RectTransform), typeof(Image));
+                    railObj.transform.SetParent(dock.transform, false);
+                    var railRt = railObj.GetComponent<RectTransform>();
+                    railRt.anchorMin = new Vector2(0f, 1f);
+                    railRt.anchorMax = new Vector2(1f, 1f);
+                    railRt.sizeDelta = new Vector2(0f, 2.5f);
+                    railRt.anchoredPosition = new Vector2(0f, -1.25f);
+                    var railImg = railObj.GetComponent<Image>();
+                    railImg.color = new Color(0.92f, 0.76f, 0.28f, 0.85f);
+                    railImg.raycastTarget = false;
+                }
+
                 var hlg = dock.GetComponent<HorizontalLayoutGroup>();
                 if (hlg == null)
                 {
@@ -205,19 +244,22 @@ namespace FantasyDefense.UI
                 hlg.childControlHeight = true;
                 hlg.childForceExpandWidth = true;
                 hlg.childForceExpandHeight = true;
-                hlg.spacing = 14f;
-                hlg.padding = new RectOffset(16, 16, 8, 8);
-                LayoutRebuilder.ForceRebuildLayoutImmediate(dock.GetComponent<RectTransform>());
+                hlg.spacing = 6f;
+                hlg.padding = new RectOffset(8, 8, 4, 4);
+                if (dockRt != null)
+                {
+                    LayoutRebuilder.ForceRebuildLayoutImmediate(dockRt);
+                }
             }
 
-            // Anti-Menumpuk: Posisi dinamis tombol Defend Citadel (Crimson 3D Pill)
+            // Anti-Menumpuk: Posisi dinamis tombol Defend Citadel (Crimson 3D Pill) melayang di atas dock kompak
             if (defendCitadelButton != null)
             {
                 var rt = defendCitadelButton.GetComponent<RectTransform>();
                 if (rt != null)
                 {
-                    rt.anchorMin = new Vector2(0.12f, 0.125f);
-                    rt.anchorMax = new Vector2(0.88f, 0.205f);
+                    rt.anchorMin = new Vector2(0.18f, 0.096f);
+                    rt.anchorMax = new Vector2(0.82f, 0.165f);
                     rt.offsetMin = Vector2.zero;
                     rt.offsetMax = Vector2.zero;
                 }
@@ -511,31 +553,31 @@ namespace FantasyDefense.UI
             if (navStageMapButton != null)
             {
                 var txt = navStageMapButton.GetComponentInChildren<Text>();
-                if (txt != null) txt.text = $"<b>{FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_MAP", "Peta", "Map").ToUpper()}</b>";
-            }
-
-            if (navHeroesButton != null)
-            {
-                var txt = navHeroesButton.GetComponentInChildren<Text>();
-                if (txt != null) txt.text = $"<b>{FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_HEROES", "Hero", "Heroes").ToUpper()}</b>";
-            }
-
-            if (navSummonButton != null)
-            {
-                var txt = navSummonButton.GetComponentInChildren<Text>();
-                if (txt != null) txt.text = $"<b>{FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_SUMMON", "Gacha", "Summon").ToUpper()}</b>";
-            }
-
-            if (navStoreButton != null)
-            {
-                var txt = navStoreButton.GetComponentInChildren<Text>();
-                if (txt != null) txt.text = $"<b>{FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_STORE", "Toko", "Store").ToUpper()}</b>";
+                if (txt != null) txt.text = "<b>< Citadel ></b>";
             }
 
             if (navForgeButton != null)
             {
                 var txt = navForgeButton.GetComponentInChildren<Text>();
-                if (txt != null) txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_FORGE", "🔨\nTempa", "🔨\nForge");
+                if (txt != null) txt.text = $"<b>{FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_FORGE", "Forge", "Forge")}</b>";
+            }
+
+            if (navHeroesButton != null)
+            {
+                var txt = navHeroesButton.GetComponentInChildren<Text>();
+                if (txt != null) txt.text = $"<b>{FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_HEROES", "Heroes", "Heroes")}</b>";
+            }
+
+            if (navSummonButton != null)
+            {
+                var txt = navSummonButton.GetComponentInChildren<Text>();
+                if (txt != null) txt.text = $"<b>{FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_SUMMON", "Gacha", "Summon")}</b>";
+            }
+
+            if (navStoreButton != null)
+            {
+                var txt = navStoreButton.GetComponentInChildren<Text>();
+                if (txt != null) txt.text = $"<b>{FantasyDefense.Localization.CitadelLocalizationManager.Get("NAV_BAG", "Bag", "Bag")}</b>";
             }
         }
 
@@ -776,6 +818,7 @@ namespace FantasyDefense.UI
         public void UpdateNavigationTabsVisual(GamePanelType activePanel)
         {
             SetTabVisual(navStageMapButton, activePanel == GamePanelType.StageMap);
+            SetTabVisual(navForgeButton, activePanel == GamePanelType.RelicForge);
             SetTabVisual(navHeroesButton, activePanel == GamePanelType.HeroUpgrade);
             SetTabVisual(navSummonButton, activePanel == GamePanelType.SummonHall);
             SetTabVisual(navStoreButton, activePanel == GamePanelType.Store);
@@ -788,42 +831,58 @@ namespace FantasyDefense.UI
             var bgImg = btn.GetComponent<Image>();
             if (bgImg != null)
             {
-                // Active: kilau kapsul emas royal Gambar 3; Inactive: andesit dongker gelap
+                // Active: kilau kapsul emas royal tembus Gambar 2; Inactive: tembus pandang bersih (Color.clear) menyatu dengan dock kaca
                 bgImg.color = isActive 
-                    ? new Color(0.96f, 0.76f, 0.22f, 0.98f) 
-                    : new Color(0.10f, 0.14f, 0.22f, 0.92f);
+                    ? new Color(0.96f, 0.75f, 0.18f, 0.24f) 
+                    : Color.clear;
             }
 
             var outline = btn.GetComponent<Outline>();
-            if (outline == null)
-            {
-                outline = btn.gameObject.AddComponent<Outline>();
-            }
             if (outline != null)
             {
-                outline.effectColor = isActive 
-                    ? new Color(1.0f, 0.90f, 0.35f, 1.0f) 
-                    : new Color(0.35f, 0.42f, 0.55f, 0.70f);
-                outline.effectDistance = isActive ? new Vector2(2.0f, -2.0f) : new Vector2(1.0f, -1.0f);
+                outline.enabled = isActive;
+                if (isActive)
+                {
+                    outline.effectColor = new Color(1.0f, 0.85f, 0.35f, 0.85f);
+                    outline.effectDistance = new Vector2(1.5f, -1.5f);
+                }
             }
 
             var iconTr = btn.transform.Find("TabIcon");
             if (iconTr != null)
             {
+                var iconRt = iconTr.GetComponent<RectTransform>();
+                if (iconRt != null)
+                {
+                    iconRt.anchorMin = new Vector2(0.24f, 0.40f);
+                    iconRt.anchorMax = new Vector2(0.76f, 0.90f);
+                    iconRt.offsetMin = Vector2.zero;
+                    iconRt.offsetMax = Vector2.zero;
+                }
                 var iconImg = iconTr.GetComponent<Image>();
                 if (iconImg != null)
                 {
-                    iconImg.color = isActive ? Color.white : new Color(0.85f, 0.88f, 0.95f, 0.85f);
+                    iconImg.preserveAspect = true;
+                    iconImg.color = isActive ? Color.white : new Color(0.88f, 0.92f, 0.98f, 0.90f);
                 }
-                iconTr.localScale = isActive ? new Vector3(1.10f, 1.10f, 1f) : Vector3.one;
+                iconTr.localScale = isActive ? new Vector3(1.08f, 1.08f, 1f) : Vector3.one;
             }
 
             var txt = btn.GetComponentInChildren<Text>();
             if (txt != null)
             {
+                txt.fontSize = 12;
                 txt.color = isActive 
-                    ? new Color(0.18f, 0.10f, 0.02f, 1.0f) 
-                    : new Color(0.85f, 0.88f, 0.95f, 0.85f);
+                    ? new Color(1.0f, 0.95f, 0.60f, 1.0f) 
+                    : new Color(0.90f, 0.93f, 0.98f, 0.90f);
+                var txtRt = txt.GetComponent<RectTransform>();
+                if (txtRt != null)
+                {
+                    txtRt.anchorMin = new Vector2(0.02f, 0.05f);
+                    txtRt.anchorMax = new Vector2(0.98f, 0.38f);
+                    txtRt.offsetMin = Vector2.zero;
+                    txtRt.offsetMax = Vector2.zero;
+                }
             }
         }
 

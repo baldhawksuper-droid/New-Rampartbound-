@@ -773,9 +773,21 @@ namespace Rampartbound.Editor
             var navEventBtn = CreateButton(quickBarObj.transform, "NavEventArena", "", Color.clear, Color.white, 14, defaultFont);
             var navArtifactBtn = CreateButton(quickBarObj.transform, "NavArtifacts", "", Color.clear, Color.white, 14, defaultFont);
 
-            // Bottom Navigation Dock (4 Tabs: Citadel, Forge, Heroes, Bag)
-            var dockObj = CreatePanel(lobbyPanelObj.transform, "BottomNavigationDock", new Color(0.06f, 0.08f, 0.14f, 0.98f));
-            PositionUI(dockObj, 0f, 0f, 1f, 0.115f);
+            // Bottom Navigation Dock (4 Tabs Kanonikal Gambar 2: Citadel, Forge, Heroes, Bag)
+            var dockObj = CreatePanel(lobbyPanelObj.transform, "BottomNavigationDock", new Color(0.04f, 0.08f, 0.16f, 0.78f)); // Translucent navy glass
+            PositionUI(dockObj, 0f, 0f, 1f, 0.082f); // Sleek compact height
+
+            // Continuous Golden Top Rail
+            var topRailObj = new GameObject("GoldenTopRail", typeof(RectTransform), typeof(Image));
+            topRailObj.transform.SetParent(dockObj.transform, false);
+            var railRt = topRailObj.GetComponent<RectTransform>();
+            railRt.anchorMin = new Vector2(0f, 1f);
+            railRt.anchorMax = new Vector2(1f, 1f);
+            railRt.sizeDelta = new Vector2(0f, 2.5f);
+            railRt.anchoredPosition = new Vector2(0f, -1.25f);
+            var railImg = topRailObj.GetComponent<Image>();
+            railImg.color = new Color(0.92f, 0.76f, 0.28f, 0.85f);
+            railImg.raycastTarget = false;
 
             var dockHlg = dockObj.AddComponent<HorizontalLayoutGroup>();
             dockHlg.childAlignment = TextAnchor.MiddleCenter;
@@ -783,8 +795,8 @@ namespace Rampartbound.Editor
             dockHlg.childControlHeight = true;
             dockHlg.childForceExpandWidth = true;
             dockHlg.childForceExpandHeight = true;
-            dockHlg.spacing = 10f;
-            dockHlg.padding = new RectOffset(12, 12, 6, 6);
+            dockHlg.spacing = 6f;
+            dockHlg.padding = new RectOffset(8, 8, 4, 4);
 
             Sprite iconNavMap = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Map.png");
             Sprite iconNavCitadel = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Citadel.png")
@@ -796,63 +808,59 @@ namespace Rampartbound.Editor
             Sprite iconNavBag = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Bag.png")
                 ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Store.png");
 
-            var navStageBtn = CreateButton(dockObj.transform, "NavStageMap", "< Citadel >", Color.clear, Color.white, 14, defaultFont);
-            var navForgeBtn = CreateButton(dockObj.transform, "NavForge", "Forge", Color.clear, Color.white, 14, defaultFont);
-            var navHeroBtn = CreateButton(dockObj.transform, "NavHeroes", "Heroes", Color.clear, Color.white, 14, defaultFont);
-            var navSummonBtn = CreateButton(dockObj.transform, "NavSummon", "Gacha", Color.clear, Color.white, 14, defaultFont);
-            var navStoreBtn = CreateButton(dockObj.transform, "NavStore", "Bag", Color.clear, Color.white, 14, defaultFont);
+            var navStageBtn = CreateButton(dockObj.transform, "NavStageMap", "< Citadel >", Color.clear, Color.white, 12, defaultFont);
+            var navForgeBtn = CreateButton(dockObj.transform, "NavForge", "Forge", Color.clear, Color.white, 12, defaultFont);
+            var navHeroBtn = CreateButton(dockObj.transform, "NavHeroes", "Heroes", Color.clear, Color.white, 12, defaultFont);
+            var navSummonBtn = CreateButton(dockObj.transform, "NavSummon", "Gacha", Color.clear, Color.white, 12, defaultFont);
+            var navStoreBtn = CreateButton(dockObj.transform, "NavStore", "Bag", Color.clear, Color.white, 12, defaultFont);
 
             System.Action<GameObject, Sprite, string, bool> setupFantasyNavTab = (btn, iconSp, label, isActive) => {
                 var bImg = btn.GetComponent<Image>();
                 if (bImg != null)
                 {
-                    if (isActive)
-                    {
-                        bImg.color = new Color(0.96f, 0.76f, 0.22f, 0.98f); // Golden active capsule
-                    }
-                    else
-                    {
-                        bImg.color = new Color(0.10f, 0.14f, 0.22f, 0.92f); // Deep navy inactive
-                    }
+                    // Active: kapsul amber tembus pandang bercahaya; Inactive: Color.clear menyatu dengan dock kaca
+                    bImg.color = isActive 
+                        ? new Color(0.96f, 0.75f, 0.18f, 0.24f) 
+                        : Color.clear;
                 }
 
                 var bOutline = btn.AddComponent<Outline>();
-                bOutline.effectColor = isActive 
-                    ? new Color(1.0f, 0.90f, 0.35f, 1.0f) 
-                    : new Color(0.35f, 0.42f, 0.55f, 0.70f);
-                bOutline.effectDistance = isActive ? new Vector2(2f, -2f) : new Vector2(1f, -1f);
+                bOutline.enabled = isActive;
+                if (isActive)
+                {
+                    bOutline.effectColor = new Color(1.0f, 0.85f, 0.35f, 0.85f);
+                    bOutline.effectDistance = new Vector2(1.5f, -1.5f);
+                }
 
                 if (iconSp != null)
                 {
                     var iconObj = new GameObject("TabIcon", typeof(RectTransform), typeof(Image));
                     iconObj.transform.SetParent(btn.transform, false);
-                    PositionUI(iconObj, 0.20f, 0.40f, 0.80f, 0.94f);
+                    PositionUI(iconObj, 0.24f, 0.40f, 0.76f, 0.90f);
                     var icImg = iconObj.GetComponent<Image>();
                     icImg.sprite = iconSp;
                     icImg.type = Image.Type.Simple;
                     icImg.preserveAspect = true;
                     icImg.raycastTarget = false;
+                    icImg.color = isActive ? Color.white : new Color(0.88f, 0.92f, 0.98f, 0.90f);
                 }
 
                 var bTxt = btn.GetComponentInChildren<Text>();
                 if (bTxt != null)
                 {
                     bTxt.text = $"<b>{label}</b>";
-                    bTxt.fontSize = 14;
+                    bTxt.fontSize = 12;
                     bTxt.font = defaultFont;
                     bTxt.alignment = TextAnchor.MiddleCenter;
-                    bTxt.color = isActive ? new Color(0.18f, 0.10f, 0.02f) : new Color(0.85f, 0.88f, 0.95f);
+                    bTxt.color = isActive ? new Color(1.0f, 0.95f, 0.60f, 1.0f) : new Color(0.90f, 0.93f, 0.98f, 0.90f);
                     var txtRt = bTxt.GetComponent<RectTransform>();
-                    txtRt.anchorMin = new Vector2(0.02f, 0.04f);
+                    txtRt.anchorMin = new Vector2(0.02f, 0.05f);
                     txtRt.anchorMax = new Vector2(0.98f, 0.38f);
                     txtRt.offsetMin = Vector2.zero;
                     txtRt.offsetMax = Vector2.zero;
-                    if (!isActive)
-                    {
-                        var tShadow = bTxt.gameObject.AddComponent<Shadow>();
-                        tShadow.effectColor = new Color(0f, 0f, 0f, 0.95f);
-                        tShadow.effectDistance = new Vector2(1.5f, -1.5f);
-                    }
+                    var tShadow = bTxt.gameObject.AddComponent<Shadow>();
+                    tShadow.effectColor = new Color(0f, 0f, 0f, 0.95f);
+                    tShadow.effectDistance = new Vector2(1.2f, -1.2f);
                 }
             };
             setupFantasyNavTab(navStageBtn, iconNavCitadel, "< Citadel >", true);

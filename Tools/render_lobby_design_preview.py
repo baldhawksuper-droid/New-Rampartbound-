@@ -95,20 +95,29 @@ def render_lobby_mockup():
         draw.rounded_rectangle([bx1 + 2, by1, bx2 - 2, by2], radius=8,
                                fill=(20, 30, 48, 240), outline=(215, 180, 50, 240), width=2)
 
-    # 8. Battle Button
-    btn_top = int(h * (1.0 - 0.220))
-    btn_bot = int(h * (1.0 - 0.120))
-    draw.rounded_rectangle([int(w*0.08), btn_top, int(w*0.92), btn_bot], radius=16,
-                           fill=(215, 35, 35, 255), outline=(245, 205, 50, 255), width=5)
+    # 8. Battle Button (Floating Cleanly Above Compact Dock)
+    btn_top = int(h * (1.0 - 0.165))
+    btn_bot = int(h * (1.0 - 0.096))
+    draw.rounded_rectangle([int(w*0.14), btn_top, int(w*0.86), btn_bot], radius=22,
+                           fill=(215, 35, 35, 255), outline=(245, 205, 50, 255), width=4)
+    # Specular rim on Battle button
+    draw.arc([int(w*0.16), btn_top + 4, int(w*0.84), btn_top + 28], start=190, end=350, fill=(255, 160, 160, 220), width=3)
 
-    # 9. Bottom Navigation Dock (4 Tabs: Citadel, Forge, Heroes, Bag)
-    dock_top = int(h * (1.0 - 0.115))
-    draw.rectangle([0, dock_top, w, h], fill=(15, 20, 35, 250))
-    draw.line([(0, dock_top), (w, dock_top)], fill=(80, 95, 130, 200), width=2)
+    # 9. Bottom Navigation Dock (Translucent Glass Gambar 2, Compact Height 0.082f)
+    dock_top = int(h * (1.0 - 0.082))
+    dock_overlay = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    d_draw = ImageDraw.Draw(dock_overlay)
+    # Translucent dark midnight navy glass (alpha 0.78)
+    d_draw.rectangle([0, dock_top, w, h], fill=(10, 20, 42, 198))
 
-    # 4 tabs
+    # Continuous Golden Beveled Top Rail along dock_top
+    d_draw.line([(0, dock_top - 1), (w, dock_top - 1)], fill=(255, 235, 140, 240), width=1)
+    d_draw.line([(0, dock_top), (w, dock_top)], fill=(225, 185, 55, 255), width=2)
+    d_draw.line([(0, dock_top + 2), (w, dock_top + 2)], fill=(120, 85, 20, 200), width=1)
+
+    # 4 Canonical Tabs: Citadel, Forge, Heroes, Bag
     tabs = [
-        {"name": "Citadel", "icon": "UI_Icon_Nav_Citadel.png", "active": True},
+        {"name": "< Citadel >", "icon": "UI_Icon_Nav_Citadel.png", "active": True},
         {"name": "Forge", "icon": "UI_Icon_Nav_Forge.png", "active": False, "badge": True},
         {"name": "Heroes", "icon": "UI_Icon_Nav_Heroes.png", "active": False, "badge": True},
         {"name": "Bag", "icon": "UI_Icon_Nav_Bag.png", "active": False}
@@ -118,36 +127,56 @@ def render_lobby_mockup():
     for idx, tab in enumerate(tabs):
         tx1 = idx * tab_w + 6
         tx2 = (idx + 1) * tab_w - 6
-        ty1 = dock_top + 8
-        ty2 = h - 8
+        ty1 = dock_top + 5
+        ty2 = h - 5
 
         if tab["active"]:
-            # Gold capsule
-            draw.rounded_rectangle([tx1, ty1, tx2, ty2], radius=14,
-                                   fill=(245, 195, 55, 255), outline=(255, 240, 160, 255), width=3)
-            # Shimmer sweep
-            draw.rounded_rectangle([tx1+3, ty1+3, tx2-3, ty1+int((ty2-ty1)*0.45)], radius=10,
-                                   fill=(255, 255, 255, 60))
-        else:
-            # Dark navy
-            draw.rounded_rectangle([tx1, ty1, tx2, ty2], radius=12,
-                                   fill=(25, 35, 55, 240), outline=(85, 105, 140, 200), width=2)
+            # Subtle warm golden luminous highlight container (soft translucent glow)
+            d_draw.rounded_rectangle([tx1, ty1, tx2, ty2], radius=10,
+                                     fill=(245, 192, 45, 50), outline=(255, 218, 90, 210), width=2)
+            # Soft top sheen
+            d_draw.rounded_rectangle([tx1 + 3, ty1 + 3, tx2 - 3, ty1 + 10], radius=4,
+                                     fill=(255, 245, 180, 75))
+
+    canvas = Image.alpha_composite(canvas, dock_overlay)
+    draw = ImageDraw.Draw(canvas)
+
+    for idx, tab in enumerate(tabs):
+        tx1 = idx * tab_w + 6
+        tx2 = (idx + 1) * tab_w - 6
+        ty1 = dock_top + 5
+        ty2 = h - 5
 
         # Tab Icon
         ic_path = os.path.join("D:/Hermes Project/Rampartbound/Assets/Art/Sprites/UI", tab["icon"])
         if os.path.exists(ic_path):
             ic_img = Image.open(ic_path).convert("RGBA")
-            ic_size = int((ty2 - ty1) * 0.58)
+            ic_size = int((ty2 - ty1) * 0.54)
             ic_res = ic_img.resize((ic_size, ic_size), Image.Resampling.LANCZOS)
             ic_x = tx1 + (tx2 - tx1 - ic_size) // 2
             ic_y = ty1 + 4
             canvas.paste(ic_res, (ic_x, ic_y), ic_res)
 
+        # Tab Label
+        try:
+            from PIL import ImageFont
+            font = ImageFont.load_default()
+            label_text = tab["name"]
+            bbox = font.getbbox(label_text)
+            tw = bbox[2] - bbox[0]
+            lx = tx1 + (tx2 - tx1 - tw) // 2
+            ly = ty2 - 16
+            label_color = (255, 245, 155, 255) if tab["active"] else (230, 238, 250, 230)
+            draw.text((lx + 1, ly + 1), label_text, fill=(0, 0, 0, 200), font=font)
+            draw.text((lx, ly), label_text, fill=label_color, font=font)
+        except Exception:
+            pass
+
         # Notification Badge (Red dot)
         if tab.get("badge", False):
             rx = tx2 - 14
-            ry = ty1 + 10
-            draw.ellipse([rx - 6, ry - 6, rx + 6, ry + 6], fill=(235, 30, 30, 255), outline=(255, 255, 255, 255), width=2)
+            ry = ty1 + 8
+            draw.ellipse([rx - 5, ry - 5, rx + 5, ry + 5], fill=(235, 30, 30, 255), outline=(255, 255, 255, 255), width=2)
 
     out_path = "C:/Users/ShezaEhzad/AppData/Local/hermes/cache/scratch/lobby_design_preview.jpg"
     canvas.convert("RGB").save(out_path, quality=92)
