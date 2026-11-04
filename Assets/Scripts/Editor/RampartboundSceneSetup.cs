@@ -726,17 +726,17 @@ namespace Rampartbound.Editor
 
             // Formasi 4 Slot Pahlawan Teras Batu (Pippin, Cedric, Rose, & Hero Terkunci)
             // Pippin (Slot 1, Kiri): Lv.12, CP 1,600
-            var rabbitCard = CreateButton(heroesContainer.transform, "RabbitCard", "<b>Pippin</b>\n<color=#FFD700>• T1</color> | CP 1,600", new Color(0f, 0f, 0f, 0f), Color.white, 12, defaultFont);
+            var rabbitCard = CreateButton(heroesContainer.transform, "RabbitCard", "<color=#00FFAA>●</color> Lv.12 | CP 1,600", new Color(0f, 0f, 0f, 0f), Color.white, 12, defaultFont);
             PositionUI(rabbitCard, 0.02f, 0.04f, 0.25f, 0.72f);
             SetupHeroCardPortrait(rabbitCard, _heroRabbitSprite, "Pippin");
 
             // Cedric (Slot 2, Tengah-Kiri): Cedric, Lv.15, CP 1,850
-            var cedricCard = CreateButton(heroesContainer.transform, "CedricCard", "<b>Cedric</b>\n<color=#FFD700>• T1</color> | CP 1,850", new Color(0f, 0f, 0f, 0f), Color.white, 12, defaultFont);
+            var cedricCard = CreateButton(heroesContainer.transform, "CedricCard", "<color=#00FFAA>●</color> Lv.15 | CP 1,850", new Color(0f, 0f, 0f, 0f), Color.white, 12, defaultFont);
             PositionUI(cedricCard, 0.26f, 0.04f, 0.49f, 0.72f);
             SetupHeroCardPortrait(cedricCard, _heroCedricSprite, "Cedric");
 
             // Rose (Slot 3, Tengah-Kanan): Lv.14, CP 1,400 (Chibi Palu Emas Raksasa)
-            var roseCard = CreateButton(heroesContainer.transform, "RoseCard", "<b>Rose</b>\n<color=#FFD700>• T1</color> | CP 1,400", new Color(0f, 0f, 0f, 0f), Color.white, 12, defaultFont);
+            var roseCard = CreateButton(heroesContainer.transform, "RoseCard", "<color=#00FFAA>●</color> Lv.14 | CP 1,400", new Color(0f, 0f, 0f, 0f), Color.white, 12, defaultFont);
             PositionUI(roseCard, 0.51f, 0.04f, 0.74f, 0.72f);
             SetupHeroCardPortrait(roseCard, _heroRoseSprite, "Rose");
 
@@ -756,9 +756,50 @@ namespace Rampartbound.Editor
                 PositionUI(tBtn, (t - 1) * segW + 0.015f, 0.10f, t * segW - 0.015f, 0.90f);
             }
 
-            // Core Battle Button (Crimson 3D Gold Frame with studs)
-            var defendBtn = CreateButton(lobbyPanelObj.transform, "DefendCitadelButton", "⚔️ BATTLE  (5 ⚡)", new Color(0.78f, 0.10f, 0.12f), Color.white, 26, defaultFont);
+            // Core Battle Button (Crimson 3D Gold Frame with studs, crossed swords, and diamond accents)
+            var defendBtn = CreateButton(lobbyPanelObj.transform, "DefendCitadelButton", "<b>BATTLE</b>  <color=#FFEE55>(5⚡)</color>", new Color(0.78f, 0.10f, 0.12f), Color.white, 26, defaultFont);
             PositionUI(defendBtn, 0.12f, 0.125f, 0.88f, 0.205f);
+
+            var defOutline = defendBtn.AddComponent<Outline>();
+            defOutline.effectColor = new Color(1.0f, 0.82f, 0.28f, 0.95f);
+            defOutline.effectDistance = new Vector2(2.5f, -2.5f);
+
+            if (_iconCrossedSwords != null)
+            {
+                var swordsObj = new GameObject("CrossedSwordsIcon", typeof(RectTransform), typeof(Image));
+                swordsObj.transform.SetParent(defendBtn.transform, false);
+                PositionUI(swordsObj, 0.03f, 0.08f, 0.20f, 0.92f);
+                var sImg = swordsObj.GetComponent<Image>();
+                sImg.sprite = _iconCrossedSwords;
+                sImg.preserveAspect = true;
+                sImg.raycastTarget = false;
+            }
+
+            if (_decorGoldDiamond != null)
+            {
+                var leftDiamond = new GameObject("LeftDiamondAccent", typeof(RectTransform), typeof(Image));
+                leftDiamond.transform.SetParent(defendBtn.transform, false);
+                PositionUI(leftDiamond, -0.04f, 0.20f, 0.04f, 0.80f);
+                var ldImg = leftDiamond.GetComponent<Image>();
+                ldImg.sprite = _decorGoldDiamond;
+                ldImg.preserveAspect = true;
+                ldImg.raycastTarget = false;
+
+                var rightDiamond = new GameObject("RightDiamondAccent", typeof(RectTransform), typeof(Image));
+                rightDiamond.transform.SetParent(defendBtn.transform, false);
+                PositionUI(rightDiamond, 0.96f, 0.20f, 1.04f, 0.80f);
+                var rdImg = rightDiamond.GetComponent<Image>();
+                rdImg.sprite = _decorGoldDiamond;
+                rdImg.preserveAspect = true;
+                rdImg.raycastTarget = false;
+            }
+
+            var glossObj = new GameObject("GlossSpecularArc", typeof(RectTransform), typeof(Image));
+            glossObj.transform.SetParent(defendBtn.transform, false);
+            PositionUI(glossObj, 0.02f, 0.52f, 0.98f, 0.96f);
+            var glossImg = glossObj.GetComponent<Image>();
+            glossImg.color = new Color(1f, 1f, 1f, 0.25f);
+            glossImg.raycastTarget = false;
 
             var trialBtn = CreateButton(lobbyPanelObj.transform, "AbyssalTrialButton", "🌌 UJIAN ABYSSAL", new Color(0.42f, 0.25f, 0.75f), Color.white, 24, defaultFont);
             trialBtn.SetActive(false);
@@ -822,6 +863,19 @@ namespace Rampartbound.Editor
                     bImg.color = isActive 
                         ? new Color(0.96f, 0.75f, 0.18f, 0.24f) 
                         : Color.clear;
+                }
+
+                if (_tabActivePodium != null)
+                {
+                    var podiumObj = new GameObject("ActivePodiumFrame", typeof(RectTransform), typeof(Image));
+                    podiumObj.transform.SetParent(btn.transform, false);
+                    PositionUI(podiumObj, -0.02f, -0.02f, 1.02f, 1.02f);
+                    var pImg = podiumObj.GetComponent<Image>();
+                    pImg.sprite = _tabActivePodium;
+                    pImg.type = Image.Type.Simple;
+                    pImg.preserveAspect = false;
+                    pImg.raycastTarget = false;
+                    podiumObj.SetActive(isActive);
                 }
 
                 var bOutline = btn.AddComponent<Outline>();
@@ -2992,6 +3046,9 @@ namespace Rampartbound.Editor
         private static Sprite _slotIconRelic;
         private static Sprite _tabHeroActive;
         private static Sprite _tabHeroInactive;
+        private static Sprite _tabActivePodium;
+        private static Sprite _iconCrossedSwords;
+        private static Sprite _decorGoldDiamond;
         private static Sprite _btnHudSpeed;
         private static Sprite _btnHudPause;
         private static Sprite _btnGachaSingle;
@@ -3056,6 +3113,14 @@ namespace Rampartbound.Editor
             if (_slotIconRelic == null) _slotIconRelic = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Slot_Icon_Relic.png");
             if (_tabHeroActive == null) _tabHeroActive = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Tab_Hero_Active.png");
             if (_tabHeroInactive == null) _tabHeroInactive = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Tab_Hero_Inactive.png");
+            if (_tabActivePodium == null) _tabActivePodium = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Frame_Active_Tab_Podium.png");
+            if (_iconCrossedSwords == null) _iconCrossedSwords = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Crossed_Swords.png");
+            if (_decorGoldDiamond == null) _decorGoldDiamond = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Decor_Gold_Diamond.png");
+            if (_badgeHeroPill == null)
+            {
+                _badgeHeroPill = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Frame_Hero_Stat_Pill.png")
+                              ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Badge_Hero_Pill.png");
+            }
         }
 
         private static void AttachRarityBorder(Transform parentCard, Sprite borderSprite)
@@ -3120,6 +3185,23 @@ namespace Rampartbound.Editor
                 badgeImg.color = new Color(0.06f, 0.09f, 0.16f, 0.94f);
             }
             badgeImg.raycastTarget = false;
+
+            // 4. Hero Name Header (Floating plate di atas stat pill sesuai target mockup)
+            if (!string.IsNullOrEmpty(heroName) && heroName != "Terkunci")
+            {
+                var nameObj = new GameObject("HeroNamePlate", typeof(RectTransform), typeof(Text));
+                nameObj.transform.SetParent(cardObj.transform, false);
+                PositionUI(nameObj, 0.02f, 0.135f, 0.98f, 0.22f);
+                var nTxt = nameObj.GetComponent<Text>();
+                nTxt.text = $"<b>{heroName}</b>";
+                nTxt.fontSize = 13;
+                nTxt.fontStyle = FontStyle.Bold;
+                nTxt.alignment = TextAnchor.MiddleCenter;
+                nTxt.color = new Color(1.0f, 0.96f, 0.82f, 1.0f);
+                var nShadow = nameObj.AddComponent<Shadow>();
+                nShadow.effectColor = new Color(0f, 0f, 0f, 0.95f);
+                nShadow.effectDistance = new Vector2(1.2f, -1.2f);
+            }
 
             var txtTrans = cardObj.transform.Find("Text");
             if (txtTrans != null)

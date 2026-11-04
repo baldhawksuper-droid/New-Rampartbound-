@@ -837,6 +837,12 @@ namespace FantasyDefense.UI
                     : Color.clear;
             }
 
+            var podiumTr = btn.transform.Find("ActivePodiumFrame");
+            if (podiumTr != null)
+            {
+                podiumTr.gameObject.SetActive(isActive);
+            }
+
             var outline = btn.GetComponent<Outline>();
             if (outline != null)
             {
@@ -901,24 +907,25 @@ namespace FantasyDefense.UI
             int heroTier = currentPreviewTier > 0 ? currentPreviewTier : (profile != null ? Mathf.Clamp(profile.starRank, 1, 5) : 1);
             int displayCp = cp * heroTier;
 
-            // Format bersih terpadu konsisten: Tampilkan nama hero di baris 1, Tier & CP di baris 2
+            // Format floating stat pill kanonikal (Lv.X | CP Y,YYY) dengan dot hijau aktif
             if (isLocked)
             {
                 infoText.text = "<b><color=#FFAA00>🔒 TERKUNCI</color></b>";
             }
             else
             {
-                infoText.text = $"<b>{heroName}</b>\n<color=#FFD700>• T{heroTier}</color> | CP {displayCp:N0}";
+                infoText.text = $"<color=#00FFAA>●</color> Lv.{lvl} | CP {displayCp:N0}";
             }
             infoText.fontSize = 12;
             infoText.alignment = TextAnchor.MiddleCenter;
 
             if (btn != null)
             {
-                var namePlate = btn.transform.Find("HeroNamePlate");
+                var namePlate = btn.transform.Find("HeroNamePlate")?.GetComponent<Text>();
                 if (namePlate != null)
                 {
-                    namePlate.gameObject.SetActive(false); // Sembunyikan label lama agar tidak tumpang tindih
+                    namePlate.gameObject.SetActive(!isLocked);
+                    namePlate.text = $"<b>{heroName}</b>";
                 }
 
                 var img = btn.transform.Find("HeroPortrait")?.GetComponent<Image>();
