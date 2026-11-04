@@ -311,7 +311,8 @@ namespace FantasyDefense.Combat
                 if (AudioManager.Instance != null && (Time.time - lastGlobalTurretSfxTime >= MIN_TURRET_SFX_INTERVAL))
                 {
                     lastGlobalTurretSfxTime = Time.time;
-                    AudioManager.Instance.PlaySound(SoundType.ArrowShot);
+                    float ballistaPitch = Random.Range(0.85f, 0.98f);
+                    AudioManager.Instance.PlaySound(SoundType.ArrowShot, ballistaPitch);
                 }
 
                 if (SkillVfxManager.Instance != null)

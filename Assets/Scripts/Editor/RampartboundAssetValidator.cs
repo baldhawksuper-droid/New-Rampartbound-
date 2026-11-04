@@ -119,7 +119,6 @@ namespace Rampartbound.Editor
             AuditEnvironment("Gem T0 Rose (Rose Quartz)", "Assets/Art/Sprites/Grid/Gem_T0_Rose.png");
             AuditEnvironment("Gem T0 Rabbit (Sapphire)", "Assets/Art/Sprites/Grid/Gem_T0_Rabbit.png");
             AuditEnvironment("Gem T0 Wind (Emerald)", "Assets/Art/Sprites/Grid/Gem_T0_Wind.png");
-            AuditEnvironment("Battlefield Backdrop", "Assets/Art/Sprites/Environment/layer1_ground_battlefield.png");
             AuditEnvironment("Battlefield Forest", "Assets/Art/Sprites/Environment/Battlefield_Forest.png");
             AuditEnvironment("Battlefield Mountain", "Assets/Art/Sprites/Environment/Battlefield_Mountain.png");
             AuditEnvironment("Battlefield Volcanic", "Assets/Art/Sprites/Environment/Battlefield_Volcanic.png");

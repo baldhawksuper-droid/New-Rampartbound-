@@ -302,7 +302,8 @@ namespace FantasyDefense.Combat
                         AudioManager.Instance.PlaySound(SoundType.ShieldSlam, 0.95f);
                         break;
                     case UnitType.WindRanger:
-                        AudioManager.Instance.PlaySound(SoundType.ArrowShot, 1.10f);
+                        float bowPitch = Random.Range(1.02f, 1.18f);
+                        AudioManager.Instance.PlaySound(SoundType.ArrowShot, bowPitch);
                         break;
                     case UnitType.RabbitMage:
                         AudioManager.Instance.PlaySound(SoundType.MagicSpark, 1.15f);

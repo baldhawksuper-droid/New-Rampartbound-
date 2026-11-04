@@ -209,33 +209,52 @@ namespace FantasyDefense.Combat
 
         /// <summary>
         /// Menghasilkan angka floating combat number dinamis dengan animasi lompatan parabolik (jump arc),
-        /// gaya tipografi komik tebal (bold comic font) dengan bayangan tebal (drop shadow) kontras tinggi.
+        /// gaya tipografi komik tebal (Lilita One arcade font) dengan 4-way stroke outline kontras tinggi (arcade readability).
         /// </summary>
         public void SpawnFloatingCombatNumber(Vector3 worldPos, string content, Color textColor, float scale = 1.0f, bool isHighJump = false)
         {
             GameObject containerObj = new GameObject($"CombatNum_{content}");
             containerObj.transform.position = worldPos;
 
-            // 1. Shadow TextMesh di belakang (Deep Comic Shadow)
-            GameObject shadowObj = new GameObject("Shadow");
-            shadowObj.transform.SetParent(containerObj.transform, false);
-            shadowObj.transform.localPosition = new Vector3(0.025f, -0.025f, 0.01f);
-            TextMesh shadowMesh = shadowObj.AddComponent<TextMesh>();
-            shadowMesh.text = content;
-            shadowMesh.fontStyle = FontStyle.Bold;
-            shadowMesh.fontSize = isHighJump ? 36 : 30;
-            shadowMesh.characterSize = 0.08f * scale;
-            shadowMesh.anchor = TextAnchor.MiddleCenter;
-            shadowMesh.alignment = TextAlignment.Center;
-            shadowMesh.color = new Color(0.04f, 0.04f, 0.06f, 0.90f);
-            MeshRenderer shadowMr = shadowObj.GetComponent<MeshRenderer>();
-            if (shadowMr != null)
+            Font comicFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+
+            // 1. Buat 4-way stroke outline (atas, bawah, kiri, kanan) untuk kontras terbaca di latar terang maupun gelap
+            Vector2[] outlineOffsets = new Vector2[]
             {
-                shadowMr.sortingLayerName = "UI";
-                shadowMr.sortingOrder = 499;
+                new Vector2(-0.025f,  0f),
+                new Vector2( 0.025f,  0f),
+                new Vector2( 0f,     -0.025f),
+                new Vector2( 0f,      0.025f),
+                new Vector2( 0.025f, -0.025f) // Drop shadow aksen
+            };
+
+            List<TextMesh> strokeMeshes = new List<TextMesh>();
+            for (int i = 0; i < outlineOffsets.Length; i++)
+            {
+                GameObject strokeObj = new GameObject($"Stroke_{i}");
+                strokeObj.transform.SetParent(containerObj.transform, false);
+                strokeObj.transform.localPosition = new Vector3(outlineOffsets[i].x, outlineOffsets[i].y, 0.01f);
+                TextMesh sm = strokeObj.AddComponent<TextMesh>();
+                sm.text = content;
+                sm.fontStyle = FontStyle.Bold;
+                sm.fontSize = isHighJump ? 36 : 30;
+                sm.characterSize = 0.08f * scale;
+                sm.anchor = TextAnchor.MiddleCenter;
+                sm.alignment = TextAlignment.Center;
+                sm.color = new Color(0.04f, 0.04f, 0.06f, 0.95f);
+                if (comicFont != null) sm.font = comicFont;
+
+                MeshRenderer smMr = strokeObj.GetComponent<MeshRenderer>();
+                if (smMr != null)
+                {
+                    smMr.sortingLayerName = "UI";
+                    smMr.sortingOrder = 499;
+                    if (comicFont != null) smMr.sharedMaterial = comicFont.material;
+                }
+                strokeMeshes.Add(sm);
             }
 
-            // 2. Front TextMesh utama (Radiant Comic Text)
+            // 2. Front TextMesh utama (Radiant Arcade Text)
             TextMesh textMesh = containerObj.AddComponent<TextMesh>();
             textMesh.text = content;
             textMesh.fontStyle = FontStyle.Bold;
@@ -244,33 +263,25 @@ namespace FantasyDefense.Combat
             textMesh.anchor = TextAnchor.MiddleCenter;
             textMesh.alignment = TextAlignment.Center;
             textMesh.color = textColor;
+            if (comicFont != null) textMesh.font = comicFont;
 
             MeshRenderer mr = containerObj.GetComponent<MeshRenderer>();
             if (mr != null)
             {
                 mr.sortingLayerName = "UI";
                 mr.sortingOrder = 500; // Prioritas mutlak di depan arena, grid, dan unit
+                if (comicFont != null) mr.sharedMaterial = comicFont.material;
             }
 
-            Font comicFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
-            if (comicFont != null)
-            {
-                shadowMesh.font = comicFont;
-                if (shadowMr != null) shadowMr.sharedMaterial = comicFont.material;
-                textMesh.font = comicFont;
-                if (mr != null) mr.sharedMaterial = comicFont.material;
-            }
-
-            StartCoroutine(FloatingCombatNumberRoutine(containerObj, textMesh, shadowMesh, scale, isHighJump));
+            StartCoroutine(FloatingCombatNumberRoutine(containerObj, textMesh, strokeMeshes, scale, isHighJump));
         }
 
-        private IEnumerator FloatingCombatNumberRoutine(GameObject obj, TextMesh textMesh, TextMesh shadowMesh, float baseScale, bool isCrit)
+        private IEnumerator FloatingCombatNumberRoutine(GameObject obj, TextMesh textMesh, List<TextMesh> strokeMeshes, float baseScale, bool isCrit)
         {
             float duration = isCrit ? 0.95f : 0.80f;
             float elapsed = 0f;
             Vector3 startPos = obj.transform.position;
             Color startColor = textMesh.color;
-            Color shadowColor = shadowMesh != null ? shadowMesh.color : Color.black;
             float horizontalDrift = Random.Range(-0.35f, 0.35f);
             float jumpHeight = isCrit ? 0.75f : 0.45f;
             float initialCharSize = 0.08f * baseScale;
@@ -292,12 +303,27 @@ namespace FantasyDefense.Combat
                         ? Mathf.Lerp(0.7f, 1.25f, progress / 0.20f)
                         : Mathf.Lerp(1.25f, 1.0f, (progress - 0.20f) / 0.30f);
                     textMesh.characterSize = initialCharSize * scaleMultiplier;
-                    if (shadowMesh != null) shadowMesh.characterSize = initialCharSize * scaleMultiplier;
+                    if (strokeMeshes != null)
+                    {
+                        for (int i = 0; i < strokeMeshes.Count; i++)
+                        {
+                            if (strokeMeshes[i] != null) strokeMeshes[i].characterSize = initialCharSize * scaleMultiplier;
+                        }
+                    }
 
                     // 3. Fading transparan halus pada separuh akhir durasi
                     float alpha = progress > 0.55f ? Mathf.Lerp(1f, 0f, (progress - 0.55f) / 0.45f) : 1f;
                     textMesh.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
-                    if (shadowMesh != null) shadowMesh.color = new Color(shadowColor.r, shadowColor.g, shadowColor.b, shadowColor.a * alpha);
+                    if (strokeMeshes != null)
+                    {
+                        for (int i = 0; i < strokeMeshes.Count; i++)
+                        {
+                            if (strokeMeshes[i] != null)
+                            {
+                                strokeMeshes[i].color = new Color(0.04f, 0.04f, 0.06f, 0.95f * alpha);
+                            }
+                        }
+                    }
                 }
 
                 yield return null;

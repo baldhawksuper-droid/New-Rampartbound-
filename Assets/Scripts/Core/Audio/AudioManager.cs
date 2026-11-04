@@ -659,9 +659,10 @@ namespace FantasyDefense.Audio
                     break;
 
                 case UnitType.WindRanger:
-                    if (unit.CurrentTier >= UnitTier.Tier3) PlaySound(SoundType.TornadoImpact, tierPitchMultiplier);
-                    else if (unit.CurrentTier == UnitTier.Tier2) PlaySound(SoundType.PiercingGale, tierPitchMultiplier);
-                    else PlaySound(SoundType.ArrowShot, tierPitchMultiplier);
+                    float arrowRandomPitch = tierPitchMultiplier * Random.Range(0.92f, 1.08f);
+                    if (unit.CurrentTier >= UnitTier.Tier3) PlaySound(SoundType.TornadoImpact, arrowRandomPitch);
+                    else if (unit.CurrentTier == UnitTier.Tier2) PlaySound(SoundType.PiercingGale, arrowRandomPitch);
+                    else PlaySound(SoundType.ArrowShot, arrowRandomPitch);
                     break;
             }
         }

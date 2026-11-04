@@ -133,7 +133,15 @@ namespace FantasyDefense.Combat
         private void SpawnAndFireProjectile(MonsterController target)
         {
             GameObject projObj;
-            Vector3 originPos = transform.position + new Vector3(0.12f, 0.35f, 0f); // Dari ujung tongkat bintang Pippin
+            // Posisi ujung kristal tongkat kayu lengkung Pippin (3/4 kanan, koordinat +0.18x, +0.38y)
+            Vector3 originPos = transform.position + new Vector3(0.18f, 0.38f, 0f);
+
+            // Efek letupan pendaran sihir astral pada kristal tongkat saat bola sihir terlepas
+            if (SkillVfxManager.Instance != null)
+            {
+                Color castColor = currentTier >= UnitTier.Tier3 ? new Color(0.9f, 0.5f, 1f) : new Color(0.35f, 0.85f, 1f);
+                SkillVfxManager.Instance.SpawnProceduralParticleBurst(originPos, castColor, Color.white, 4, 1.2f, sortingOrder: 65);
+            }
 
             if (projectilePrefab != null)
             {

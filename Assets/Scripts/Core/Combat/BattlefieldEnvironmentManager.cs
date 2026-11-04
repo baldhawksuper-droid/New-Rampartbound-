@@ -158,7 +158,7 @@ namespace FantasyDefense.Combat
             var sprite = Resources.Load<Sprite>(spritePath);
             if (sprite == null)
             {
-                sprite = Resources.Load<Sprite>("Sprites/Environment/layer1_ground_battlefield");
+                sprite = Resources.Load<Sprite>("Sprites/Environment/Battlefield_Forest");
             }
             return sprite;
         }
