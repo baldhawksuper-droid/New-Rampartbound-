@@ -220,14 +220,39 @@ namespace FantasyDefense.Combat
             Vector3 dir = (targetWorldPos - anchorPos).normalized;
             if (dir == Vector3.zero) dir = Vector3.up;
 
-            Vector3 windupPos = anchorPos - dir * 0.06f;
-            float effectiveLungeDist = (unitController != null && unitController.UnitType == UnitType.RabbitMage) ? 0.04f : attackLungeDistance;
-            Vector3 lungePos = anchorPos + dir * effectiveLungeDist;
+            // Archetype-Specific Windup & Lunge Motion Cadence
+            Vector3 windupPos;
+            Vector3 lungePos;
+            float attackTilt = Mathf.Clamp(-dir.x * 16f, -20f, 20f);
+
+            if (unitController != null && unitController.UnitType == UnitType.WindRanger)
+            {
+                // Archer: Tarik tali busur ke belakang (recoil), tidak menerjang maju seperti pendekar pedang
+                windupPos = anchorPos - dir * 0.06f;
+                lungePos = anchorPos + dir * 0.03f;
+            }
+            else if (unitController != null && unitController.UnitType == UnitType.RoseTanker)
+            {
+                // Paladin: Mengangkat palu perang tinggi ke atas, lalu menghantam tanah (downward slam)
+                windupPos = anchorPos + Vector3.up * 0.08f;
+                lungePos = anchorPos + dir * 0.12f + Vector3.down * 0.03f;
+            }
+            else if (unitController != null && unitController.UnitType == UnitType.RabbitMage)
+            {
+                // Mage: Melayang anggun saat mengumpulkan tenaga sihir bintang di tongkat kristal
+                windupPos = anchorPos + Vector3.up * 0.06f;
+                lungePos = anchorPos + Vector3.up * 0.02f;
+            }
+            else
+            {
+                // Melee Spellblade (Cedric & default): Tarikan mundur lalu terjang maju tajam
+                windupPos = anchorPos - dir * 0.07f;
+                lungePos = anchorPos + dir * attackLungeDistance;
+            }
 
             Sprite defaultSprite = spriteRenderer != null ? spriteRenderer.sprite : null;
 
             // Orientasi serangan: Kemiringan hero condong halus ke arah lintasan tebasan monster
-            float attackTilt = Mathf.Clamp(-dir.x * 16f, -20f, 20f);
             Quaternion strikeRot = Quaternion.Euler(0f, 0f, attackTilt);
             Quaternion windupRot = Quaternion.Euler(0f, 0f, -attackTilt * 0.35f);
 
@@ -298,7 +323,9 @@ namespace FantasyDefense.Combat
                 }
                 else if (unitController.UnitType == UnitType.WindRanger)
                 {
-                    SkillVfxManager.Instance.SpawnWindArrowShot(anchorPos, lungePos + dir * 0.35f, unitController.CurrentTier);
+                    // Letupan partikel angin hijau di ujung busur saat tali busur dilepaskan
+                    Color windEmerald = unitController.CurrentTier >= UnitTier.Tier4 ? new Color(0.15f, 1.0f, 0.75f) : new Color(0.25f, 0.95f, 0.45f);
+                    SkillVfxManager.Instance.SpawnProceduralParticleBurst(anchorPos + new Vector3(0.12f, 0.28f, 0f), windEmerald, Color.white, 5, 1.8f);
                 }
                 else if (unitController.UnitType == UnitType.RabbitMage)
                 {

@@ -203,7 +203,7 @@ def main():
     if os.path.exists(csproj_path):
         import subprocess
         print(f"[BUILD] Compiling C# assemblies with {dotnet_bin} build...")
-        res = subprocess.run([dotnet_bin, "build", csproj_path], capture_output=True, text=True)
+        res = subprocess.run([dotnet_bin, "build", csproj_path, "-nodeReuse:false"], capture_output=True, text=True)
         if res.returncode != 0:
             print("\n[FAIL] Local Roslyn .NET compilation FAILED:")
             print(res.stdout)

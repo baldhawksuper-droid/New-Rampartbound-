@@ -67,6 +67,14 @@ namespace FantasyDefense.Combat
             if (target != null)
                 lastTargetPos = target.transform.position;
 
+            // Orientasi proyektil seketika pada frame inisialisasi agar sprite langsung menghadap target sejak frame 0
+            Vector3 initDir = (lastTargetPos - transform.position).normalized;
+            if (initDir != Vector3.zero)
+            {
+                float initialAngle = Mathf.Atan2(initDir.y, initDir.x) * Mathf.Rad2Deg;
+                transform.rotation = Quaternion.Euler(0, 0, initialAngle);
+            }
+
             Destroy(gameObject, maxLifetime);
         }
 
@@ -78,17 +86,18 @@ namespace FantasyDefense.Combat
             }
 
             Vector3 direction = (lastTargetPos - transform.position).normalized;
-            transform.position += direction * (flightSpeed * Time.deltaTime);
 
-            // Rotasi proyektil menghadap arah terbang
+            // Rotasi proyektil menghadap arah terbang diperbarui sebelum pergeseran posisi
             if (direction != Vector3.zero)
             {
                 float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
                 transform.rotation = Quaternion.Euler(0, 0, angle);
             }
 
+            transform.position += direction * (flightSpeed * Time.deltaTime);
+
             // Deteksi benturan saat mendekati posisi target
-            if (Vector3.Distance(transform.position, lastTargetPos) < 0.2f)
+            if (Vector3.Distance(transform.position, lastTargetPos) < 0.25f)
             {
                 HitTarget();
             }

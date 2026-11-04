@@ -119,12 +119,15 @@ namespace FantasyDefense.Combat
             }
             else
             {
-                // Dynamic clean fallback: membuat proyektil anak panah zamrud secara runtime
+                // Dynamic clean fallback: membuat proyektil anak panah zamrud orisinil secara runtime
                 projObj = new GameObject($"WindArrow_T{(int)currentTier}");
-                projObj.transform.position = transform.position;
+                // Titik spawn dari posisi busur panah (kanan atas tubuh hero)
+                Vector3 muzzleOffset = new Vector3(0.12f, 0.28f, 0f);
+                projObj.transform.position = transform.position + muzzleOffset;
 
                 var sr = projObj.AddComponent<SpriteRenderer>();
-                sr.sortingOrder = 24;
+                sr.sortingLayerName = "Effects";
+                sr.sortingOrder = 50;
 
                 Sprite arrowSprite = Resources.Load<Sprite>("Sprites/Combat/Projectile_Wind_Arrow");
 #if UNITY_EDITOR
@@ -136,7 +139,7 @@ namespace FantasyDefense.Combat
                 if (arrowSprite != null)
                 {
                     sr.sprite = arrowSprite;
-                    sr.color = currentTier >= UnitTier.Tier3 ? new Color(0.8f, 1f, 0.9f) : Color.white;
+                    sr.color = currentTier >= UnitTier.Tier3 ? new Color(0.9f, 1f, 0.95f) : Color.white;
                 }
                 else
                 {
@@ -144,7 +147,21 @@ namespace FantasyDefense.Combat
                     sr.color = currentTier >= UnitTier.Tier3 ? new Color(0.3f, 1f, 0.6f) : new Color(0.1f, 0.85f, 0.45f);
                 }
 
-                projObj.transform.localScale = new Vector3(0.65f, 0.45f, 1f);
+                // Skala seragam (UNIFORM SCALE) agar rotasi proyektil matematis tidak mendistorsi/memipihkan bentuk panah
+                float arrowScale = currentTier >= UnitTier.Tier4 ? 0.45f : 0.38f;
+                projObj.transform.localScale = new Vector3(arrowScale, arrowScale, 1f);
+
+                // Jejak angin halus (wind ribbon trail) mengikuti lintasan anak panah
+                var trail = projObj.AddComponent<TrailRenderer>();
+                trail.time = 0.08f;
+                trail.startWidth = 0.08f;
+                trail.endWidth = 0.01f;
+                Shader shader = Shader.Find("Sprites/Default") ?? Shader.Find("Particles/Standard Unlit");
+                if (shader != null) trail.material = new Material(shader);
+                trail.startColor = new Color(0.25f, 1.0f, 0.65f, 0.70f);
+                trail.endColor = new Color(0.10f, 0.90f, 0.40f, 0f);
+                trail.sortingLayerName = "Effects";
+                trail.sortingOrder = 49;
             }
 
             var proj = projObj.GetComponent<Projectile>();
