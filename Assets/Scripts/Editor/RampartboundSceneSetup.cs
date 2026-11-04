@@ -726,17 +726,17 @@ namespace Rampartbound.Editor
 
             // Formasi 4 Slot Pahlawan Teras Batu (Pippin, Cedric, Rose, & Hero Terkunci)
             // Pippin (Slot 1, Kiri): Lv.12, CP 1,600
-            var rabbitCard = CreateButton(heroesContainer.transform, "RabbitCard", "<b><color=#00FFFF>•</color> Lv.12 | CP 1,600</b>", new Color(0f, 0f, 0f, 0f), Color.white, 13, defaultFont);
+            var rabbitCard = CreateButton(heroesContainer.transform, "RabbitCard", "<b>Pippin</b>\n<color=#FFD700>• T1</color> | CP 1,600", new Color(0f, 0f, 0f, 0f), Color.white, 12, defaultFont);
             PositionUI(rabbitCard, 0.02f, 0.04f, 0.25f, 0.72f);
             SetupHeroCardPortrait(rabbitCard, _heroRabbitSprite, "Pippin");
 
             // Cedric (Slot 2, Tengah-Kiri): Cedric, Lv.15, CP 1,850
-            var cedricCard = CreateButton(heroesContainer.transform, "CedricCard", "<b>Cedric</b>\n<color=#00FFFF>•</color> Lv.15 | CP 1,850", new Color(0f, 0f, 0f, 0f), Color.white, 13, defaultFont);
+            var cedricCard = CreateButton(heroesContainer.transform, "CedricCard", "<b>Cedric</b>\n<color=#FFD700>• T1</color> | CP 1,850", new Color(0f, 0f, 0f, 0f), Color.white, 12, defaultFont);
             PositionUI(cedricCard, 0.26f, 0.04f, 0.49f, 0.72f);
             SetupHeroCardPortrait(cedricCard, _heroCedricSprite, "Cedric");
 
             // Rose (Slot 3, Tengah-Kanan): Lv.14, CP 1,400 (Chibi Palu Emas Raksasa)
-            var roseCard = CreateButton(heroesContainer.transform, "RoseCard", "<b><color=#00FFFF>•</color> Lv.14 | CP 1,400</b>", new Color(0f, 0f, 0f, 0f), Color.white, 13, defaultFont);
+            var roseCard = CreateButton(heroesContainer.transform, "RoseCard", "<b>Rose</b>\n<color=#FFD700>• T1</color> | CP 1,400", new Color(0f, 0f, 0f, 0f), Color.white, 12, defaultFont);
             PositionUI(roseCard, 0.51f, 0.04f, 0.74f, 0.72f);
             SetupHeroCardPortrait(roseCard, _heroRoseSprite, "Rose");
 
@@ -745,6 +745,16 @@ namespace Rampartbound.Editor
             PositionUI(windCard, 0.75f, 0.04f, 0.98f, 0.72f);
             SetupHeroCardPortrait(windCard, _heroLockedSilhouette != null ? _heroLockedSilhouette : _heroWindSprite, "Terkunci");
             windCard.SetActive(true);
+
+            // Hero Tier Preview Selector Bar (T1 - T5)
+            var tierBarObj = CreatePanel(heroesContainer.transform, "TierSelectorBar", new Color(0.05f, 0.08f, 0.14f, 0.85f));
+            PositionUI(tierBarObj, 0.20f, 0.74f, 0.80f, 0.81f);
+            float segW = 1.0f / 5.0f;
+            for (int t = 1; t <= 5; t++)
+            {
+                var tBtn = CreateButton(tierBarObj.transform, $"TierBtn_{t}", $"T{t}", t == 1 ? new Color(0.96f, 0.76f, 0.22f, 1f) : new Color(0.10f, 0.15f, 0.24f, 0.88f), t == 1 ? new Color(0.12f, 0.08f, 0.02f) : new Color(0.75f, 0.85f, 0.95f), 14, defaultFont);
+                PositionUI(tBtn, (t - 1) * segW + 0.015f, 0.10f, t * segW - 0.015f, 0.90f);
+            }
 
             // Core Battle Button (Crimson 3D Gold Frame with studs)
             var defendBtn = CreateButton(lobbyPanelObj.transform, "DefendCitadelButton", "⚔️ BATTLE  (5 ⚡)", new Color(0.78f, 0.10f, 0.12f), Color.white, 26, defaultFont);
@@ -881,6 +891,8 @@ namespace Rampartbound.Editor
             lobbySO.FindProperty("roseInfoText").objectReferenceValue = roseCard.GetComponentInChildren<Text>();
             lobbySO.FindProperty("windRangerCardButton").objectReferenceValue = windCard.GetComponent<Button>();
             lobbySO.FindProperty("windRangerInfoText").objectReferenceValue = windCard.GetComponentInChildren<Text>();
+            var tierBarProp = lobbySO.FindProperty("tierSelectorBar");
+            if (tierBarProp != null) tierBarProp.objectReferenceValue = tierBarObj;
             lobbySO.FindProperty("defendCitadelButton").objectReferenceValue = defendBtn.GetComponent<Button>();
             lobbySO.FindProperty("defenseTurretWorkshopButton").objectReferenceValue = defenseTurretBtn.GetComponent<Button>();
             lobbySO.FindProperty("abyssalTrialButton").objectReferenceValue = trialBtn.GetComponent<Button>();

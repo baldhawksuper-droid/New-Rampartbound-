@@ -89,11 +89,19 @@ namespace FantasyDefense.Combat
                 NotifySkillTriggered(sName);
             }
 
-            SpawnAndFireProjectile(target);
-
-            if (AudioManager.Instance != null)
+            System.Action fireAction = () =>
             {
-                AudioManager.Instance.PlaySound(SoundType.MagicSpark, 1.15f);
+                if (target == null) return;
+                SpawnAndFireProjectile(target);
+                if (AudioManager.Instance != null)
+                {
+                    AudioManager.Instance.PlaySound(SoundType.MagicSpark, 1.15f);
+                }
+            };
+
+            if (visualAnimator == null)
+            {
+                visualAnimator = GetComponent<HeroVisualAnimator>();
             }
 
             if (visualAnimator != null)
@@ -103,14 +111,21 @@ namespace FantasyDefense.Combat
                     Color auraColor = currentTier >= UnitTier.Tier5 ? new Color(0.9f, 0.95f, 1f) :
                                      (currentTier == UnitTier.Tier4 ? new Color(0.7f, 0.2f, 1f) :
                                      (currentTier == UnitTier.Tier3 ? new Color(0.85f, 0.3f, 1f) : new Color(0.2f, 0.75f, 1f)));
-                    visualAnimator.PlaySkillCast("Arcane", auraColor);
+                    visualAnimator.PulseAura(auraColor, 0.38f);
                 }
-                visualAnimator.PlayAttack(target.transform.position);
+                visualAnimator.PlayAttack(target.transform.position, fireAction);
             }
             else
             {
-                StartCoroutine(AnimateAttackPunch());
+                StartCoroutine(DelayedFallbackAttack(fireAction));
             }
+        }
+
+        private IEnumerator DelayedFallbackAttack(System.Action fireAction)
+        {
+            StartCoroutine(AnimateAttackPunch());
+            yield return new WaitForSeconds(0.18f);
+            fireAction?.Invoke();
         }
 
         private void SpawnAndFireProjectile(MonsterController target)

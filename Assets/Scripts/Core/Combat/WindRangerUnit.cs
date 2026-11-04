@@ -55,42 +55,59 @@ namespace FantasyDefense.Combat
 
             shotCount++;
 
-            if (currentTier == UnitTier.Tier1)
+            System.Action fireAction = () =>
             {
-                // T1: Swift Arrow
-                SpawnArrowProjectile(target, GetAttackDamage(), false, 0f, 0f);
-            }
-            else if (currentTier == UnitTier.Tier2)
-            {
-                // T2: Piercing Gale setiap 2 tembakan
-                if (shotCount % 2 == 0)
+                if (target == null) return;
+
+                if (currentTier == UnitTier.Tier1)
                 {
-                    ExecutePiercingGale(target);
-                }
-                else
-                {
+                    // T1: Swift Arrow
                     SpawnArrowProjectile(target, GetAttackDamage(), false, 0f, 0f);
                 }
-            }
-            else if (currentTier >= UnitTier.Tier3)
-            {
-                // T3, T4, T5: Tornado Barrage & Zephyr Whirlwind
-                if (Time.time - lastSkillAnnounceTime >= 6.0f)
+                else if (currentTier == UnitTier.Tier2)
                 {
-                    lastSkillAnnounceTime = Time.time;
-                    NotifySkillTriggered("Tornado Barrage");
+                    // T2: Piercing Gale setiap 2 tembakan
+                    if (shotCount % 2 == 0)
+                    {
+                        ExecutePiercingGale(target);
+                    }
+                    else
+                    {
+                        SpawnArrowProjectile(target, GetAttackDamage(), false, 0f, 0f);
+                    }
                 }
-                ExecuteTornadoBarrage(target);
+                else if (currentTier >= UnitTier.Tier3)
+                {
+                    // T3, T4, T5: Tornado Barrage & Zephyr Whirlwind
+                    if (Time.time - lastSkillAnnounceTime >= 6.0f)
+                    {
+                        lastSkillAnnounceTime = Time.time;
+                        NotifySkillTriggered("Tornado Barrage");
+                    }
+                    ExecuteTornadoBarrage(target);
+                }
+            };
+
+            if (visualAnimator == null)
+            {
+                visualAnimator = GetComponent<HeroVisualAnimator>();
             }
 
             if (visualAnimator != null)
             {
-                visualAnimator.PlayAttack(target.transform.position);
+                visualAnimator.PlayAttack(target.transform.position, fireAction);
             }
             else
             {
-                StartCoroutine(AnimateAttackPunch());
+                StartCoroutine(DelayedFallbackAttack(fireAction));
             }
+        }
+
+        private IEnumerator DelayedFallbackAttack(System.Action fireAction)
+        {
+            StartCoroutine(AnimateAttackPunch());
+            yield return new WaitForSeconds(0.18f);
+            fireAction?.Invoke();
         }
 
         private void SpawnArrowProjectile(MonsterController target, float dmg, bool isCrit, float splashRadius, float slow)

@@ -296,13 +296,18 @@ namespace FantasyDefense.Combat
         /// </summary>
         public override void PlayAttack(Vector3 targetWorldPos)
         {
+            PlayAttack(targetWorldPos, null);
+        }
+
+        public override void PlayAttack(Vector3 targetWorldPos, System.Action onStrikeImpact)
+        {
             if (isModularConfigured && torsoBone != null && torsoBone.gameObject.activeSelf)
             {
-                PlayModularAttack(targetWorldPos, null);
+                PlayModularAttack(targetWorldPos, onStrikeImpact);
             }
             else
             {
-                base.PlayAttack(targetWorldPos);
+                base.PlayAttack(targetWorldPos, onStrikeImpact);
             }
         }
 

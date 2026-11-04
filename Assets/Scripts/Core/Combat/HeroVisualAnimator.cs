@@ -186,6 +186,14 @@ namespace FantasyDefense.Combat
         /// </summary>
         public virtual void PlayAttack(Vector3 targetWorldPos)
         {
+            PlayAttack(targetWorldPos, null);
+        }
+
+        /// <summary>
+        /// Memicu animasi serang terkalibrasi dengan callback impak / peluncuran proyektil presisi pada pose Strike.
+        /// </summary>
+        public virtual void PlayAttack(Vector3 targetWorldPos, System.Action onStrikeImpact)
+        {
             if (unitController != null && unitController.IsDragging) return;
 
             currentState = AnimationState.Attack;
@@ -203,10 +211,10 @@ namespace FantasyDefense.Combat
                 frameAnimRoutine = null;
             }
 
-            activeAnimRoutine = StartCoroutine(AttackLungeRoutine(targetWorldPos));
+            activeAnimRoutine = StartCoroutine(AttackLungeRoutine(targetWorldPos, onStrikeImpact));
         }
 
-        private IEnumerator AttackLungeRoutine(Vector3 targetWorldPos)
+        private IEnumerator AttackLungeRoutine(Vector3 targetWorldPos, System.Action onStrikeImpact = null)
         {
             Vector3 anchorPos = GetAnchorPosition();
             Vector3 dir = (targetWorldPos - anchorPos).normalized;
@@ -313,6 +321,8 @@ namespace FantasyDefense.Combat
             }
 
             // 2b. Freeze-Frame Strike Hold (Tahan frame strike selama 0.18s agar pose serang terlihat jelas dan tajam oleh mata pemain)
+            onStrikeImpact?.Invoke();
+
             elapsed = 0f;
             while (elapsed < tStrikeHold)
             {
@@ -431,6 +441,41 @@ namespace FantasyDefense.Combat
             transform.position = anchorPos;
             transform.localScale = baseScale;
             StartIdleAnimation();
+        }
+
+        private Coroutine auraPulseRoutine;
+
+        /// <summary>
+        /// Memicu denyut kilau aura magis non-interuptif saat merapal serangan berkekuatan elemen.
+        /// </summary>
+        public void PulseAura(Color auraColor, float duration = 0.35f)
+        {
+            if (auraPulseRoutine != null) StopCoroutine(auraPulseRoutine);
+            if (gameObject.activeInHierarchy)
+            {
+                auraPulseRoutine = StartCoroutine(AuraPulseRoutine(auraColor, duration));
+            }
+        }
+
+        private IEnumerator AuraPulseRoutine(Color auraColor, float duration)
+        {
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+                float pulse = Mathf.Sin(t * Mathf.PI);
+                if (spriteRenderer != null)
+                {
+                    spriteRenderer.color = Color.Lerp(defaultColor, auraColor, pulse);
+                }
+                yield return null;
+            }
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.color = defaultColor;
+            }
+            auraPulseRoutine = null;
         }
 
         #endregion

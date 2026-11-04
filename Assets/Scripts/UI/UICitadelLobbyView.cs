@@ -53,6 +53,11 @@ namespace FantasyDefense.UI
         [SerializeField] private Button windRangerCardButton;
         [SerializeField] private Text windRangerInfoText;
 
+        [Header("Hero Tier Preview Selector")]
+        [SerializeField] private GameObject tierSelectorBar;
+        [SerializeField] private Button[] tierSelectorButtons;
+        private int currentPreviewTier = 1;
+
         [Header("Core Battle Action Buttons")]
         [SerializeField] private Button defendCitadelButton;
         [SerializeField] private Button defenseTurretWorkshopButton;
@@ -93,6 +98,7 @@ namespace FantasyDefense.UI
             Instance = this;
 
             InitializeButtons();
+            InitializeTierSelectorBar();
             ApplyLilitaOneFonts();
             ApplyResponsiveLayout();
         }
@@ -652,20 +658,19 @@ namespace FantasyDefense.UI
 
             bool isLocked = profile != null && !profile.isUnlocked;
 
-            // Format bersih terpadu: Cedric memiliki nama, Pippin & Rose ringkas elegan, Wind Ranger terkunci
+            int heroTier = currentPreviewTier > 0 ? currentPreviewTier : (profile != null ? Mathf.Clamp(profile.starRank, 1, 5) : 1);
+            int displayCp = cp * heroTier;
+
+            // Format bersih terpadu konsisten: Tampilkan nama hero di baris 1, Tier & CP di baris 2
             if (isLocked)
             {
                 infoText.text = "<b><color=#FFAA00>🔒 TERKUNCI</color></b>";
             }
-            else if (type == UnitType.Knight)
-            {
-                infoText.text = $"<b>{heroName}</b>\n<color=#00FFFF>•</color> Lv.{lvl} | CP {cp:N0}";
-            }
             else
             {
-                infoText.text = $"<b><color=#00FFFF>•</color> Lv.{lvl} | CP {cp:N0}</b>";
+                infoText.text = $"<b>{heroName}</b>\n<color=#FFD700>• T{heroTier}</color> | CP {displayCp:N0}";
             }
-            infoText.fontSize = 13;
+            infoText.fontSize = 12;
             infoText.alignment = TextAnchor.MiddleCenter;
 
             if (btn != null)
@@ -695,7 +700,6 @@ namespace FantasyDefense.UI
                     else
                     {
                         img.color = Color.white;
-                        int heroTier = profile != null ? Mathf.Clamp(profile.starRank, 1, 5) : 1;
                         Sprite heroSprite = GetHeroSpriteForType(type, heroTier);
                         if (heroSprite != null)
                         {
@@ -742,6 +746,149 @@ namespace FantasyDefense.UI
                 }
             }
         }
+
+        #region Hero Tier Preview Selector
+
+        private void InitializeTierSelectorBar()
+        {
+            if (tierSelectorBar == null)
+            {
+                Transform parentTr = courtyardContainer != null ? courtyardContainer : (rabbitCardButton != null ? rabbitCardButton.transform.parent : null);
+                if (parentTr != null)
+                {
+                    var found = parentTr.Find("TierSelectorBar");
+                    if (found != null)
+                    {
+                        tierSelectorBar = found.gameObject;
+                    }
+                    else
+                    {
+                        tierSelectorBar = CreateDynamicTierSelectorBar(parentTr);
+                    }
+                }
+            }
+
+            if (tierSelectorBar != null && (tierSelectorButtons == null || tierSelectorButtons.Length == 0))
+            {
+                tierSelectorButtons = tierSelectorBar.GetComponentsInChildren<Button>(true);
+            }
+
+            if (tierSelectorButtons != null)
+            {
+                for (int i = 0; i < tierSelectorButtons.Length; i++)
+                {
+                    int tier = i + 1;
+                    tierSelectorButtons[i].onClick.RemoveAllListeners();
+                    tierSelectorButtons[i].onClick.AddListener(() => SetPreviewTier(tier));
+                }
+            }
+
+            UpdateTierSelectorVisuals();
+        }
+
+        private GameObject CreateDynamicTierSelectorBar(Transform parentTr)
+        {
+            var barObj = new GameObject("TierSelectorBar", typeof(RectTransform), typeof(Image));
+            barObj.transform.SetParent(parentTr, false);
+
+            var rt = barObj.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0.20f, 0.73f);
+            rt.anchorMax = new Vector2(0.80f, 0.79f);
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+
+            var bgImg = barObj.GetComponent<Image>();
+            bgImg.color = new Color(0.05f, 0.08f, 0.14f, 0.85f);
+
+            var font = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+
+            var buttonsList = new System.Collections.Generic.List<Button>();
+            float segmentW = 1.0f / 5.0f;
+            for (int i = 0; i < 5; i++)
+            {
+                int tierNum = i + 1;
+                var btnObj = new GameObject($"TierBtn_{tierNum}", typeof(RectTransform), typeof(Image), typeof(Button));
+                btnObj.transform.SetParent(barObj.transform, false);
+
+                var btnRt = btnObj.GetComponent<RectTransform>();
+                btnRt.anchorMin = new Vector2(i * segmentW + 0.015f, 0.10f);
+                btnRt.anchorMax = new Vector2((i + 1) * segmentW - 0.015f, 0.90f);
+                btnRt.offsetMin = Vector2.zero;
+                btnRt.offsetMax = Vector2.zero;
+
+                var btnImg = btnObj.GetComponent<Image>();
+                btnImg.color = (tierNum == currentPreviewTier) ? new Color(0.96f, 0.76f, 0.22f, 1.0f) : new Color(0.10f, 0.15f, 0.24f, 0.88f);
+
+                var textObj = new GameObject("Text", typeof(RectTransform), typeof(Text));
+                textObj.transform.SetParent(btnObj.transform, false);
+                var textRt = textObj.GetComponent<RectTransform>();
+                textRt.anchorMin = Vector2.zero;
+                textRt.anchorMax = Vector2.one;
+                textRt.offsetMin = Vector2.zero;
+                textRt.offsetMax = Vector2.zero;
+
+                var txt = textObj.GetComponent<Text>();
+                txt.text = $"T{tierNum}";
+                txt.alignment = TextAnchor.MiddleCenter;
+                txt.fontSize = 14;
+                txt.color = (tierNum == currentPreviewTier) ? new Color(0.12f, 0.08f, 0.02f, 1.0f) : new Color(0.75f, 0.85f, 0.95f, 1.0f);
+                if (font != null) txt.font = font;
+
+                buttonsList.Add(btnObj.GetComponent<Button>());
+            }
+            tierSelectorButtons = buttonsList.ToArray();
+            return barObj;
+        }
+
+        private void UpdateTierSelectorVisuals()
+        {
+            if (tierSelectorButtons == null) return;
+
+            for (int i = 0; i < tierSelectorButtons.Length; i++)
+            {
+                var btn = tierSelectorButtons[i];
+                if (btn == null) continue;
+                bool isActive = (i + 1) == currentPreviewTier;
+
+                var img = btn.GetComponent<Image>();
+                if (img != null)
+                {
+                    img.color = isActive 
+                        ? new Color(0.96f, 0.76f, 0.22f, 1.0f) 
+                        : new Color(0.10f, 0.15f, 0.24f, 0.88f);
+                }
+
+                var txt = btn.GetComponentInChildren<Text>();
+                if (txt != null)
+                {
+                    txt.color = isActive 
+                        ? new Color(0.12f, 0.08f, 0.02f, 1.0f) 
+                        : new Color(0.75f, 0.85f, 0.95f, 1.0f);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Mengatur tier pahlawan yang ditampilkan pada standee pelataran lobi (T1 s/d T5).
+        /// </summary>
+        public void SetPreviewTier(int tier)
+        {
+            currentPreviewTier = Mathf.Clamp(tier, 1, 5);
+            UpdateTierSelectorVisuals();
+            RefreshDisplays();
+
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySound(SoundType.ButtonClick, 1.15f);
+            }
+
+            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null && FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+            {
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Selection);
+            }
+        }
+
+        #endregion
 
         private Sprite GetHeroSpriteForType(UnitType type, int tier = 1)
         {
