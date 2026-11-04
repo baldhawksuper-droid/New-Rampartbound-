@@ -88,6 +88,16 @@ namespace FantasyDefense.UI
         [SerializeField] private bool showForge = false;
         [SerializeField] private bool showFeaturePreview = false;
 
+        [Header("Citadel Courtyard Atmosphere & Standee VFX")]
+        [SerializeField] private bool enableCourtyardAtmosphere = true;
+        [SerializeField] private bool enableStandeeIdleBobbing = true;
+        private RectTransform pippinPortraitRt, pippinShadowRt;
+        private RectTransform cedricPortraitRt, cedricShadowRt;
+        private RectTransform rosePortraitRt, roseShadowRt;
+        private RectTransform windPortraitRt, windShadowRt;
+        private Image valleyMistOverlay;
+        private Image godRaysOverlay;
+
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -99,6 +109,7 @@ namespace FantasyDefense.UI
 
             InitializeButtons();
             InitializeTierSelectorBar();
+            InitializeAtmosphereAndBobbing();
             ApplyLilitaOneFonts();
             ApplyResponsiveLayout();
         }
@@ -221,6 +232,175 @@ namespace FantasyDefense.UI
                 float pulse = 1.0f + (Mathf.Sin(Time.unscaledTime * 3.0f) * 0.5f + 0.5f) * 0.03f;
                 defendCitadelButton.transform.localScale = new Vector3(pulse, pulse, 1f);
             }
+
+            UpdateAtmosphereAndStandeeBobbing();
+        }
+
+        private void InitializeAtmosphereAndBobbing()
+        {
+            if (rabbitCardButton != null)
+            {
+                pippinPortraitRt = rabbitCardButton.transform.Find("HeroPortrait")?.GetComponent<RectTransform>();
+                pippinShadowRt = rabbitCardButton.transform.Find("GroundShadow")?.GetComponent<RectTransform>();
+            }
+            if (cedricCardButton != null)
+            {
+                cedricPortraitRt = cedricCardButton.transform.Find("HeroPortrait")?.GetComponent<RectTransform>();
+                cedricShadowRt = cedricCardButton.transform.Find("GroundShadow")?.GetComponent<RectTransform>();
+            }
+            if (roseCardButton != null)
+            {
+                rosePortraitRt = roseCardButton.transform.Find("HeroPortrait")?.GetComponent<RectTransform>();
+                roseShadowRt = roseCardButton.transform.Find("GroundShadow")?.GetComponent<RectTransform>();
+            }
+            if (windRangerCardButton != null)
+            {
+                windPortraitRt = windRangerCardButton.transform.Find("HeroPortrait")?.GetComponent<RectTransform>();
+                windShadowRt = windRangerCardButton.transform.Find("GroundShadow")?.GetComponent<RectTransform>();
+            }
+
+            // Inisialisasi Lapisan Atmosfer Lembah & God Rays jika belum ada
+            if (enableCourtyardAtmosphere && valleyMistOverlay == null)
+            {
+                Transform parentTr = courtyardContainer != null ? courtyardContainer.parent : transform;
+                if (parentTr != null)
+                {
+                    var existingAtmosphere = parentTr.Find("LobbyAtmosphereLayer");
+                    GameObject atmoObj;
+                    if (existingAtmosphere != null)
+                    {
+                        atmoObj = existingAtmosphere.gameObject;
+                    }
+                    else
+                    {
+                        atmoObj = new GameObject("LobbyAtmosphereLayer", typeof(RectTransform));
+                        atmoObj.transform.SetParent(parentTr, false);
+                        var rt = atmoObj.GetComponent<RectTransform>();
+                        rt.anchorMin = Vector2.zero;
+                        rt.anchorMax = Vector2.one;
+                        rt.offsetMin = Vector2.zero;
+                        rt.offsetMax = Vector2.zero;
+
+                        // Tempatkan tepat di belakang wadah pahlawan agar menyatu dengan pemandangan lembah
+                        if (courtyardContainer != null)
+                        {
+                            int courtIndex = courtyardContainer.GetSiblingIndex();
+                            atmoObj.transform.SetSiblingIndex(Mathf.Max(0, courtIndex));
+                        }
+                    }
+
+                    // 1. Kabut Lembah Lembut (Valley Mist)
+                    var mistTr = atmoObj.transform.Find("ValleyMist");
+                    if (mistTr == null)
+                    {
+                        var mistObj = new GameObject("ValleyMist", typeof(RectTransform), typeof(Image));
+                        mistObj.transform.SetParent(atmoObj.transform, false);
+                        var mRt = mistObj.GetComponent<RectTransform>();
+                        mRt.anchorMin = new Vector2(0f, 0.45f);
+                        mRt.anchorMax = new Vector2(1f, 0.68f);
+                        mRt.offsetMin = Vector2.zero;
+                        mRt.offsetMax = Vector2.zero;
+                        valleyMistOverlay = mistObj.GetComponent<Image>();
+                        valleyMistOverlay.color = new Color(0.85f, 0.92f, 1.0f, 0.15f);
+                        valleyMistOverlay.raycastTarget = false;
+                    }
+                    else
+                    {
+                        valleyMistOverlay = mistTr.GetComponent<Image>();
+                    }
+
+                    // 2. Berkas Sinar Mentari Lembut (God Rays Shimmer)
+                    var rayTr = atmoObj.transform.Find("GodRays");
+                    if (rayTr == null)
+                    {
+                        var rayObj = new GameObject("GodRays", typeof(RectTransform), typeof(Image));
+                        rayObj.transform.SetParent(atmoObj.transform, false);
+                        var rRt = rayObj.GetComponent<RectTransform>();
+                        rRt.anchorMin = new Vector2(0.40f, 0.50f);
+                        rRt.anchorMax = new Vector2(1f, 0.95f);
+                        rRt.offsetMin = Vector2.zero;
+                        rRt.offsetMax = Vector2.zero;
+                        godRaysOverlay = rayObj.GetComponent<Image>();
+                        godRaysOverlay.color = new Color(1.0f, 0.95f, 0.80f, 0.08f);
+                        godRaysOverlay.raycastTarget = false;
+                    }
+                    else
+                    {
+                        godRaysOverlay = rayTr.GetComponent<Image>();
+                    }
+                }
+            }
+        }
+
+        private void UpdateAtmosphereAndStandeeBobbing()
+        {
+            float t = Time.unscaledTime;
+
+            // 1. Shimmer kabut lembah & god rays
+            if (valleyMistOverlay != null && valleyMistOverlay.gameObject.activeInHierarchy)
+            {
+                float mistAlpha = 0.12f + (Mathf.Sin(t * 0.8f) * 0.04f);
+                valleyMistOverlay.color = new Color(0.85f, 0.92f, 1.0f, mistAlpha);
+            }
+            if (godRaysOverlay != null && godRaysOverlay.gameObject.activeInHierarchy)
+            {
+                float rayAlpha = 0.07f + (Mathf.Sin(t * 0.6f + 1.2f) * 0.03f);
+                godRaysOverlay.color = new Color(1.0f, 0.95f, 0.80f, rayAlpha);
+            }
+
+            // 2. Subtle Idle Breathing Bobbing pada Standee Hero di Teras
+            if (enableStandeeIdleBobbing)
+            {
+                // Pippin (Mage lembut mengambang)
+                if (pippinPortraitRt != null)
+                {
+                    float yPippin = Mathf.Sin(t * 2.2f) * 3.5f;
+                    float sPippin = 1.0f + (Mathf.Sin(t * 2.2f) * 0.015f);
+                    pippinPortraitRt.anchoredPosition = new Vector2(0f, yPippin);
+                    pippinPortraitRt.localScale = new Vector3(1f, sPippin, 1f);
+                    if (pippinShadowRt != null)
+                    {
+                        float shadowScale = 1.0f - (yPippin * 0.012f);
+                        pippinShadowRt.localScale = new Vector3(shadowScale, shadowScale, 1f);
+                    }
+                }
+
+                // Cedric (Ksatria tegap menapak)
+                if (cedricPortraitRt != null)
+                {
+                    float yCedric = Mathf.Sin(t * 2.0f + 0.85f) * 2.8f;
+                    float sCedric = 1.0f + (Mathf.Sin(t * 2.0f + 0.85f) * 0.012f);
+                    cedricPortraitRt.anchoredPosition = new Vector2(0f, yCedric);
+                    cedricPortraitRt.localScale = new Vector3(1f, sCedric, 1f);
+                    if (cedricShadowRt != null)
+                    {
+                        float shadowScale = 1.0f - (yCedric * 0.012f);
+                        cedricShadowRt.localScale = new Vector3(shadowScale, shadowScale, 1f);
+                    }
+                }
+
+                // Rose (Paladin tangguh berbaju zirah)
+                if (rosePortraitRt != null)
+                {
+                    float yRose = Mathf.Sin(t * 1.9f + 1.70f) * 2.2f;
+                    float sRose = 1.0f + (Mathf.Sin(t * 1.9f + 1.70f) * 0.010f);
+                    rosePortraitRt.anchoredPosition = new Vector2(0f, yRose);
+                    rosePortraitRt.localScale = new Vector3(1f, sRose, 1f);
+                    if (roseShadowRt != null)
+                    {
+                        float shadowScale = 1.0f - (yRose * 0.010f);
+                        roseShadowRt.localScale = new Vector3(shadowScale, shadowScale, 1f);
+                    }
+                }
+            }
+        }
+
+        private void PlayLobbyAtmosphericAudio()
+        {
+            if (FantasyDefense.Audio.AudioManager.Instance != null)
+            {
+                FantasyDefense.Audio.AudioManager.Instance.PlayBGM(FantasyDefense.Audio.BgmTrack.LobbyTheme);
+            }
         }
 
         private void OnEnable()
@@ -241,6 +421,7 @@ namespace FantasyDefense.UI
             ApplyResponsiveLayout();
             RefreshLocalization();
             RefreshDisplays();
+            PlayLobbyAtmosphericAudio();
         }
 
         private void OnDisable()
