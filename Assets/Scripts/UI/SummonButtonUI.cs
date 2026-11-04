@@ -359,6 +359,25 @@ namespace FantasyDefense.UI
             if (FantasyDefense.GridSystem.GridMatch3Solver.Instance != null && FantasyDefense.GridSystem.GridMatch3Solver.Instance.IsResolving)
             {
                 StartCoroutine(ShakeButtonRoutine());
+                if (SkillVfxManager.Instance != null)
+                {
+                    SkillVfxManager.Instance.SpawnFloatingText(
+                        transform.position + Vector3.up * 0.9f,
+                        CitadelLocalizationManager.Text("⚠️ PAPAN SEDANG AKTIF!", "⚠️ BOARD IS RESOLVING!"),
+                        new Color(1f, 0.75f, 0.2f),
+                        1.2f,
+                        true
+                    );
+                }
+                if (Audio.AudioManager.Instance != null)
+                {
+                    Audio.AudioManager.Instance.PlaySfx(Audio.AudioSfxType.ButtonClick);
+                }
+                if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
+                    FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+                {
+                    FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Warning);
+                }
                 return;
             }
 

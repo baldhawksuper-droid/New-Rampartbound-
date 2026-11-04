@@ -354,6 +354,12 @@ namespace FantasyDefense.Summon
         /// </summary>
         public bool TrySummonSpecificHero(UnitType targetType)
         {
+            if (FantasyDefense.GridSystem.GridMatch3Solver.Instance != null && FantasyDefense.GridSystem.GridMatch3Solver.Instance.IsResolving)
+            {
+                Debug.LogWarning("[HeroSummoner] Aksi ditahan: Papan sedang menyelesaikan cascade Match-3.");
+                return false;
+            }
+
             if (GridManager.Instance == null || !GridManager.Instance.IsInitialized)
             {
                 OnSummonFailed?.Invoke(SummonFailureReason.ManagerNotReady);

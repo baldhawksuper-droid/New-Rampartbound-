@@ -894,8 +894,27 @@ namespace FantasyDefense.Combat
 
             ghostOriginSr = ghostOriginObj.AddComponent<SpriteRenderer>();
             ghostOriginSr.sprite = spriteRenderer.sprite;
-            // Siluet transparan lembut di petak asal agar pemain tahu ke mana permata akan kembali
-            ghostOriginSr.color = new Color(1f, 1f, 1f, 0.38f);
+
+            // Penyelarasan kontras siluet sesuai tema bioma aktif agar tidak pudar di medan terang
+            Color ghostColor = new Color(1f, 1f, 1f, 0.44f);
+            if (BattlefieldEnvironmentManager.Instance != null)
+            {
+                switch (BattlefieldEnvironmentManager.Instance.CurrentTheme)
+                {
+                    case BattlefieldEnvironmentTheme.Mountain: // Batuan karang & salju terang
+                        ghostColor = new Color(0.82f, 0.90f, 1f, 0.48f);
+                        break;
+                    case BattlefieldEnvironmentTheme.Volcanic: // Magma & basal gelap
+                        ghostColor = new Color(1f, 0.88f, 0.82f, 0.45f);
+                        break;
+                    case BattlefieldEnvironmentTheme.Forest:
+                    default:
+                        ghostColor = new Color(1f, 1f, 1f, 0.44f);
+                        break;
+                }
+            }
+
+            ghostOriginSr.color = ghostColor;
             ghostOriginSr.sortingOrder = normalSortingOrder;
         }
 

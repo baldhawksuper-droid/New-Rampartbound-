@@ -716,7 +716,7 @@ namespace FantasyDefense.Audio
             proceduralClipCache[SoundType.CriticalHitChime] = CreateArpeggioClip("CriticalHitChime", new float[] { 1046.50f, 1567.98f, 2093.00f, 3135.96f }, 0.024f);
 
             // Audio Khusus Tactile Tile Rebound Thud (Benturan elastis lembut saat geseran batal/terlarang)
-            proceduralClipCache[SoundType.TileReboundThud] = CreateToneClip("TileReboundThud", 0.12f, 240f, 110f);
+            proceduralClipCache[SoundType.TileReboundThud] = CreateToneClip("TileReboundThud", 0.14f, 220f, 95f);
         }
 
         private AudioClip CreateToneClip(string name, float duration, float startFreq, float endFreq)
@@ -770,12 +770,14 @@ namespace FantasyDefense.Audio
                 }
                 else if (isTileRebound)
                 {
-                    // Tactile rubber/felt board rebound thud with quick dampening
-                    float env = Mathf.Exp(-24f * progress);
-                    filterNoise += 0.12f * (Random.Range(-1f, 1f) - filterNoise);
-                    float thud = Mathf.Sin(2 * Mathf.PI * Mathf.Lerp(startFreq, endFreq, progress) * t) * 0.70f +
-                                 Mathf.Sin(Mathf.PI * 90f * t) * 0.30f;
-                    samples[i] = (thud + filterNoise * 0.10f) * env * 0.60f;
+                    // Tactile rubber/wood token rebound thud with spring-damped non-linear pitch decay
+                    float env = Mathf.Exp(-22f * progress);
+                    filterNoise += 0.10f * (Random.Range(-1f, 1f) - filterNoise);
+                    float nonLinearProgress = Mathf.Pow(progress, 0.72f);
+                    float curFreq = Mathf.Lerp(startFreq, endFreq, nonLinearProgress);
+                    float primaryThud = Mathf.Sin(2 * Mathf.PI * curFreq * t) * 0.72f;
+                    float subResonance = Mathf.Sin(2 * Mathf.PI * 75f * t) * 0.28f;
+                    samples[i] = (primaryThud + subResonance + filterNoise * 0.08f) * env * 0.65f;
                 }
                 else if (isZap)
                 {
