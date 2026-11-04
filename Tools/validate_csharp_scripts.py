@@ -45,6 +45,12 @@ def check_deprecations(path, content):
 
 def check_known_namespaces(path, content):
     errors = []
+    # Strip comments and literal strings
+    clean = re.sub(r'//.*', '', content)
+    clean = re.sub(r'/\*.*?\*/', '', clean, flags=re.DOTALL)
+    clean = re.sub(r'"(\\.|[^"\\])*"', '""', clean)
+    clean = re.sub(r"'(\\.|[^'\\])*'", "''", clean)
+
     if 'SkillVfxManager' in content and 'namespace FantasyDefense.Combat' not in content:
         if 'using FantasyDefense.Combat;' not in content and 'FantasyDefense.Combat.SkillVfxManager' not in content:
             errors.append("CS0103 'SkillVfxManager' referenced without 'using FantasyDefense.Combat;'")
@@ -54,6 +60,20 @@ def check_known_namespaces(path, content):
     if 'SoundType' in content and 'namespace FantasyDefense.Audio' not in content:
         if 'using FantasyDefense.Audio;' not in content and 'Audio.SoundType' not in content and 'FantasyDefense.Audio.SoundType' not in content:
             errors.append("CS0103 'SoundType' referenced without 'using FantasyDefense.Audio;' or 'Audio.SoundType'")
+    # Check Action/Func when used as a type identifier (e.g. Action or Action<...>, Func<...>)
+    # and not prefixed by System. or within comments/strings
+    clean_lines = clean.split('\n')
+    for line_idx, line in enumerate(clean_lines, 1):
+        if re.search(r'(?<!System\.)\b(Action|Func)\s*(<|\b\w+\s*[=;,\)])', line):
+            if 'using System;' not in content:
+                errors.append(f"Line {line_idx}: CS0246 The type or namespace name 'Action/Func' could not be found (missing 'using System;')")
+                break
+    if re.search(r'(?<!System\.Collections\.)\bIEnumerator\b', clean):
+        if 'using System.Collections;' not in content:
+            errors.append("CS0246 The type or namespace name 'IEnumerator' could not be found (missing 'using System.Collections;')")
+    if re.search(r'(?<!System\.Collections\.Generic\.)\b(List|Dictionary|HashSet|Queue|Stack)\s*<', clean):
+        if 'using System.Collections.Generic;' not in content:
+            errors.append("CS0246 Collection type referenced without 'using System.Collections.Generic;'")
     return errors
 
 def check_scope_shadowing(path, content):
