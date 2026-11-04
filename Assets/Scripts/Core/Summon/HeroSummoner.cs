@@ -700,7 +700,12 @@ namespace FantasyDefense.Summon
                 {
                     if (h != null && formationTypes.Contains(h.unitType))
                     {
-                        list.Add(h);
+                        // Pastikan jika hero ini terkunci di roster, jangan masukkan ke pool pemanggilan
+                        var profile = FantasyDefense.Metagame.CitadelLobbyManager.Instance.GetHeroProfile(h.unitType);
+                        if (profile == null || profile.isUnlocked)
+                        {
+                            list.Add(h);
+                        }
                     }
                 }
                 if (list.Count > 0) return list;

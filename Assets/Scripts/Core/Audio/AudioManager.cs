@@ -201,6 +201,7 @@ namespace FantasyDefense.Audio
         private int sfxPlayCounter = 0;
         private readonly Dictionary<SoundType, float> lastPlayTimeBySound = new Dictionary<SoundType, float>();
         private Coroutine duckBgmCoroutine;
+        private Coroutine bgmCrossfadeCoroutine;
 
         /// <summary>
         /// Meredam volume BGM sementara saat ledakan besar/fanfare terjadi (Sidechain Ducking),
@@ -376,7 +377,7 @@ namespace FantasyDefense.Audio
             }
         }
 
-        public void PlayBGM(BgmTrack track)
+        public void PlayBGM(BgmTrack track, float fadeDuration = 0.45f)
         {
             if (bgmSource == null) return;
             if (currentBgmTrack == track && bgmSource.isPlaying) return;
@@ -384,7 +385,7 @@ namespace FantasyDefense.Audio
             currentBgmTrack = track;
             if (track == BgmTrack.None)
             {
-                bgmSource.Stop();
+                StopBGM(fadeDuration);
                 return;
             }
 
@@ -414,32 +415,95 @@ namespace FantasyDefense.Audio
                 }
             }
 
-            if (realBgm != null)
+            AudioClip targetClip = realBgm;
+            if (targetClip == null)
             {
-                bgmSource.clip = realBgm;
-                UpdateVolumes();
-                bgmSource.Play();
-                return;
+                proceduralBgmCache.TryGetValue(track, out targetClip);
             }
 
-            // 3. Fallback mulus ke procedural synthesized melody
-            if (proceduralBgmCache.TryGetValue(track, out AudioClip clip))
+            if (targetClip != null)
             {
-                bgmSource.clip = clip;
-                UpdateVolumes();
-                bgmSource.Play();
+                if (bgmCrossfadeCoroutine != null) StopCoroutine(bgmCrossfadeCoroutine);
+                if (gameObject.activeInHierarchy && bgmSource.isPlaying && fadeDuration > 0.05f)
+                {
+                    bgmCrossfadeCoroutine = StartCoroutine(CrossfadeBgmRoutine(targetClip, fadeDuration));
+                }
+                else
+                {
+                    bgmSource.clip = targetClip;
+                    UpdateVolumes();
+                    bgmSource.Play();
+                }
             }
         }
 
-        public void PlayBgm(BgmTrack track) => PlayBGM(track);
+        private System.Collections.IEnumerator CrossfadeBgmRoutine(AudioClip newClip, float duration)
+        {
+            float targetVol = isBgmMuted ? 0f : (bgmVolume * masterVolume);
+            float startVol = bgmSource.volume;
+            float halfDuration = duration * 0.5f;
 
-        public void StopBGM()
+            // Fade out musik lama
+            float elapsed = 0f;
+            while (elapsed < halfDuration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = Mathf.Clamp01(elapsed / halfDuration);
+                bgmSource.volume = Mathf.Lerp(startVol, 0f, t);
+                yield return null;
+            }
+
+            bgmSource.Stop();
+            bgmSource.clip = newClip;
+            bgmSource.volume = 0f;
+            bgmSource.Play();
+
+            // Fade in musik baru
+            elapsed = 0f;
+            while (elapsed < halfDuration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = Mathf.Clamp01(elapsed / halfDuration);
+                bgmSource.volume = Mathf.Lerp(0f, targetVol, t);
+                yield return null;
+            }
+
+            bgmSource.volume = targetVol;
+            bgmCrossfadeCoroutine = null;
+        }
+
+        public void PlayBgm(BgmTrack track) => PlayBGM(track, 0.45f);
+
+        public void StopBGM(float fadeDuration = 0.35f)
         {
             currentBgmTrack = BgmTrack.None;
-            if (bgmSource != null)
+            if (bgmSource == null || !bgmSource.isPlaying) return;
+
+            if (bgmCrossfadeCoroutine != null) StopCoroutine(bgmCrossfadeCoroutine);
+            if (gameObject.activeInHierarchy && fadeDuration > 0.05f)
+            {
+                bgmCrossfadeCoroutine = StartCoroutine(FadeOutBgmRoutine(fadeDuration));
+            }
+            else
             {
                 bgmSource.Stop();
             }
+        }
+
+        private System.Collections.IEnumerator FadeOutBgmRoutine(float duration)
+        {
+            float startVol = bgmSource.volume;
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+                bgmSource.volume = Mathf.Lerp(startVol, 0f, t);
+                yield return null;
+            }
+            bgmSource.Stop();
+            UpdateVolumes();
+            bgmCrossfadeCoroutine = null;
         }
 
         public void SetMasterVolume(float val)

@@ -856,6 +856,13 @@ namespace Rampartbound.Editor
             var navStoreBtn = CreateButton(dockObj.transform, "NavStore", "Bag", Color.clear, Color.white, 12, defaultFont);
 
             System.Action<GameObject, Sprite, string, bool> setupFantasyNavTab = (btn, iconSp, label, isActive) => {
+                // Standar Ergonomi Sentuh Mobile: Menjamin hit-box tombol minimal 48x48dp (diset min 52x52)
+                var le = btn.GetComponent<LayoutElement>() ?? btn.AddComponent<LayoutElement>();
+                le.minWidth = 52f;
+                le.minHeight = 52f;
+                le.flexibleWidth = 1f;
+                le.flexibleHeight = 1f;
+
                 var bImg = btn.GetComponent<Image>();
                 if (bImg != null)
                 {
@@ -863,6 +870,7 @@ namespace Rampartbound.Editor
                     bImg.color = isActive 
                         ? new Color(0.96f, 0.75f, 0.18f, 0.24f) 
                         : Color.clear;
+                    bImg.raycastTarget = true; // Menjamin area hit-box menangkap tap sentuhan jari
                 }
 
                 if (_tabActivePodium != null)
