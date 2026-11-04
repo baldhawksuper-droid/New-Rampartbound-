@@ -209,6 +209,12 @@ namespace FantasyDefense.Summon
         /// </summary>
         public bool TrySummonHero()
         {
+            if (FantasyDefense.Core.GridMatch3Solver.Instance != null && FantasyDefense.Core.GridMatch3Solver.Instance.IsResolving)
+            {
+                Debug.LogWarning("[HeroSummoner] Aksi ditahan: Papan sedang menyelesaikan cascade Match-3.");
+                return false;
+            }
+
             // 1. Validasi keberadaan GridManager
             if (GridManager.Instance == null || !GridManager.Instance.IsInitialized)
             {
@@ -315,6 +321,11 @@ namespace FantasyDefense.Summon
         /// </summary>
         public bool TrySummonFreeHero()
         {
+            if (FantasyDefense.Core.GridMatch3Solver.Instance != null && FantasyDefense.Core.GridMatch3Solver.Instance.IsResolving)
+            {
+                return false;
+            }
+
             if (GridManager.Instance == null || !GridManager.Instance.IsInitialized)
             {
                 return false;
@@ -449,6 +460,12 @@ namespace FantasyDefense.Summon
         /// </summary>
         public bool TryExecuteSwapMergeCatalyst()
         {
+            if (FantasyDefense.Core.GridMatch3Solver.Instance != null && FantasyDefense.Core.GridMatch3Solver.Instance.IsResolving)
+            {
+                Debug.LogWarning("[HeroSummoner] Katalis ditahan: Papan sedang menyelesaikan cascade Match-3.");
+                return false;
+            }
+
             if (EconomyManager.Instance != null && !EconomyManager.Instance.CanAffordSummon())
             {
                 Debug.LogWarning("[HeroSummoner] Gems/Mana tidak cukup untuk memicu Katalis Papan.");

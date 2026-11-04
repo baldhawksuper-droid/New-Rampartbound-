@@ -215,6 +215,11 @@ namespace FantasyDefense.Combat
                 HighlightMergeCandidates(false);
             }
 
+            if (DraggedUnit == this)
+            {
+                DraggedUnit = null;
+            }
+
             if (twinFramePulseRoutine != null)
             {
                 StopCoroutine(twinFramePulseRoutine);
@@ -867,6 +872,9 @@ namespace FantasyDefense.Combat
 
         #region Mobile & Pointer Drag-and-Drop Interaction
 
+        public static UnitController DraggedUnit { get; private set; }
+        public static bool IsAnyUnitDragging => DraggedUnit != null;
+
         public static UnitController CurrentlySelectedUnit { get; private set; }
 
         public static void DeselectCurrentUnit()
@@ -881,6 +889,7 @@ namespace FantasyDefense.Combat
                     unit.currentCell.SetHighlightState(TileHighlightState.None);
                 }
                 unit.UpdateVisualAppearance();
+                unit.UpdateDepthSorting();
             }
         }
 
@@ -1112,6 +1121,11 @@ namespace FantasyDefense.Combat
 
         public void OnBeginDrag(PointerEventData eventData)
         {
+            if (CurrentlySelectedUnit != null)
+            {
+                DeselectCurrentUnit();
+            }
+
             if (holdFocusRoutine != null)
             {
                 StopCoroutine(holdFocusRoutine);
@@ -1125,6 +1139,11 @@ namespace FantasyDefense.Combat
                 return;
             }
 
+            if (GridInputHandler.Instance != null && GridInputHandler.Instance.IsSwapping)
+            {
+                return;
+            }
+
             // Di mode puzzle saat gelombang tempur sedang aktif, token/hero fokus bertarung
             if (GameManager.Instance != null && GameManager.Instance.CurrentBattleMode == BattleMode.PuzzlePreparation && (GameManager.Instance.CurrentState == BattleState.WaveActive || GameManager.Instance.CurrentState == BattleState.CombatActive))
             {
@@ -1132,6 +1151,7 @@ namespace FantasyDefense.Combat
             }
 
             isDragging = true;
+            DraggedUnit = this;
             initialPosition = currentCell != null ? currentCell.transform.position : transform.position;
             transform.position = new Vector3(transform.position.x, transform.position.y, -0.5f);
 
@@ -1162,14 +1182,14 @@ namespace FantasyDefense.Combat
             dragPos.z = -0.5f;
             transform.position = dragPos;
 
-            // Deteksi petak terdekat secara matematis (World-Space Slot Snapping)
+            // Deteksi petak terdekat secara presisi (World-Space Slot Snapping)
             TileCell hitCell = null;
             if (GridManager.Instance != null)
             {
-                hitCell = GridManager.Instance.GetClosestCell(transform.position, GridManager.Instance.CellSize * 0.95f);
+                hitCell = GridManager.Instance.GetClosestCell(transform.position, GridManager.Instance.CellSize * 0.90f);
                 if (hitCell == null)
                 {
-                    hitCell = GridManager.Instance.GetClosestCell(worldPos, GridManager.Instance.CellSize * 0.95f);
+                    hitCell = GridManager.Instance.GetClosestCell(worldPos, GridManager.Instance.CellSize * 0.90f);
                 }
             }
 
@@ -1184,17 +1204,46 @@ namespace FantasyDefense.Combat
 
                 if (currentHoveredCell != null && currentHoveredCell != currentCell)
                 {
-                    if (!currentHoveredCell.IsOccupied)
+                    bool isPuzzle = GameManager.Instance != null &&
+                        GameManager.Instance.CurrentBattleMode == BattleMode.PuzzlePreparation &&
+                        GameManager.Instance.CurrentState == BattleState.Preparation;
+
+                    if (isPuzzle)
                     {
-                        currentHoveredCell.SetHighlightState(TileHighlightState.ValidMove);
-                    }
-                    else if (CanMergeWith(currentHoveredCell.CurrentUnit))
-                    {
-                        currentHoveredCell.SetHighlightState(TileHighlightState.ValidMerge);
+                        int dist = Mathf.Abs(currentCell.X - currentHoveredCell.X) + Mathf.Abs(currentCell.Y - currentHoveredCell.Y);
+                        if (dist == 1)
+                        {
+                            bool canMatch = GridMatch3Solver.Instance != null &&
+                                GridMatch3Solver.Instance.SimulateSwapAndCheckMatch(currentCell, currentHoveredCell);
+
+                            if (canMatch)
+                            {
+                                currentHoveredCell.SetHighlightState(TileHighlightState.ValidMerge);
+                            }
+                            else
+                            {
+                                currentHoveredCell.SetHighlightState(TileHighlightState.InvalidMove);
+                            }
+                        }
+                        else
+                        {
+                            currentHoveredCell.SetHighlightState(TileHighlightState.InvalidMove);
+                        }
                     }
                     else
                     {
-                        currentHoveredCell.SetHighlightState(TileHighlightState.Hover); // Kuning: Indikasi Tukar Posisi (Swap)
+                        if (!currentHoveredCell.IsOccupied)
+                        {
+                            currentHoveredCell.SetHighlightState(TileHighlightState.ValidMove);
+                        }
+                        else if (CanMergeWith(currentHoveredCell.CurrentUnit))
+                        {
+                            currentHoveredCell.SetHighlightState(TileHighlightState.ValidMerge);
+                        }
+                        else
+                        {
+                            currentHoveredCell.SetHighlightState(TileHighlightState.Hover);
+                        }
                     }
                 }
             }
@@ -1204,20 +1253,21 @@ namespace FantasyDefense.Combat
         {
             if (!isDragging) return;
             isDragging = false;
+            if (DraggedUnit == this) DraggedUnit = null;
 
             if (currentHoveredCell != null)
             {
                 currentHoveredCell.SetHighlightState(TileHighlightState.None);
-                currentHoveredCell = null;
             }
 
-            if (spriteRenderer != null)
-                spriteRenderer.sortingOrder = normalSortingOrder;
+            TileCell targetCell = currentHoveredCell;
+            currentHoveredCell = null;
 
             // Matikan seluruh efek pulsasi kandidat fusi di papan arena
             HighlightMergeCandidates(false);
 
             UpdateVisualAppearance(); // Kembalikan skala normal tier
+            UpdateDepthSorting();
 
             OnUnitDragEnded?.Invoke(this);
 
@@ -1236,16 +1286,15 @@ namespace FantasyDefense.Combat
                 if (recycled) return;
             }
 
-            // Deteksi petak target berdasarkan World-Space Slot Snapping standar 2D Merge Defense
-            TileCell targetCell = null;
-            if (GridManager.Instance != null)
+            // Deteksi petak target berdasarkan World-Space Slot Snapping terkalibrasi
+            if (targetCell == null && GridManager.Instance != null)
             {
-                // Prioritas 1: Posisi jari sentuhan saat dilepas (dropWorldPos) dengan toleransi snapping penuh (CellSize * 1.25f)
-                targetCell = GridManager.Instance.GetClosestCell(dropWorldPos, GridManager.Instance.CellSize * 1.25f);
-                // Prioritas 2: Posisi token visual saat dilepas
+                // Prioritas 1: Posisi token visual saat dilepas
+                targetCell = GridManager.Instance.GetClosestCell(transform.position, GridManager.Instance.CellSize * 0.90f);
+                // Prioritas 2: Posisi jari sentuhan saat dilepas
                 if (targetCell == null)
                 {
-                    targetCell = GridManager.Instance.GetClosestCell(transform.position, GridManager.Instance.CellSize * 1.25f);
+                    targetCell = GridManager.Instance.GetClosestCell(dropWorldPos, GridManager.Instance.CellSize * 0.90f);
                 }
             }
 
@@ -1285,6 +1334,36 @@ namespace FantasyDefense.Combat
                     // Fusi unit HANYA terjadi secara otomatis melalui Match-3 atau lebih (termasuk 4, 5, L, +) oleh GridMatch3Solver.
                     if (dist == 1)
                     {
+                        // Uji kecocokan Match-3 terlebih dahulu (Validasi Gerakan Mendamping)
+                        bool hasMatch = false;
+                        if (GridMatch3Solver.Instance != null)
+                        {
+                            hasMatch = GridMatch3Solver.Instance.SimulateSwapAndCheckMatch(currentCell, targetCell);
+                        }
+
+                        if (!hasMatch)
+                        {
+                            // GERAKAN MENDAMPING YANG DILARANG (Tidak menghasilkan Match-3):
+                            // Kembalikan gem ke posisi asal dengan mulus (Snap Back / Revert) tanpa mengonsumsi sisa langkah!
+                            SnapBack();
+
+                            if (AudioManager.Instance != null)
+                            {
+                                AudioManager.Instance.PlaySound(SoundType.ButtonClick, 0.65f);
+                            }
+
+                            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
+                                FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+                            {
+                                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Warning);
+                            }
+
+                            targetCell.SetHighlightState(TileHighlightState.InvalidMove);
+                            StartCoroutine(ClearHighlightAfterDelay(targetCell, 0.25f));
+                            return;
+                        }
+
+                        // GERAKAN SAH (Membentuk Match-3):
                         ExecuteSwapWith(otherUnit);
                         GameManager.Instance.TryConsumeMove();
                         return;
@@ -1293,6 +1372,10 @@ namespace FantasyDefense.Combat
                     {
                         // Menukar lebih dari 1 langkah tidak diizinkan di mode puzzle
                         SnapBack();
+                        if (AudioManager.Instance != null)
+                        {
+                            AudioManager.Instance.PlaySound(SoundType.ButtonClick, 0.65f);
+                        }
                         return;
                     }
                 }
@@ -1538,9 +1621,9 @@ namespace FantasyDefense.Combat
                 if (spriteRenderer != null)
                 {
                     spriteRenderer.color = Color.white;
-                    spriteRenderer.sortingOrder = normalSortingOrder;
                 }
 
+                UpdateDepthSorting();
                 UpdateVisualAppearance();
             }
         }
@@ -1623,8 +1706,26 @@ namespace FantasyDefense.Combat
         /// </summary>
         public void SnapBack()
         {
-            Vector3 target = currentCell != null ? currentCell.transform.position : initialPosition;
-            SmoothSnapTo(target, 0.12f);
+            if (currentCell != null)
+            {
+                transform.SetParent(currentCell.transform, true);
+                SmoothSnapTo(currentCell.transform.position, 0.14f);
+            }
+            else
+            {
+                SmoothSnapTo(initialPosition, 0.14f);
+            }
+            UpdateVisualAppearance();
+            UpdateDepthSorting();
+        }
+
+        private IEnumerator ClearHighlightAfterDelay(TileCell cell, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            if (cell != null && cell != currentHoveredCell && (CurrentlySelectedUnit == null || CurrentlySelectedUnit.currentCell != cell))
+            {
+                cell.SetHighlightState(TileHighlightState.None);
+            }
         }
 
         /// <summary>

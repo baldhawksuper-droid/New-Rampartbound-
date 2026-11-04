@@ -28,7 +28,7 @@ namespace FantasyDefense.GridSystem
         [SerializeField] private float swapDuration = 0.15f;
 
         [Tooltip("Jika aktif, swap yang tidak menghasilkan match akan diputar balik (revert swap)")]
-        [SerializeField] private bool requireMatchToSwap = false;
+        [SerializeField] private bool requireMatchToSwap = true;
 
         [Header("State Tracking")]
         [SerializeField] private bool isSwapping = false;
@@ -132,6 +132,13 @@ namespace FantasyDefense.GridSystem
 
         private void OnPointerDown(Vector2 screenPos, int pointerId)
         {
+            if (UnitController.IsAnyUnitDragging)
+            {
+                isPointerDown = false;
+                startCell = null;
+                return;
+            }
+
             // Abaikan hanya jika pointer mengenai elemen UI interaktif (Button, Slider, dsb.)
             if (IsPointerOverUI(screenPos))
             {
@@ -191,6 +198,13 @@ namespace FantasyDefense.GridSystem
 
         private void OnPointerUp(Vector2 screenPos, int pointerId)
         {
+            if (UnitController.IsAnyUnitDragging)
+            {
+                isPointerDown = false;
+                startCell = null;
+                return;
+            }
+
             if (!isPointerDown || startCell == null)
             {
                 isPointerDown = false;
