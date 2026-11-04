@@ -81,6 +81,7 @@ namespace FantasyDefense.GridSystem
                 FantasyDefense.Combat.BattlefieldEnvironmentTheme.Forest => new Color(0.92f, 0.98f, 0.92f, 1f),
                 FantasyDefense.Combat.BattlefieldEnvironmentTheme.Mountain => new Color(0.88f, 0.92f, 0.98f, 1f),
                 FantasyDefense.Combat.BattlefieldEnvironmentTheme.Volcanic => new Color(0.98f, 0.88f, 0.85f, 1f),
+                FantasyDefense.Combat.BattlefieldEnvironmentTheme.Beach => new Color(0.95f, 0.92f, 0.82f, 1f),
                 _ => Color.white
             };
 
@@ -89,6 +90,7 @@ namespace FantasyDefense.GridSystem
                 FantasyDefense.Combat.BattlefieldEnvironmentTheme.Forest => new Color(0.95f, 1f, 0.95f, 1f),
                 FantasyDefense.Combat.BattlefieldEnvironmentTheme.Mountain => new Color(0.92f, 0.95f, 1f, 1f),
                 FantasyDefense.Combat.BattlefieldEnvironmentTheme.Volcanic => new Color(1f, 0.93f, 0.90f, 1f),
+                FantasyDefense.Combat.BattlefieldEnvironmentTheme.Beach => new Color(1f, 0.97f, 0.90f, 1f),
                 _ => Color.white
             };
 

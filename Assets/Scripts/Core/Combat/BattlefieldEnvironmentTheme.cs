@@ -11,6 +11,7 @@ namespace FantasyDefense.Combat
     {
         Forest = 0,
         Mountain = 1,
-        Volcanic = 2
+        Volcanic = 2,
+        Beach = 3
     }
 }

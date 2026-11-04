@@ -84,6 +84,7 @@ namespace FantasyDefense.Combat
                 BattlefieldEnvironmentTheme.Forest => Audio.BgmTrack.BattlefieldForest,
                 BattlefieldEnvironmentTheme.Mountain => Audio.BgmTrack.BattlefieldMountain,
                 BattlefieldEnvironmentTheme.Volcanic => Audio.BgmTrack.BattlefieldVolcanic,
+                BattlefieldEnvironmentTheme.Beach => Audio.BgmTrack.BattlefieldBeach,
                 _ => Audio.BgmTrack.BattlefieldForest
             };
 
@@ -152,6 +153,7 @@ namespace FantasyDefense.Combat
                 BattlefieldEnvironmentTheme.Forest => "Sprites/Environment/Battlefield_Forest",
                 BattlefieldEnvironmentTheme.Mountain => "Sprites/Environment/Battlefield_Mountain",
                 BattlefieldEnvironmentTheme.Volcanic => "Sprites/Environment/Battlefield_Volcanic",
+                BattlefieldEnvironmentTheme.Beach => "Sprites/Environment/Battlefield_Beach",
                 _ => "Sprites/Environment/Battlefield_Forest"
             };
 
@@ -241,6 +243,7 @@ namespace FantasyDefense.Combat
                     BattlefieldEnvironmentTheme.Forest => UnityEngine.Random.Range(0.45f, 0.75f),
                     BattlefieldEnvironmentTheme.Mountain => UnityEngine.Random.Range(0.35f, 0.65f),
                     BattlefieldEnvironmentTheme.Volcanic => UnityEngine.Random.Range(0.25f, 0.50f),
+                    BattlefieldEnvironmentTheme.Beach => UnityEngine.Random.Range(0.40f, 0.70f),
                     _ => 0.5f
                 };
 
@@ -277,6 +280,13 @@ namespace FantasyDefense.Combat
                     Color ashMain = new Color(1.0f, 0.35f, 0.08f, 0.95f);
                     Color ashSec = new Color(1.0f, 0.80f, 0.15f, 0.85f);
                     SkillVfxManager.Instance.SpawnProceduralParticleBurst(spawnPos, ashMain, ashSec, 4, 1.4f, sortingOrder: -40);
+                    break;
+
+                case BattlefieldEnvironmentTheme.Beach:
+                    // Buih air laut & kilau pasir pantai keemasan
+                    Color foamMain = new Color(0.75f, 0.95f, 1.0f, 0.85f);
+                    Color sandSpark = new Color(1.0f, 0.92f, 0.65f, 0.80f);
+                    SkillVfxManager.Instance.SpawnProceduralParticleBurst(spawnPos, foamMain, sandSpark, 3, 0.95f, sortingOrder: -40);
                     break;
             }
         }

@@ -88,7 +88,8 @@ namespace FantasyDefense.Audio
         BossTheme,
         BattlefieldForest,
         BattlefieldMountain,
-        BattlefieldVolcanic
+        BattlefieldVolcanic,
+        BattlefieldBeach
     }
 
     /// <summary>
@@ -407,6 +408,7 @@ namespace FantasyDefense.Audio
                     BgmTrack.BattlefieldForest => "Audio/Music/BGM_Battlefield_Forest",
                     BgmTrack.BattlefieldMountain => "Audio/Music/BGM_Battlefield_Mountain",
                     BgmTrack.BattlefieldVolcanic => "Audio/Music/BGM_Battlefield_Volcanic",
+                    BgmTrack.BattlefieldBeach => "Audio/Music/BGM_Battlefield_Beach",
                     _ => null
                 };
                 if (!string.IsNullOrEmpty(resPath))
@@ -991,6 +993,13 @@ namespace FantasyDefense.Audio
                 196.00f, 246.94f, 293.66f, 392.00f
             };
             proceduralBgmCache[BgmTrack.BattlefieldVolcanic] = CreateRhythmicBgmClip("BGM_BattlefieldVolcanic", volcanicMelody, 0.18f);
+
+            // BGM 6: Bioma Pantai Pesisir (Coastal Beach Shore) - Melodi angin laut tropis & nada riak ombak tenang (F Major Pentatonic)
+            float[] beachMelody = new float[] {
+                349.23f, 392.00f, 440.00f, 523.25f, 587.33f, 523.25f, 440.00f, 392.00f,
+                349.23f, 440.00f, 523.25f, 659.25f, 587.33f, 523.25f, 440.00f, 349.23f
+            };
+            proceduralBgmCache[BgmTrack.BattlefieldBeach] = CreateHarmonicBgmClip("BGM_BattlefieldBeach", beachMelody, 0.32f);
         }
 
         private AudioClip CreateHarmonicBgmClip(string name, float[] freqs, float noteDuration)

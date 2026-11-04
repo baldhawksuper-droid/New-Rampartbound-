@@ -155,6 +155,11 @@ namespace FantasyDefense.Combat
                 if (isCannon)
                 {
                     SkillVfxManager.Instance.SpawnCannonImpactVfx(transform.position, splashRadius);
+                    // Critical Screen Micro-Shake khusus ledakan mortir meriam benteng
+                    if (FantasyDefense.Core.MobileCameraAdapter.Instance != null)
+                    {
+                        FantasyDefense.Core.MobileCameraAdapter.Instance.TriggerScreenShake(duration: 0.08f, magnitude: isCrit ? 0.06f : 0.04f);
+                    }
                 }
                 else if (isBallista)
                 {

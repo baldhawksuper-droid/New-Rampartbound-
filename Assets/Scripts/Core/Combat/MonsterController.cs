@@ -38,6 +38,9 @@ namespace FantasyDefense.Combat
 
         [Header("Components")]
         [SerializeField] protected SpriteRenderer spriteRenderer;
+        protected Transform groundShadowTrans;
+        protected SpriteRenderer groundShadowSr;
+        protected Vector3 baseShadowScale = new Vector3(1.10f, 0.45f, 1f);
 
         [Header("Status Effect States")]
         [SerializeField] protected bool isStunned = false;
@@ -239,18 +242,23 @@ namespace FantasyDefense.Combat
             }
 
             // Pasang bayangan tanah taktil (Ground Shadow) menggunakan UI_Shadow_Oval agar monster menjejak kokoh di jalan
-            Transform shadowTrans = transform.Find("Monster_Ground_Shadow");
-            if (shadowTrans == null)
+            groundShadowTrans = transform.Find("Monster_Ground_Shadow");
+            if (groundShadowTrans == null)
             {
                 GameObject shadowObj = new GameObject("Monster_Ground_Shadow");
                 shadowObj.transform.SetParent(transform, false);
                 shadowObj.transform.localPosition = new Vector3(0f, -0.42f, 0.05f);
-                shadowObj.transform.localScale = new Vector3(1.10f, 0.45f, 1f);
-                var shadowSr = shadowObj.AddComponent<SpriteRenderer>();
-                shadowSr.sprite = Resources.Load<Sprite>("Sprites/UI/UI_Shadow_Oval");
-                shadowSr.color = new Color(0f, 0f, 0f, 0.38f);
-                shadowSr.sortingLayerName = "Cell";
-                shadowSr.sortingOrder = 2;
+                shadowObj.transform.localScale = baseShadowScale;
+                groundShadowSr = shadowObj.AddComponent<SpriteRenderer>();
+                groundShadowSr.sprite = Resources.Load<Sprite>("Sprites/UI/UI_Shadow_Oval");
+                groundShadowSr.color = new Color(0f, 0f, 0f, 0.38f);
+                groundShadowSr.sortingLayerName = "Cell";
+                groundShadowSr.sortingOrder = 2;
+                groundShadowTrans = shadowObj.transform;
+            }
+            else
+            {
+                groundShadowSr = groundShadowTrans.GetComponent<SpriteRenderer>();
             }
             }
 
@@ -596,6 +604,18 @@ namespace FantasyDefense.Combat
                     // Fallback aman jika spriteRenderer di root objek: JANGAN sentuh localPosition!
                     transform.localScale = new Vector3(baseScale.x * scaleModX, baseScale.y * scaleModY, baseScale.z);
                     transform.localRotation = Quaternion.Euler(0f, 0f, stepTilt);
+                }
+
+                // Dynamic Ground Shadow Decal: bayangan tanah mengecil saat melompat (hop) & melebar saat mendarat (squash)
+                if (groundShadowTrans != null)
+                {
+                    float shadowScaleFactor = Mathf.Clamp(1.0f - (stepBob * 1.8f) + ((scaleModX - 1.0f) * 0.4f), 0.65f, 1.35f);
+                    groundShadowTrans.localScale = new Vector3(baseShadowScale.x * shadowScaleFactor, baseShadowScale.y * shadowScaleFactor, 1f);
+                    if (groundShadowSr != null)
+                    {
+                        float shadowAlpha = Mathf.Clamp(0.38f - (stepBob * 1.2f), 0.18f, 0.45f);
+                        groundShadowSr.color = new Color(0f, 0f, 0f, shadowAlpha);
+                    }
                 }
 
                 // Multi-frame animation cycle jika frame sprite tersedia

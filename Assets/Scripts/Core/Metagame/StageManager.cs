@@ -182,14 +182,19 @@ namespace FantasyDefense.Metagame
                 }
 
                 // Tema Visual Lingkungan Pertempuran Berbasis Bioma:
-                // Stage 1-4: Forest (Padang Rumput & Gerbang Luar)
-                // Stage 5-8: Mountain (Punggung Bukit Karang & Batuan Granit)
-                // Stage 9-10: Volcanic (Dataran Magma Vulkanik & Sarang Boss)
-                if (i <= 3)
+                // Stage 1-2: Forest (Padang Rumput Depan & Pengepungan)
+                // Stage 3: Beach (Pesisir Pantai Karang - Debut Mire Scrapper)
+                // Stage 4-7: Mountain (Punggung Bukit Karang & Batuan Granit)
+                // Stage 8-10: Volcanic (Dataran Magma Vulkanik & Sarang Boss)
+                if (i <= 1)
                 {
                     stage.environmentTheme = Combat.BattlefieldEnvironmentTheme.Forest;
                 }
-                else if (i <= 7)
+                else if (i == 2)
+                {
+                    stage.environmentTheme = Combat.BattlefieldEnvironmentTheme.Beach;
+                }
+                else if (i <= 6)
                 {
                     stage.environmentTheme = Combat.BattlefieldEnvironmentTheme.Mountain;
                 }

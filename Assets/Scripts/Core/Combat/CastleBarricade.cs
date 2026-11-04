@@ -243,6 +243,11 @@ namespace FantasyDefense.Combat
                 SkillVfxManager.Instance.SpawnFloatingCombatNumber(transform.position + Vector3.up * 0.8f, $"-{damage}", new Color(1f, 0.25f, 0.25f), 1.25f, true);
                 SkillVfxManager.Instance.SpawnProceduralParticleBurst(transform.position + Vector3.up * 0.3f, new Color(1f, 0.45f, 0.2f), new Color(0.9f, 0.15f, 0.15f), 12, 3.5f);
 
+                // Rekomendasi 3: Barricade Crumble Dust VFX (serpihan kayu & kepulan debu cokelat saat barikade retak/terkena serangan)
+                Color woodSplinter = new Color(0.55f, 0.35f, 0.18f, 0.90f);
+                Color dustCloud = new Color(0.72f, 0.62f, 0.50f, 0.75f);
+                SkillVfxManager.Instance.SpawnProceduralParticleBurst(transform.position + new Vector3(UnityEngine.Random.Range(-0.8f, 0.8f), 0.15f, 0f), woodSplinter, dustCloud, 10, 2.2f, sortingOrder: 25);
+
                 // Efek Visual Retakan Gerbang & Cipratan Debu Batu Halus (Point 2 - Siege FX)
                 Vector3 dustPos = transform.position + new Vector3(UnityEngine.Random.Range(-0.85f, 0.85f), 0.25f, 0f);
                 SkillVfxManager.Instance.SpawnProceduralParticleBurst(
