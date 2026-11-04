@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Assembly-CSharp</AssemblyName>
+    <RootNamespace>FantasyDefense</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <OutputPath>bin\Debug</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>3</WarningLevel>
+    <NoWarn>0169;0414;0649</NoWarn>
+    <DefineConstants>UNITY_6000_0_OR_NEWER;UNITY_ANDROID</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Assets\Scripts\**\*.cs" Exclude="Assets\Scripts\Editor\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Tools\UnityLibs\*.dll">
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+</Project>

@@ -130,10 +130,10 @@ namespace FantasyDefense.Combat
                 return;
             }
 
-#if UNITY_ANDROID || UNITY_IOS
+#if UNITY_IOS && !UNITY_EDITOR
             try
             {
-                // Handheld.Vibrate fallback hanya jika tidak ada manager
+                // Handheld.Vibrate fallback hanya jika tidak ada manager pada platform iOS
                 Handheld.Vibrate();
             }
             catch (Exception)

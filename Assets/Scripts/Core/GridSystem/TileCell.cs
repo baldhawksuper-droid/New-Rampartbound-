@@ -12,7 +12,8 @@ namespace FantasyDefense.GridSystem
         Hover,
         ValidMerge,
         ValidMove,
-        Invalid
+        Invalid,
+        InvalidMove = Invalid
     }
 
     [RequireComponent(typeof(SpriteRenderer), typeof(BoxCollider2D))]

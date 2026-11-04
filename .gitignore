@@ -43,6 +43,9 @@ crashlytics-build.properties
 ExportedObj/
 .consulo/
 *.csproj
+!Rampartbound.csproj
+bin/
+obj/
 *.unityproj
 *.sln
 *.slnx

@@ -209,7 +209,7 @@ namespace FantasyDefense.Summon
         /// </summary>
         public bool TrySummonHero()
         {
-            if (FantasyDefense.Core.GridMatch3Solver.Instance != null && FantasyDefense.Core.GridMatch3Solver.Instance.IsResolving)
+            if (FantasyDefense.GridSystem.GridMatch3Solver.Instance != null && FantasyDefense.GridSystem.GridMatch3Solver.Instance.IsResolving)
             {
                 Debug.LogWarning("[HeroSummoner] Aksi ditahan: Papan sedang menyelesaikan cascade Match-3.");
                 return false;
@@ -321,7 +321,7 @@ namespace FantasyDefense.Summon
         /// </summary>
         public bool TrySummonFreeHero()
         {
-            if (FantasyDefense.Core.GridMatch3Solver.Instance != null && FantasyDefense.Core.GridMatch3Solver.Instance.IsResolving)
+            if (FantasyDefense.GridSystem.GridMatch3Solver.Instance != null && FantasyDefense.GridSystem.GridMatch3Solver.Instance.IsResolving)
             {
                 return false;
             }
@@ -460,7 +460,7 @@ namespace FantasyDefense.Summon
         /// </summary>
         public bool TryExecuteSwapMergeCatalyst()
         {
-            if (FantasyDefense.Core.GridMatch3Solver.Instance != null && FantasyDefense.Core.GridMatch3Solver.Instance.IsResolving)
+            if (FantasyDefense.GridSystem.GridMatch3Solver.Instance != null && FantasyDefense.GridSystem.GridMatch3Solver.Instance.IsResolving)
             {
                 Debug.LogWarning("[HeroSummoner] Katalis ditahan: Papan sedang menyelesaikan cascade Match-3.");
                 return false;

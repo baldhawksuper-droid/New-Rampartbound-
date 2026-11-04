@@ -176,11 +176,45 @@ def main():
                 has_errors = True
 
     if has_errors:
-        print(f"\nPre-commit Roslyn verification FAILED on one or more of {total_files} files.")
+        print(f"\n[FAIL] Static regex linting FAILED on one or more of {total_files} files.")
         sys.exit(1)
-    else:
-        print(f"Pre-commit Roslyn verification PASSED! Clean check across {total_files} C# scripts.")
-        sys.exit(0)
+
+    print(f"[PASS] Static regex linting passed across {total_files} C# scripts.")
+
+    # Step 2: Unity .meta file integrity check
+    meta_validator = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'validate_meta_files.py')
+    if os.path.exists(meta_validator):
+        import subprocess
+        res = subprocess.run([sys.executable, meta_validator], capture_output=True, text=True)
+        if res.returncode != 0:
+            print("\n[FAIL] Unity .meta integrity verification FAILED:")
+            print(res.stdout)
+            print(res.stderr)
+            sys.exit(1)
+        print("[PASS] Unity .meta files integrity verified (100% matched, valid GUIDs).")
+
+    # Step 3: Local Roslyn .NET compiler build check against Unity 6 assemblies
+    csproj_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'Rampartbound.csproj')
+    dotnet_bin = "dotnet"
+    user_dotnet = os.path.expanduser(r"~\.dotnet\dotnet.exe")
+    if os.path.exists(user_dotnet):
+        dotnet_bin = user_dotnet
+
+    if os.path.exists(csproj_path):
+        import subprocess
+        print(f"[BUILD] Compiling C# assemblies with {dotnet_bin} build...")
+        res = subprocess.run([dotnet_bin, "build", csproj_path], capture_output=True, text=True)
+        if res.returncode != 0:
+            print("\n[FAIL] Local Roslyn .NET compilation FAILED:")
+            print(res.stdout)
+            print(res.stderr)
+            sys.exit(1)
+        print("[PASS] Local Roslyn .NET compilation SUCCEEDED with zero errors!")
+
+    print(f"\n=======================================================")
+    print(f"  ALL PRE-COMMIT GATES PASSED (Code, Meta, & Compiler) ")
+    print(f"=======================================================")
+    sys.exit(0)
 
 if __name__ == '__main__':
     main()

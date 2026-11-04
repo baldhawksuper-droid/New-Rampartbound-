@@ -56,7 +56,9 @@ namespace FantasyDefense.Audio
         PermafrostCrystalShatter,
         TwinFocusChime,
         CriticalHitChime,
-        TileReboundThud
+        TileReboundThud,
+        HeroUpgrade = MergeSuccess,
+        SummonCard = GachaPull
     }
 
     public enum AudioSfxType

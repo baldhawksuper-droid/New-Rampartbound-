@@ -356,7 +356,7 @@ namespace FantasyDefense.UI
             bool isPuzzle = FantasyDefense.Core.GameManager.Instance != null &&
                             FantasyDefense.Core.GameManager.Instance.CurrentBattleMode == BattleMode.PuzzlePreparation;
 
-            if (FantasyDefense.Core.GridMatch3Solver.Instance != null && FantasyDefense.Core.GridMatch3Solver.Instance.IsResolving)
+            if (FantasyDefense.GridSystem.GridMatch3Solver.Instance != null && FantasyDefense.GridSystem.GridMatch3Solver.Instance.IsResolving)
             {
                 StartCoroutine(ShakeButtonRoutine());
                 return;
