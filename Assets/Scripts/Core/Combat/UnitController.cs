@@ -1276,7 +1276,7 @@ namespace FantasyDefense.Combat
                             }
                             else
                             {
-                                currentHoveredCell.SetHighlightState(TileHighlightState.InvalidMove);
+                                currentHoveredCell.SetHighlightState(TileHighlightState.Hover); // Gerakan valid (Swap bebas berdampingan)
                             }
                         }
                         else
@@ -1392,36 +1392,7 @@ namespace FantasyDefense.Combat
                     // Fusi unit HANYA terjadi secara otomatis melalui Match-3 atau lebih (termasuk 4, 5, L, +) oleh GridMatch3Solver.
                     if (dist == 1)
                     {
-                        // Uji kecocokan Match-3 terlebih dahulu (Validasi Gerakan Mendamping)
-                        bool hasMatch = false;
-                        if (GridMatch3Solver.Instance != null)
-                        {
-                            hasMatch = GridMatch3Solver.Instance.SimulateSwapAndCheckMatch(currentCell, targetCell);
-                        }
-
-                        if (!hasMatch)
-                        {
-                            // GERAKAN MENDAMPING YANG DILARANG (Tidak menghasilkan Match-3):
-                            // Kembalikan gem ke posisi asal dengan mulus (Snap Back / Revert) tanpa mengonsumsi sisa langkah!
-                            SnapBack();
-
-                            if (AudioManager.Instance != null)
-                            {
-                                AudioManager.Instance.PlaySound(SoundType.TileReboundThud, 0.75f);
-                            }
-
-                            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
-                                FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
-                            {
-                                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Warning);
-                            }
-
-                            targetCell.SetHighlightState(TileHighlightState.InvalidMove);
-                            StartCoroutine(ClearHighlightAfterDelay(targetCell, 0.25f));
-                            return;
-                        }
-
-                        // GERAKAN SAH (Membentuk Match-3):
+                        // Sesuai Aturan: Tukar tempat (Swap) antar kotak bersebelahan dapat dilakukan secara bebas tanpa harus membentuk Match-3.
                         DestroyOriginGhostSilhouette();
                         ExecuteSwapWith(otherUnit);
                         GameManager.Instance.TryConsumeMove();

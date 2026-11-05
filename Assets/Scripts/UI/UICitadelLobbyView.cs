@@ -501,6 +501,12 @@ namespace FantasyDefense.UI
             ApplyResponsiveLayout();
             RefreshLocalization();
             RefreshDisplays();
+
+            // Pemicu panduan onboarding selamat datang saat pertama kali masuk lobby
+            if (FantasyDefense.Metagame.TutorialGuideManager.Instance != null)
+            {
+                FantasyDefense.Metagame.TutorialGuideManager.Instance.CheckAndStartLobbyGuide();
+            }
         }
 
         private void EnsureLobbyBackdropVisual()
@@ -623,7 +629,11 @@ namespace FantasyDefense.UI
             if (navStageMapButton != null)
                 navStageMapButton.onClick.AddListener(() => OpenPanel(GamePanelType.StageMap));
             if (navHeroesButton != null)
-                navHeroesButton.onClick.AddListener(() => OpenPanel(GamePanelType.HeroUpgrade));
+                navHeroesButton.onClick.AddListener(() =>
+                {
+                    FantasyDefense.Metagame.TutorialGuideManager.Instance?.NotifyActionTriggered("NavHeroes");
+                    OpenPanel(GamePanelType.HeroUpgrade);
+                });
             if (navSummonButton != null)
                 navSummonButton.onClick.AddListener(() => OpenPanel(GamePanelType.SummonHall));
             if (navForgeButton != null)
@@ -701,6 +711,9 @@ namespace FantasyDefense.UI
             if (citadelLevelText != null)
             {
                 citadelLevelText.text = $"Citadel Lv.{data.citadelLevel}";
+                var lvlShadow = citadelLevelText.GetComponent<Shadow>() ?? citadelLevelText.gameObject.AddComponent<Shadow>();
+                lvlShadow.effectColor = new Color(0.04f, 0.06f, 0.11f, 0.95f); // #0A101D Kontras tegas
+                lvlShadow.effectDistance = new Vector2(1.5f, -1.5f);
             }
             var lilitaFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
             if (energyText != null)
@@ -770,6 +783,9 @@ namespace FantasyDefense.UI
             if (teamCpText != null)
             {
                 teamCpText.text = $"⚡ TEAM CP: {lobby.TotalTeamCP:N0}";
+                var cpShadow = teamCpText.GetComponent<Shadow>() ?? teamCpText.gameObject.AddComponent<Shadow>();
+                cpShadow.effectColor = new Color(0.04f, 0.06f, 0.11f, 0.95f); // #0A101D Drop-shadow tegas
+                cpShadow.effectDistance = new Vector2(1.5f, -1.5f);
             }
 
             // Update Standee Badges Sesuai Formasi Terkini (Slot 0 - 3)
@@ -792,8 +808,16 @@ namespace FantasyDefense.UI
                     if (infoTexts[i] != null)
                     {
                         infoTexts[i].text = $"<b><color=#AAAAAA>SLOT {i + 1}</color></b>\n<color=#FFD700>🔒 Gacha</color>";
-                        infoTexts[i].fontSize = 13;
+                        infoTexts[i].fontSize = 12;
                         infoTexts[i].alignment = TextAnchor.MiddleCenter;
+                        var textRt = infoTexts[i].GetComponent<RectTransform>();
+                        if (textRt != null)
+                        {
+                            textRt.anchorMin = new Vector2(0.02f, 0.00f);
+                            textRt.anchorMax = new Vector2(0.98f, 0.13f);
+                            textRt.offsetMin = Vector2.zero;
+                            textRt.offsetMax = Vector2.zero;
+                        }
                     }
                     if (standeeButtons[i] != null)
                     {
@@ -802,15 +826,53 @@ namespace FantasyDefense.UI
                         {
                             namePlate.gameObject.SetActive(false);
                         }
+
+                        // Penyelarasan skala & grounding slot 4 locked agar simetris dengan slot 1-3
+                        var portraitRt = standeeButtons[i].transform.Find("HeroPortrait")?.GetComponent<RectTransform>();
+                        if (portraitRt != null)
+                        {
+                            portraitRt.anchorMin = new Vector2(0.5f, 0.13f);
+                            portraitRt.anchorMax = new Vector2(0.5f, 0.13f);
+                            portraitRt.pivot = new Vector2(0.5f, 0f);
+                            portraitRt.sizeDelta = new Vector2(165f, 205f);
+                            portraitRt.anchoredPosition = Vector2.zero;
+                        }
+
+                        var shadowRt = standeeButtons[i].transform.Find("GroundShadow")?.GetComponent<RectTransform>();
+                        if (shadowRt != null)
+                        {
+                            shadowRt.anchorMin = new Vector2(0.5f, 0.13f);
+                            shadowRt.anchorMax = new Vector2(0.5f, 0.13f);
+                            shadowRt.pivot = new Vector2(0.5f, 0.5f);
+                            shadowRt.sizeDelta = new Vector2(130f, 28f);
+                            shadowRt.anchoredPosition = Vector2.zero;
+                            var sImg = shadowRt.GetComponent<Image>();
+                            if (sImg != null) sImg.color = new Color(0.03f, 0.06f, 0.12f, 0.70f);
+                        }
+
+                        var badgeRt = standeeButtons[i].transform.Find("BadgePill")?.GetComponent<RectTransform>();
+                        if (badgeRt != null)
+                        {
+                            badgeRt.anchorMin = new Vector2(0.02f, 0.00f);
+                            badgeRt.anchorMax = new Vector2(0.98f, 0.13f);
+                            badgeRt.offsetMin = Vector2.zero;
+                            badgeRt.offsetMax = Vector2.zero;
+                        }
+
                         var img = standeeButtons[i].transform.Find("HeroPortrait")?.GetComponent<Image>();
                         if (img != null)
                         {
-                            img.color = new Color(0.12f, 0.16f, 0.25f, 0.60f); // Siluet pahlawan berarsir elegan
-                            Sprite lockedHeroSprite = GetHeroSpriteForType(heroType, 1);
+                            img.color = new Color(0.20f, 0.25f, 0.38f, 0.65f); // Siluet tembus pandang elegan
+                            Sprite lockedHeroSprite = Resources.Load<Sprite>("Sprites/UI/UI_Hero_Locked_Silhouette")
+#if UNITY_EDITOR
+                                ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Hero_Locked_Silhouette.png")
+#endif
+                                ?? GetHeroSpriteForType(heroType, 1);
                             if (lockedHeroSprite != null)
                             {
                                 img.sprite = lockedHeroSprite;
                             }
+                            img.preserveAspect = true;
                         }
                     }
                 }
@@ -1225,6 +1287,14 @@ namespace FantasyDefense.UI
 
         private void OnStandeeTapped(Button btn, UnitType type)
         {
+            // 1. Sedikit haptic feedback halus (Light) saat standee pahlawan disentuh
+            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+            {
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Light);
+            }
+
+            // 2. Animasi mikro squash & stretch (skala Y dari 0.95 ke 1.05 selama 0.15 detik)
             if (btn != null && btn.gameObject.activeInHierarchy)
             {
                 StartCoroutine(StandeeTapJuiceRoutine(btn.transform));
@@ -1263,11 +1333,6 @@ namespace FantasyDefense.UI
                 };
                 AudioManager.Instance.PlaySound(heroSound, 1.25f);
                 AudioManager.Instance.PlaySound(SoundType.DialogueBlipChime, 1.15f);
-            }
-
-            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null && FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
-            {
-                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Selection);
             }
 
             float now = Time.unscaledTime;
@@ -1454,39 +1519,45 @@ namespace FantasyDefense.UI
         {
             if (tr == null) yield break;
             Vector3 originalScale = tr.localScale;
-            float duration = 0.28f;
+            float duration = 0.15f;
             float elapsed = 0f;
 
             // Spawn micro sparkle burst
             SpawnTapSparkleBurst(tr);
 
-            // Squash-and-stretch respons lembut: 1.0 -> 0.95 (squash) -> 1.02 (stretch) -> 1.0 (settle)
+            // Squash-and-stretch arcade taktil: Skala Y dari 0.95 (squash) ke 1.05 (stretch) selama 0.15 detik, lalu settle ke 1.00
             while (elapsed < duration)
             {
                 elapsed += Time.unscaledDeltaTime;
                 float t = Mathf.Clamp01(elapsed / duration);
-                float scaleFactor;
+                float scaleY;
+                float scaleX;
 
-                if (t < 0.35f)
+                if (t < 0.45f)
                 {
-                    // Phase 1: Squash lembut ke 0.95f
-                    float p = t / 0.35f;
-                    scaleFactor = Mathf.Lerp(1.0f, 0.95f, Mathf.Sin(p * Mathf.PI * 0.5f));
+                    // Phase 1: Squash lembut ke Y: 0.95f
+                    float p = t / 0.45f;
+                    float s = Mathf.Sin(p * Mathf.PI * 0.5f);
+                    scaleY = Mathf.Lerp(1.0f, 0.95f, s);
+                    scaleX = Mathf.Lerp(1.0f, 1.04f, s);
                 }
-                else if (t < 0.70f)
+                else if (t < 0.85f)
                 {
-                    // Phase 2: Overshoot stretch ke 1.02f
-                    float p = (t - 0.35f) / 0.35f;
-                    scaleFactor = Mathf.Lerp(0.95f, 1.02f, Mathf.Sin(p * Mathf.PI * 0.5f));
+                    // Phase 2: Stretch ke Y: 1.05f
+                    float p = (t - 0.45f) / 0.40f;
+                    float s = Mathf.Sin(p * Mathf.PI * 0.5f);
+                    scaleY = Mathf.Lerp(0.95f, 1.05f, s);
+                    scaleX = Mathf.Lerp(1.04f, 0.97f, s);
                 }
                 else
                 {
                     // Phase 3: Settle kembali ke 1.00f
-                    float p = (t - 0.70f) / 0.30f;
-                    scaleFactor = Mathf.Lerp(1.02f, 1.0f, Mathf.Sin(p * Mathf.PI * 0.5f));
+                    float p = (t - 0.85f) / 0.15f;
+                    scaleY = Mathf.Lerp(1.05f, 1.0f, p);
+                    scaleX = Mathf.Lerp(0.97f, 1.0f, p);
                 }
 
-                tr.localScale = new Vector3(originalScale.x * scaleFactor, originalScale.y * scaleFactor, originalScale.z);
+                tr.localScale = new Vector3(originalScale.x * scaleX, originalScale.y * scaleY, originalScale.z);
                 yield return null;
             }
 

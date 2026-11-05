@@ -601,6 +601,13 @@ namespace FantasyDefense.UI
 
                 // Tactile Level-Up Celebration: Punch Bounce & Floating Text
                 TriggerLevelUpCelebration();
+
+                // Notifikasi panduan tutorial FTUE
+                if (FantasyDefense.Metagame.TutorialGuideManager.Instance != null)
+                {
+                    FantasyDefense.Metagame.TutorialGuideManager.Instance.NotifyActionTriggered("UpgradeHeroButton");
+                    FantasyDefense.Metagame.TutorialGuideManager.Instance.NotifyActionTriggered("HeroUpgradeBtn");
+                }
             }
 
             RefreshDisplay();

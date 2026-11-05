@@ -28,7 +28,7 @@ namespace FantasyDefense.GridSystem
         [SerializeField] private float swapDuration = 0.12f;
 
         [Tooltip("Jika aktif, swap yang tidak menghasilkan match akan diputar balik (revert swap)")]
-        [SerializeField] private bool requireMatchToSwap = true;
+        [SerializeField] private bool requireMatchToSwap = false;
 
         [Header("State Tracking")]
         [SerializeField] private bool isSwapping = false;

@@ -168,10 +168,10 @@ namespace FantasyDefense.Metagame
                     new TutorialStepData(
                         TutorialStep.LobbyNavigation,
                         "BaldHawk (Mentor)",
-                        "Ini adalah Citadel Lobby. Buka menu 'Hero Roster' untuk memperkuat atribut dan perlengkapan pahlawanmu.",
+                        "Ini adalah Citadel Lobby. Buka menu 'Heroes' untuk memperkuat atribut dan perlengkapan pahlawanmu.",
                         "BaldHawk (Mentor)",
-                        "This is the Citadel Lobby. Open the 'Hero Roster' menu to empower your champions and inspect their gear.",
-                        "LobbyHeroMenuBtn",
+                        "This is the Citadel Lobby. Open the 'Heroes' menu to empower your champions and inspect their gear.",
+                        "NavHeroes",
                         true
                     ),
                     new TutorialStepData(
@@ -180,7 +180,7 @@ namespace FantasyDefense.Metagame
                         "Tingkatkan level Sir Cedric untuk meningkatkan Attack & Defense benteng kita!",
                         "BaldHawk (Mentor)",
                         "Upgrade Sir Cedric to bolster our citadel's Attack and Defense attributes!",
-                        "HeroUpgradeBtn",
+                        "UpgradeHeroButton",
                         true
                     ),
                     new TutorialStepData(
@@ -284,6 +284,25 @@ namespace FantasyDefense.Metagame
             TriggerStep(currentStep);
         }
 
+        /// <summary>
+        /// Memeriksa dan memicu langkah onboarding tutorial saat pertama kali membuka Citadel Lobby.
+        /// </summary>
+        public void CheckAndStartLobbyGuide()
+        {
+            if (disableTutorial || IsCompleted) return;
+
+            if (currentStep == TutorialStep.WelcomeGreeting)
+            {
+                isTutorialActive = true;
+                TriggerStep(TutorialStep.WelcomeGreeting);
+            }
+            else if (currentStep == TutorialStep.LobbyNavigation)
+            {
+                isTutorialActive = true;
+                TriggerStep(TutorialStep.LobbyNavigation);
+            }
+        }
+
         public TutorialStepData GetStepData(TutorialStep step)
         {
             return stepDefinitions.Find(s => s.step == step);
@@ -336,7 +355,23 @@ namespace FantasyDefense.Metagame
             var data = GetStepData(currentStep);
             if (data != null && data.requireSpecificAction)
             {
-                if (string.Equals(data.targetUiElementName, actionName, StringComparison.OrdinalIgnoreCase))
+                bool match = string.Equals(data.targetUiElementName, actionName, StringComparison.OrdinalIgnoreCase);
+                if (!match)
+                {
+                    // Aliasing toleran untuk nama elemen antarmuka editor vs runtime
+                    if ((data.targetUiElementName == "NavHeroes" || data.targetUiElementName == "LobbyHeroMenuBtn") &&
+                        (actionName == "NavHeroes" || actionName == "LobbyHeroMenuBtn"))
+                    {
+                        match = true;
+                    }
+                    else if ((data.targetUiElementName == "UpgradeHeroButton" || data.targetUiElementName == "HeroUpgradeBtn") &&
+                             (actionName == "UpgradeHeroButton" || actionName == "HeroUpgradeBtn"))
+                    {
+                        match = true;
+                    }
+                }
+
+                if (match)
                 {
                     AdvanceStep();
                 }

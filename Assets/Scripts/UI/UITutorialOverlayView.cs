@@ -231,11 +231,16 @@ namespace FantasyDefense.UI
             if (speakerNameText != null) speakerNameText.text = stepData.GetLocalizedSpeaker();
             if (dialogueBodyText != null) dialogueBodyText.text = stepData.GetLocalizedDialogue();
 
-            // Jika step butuh aksi klik tombol spesifik, hilangkan hint tap-anywhere
+            // Jika step butuh aksi klik tombol spesifik, hilangkan hint tap-anywhere dan nonaktifkan blocker fullscreen
             if (tapHintText != null)
             {
                 tapHintText.gameObject.SetActive(!stepData.requireSpecificAction);
                 tapHintText.text = FantasyDefense.Localization.CitadelLocalizationManager.Text("Ketuk di mana saja untuk lanjut...", "Tap anywhere to continue...");
+            }
+
+            if (tapToContinueButton != null)
+            {
+                tapToContinueButton.gameObject.SetActive(!stepData.requireSpecificAction);
             }
 
             if (skipButtonText != null)
@@ -269,6 +274,26 @@ namespace FantasyDefense.UI
             try
             {
                 GameObject targetObj = GameObject.Find(targetElementName);
+                if (targetObj == null)
+                {
+                    // Fallback alias lookup jika penamaan hierarchy di editor berbeda
+                    string[] aliases = targetElementName switch
+                    {
+                        "NavHeroes" => new[] { "LobbyHeroMenuBtn", "Nav_Heroes", "HeroesButton" },
+                        "LobbyHeroMenuBtn" => new[] { "NavHeroes", "Nav_Heroes", "HeroesButton" },
+                        "UpgradeHeroButton" => new[] { "HeroUpgradeBtn", "UpgradeButton", "Btn_Upgrade" },
+                        "HeroUpgradeBtn" => new[] { "UpgradeHeroButton", "UpgradeButton", "Btn_Upgrade" },
+                        "DefendCitadelButton" => new[] { "StartBattleButton", "BattleButton" },
+                        _ => System.Array.Empty<string>()
+                    };
+
+                    foreach (var alias in aliases)
+                    {
+                        targetObj = GameObject.Find(alias);
+                        if (targetObj != null) break;
+                    }
+                }
+
                 if (targetObj != null)
                 {
                     RectTransform targetRect = targetObj.GetComponent<RectTransform>();
@@ -302,6 +327,7 @@ namespace FantasyDefense.UI
         private void OnTapContinue()
         {
             if (currentStepData == null) return;
+            if (currentStepData.requireSpecificAction) return;
             TutorialGuideManager.Instance?.AdvanceStep();
         }
 

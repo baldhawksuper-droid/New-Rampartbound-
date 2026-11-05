@@ -642,6 +642,9 @@ namespace Rampartbound.Editor
 
             var lvlTxt = CreateText(lobbyHeaderObj.transform, "CitadelLevel", "🏰 Citadel Lv.8", 22, FontStyle.Bold, TextAnchor.MiddleLeft, new Color(1f, 0.88f, 0.45f), defaultFont);
             PositionUI(lvlTxt.gameObject, 0.04f, 0.15f, 0.36f, 0.85f);
+            var lvlShadow = lvlTxt.gameObject.AddComponent<Shadow>();
+            lvlShadow.effectColor = new Color(0.04f, 0.06f, 0.11f, 0.95f); // #0A101D Kontras tegas
+            lvlShadow.effectDistance = new Vector2(1.5f, -1.5f);
             var cmdNameTxt = lvlTxt;
 
             Text energyTxt;
@@ -693,6 +696,9 @@ namespace Rampartbound.Editor
             var cpOutline = cpTxt.gameObject.AddComponent<Outline>();
             cpOutline.effectColor = new Color(0.25f, 0.12f, 0.02f, 0.95f);
             cpOutline.effectDistance = new Vector2(1.5f, -1.5f);
+            var cpShadow = cpTxt.gameObject.AddComponent<Shadow>();
+            cpShadow.effectColor = new Color(0.04f, 0.06f, 0.11f, 0.95f); // #0A101D Drop-shadow tegas
+            cpShadow.effectDistance = new Vector2(1.5f, -1.5f);
 
             // Workshop Artileri Benteng Citadel: Ditempatkan elegan di sayap kiri atas sejajar TEAM CP dengan aksen batu pahat
             var defenseTurretBtn = CreateButton(lobbyPanelObj.transform, "DefenseTurretWorkshopButton", "🏰 ARTILERI", new Color(0.18f, 0.14f, 0.10f), new Color(1f, 0.92f, 0.45f), 14, defaultFont);
