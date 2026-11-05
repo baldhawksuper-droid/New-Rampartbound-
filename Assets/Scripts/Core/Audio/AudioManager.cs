@@ -279,7 +279,12 @@ namespace FantasyDefense.Audio
 
             // Variasi nada alami & anti-monotoni saat pertempuran berjalan di kecepatan 2x atau 3x
             float pitchJitter;
-            if (speedFactor >= 2.0f)
+            if (type == SoundType.ButtonClick)
+            {
+                // Micro-pitch jitter alami untuk tap UI (0.96x - 1.04x) agar tap beruntun terdengar renyah & organik
+                pitchJitter = Random.Range(0.96f, 1.04f);
+            }
+            else if (speedFactor >= 2.0f)
             {
                 float rhythmicStep = (sfxPlayCounter % 3 - 1) * 0.04f;
                 pitchJitter = Random.Range(0.92f, 1.10f) + rhythmicStep;

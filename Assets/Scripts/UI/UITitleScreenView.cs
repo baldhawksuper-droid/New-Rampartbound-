@@ -60,6 +60,7 @@ namespace FantasyDefense.UI
         private bool isHandBeingDragged = false;
         private Vector2 handHomeAnchoredPos;
         private Coroutine handTapRoutine;
+        private bool isTransitioning = false;
 
         private void Awake()
         {
@@ -242,6 +243,7 @@ namespace FantasyDefense.UI
 
         private void OnEnable()
         {
+            isTransitioning = false;
             FantasyDefense.Localization.CitadelLocalizationManager.OnLanguageChanged += HandleLanguageChanged;
             RefreshLocalization();
             StartHandTapping();
@@ -507,6 +509,9 @@ namespace FantasyDefense.UI
 
         private void OnEnterCitadelClicked()
         {
+            if (isTransitioning) return;
+            isTransitioning = true;
+
             if (!isAssetsPreloaded)
             {
                 ForceReadyStartButton();
