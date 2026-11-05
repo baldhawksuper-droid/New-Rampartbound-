@@ -373,5 +373,43 @@ namespace Rampartbound.Editor
             }
         }
     }
+
+#if UNITY_ANDROID
+    public class AndroidManifestPostprocessor : UnityEditor.Android.IPostGenerateGradleAndroidProject
+    {
+        public int callbackOrder => 0;
+
+        public void OnPostGenerateGradleAndroidProject(string basePath)
+        {
+            try
+            {
+                string[] searchPaths = new string[]
+                {
+                    Path.Combine(basePath, "src", "main", "AndroidManifest.xml"),
+                    Path.Combine(basePath, "unityLibrary", "src", "main", "AndroidManifest.xml"),
+                    Path.Combine(basePath, "launcher", "src", "main", "AndroidManifest.xml")
+                };
+
+                foreach (string manifestPath in searchPaths)
+                {
+                    if (File.Exists(manifestPath))
+                    {
+                        string content = File.ReadAllText(manifestPath);
+                        if (!content.Contains("android.permission.VIBRATE"))
+                        {
+                            content = content.Replace("</manifest>", "    <uses-permission android:name=\"android.permission.VIBRATE\" />\n</manifest>");
+                            File.WriteAllText(manifestPath, content);
+                            Debug.Log($"[BuildPipeline] Berhasil menginjeksikan izin android.permission.VIBRATE ke: {manifestPath}");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"[BuildPipeline] Peringatan saat menambahkan izin VIBRATE di AndroidManifest: {ex.Message}");
+            }
+        }
+    }
+#endif
 }
 #endif

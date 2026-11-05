@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -51,7 +52,14 @@ namespace FantasyDefense.UI
 
             if (triggerHaptic && DevicePerformanceManager.Instance != null)
             {
-                DevicePerformanceManager.Instance.TriggerHaptic(HapticFeedbackType.Light);
+                try
+                {
+                    DevicePerformanceManager.Instance.TriggerHaptic(HapticFeedbackType.Light);
+                }
+                catch (Exception)
+                {
+                    // Jangan biarkan kegagalan haptic menghentikan event tap UI
+                }
             }
         }
 
@@ -65,7 +73,14 @@ namespace FantasyDefense.UI
         {
             if (triggerSound && AudioManager.Instance != null)
             {
-                AudioManager.Instance.PlaySound(SoundType.ButtonClick);
+                try
+                {
+                    AudioManager.Instance.PlaySound(SoundType.ButtonClick);
+                }
+                catch (Exception)
+                {
+                    // Jangan biarkan kegagalan audio menghentikan event click UI
+                }
             }
         }
 

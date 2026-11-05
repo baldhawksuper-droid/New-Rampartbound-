@@ -480,12 +480,20 @@ namespace FantasyDefense.UI
 
             if (AudioManager.Instance != null)
             {
-                AudioManager.Instance.PlaySound(SoundType.ButtonClick);
+                try
+                {
+                    AudioManager.Instance.PlaySound(SoundType.ButtonClick);
+                }
+                catch (Exception) { }
             }
 
             if (DevicePerformanceManager.Instance != null)
             {
-                DevicePerformanceManager.Instance.TriggerHaptic(HapticFeedbackType.Medium);
+                try
+                {
+                    DevicePerformanceManager.Instance.TriggerHaptic(HapticFeedbackType.Medium);
+                }
+                catch (Exception) { }
             }
 
             // Micro-bounce button juice on start button

@@ -168,24 +168,40 @@ namespace FantasyDefense.Mobile
 #if UNITY_ANDROID && !UNITY_EDITOR
             if (vibrator != null)
             {
-                long milliseconds = 25;
-                switch (type)
+                try
                 {
-                    case HapticFeedbackType.Light: milliseconds = 20; break;
-                    case HapticFeedbackType.Medium: milliseconds = 50; break;
-                    case HapticFeedbackType.Heavy: milliseconds = 90; break;
-                    case HapticFeedbackType.Success: milliseconds = 40; break;
-                    case HapticFeedbackType.Warning: milliseconds = 80; break;
-                    case HapticFeedbackType.Failure: milliseconds = 110; break;
-                    case HapticFeedbackType.Selection: milliseconds = 15; break;
+                    long milliseconds = 25;
+                    switch (type)
+                    {
+                        case HapticFeedbackType.Light: milliseconds = 20; break;
+                        case HapticFeedbackType.Medium: milliseconds = 50; break;
+                        case HapticFeedbackType.Heavy: milliseconds = 90; break;
+                        case HapticFeedbackType.Success: milliseconds = 40; break;
+                        case HapticFeedbackType.Warning: milliseconds = 80; break;
+                        case HapticFeedbackType.Failure: milliseconds = 110; break;
+                        case HapticFeedbackType.Selection: milliseconds = 15; break;
+                    }
+                    vibrator.Call("vibrate", milliseconds);
                 }
-                vibrator.Call("vibrate", milliseconds);
+                catch (Exception ex)
+                {
+                    Debug.LogWarning($"[DevicePerformanceManager] Android vibrator call gagal/dibatasi: {ex.Message}");
+                    vibrator = null;
+                    isHapticsEnabled = false;
+                }
                 return;
             }
 #endif
 
 #if UNITY_IOS && !UNITY_EDITOR
-            Handheld.Vibrate();
+            try
+            {
+                Handheld.Vibrate();
+            }
+            catch (Exception)
+            {
+                isHapticsEnabled = false;
+            }
             return;
 #endif
 
