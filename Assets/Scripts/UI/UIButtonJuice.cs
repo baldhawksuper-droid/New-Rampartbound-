@@ -24,15 +24,28 @@ namespace FantasyDefense.UI
 
         private Vector3 originalScale = Vector3.one;
         private Coroutine activeRoutine;
+        private UnityEngine.UI.Graphic targetGraphic;
+        private Color originalColor = Color.white;
+        private bool hasGraphic = false;
 
         private void Awake()
         {
             originalScale = transform.localScale;
+            targetGraphic = GetComponent<UnityEngine.UI.Graphic>();
+            if (targetGraphic != null)
+            {
+                originalColor = targetGraphic.color;
+                hasGraphic = true;
+            }
         }
 
         private void OnEnable()
         {
             transform.localScale = originalScale;
+            if (hasGraphic && targetGraphic != null)
+            {
+                targetGraphic.color = originalColor;
+            }
         }
 
         private void OnDisable()
@@ -43,12 +56,26 @@ namespace FantasyDefense.UI
                 activeRoutine = null;
             }
             transform.localScale = originalScale;
+            if (hasGraphic && targetGraphic != null)
+            {
+                targetGraphic.color = originalColor;
+            }
         }
 
         public void OnPointerDown(PointerEventData eventData)
         {
             if (activeRoutine != null) StopCoroutine(activeRoutine);
             activeRoutine = StartCoroutine(ScaleRoutine(transform.localScale, originalScale * pressedScale, 0.08f));
+
+            if (hasGraphic && targetGraphic != null)
+            {
+                targetGraphic.color = new Color(
+                    Mathf.Clamp01(originalColor.r * 1.18f),
+                    Mathf.Clamp01(originalColor.g * 1.18f),
+                    Mathf.Clamp01(originalColor.b * 1.18f),
+                    originalColor.a
+                );
+            }
 
             if (triggerHaptic && DevicePerformanceManager.Instance != null)
             {
@@ -86,6 +113,11 @@ namespace FantasyDefense.UI
 
         private IEnumerator BounceBackRoutine()
         {
+            if (hasGraphic && targetGraphic != null)
+            {
+                targetGraphic.color = originalColor;
+            }
+
             // 1. Overshoot bounce ke 1.05x
             yield return ScaleRoutine(transform.localScale, originalScale * bounceScale, animationDuration * 0.45f);
 

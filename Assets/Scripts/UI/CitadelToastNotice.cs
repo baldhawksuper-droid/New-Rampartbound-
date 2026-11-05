@@ -70,7 +70,7 @@ namespace FantasyDefense.UI
 
             toastCanvasGroup = toastRoot.AddComponent<CanvasGroup>();
             toastCanvasGroup.alpha = 0f;
-            toastCanvasGroup.blocksRaycasts = true;
+            toastCanvasGroup.blocksRaycasts = false;
 
             // Text Label
             var textObj = new GameObject("ToastMessage");
@@ -182,7 +182,11 @@ namespace FantasyDefense.UI
                 StopCoroutine(activeRoutine);
                 activeRoutine = null;
             }
-            if (toastCanvasGroup != null) toastCanvasGroup.alpha = 0f;
+            if (toastCanvasGroup != null)
+            {
+                toastCanvasGroup.alpha = 0f;
+                toastCanvasGroup.blocksRaycasts = false;
+            }
             if (toastRoot != null) toastRoot.SetActive(false);
         }
 
@@ -206,6 +210,7 @@ namespace FantasyDefense.UI
             }
 
             toastCanvasGroup.alpha = 1f;
+            toastCanvasGroup.blocksRaycasts = true;
             toastRoot.transform.localScale = targetScale;
 
             yield return new WaitForSecondsRealtime(duration);
@@ -222,6 +227,7 @@ namespace FantasyDefense.UI
             }
 
             toastCanvasGroup.alpha = 0f;
+            toastCanvasGroup.blocksRaycasts = false;
             toastRoot.SetActive(false);
             activeRoutine = null;
         }

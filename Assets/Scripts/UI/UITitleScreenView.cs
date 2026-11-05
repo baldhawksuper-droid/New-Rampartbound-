@@ -132,12 +132,31 @@ namespace FantasyDefense.UI
 
             // Jalankan pre-warming seluruh aset sejak awal game terbuka (Point 6)
             StartCoroutine(PreloadAllGameAssetsRoutine());
+            StartCoroutine(PreloadTimeoutGuardRoutine());
 
             if (handCursorRt != null)
             {
                 handHomeAnchoredPos = handCursorRt.anchoredPosition;
                 StartHandTapping();
             }
+        }
+
+        private IEnumerator PreloadTimeoutGuardRoutine()
+        {
+            yield return new WaitForSecondsRealtime(1.8f);
+            if (!isAssetsPreloaded)
+            {
+                Debug.LogWarning("[UITitleScreenView] Preload timeout guard dipicu (1.8s) -> membuka paksa tombol start.");
+                ForceReadyStartButton();
+            }
+        }
+
+        private void ForceReadyStartButton()
+        {
+            isAssetsPreloaded = true;
+            if (loadingStatusText != null) loadingStatusText.gameObject.SetActive(false);
+            if (loadingProgressBar != null) loadingProgressBar.gameObject.SetActive(false);
+            if (enterCitadelButton != null) enterCitadelButton.interactable = true;
         }
 
         private IEnumerator PreloadAllGameAssetsRoutine()
@@ -156,54 +175,66 @@ namespace FantasyDefense.UI
             }
 
             // 1. Preload Hero Pool & Gems T0
-            if (FantasyDefense.Summon.HeroSummoner.Instance != null)
+            try
             {
-                FantasyDefense.Summon.HeroSummoner.Instance.EnsureHeroPoolLoaded();
+                if (FantasyDefense.Summon.HeroSummoner.Instance != null)
+                {
+                    FantasyDefense.Summon.HeroSummoner.Instance.EnsureHeroPoolLoaded();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"[TitleScreen] Preload hero pool warning: {ex.Message}");
             }
             if (loadingProgressBar != null) loadingProgressBar.value = 0.25f;
             yield return null;
 
             // 2. Preload Monster Sprites
-            Resources.Load<Sprite>("Sprites/Monsters/Monster_Creep");
-            Resources.Load<Sprite>("Sprites/Monsters/Monster_Brute");
-            Resources.Load<Sprite>("Sprites/Monsters/Monster_Boss");
+            try
+            {
+                Resources.Load<Sprite>("Sprites/Monsters/Monster_Creep");
+                Resources.Load<Sprite>("Sprites/Monsters/Monster_Brute");
+                Resources.Load<Sprite>("Sprites/Monsters/Monster_Boss");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"[TitleScreen] Preload monster warning: {ex.Message}");
+            }
             if (loadingProgressBar != null) loadingProgressBar.value = 0.50f;
             yield return null;
 
             // 3. Preload Tile Sprites
-            Resources.Load<Sprite>("Sprites/Grid/Tile_Empty");
-            Resources.Load<Sprite>("Sprites/Grid/Tile_Hover");
+            try
+            {
+                Resources.Load<Sprite>("Sprites/Grid/Tile_Empty");
+                Resources.Load<Sprite>("Sprites/Grid/Tile_Hover");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"[TitleScreen] Preload tiles warning: {ex.Message}");
+            }
             if (loadingProgressBar != null) loadingProgressBar.value = 0.75f;
             yield return null;
 
             // 4. Preload Local Save Data
-            if (FantasyDefense.Save.SaveManager.Instance != null)
+            try
             {
-                FantasyDefense.Save.SaveManager.Instance.LoadProfile((loadedData) =>
+                if (FantasyDefense.Save.SaveManager.Instance != null)
                 {
-                    Debug.Log($"[TitleScreen] Profil akun berhasil dipre-warm: {(loadedData != null ? loadedData.playerDisplayName : "Akun Baru")}.");
-                });
+                    FantasyDefense.Save.SaveManager.Instance.LoadProfile((loadedData) =>
+                    {
+                        Debug.Log($"[TitleScreen] Profil akun berhasil dipre-warm: {(loadedData != null ? loadedData.playerDisplayName : "Akun Baru")}.");
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"[TitleScreen] Preload save profile warning: {ex.Message}");
             }
             if (loadingProgressBar != null) loadingProgressBar.value = 1.0f;
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(0.1f);
 
-            isAssetsPreloaded = true;
-            if (loadingStatusText != null)
-            {
-                loadingStatusText.text = "✨ Aset Siap!";
-                yield return new WaitForSeconds(0.15f);
-                loadingStatusText.gameObject.SetActive(false);
-            }
-
-            if (loadingProgressBar != null)
-            {
-                loadingProgressBar.gameObject.SetActive(false);
-            }
-
-            if (enterCitadelButton != null)
-            {
-                enterCitadelButton.interactable = true;
-            }
+            ForceReadyStartButton();
 
             RefreshLocalization();
             Debug.Log("[UITitleScreenView] Seluruh aset game berhasil di-prewarm & dimuat. Siap dimainkan tanpa jeda / race condition!");
@@ -476,7 +507,10 @@ namespace FantasyDefense.UI
 
         private void OnEnterCitadelClicked()
         {
-            if (!isAssetsPreloaded) return;
+            if (!isAssetsPreloaded)
+            {
+                ForceReadyStartButton();
+            }
 
             if (AudioManager.Instance != null)
             {
