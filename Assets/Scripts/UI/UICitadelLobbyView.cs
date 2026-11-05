@@ -90,7 +90,7 @@ namespace FantasyDefense.UI
         [SerializeField] private bool showFeaturePreview = false;
 
         [Header("Citadel Courtyard Atmosphere & Standee VFX")]
-        [SerializeField] private bool enableCourtyardAtmosphere = true;
+        [SerializeField] private bool enableCourtyardAtmosphere = false;
         [SerializeField] private bool enableStandeeIdleBobbing = true;
         private RectTransform pippinPortraitRt, pippinShadowRt;
         private RectTransform cedricPortraitRt, cedricShadowRt;
@@ -98,6 +98,7 @@ namespace FantasyDefense.UI
         private RectTransform windPortraitRt, windShadowRt;
         private Image valleyMistOverlay;
         private Image godRaysOverlay;
+        private Coroutine greetingBubbleCoroutine;
 
         private void Awake()
         {
@@ -301,14 +302,21 @@ namespace FantasyDefense.UI
                 windShadowRt = windRangerCardButton.transform.Find("GroundShadow")?.GetComponent<RectTransform>();
             }
 
-            // Inisialisasi Lapisan Atmosfer Lembah & God Rays jika belum ada
-            if (enableCourtyardAtmosphere && valleyMistOverlay == null)
+            // Inisialisasi Lapisan Atmosfer Lembah & God Rays (dibersihkan jika dinonaktifkan agar pemandangan jernih)
+            Transform parentTr = courtyardContainer != null ? courtyardContainer.parent : transform;
+            if (parentTr != null)
             {
-                Transform parentTr = courtyardContainer != null ? courtyardContainer.parent : transform;
-                if (parentTr != null)
+                var existingAtmosphere = parentTr.Find("LobbyAtmosphereLayer");
+                if (existingAtmosphere != null && !enableCourtyardAtmosphere)
                 {
-                    var existingAtmosphere = parentTr.Find("LobbyAtmosphereLayer");
-                    GameObject atmoObj;
+                    Destroy(existingAtmosphere.gameObject);
+                }
+            }
+
+            if (enableCourtyardAtmosphere && valleyMistOverlay == null && parentTr != null)
+            {
+                var existingAtmosphere = parentTr.Find("LobbyAtmosphereLayer");
+                GameObject atmoObj;
                     if (existingAtmosphere != null)
                     {
                         atmoObj = existingAtmosphere.gameObject;
@@ -372,7 +380,6 @@ namespace FantasyDefense.UI
                     }
                 }
             }
-        }
 
         private void UpdateAtmosphereAndStandeeBobbing()
         {
@@ -468,6 +475,8 @@ namespace FantasyDefense.UI
 
         private void OnDisable()
         {
+            if (greetingBubbleCoroutine != null) { StopCoroutine(greetingBubbleCoroutine); greetingBubbleCoroutine = null; }
+            if (activeGreetingBubble != null) { Destroy(activeGreetingBubble); activeGreetingBubble = null; }
             if (_goldTickerRoutine != null) { StopCoroutine(_goldTickerRoutine); _goldTickerRoutine = null; }
             if (_energyTickerRoutine != null) { StopCoroutine(_energyTickerRoutine); _energyTickerRoutine = null; }
             if (_gemsTickerRoutine != null) { StopCoroutine(_gemsTickerRoutine); _gemsTickerRoutine = null; }
@@ -812,6 +821,16 @@ namespace FantasyDefense.UI
 
         private void HandlePanelChanged(GamePanelType panelType)
         {
+            if (greetingBubbleCoroutine != null)
+            {
+                StopCoroutine(greetingBubbleCoroutine);
+                greetingBubbleCoroutine = null;
+            }
+            if (activeGreetingBubble != null)
+            {
+                Destroy(activeGreetingBubble);
+                activeGreetingBubble = null;
+            }
             UpdateNavigationTabsVisual(panelType);
         }
 
@@ -955,22 +974,23 @@ namespace FantasyDefense.UI
                     }
                 }
 
-                // Penyelarasan jarak: Rapatkan hero portrait, ground shadow, dan badge pill tanpa celah renggang
+                // Penyelarasan jarak: Rapatkan hero portrait dan ground shadow menapak di atas badge pill
                 var portraitRt = btn.transform.Find("HeroPortrait")?.GetComponent<RectTransform>();
                 if (portraitRt != null)
                 {
-                    portraitRt.anchorMin = new Vector2(0.02f, 0.12f);
-                    portraitRt.anchorMax = new Vector2(0.98f, 0.98f);
-                    portraitRt.offsetMin = Vector2.zero;
-                    portraitRt.offsetMax = Vector2.zero;
+                    portraitRt.anchorMin = new Vector2(0.5f, 0.13f);
+                    portraitRt.anchorMax = new Vector2(0.5f, 0.13f);
+                    portraitRt.pivot = new Vector2(0.5f, 0f);
+                    portraitRt.sizeDelta = new Vector2(165f, 205f);
                 }
                 var shadowRt = btn.transform.Find("GroundShadow")?.GetComponent<RectTransform>();
                 if (shadowRt != null)
                 {
-                    shadowRt.anchorMin = new Vector2(0.08f, 0.10f);
-                    shadowRt.anchorMax = new Vector2(0.92f, 0.17f);
-                    shadowRt.offsetMin = Vector2.zero;
-                    shadowRt.offsetMax = Vector2.zero;
+                    shadowRt.anchorMin = new Vector2(0.5f, 0.13f);
+                    shadowRt.anchorMax = new Vector2(0.5f, 0.13f);
+                    shadowRt.pivot = new Vector2(0.5f, 0.5f);
+                    shadowRt.sizeDelta = new Vector2(130f, 28f);
+                    shadowRt.anchoredPosition = new Vector2(0f, 0f);
 
                     var shadowImg = shadowRt.GetComponent<Image>();
                     if (shadowImg != null)
@@ -1267,9 +1287,15 @@ namespace FantasyDefense.UI
         private void SpawnHeroGreetingBubble(Transform targetTr, UnitType type)
         {
             if (targetTr == null) return;
+            if (greetingBubbleCoroutine != null)
+            {
+                StopCoroutine(greetingBubbleCoroutine);
+                greetingBubbleCoroutine = null;
+            }
             if (activeGreetingBubble != null)
             {
                 Destroy(activeGreetingBubble);
+                activeGreetingBubble = null;
             }
 
             var lilitaFont = Resources.Load<Font>("Fonts/LilitaOne-Regular");
@@ -1345,7 +1371,7 @@ namespace FantasyDefense.UI
 
             txt.text = quote;
 
-            StartCoroutine(GreetingBubbleRoutine(activeGreetingBubble));
+            greetingBubbleCoroutine = StartCoroutine(GreetingBubbleRoutine(activeGreetingBubble));
         }
 
         private IEnumerator GreetingBubbleRoutine(GameObject bubble)
@@ -1355,6 +1381,8 @@ namespace FantasyDefense.UI
             var rt = bubble.GetComponent<RectTransform>();
             var img = bubble.GetComponent<Image>();
             var txt = bubble.GetComponentInChildren<Text>();
+            if (rt == null || img == null) yield break;
+
             Vector3 targetPos = rt.position;
             Vector3 startPos = targetPos - new Vector3(0f, 15f, 0f);
 
@@ -1362,20 +1390,36 @@ namespace FantasyDefense.UI
             float elapsed = 0f;
             while (elapsed < popDur)
             {
+                if (bubble == null || rt == null) yield break;
                 elapsed += Time.unscaledDeltaTime;
                 float t = elapsed / popDur;
                 float s = Mathf.Sin(t * Mathf.PI * 0.5f);
-                rt.position = Vector3.Lerp(startPos, targetPos, s);
-                rt.localScale = Vector3.one * (0.4f + s * 0.6f);
+                try
+                {
+                    rt.position = Vector3.Lerp(startPos, targetPos, s);
+                    rt.localScale = Vector3.one * (0.4f + s * 0.6f);
+                }
+                catch (Exception)
+                {
+                    yield break;
+                }
                 yield return null;
             }
 
-            rt.position = targetPos;
-            rt.localScale = Vector3.one;
+            if (bubble == null || rt == null) yield break;
+            try
+            {
+                rt.position = targetPos;
+                rt.localScale = Vector3.one;
+            }
+            catch (Exception)
+            {
+                yield break;
+            }
 
             yield return new WaitForSecondsRealtime(1.6f);
 
-            if (bubble == null) yield break;
+            if (bubble == null || rt == null || img == null) yield break;
 
             float fadeDur = 0.35f;
             elapsed = 0f;
@@ -1384,14 +1428,21 @@ namespace FantasyDefense.UI
 
             while (elapsed < fadeDur)
             {
-                if (bubble == null) yield break;
+                if (bubble == null || rt == null || img == null) yield break;
                 elapsed += Time.unscaledDeltaTime;
                 float t = elapsed / fadeDur;
-                rt.position = targetPos + new Vector3(0f, t * 18f, 0f);
-                img.color = new Color(origImgCol.r, origImgCol.g, origImgCol.b, origImgCol.a * (1f - t));
-                if (txt != null)
+                try
                 {
-                    txt.color = new Color(origTxtCol.r, origTxtCol.g, origTxtCol.b, origTxtCol.a * (1f - t));
+                    rt.position = targetPos + new Vector3(0f, t * 18f, 0f);
+                    img.color = new Color(origImgCol.r, origImgCol.g, origImgCol.b, origImgCol.a * (1f - t));
+                    if (txt != null)
+                    {
+                        txt.color = new Color(origTxtCol.r, origTxtCol.g, origTxtCol.b, origTxtCol.a * (1f - t));
+                    }
+                }
+                catch (Exception)
+                {
+                    yield break;
                 }
                 yield return null;
             }
@@ -1471,6 +1522,8 @@ namespace FantasyDefense.UI
 
             var rt = obj.GetComponent<RectTransform>();
             var txt = obj.GetComponent<Text>();
+            if (rt == null || txt == null) yield break;
+
             Vector3 startPos = rt.position;
             float duration = 0.45f;
             float elapsed = 0f;
@@ -1478,23 +1531,31 @@ namespace FantasyDefense.UI
 
             while (elapsed < duration)
             {
+                if (obj == null || rt == null || txt == null) yield break;
                 elapsed += Time.unscaledDeltaTime;
                 float t = Mathf.Clamp01(elapsed / duration);
 
-                rt.position = startPos + new Vector3(0f, Mathf.Sin(t * Mathf.PI * 0.5f) * 35f, 0f);
-                float scale = Mathf.Sin(t * Mathf.PI) * 1.35f;
-                rt.localScale = Vector3.one * Mathf.Max(0.1f, scale);
-
-                if (t > 0.4f)
+                try
                 {
-                    float a = (1f - t) / 0.6f;
-                    txt.color = new Color(origColor.r, origColor.g, origColor.b, a);
+                    rt.position = startPos + new Vector3(0f, Mathf.Sin(t * Mathf.PI * 0.5f) * 35f, 0f);
+                    float scale = Mathf.Sin(t * Mathf.PI) * 1.35f;
+                    rt.localScale = Vector3.one * Mathf.Max(0.1f, scale);
+
+                    if (t > 0.4f)
+                    {
+                        float a = (1f - t) / 0.6f;
+                        txt.color = new Color(origColor.r, origColor.g, origColor.b, a);
+                    }
+                }
+                catch (Exception)
+                {
+                    yield break;
                 }
 
                 yield return null;
             }
 
-            Destroy(obj);
+            if (obj != null) Destroy(obj);
         }
 
         private IEnumerator AnimateRollingGold(int fromVal, int toVal)
@@ -1574,25 +1635,43 @@ namespace FantasyDefense.UI
 
         private void OpenHeroUpgrade(UnitType heroType)
         {
-            if (AudioManager.Instance != null)
+            try
             {
-                AudioManager.Instance.PlaySound(SoundType.ButtonClick);
-            }
+                if (greetingBubbleCoroutine != null)
+                {
+                    StopCoroutine(greetingBubbleCoroutine);
+                    greetingBubbleCoroutine = null;
+                }
+                if (activeGreetingBubble != null)
+                {
+                    Destroy(activeGreetingBubble);
+                    activeGreetingBubble = null;
+                }
 
-            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
-                FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
-            {
-                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Light);
-            }
+                if (AudioManager.Instance != null)
+                {
+                    AudioManager.Instance.PlaySound(SoundType.ButtonClick);
+                }
 
-            if (GameFlowManager.Instance != null)
-            {
-                GameFlowManager.Instance.OpenPanel(GamePanelType.HeroUpgrade);
-            }
+                if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
+                    FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+                {
+                    FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Light);
+                }
 
-            if (UIHeroUpgradeView.Instance != null)
+                if (GameFlowManager.Instance != null)
+                {
+                    GameFlowManager.Instance.OpenPanel(GamePanelType.HeroUpgrade);
+                }
+
+                if (UIHeroUpgradeView.Instance != null)
+                {
+                    UIHeroUpgradeView.Instance.SelectHero(heroType);
+                }
+            }
+            catch (Exception ex)
             {
-                UIHeroUpgradeView.Instance.SelectHero(heroType);
+                Debug.LogError($"[UICitadelLobbyView] Gagal membuka Hero Upgrade: {ex}");
             }
         }
 

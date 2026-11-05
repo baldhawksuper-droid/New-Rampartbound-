@@ -266,26 +266,33 @@ namespace FantasyDefense.UI
             }
 
             // Cari target GameObject di hierarki aktif
-            GameObject targetObj = GameObject.Find(targetElementName);
-            if (targetObj != null)
+            try
             {
-                RectTransform targetRect = targetObj.GetComponent<RectTransform>();
-                if (targetRect != null)
+                GameObject targetObj = GameObject.Find(targetElementName);
+                if (targetObj != null)
                 {
-                    if (spotlightCutout != null)
+                    RectTransform targetRect = targetObj.GetComponent<RectTransform>();
+                    if (targetRect != null)
                     {
-                        spotlightCutout.gameObject.SetActive(true);
-                        spotlightCutout.position = targetRect.position;
-                        spotlightCutout.sizeDelta = targetRect.sizeDelta + new Vector2(20f, 20f);
-                    }
+                        if (spotlightCutout != null)
+                        {
+                            spotlightCutout.gameObject.SetActive(true);
+                            spotlightCutout.position = targetRect.position;
+                            spotlightCutout.sizeDelta = targetRect.sizeDelta + new Vector2(20f, 20f);
+                        }
 
-                    if (pointerHand != null)
-                    {
-                        pointerHand.gameObject.SetActive(true);
-                        pointerHand.position = targetRect.position + new Vector3(0, 50f, 0);
+                        if (pointerHand != null)
+                        {
+                            pointerHand.gameObject.SetActive(true);
+                            pointerHand.position = targetRect.position + new Vector3(0, 50f, 0);
+                        }
+                        return;
                     }
-                    return;
                 }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning($"[UITutorialOverlayView] Gagal memperbarui posisi spotlight: {ex.Message}");
             }
 
             if (spotlightCutout != null) spotlightCutout.gameObject.SetActive(false);

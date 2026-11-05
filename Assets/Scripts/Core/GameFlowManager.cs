@@ -180,50 +180,57 @@ namespace FantasyDefense.Core
                 AudioManager.Instance.PlaySound(SoundType.ButtonClick);
             }
 
-            switch (panelType)
+            try
             {
-                case GamePanelType.StageMap:
-                    if (stageMapView != null) stageMapView.OpenView();
-                    break;
-                case GamePanelType.HeroUpgrade:
-                    if (heroUpgradeView != null) heroUpgradeView.OpenView();
-                    break;
-                case GamePanelType.SummonHall:
-                    if (summonHallView != null) summonHallView.OpenView();
-                    break;
-                case GamePanelType.Store:
-                    if (storeView != null) storeView.OpenView();
-                    break;
-                case GamePanelType.RelicForge:
-                    if (relicForgeView != null) relicForgeView.OpenView();
-                    break;
-                case GamePanelType.CitadelTalents:
-                    if (talentView != null) talentView.OpenPanel();
-                    break;
-                case GamePanelType.Quests:
-                    if (questView != null) questView.OpenQuestView();
-                    break;
-                case GamePanelType.Guild:
-                    if (guildView != null) guildView.OpenView();
-                    break;
-                case GamePanelType.BattlePass:
-                    if (battlePassView != null) battlePassView.OpenView();
-                    break;
-                case GamePanelType.EventArena:
-                    if (eventArenaView != null) eventArenaView.OpenView();
-                    break;
-                case GamePanelType.Artifacts:
-                    if (artifactView != null) artifactView.OpenView();
-                    break;
-                case GamePanelType.AudioSettings:
-                    if (audioSettingsView != null) audioSettingsView.OpenSettings();
-                    break;
-                case GamePanelType.EndlessTrial:
-                    if (endlessTrialView != null) endlessTrialView.OpenView();
-                    break;
-                default:
-                    currentActivePanel = GamePanelType.None;
-                    break;
+                switch (panelType)
+                {
+                    case GamePanelType.StageMap:
+                        if (stageMapView != null) stageMapView.OpenView();
+                        break;
+                    case GamePanelType.HeroUpgrade:
+                        if (heroUpgradeView != null) heroUpgradeView.OpenView();
+                        break;
+                    case GamePanelType.SummonHall:
+                        if (summonHallView != null) summonHallView.OpenView();
+                        break;
+                    case GamePanelType.Store:
+                        if (storeView != null) storeView.OpenView();
+                        break;
+                    case GamePanelType.RelicForge:
+                        if (relicForgeView != null) relicForgeView.OpenView();
+                        break;
+                    case GamePanelType.CitadelTalents:
+                        if (talentView != null) talentView.OpenPanel();
+                        break;
+                    case GamePanelType.Quests:
+                        if (questView != null) questView.OpenQuestView();
+                        break;
+                    case GamePanelType.Guild:
+                        if (guildView != null) guildView.OpenView();
+                        break;
+                    case GamePanelType.BattlePass:
+                        if (battlePassView != null) battlePassView.OpenView();
+                        break;
+                    case GamePanelType.EventArena:
+                        if (eventArenaView != null) eventArenaView.OpenView();
+                        break;
+                    case GamePanelType.Artifacts:
+                        if (artifactView != null) artifactView.OpenView();
+                        break;
+                    case GamePanelType.AudioSettings:
+                        if (audioSettingsView != null) audioSettingsView.OpenSettings();
+                        break;
+                    case GamePanelType.EndlessTrial:
+                        if (endlessTrialView != null) endlessTrialView.OpenView();
+                        break;
+                    default:
+                        currentActivePanel = GamePanelType.None;
+                        break;
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"[GameFlowManager] Gagal membuka sub-panel {panelType}: {ex}");
             }
 
             OnPanelChanged?.Invoke(currentActivePanel);

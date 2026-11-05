@@ -755,6 +755,7 @@ namespace Rampartbound.Editor
                 var tBtn = CreateButton(tierBarObj.transform, $"TierBtn_{t}", $"T{t}", t == 1 ? new Color(0.96f, 0.76f, 0.22f, 1f) : new Color(0.10f, 0.15f, 0.24f, 0.88f), t == 1 ? new Color(0.12f, 0.08f, 0.02f) : new Color(0.75f, 0.85f, 0.95f), 14, defaultFont);
                 PositionUI(tBtn, (t - 1) * segW + 0.015f, 0.10f, t * segW - 0.015f, 0.90f);
             }
+            tierBarObj.SetActive(false);
 
             // Core Battle Button (Crimson 3D Gold Frame with studs, crossed swords, and diamond accents)
             var defendBtn = CreateButton(lobbyPanelObj.transform, "DefendCitadelButton", "<b>BATTLE</b>  <color=#FFEE55>(5⚡)</color>", new Color(0.78f, 0.10f, 0.12f), Color.white, 26, defaultFont);
@@ -866,10 +867,8 @@ namespace Rampartbound.Editor
                 var bImg = btn.GetComponent<Image>();
                 if (bImg != null)
                 {
-                    // Active: kapsul amber tembus pandang bercahaya; Inactive: Color.clear menyatu dengan dock kaca
-                    bImg.color = isActive 
-                        ? new Color(0.96f, 0.75f, 0.18f, 0.24f) 
-                        : Color.clear;
+                    // Selalu transparan agar menyatu halus dengan kaca dock tanpa balok kuning solid
+                    bImg.color = Color.clear;
                     bImg.raycastTarget = true; // Menjamin area hit-box menangkap tap sentuhan jari
                 }
 
@@ -877,11 +876,11 @@ namespace Rampartbound.Editor
                 {
                     var podiumObj = new GameObject("ActivePodiumFrame", typeof(RectTransform), typeof(Image));
                     podiumObj.transform.SetParent(btn.transform, false);
-                    PositionUI(podiumObj, -0.02f, -0.02f, 1.02f, 1.02f);
+                    PositionUI(podiumObj, 0.05f, 0.05f, 0.95f, 0.95f);
                     var pImg = podiumObj.GetComponent<Image>();
                     pImg.sprite = _tabActivePodium;
                     pImg.type = Image.Type.Simple;
-                    pImg.preserveAspect = false;
+                    pImg.preserveAspect = true;
                     pImg.raycastTarget = false;
                     podiumObj.SetActive(isActive);
                 }
@@ -930,14 +929,6 @@ namespace Rampartbound.Editor
             setupFantasyNavTab(navHeroBtn, iconNavHeroes, "Heroes", false);
             setupFantasyNavTab(navSummonBtn, iconNavSummon, "Gacha", false);
             setupFantasyNavTab(navStoreBtn, iconNavBag, "Bag", false);
-
-            // Shimmer Sweep Light pada Tab Aktif < Citadel >
-            var shimmerObj = new GameObject("ActiveShimmerSweep", typeof(RectTransform), typeof(Image));
-            shimmerObj.transform.SetParent(navStageBtn.transform, false);
-            PositionUI(shimmerObj, 0.05f, 0.05f, 0.95f, 0.95f);
-            var shimmerImg = shimmerObj.GetComponent<Image>();
-            shimmerImg.color = new Color(1f, 1f, 1f, 0.22f);
-            shimmerImg.raycastTarget = false;
 
             // Notification Badges (Red Dots) pada tab Forge dan Heroes (Poin Rekomendasi 3)
             CreateNotificationBadge(navForgeBtn.transform, NotificationBadgeType.DailySummonFree);
@@ -3184,22 +3175,15 @@ namespace Rampartbound.Editor
         {
             if (cardObj == null) return;
 
-            // 1. Hero Standee Portrait (Proporsional menapak dekat dengan pelat nama tanpa celah kosong)
-            if (heroSprite != null)
-            {
-                var portraitObj = new GameObject("HeroPortrait", typeof(RectTransform), typeof(Image));
-                portraitObj.transform.SetParent(cardObj.transform, false);
-                PositionUI(portraitObj, 0.02f, 0.12f, 0.98f, 0.98f);
-                var img = portraitObj.GetComponent<Image>();
-                img.sprite = heroSprite;
-                img.preserveAspect = true;
-                img.raycastTarget = false;
-            }
-
-            // 2. Oval Ground Shadow (di bawah kaki hero standee tepat di atas pelat nama)
+            // 1. Oval Ground Shadow (di bawah kaki hero standee tepat di atas pelat nama)
             var shadowObj = new GameObject("GroundShadow", typeof(RectTransform), typeof(Image));
             shadowObj.transform.SetParent(cardObj.transform, false);
-            PositionUI(shadowObj, 0.08f, 0.10f, 0.92f, 0.17f);
+            var shadowRt = shadowObj.GetComponent<RectTransform>();
+            shadowRt.anchorMin = new Vector2(0.5f, 0.13f);
+            shadowRt.anchorMax = new Vector2(0.5f, 0.13f);
+            shadowRt.pivot = new Vector2(0.5f, 0.5f);
+            shadowRt.sizeDelta = new Vector2(130f, 28f);
+            shadowRt.anchoredPosition = Vector2.zero;
             var shadowImg = shadowObj.GetComponent<Image>();
             if (_shadowOval != null)
             {
@@ -3207,6 +3191,23 @@ namespace Rampartbound.Editor
             }
             shadowImg.color = new Color(0.03f, 0.06f, 0.12f, 0.70f);
             shadowImg.raycastTarget = false;
+
+            // 2. Hero Standee Portrait (Grounded tegap menapak di atas bayangan tanah & pelat nama)
+            if (heroSprite != null)
+            {
+                var portraitObj = new GameObject("HeroPortrait", typeof(RectTransform), typeof(Image));
+                portraitObj.transform.SetParent(cardObj.transform, false);
+                var pRt = portraitObj.GetComponent<RectTransform>();
+                pRt.anchorMin = new Vector2(0.5f, 0.13f);
+                pRt.anchorMax = new Vector2(0.5f, 0.13f);
+                pRt.pivot = new Vector2(0.5f, 0f); // Pivot di telapak kaki hero agar menapak kokoh di teras
+                pRt.sizeDelta = new Vector2(165f, 205f);
+                pRt.anchoredPosition = Vector2.zero;
+                var img = portraitObj.GetComponent<Image>();
+                img.sprite = heroSprite;
+                img.preserveAspect = true;
+                img.raycastTarget = false;
+            }
 
             // 3. Info Badge Pill (Pill terintegrasi rapi rapat di bawah kaki pahlawan)
             var badgeObj = new GameObject("BadgePill", typeof(RectTransform), typeof(Image));
