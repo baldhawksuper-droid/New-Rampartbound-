@@ -400,50 +400,88 @@ namespace FantasyDefense.UI
                 godRaysOverlay.color = new Color(1.0f, 0.95f, 0.80f, rayAlpha);
             }
 
-            // 2. Subtle Idle Breathing Bobbing pada Standee Hero di Teras
+            // 2. Grounded Idle Breathing pada Standee Hero di Teras
+            // Sesuai mandat desain: Kaki hero TIDAK BOLEH bobbing / terangkat dari teras.
+            // Posisi Y telapak kaki dikunci kokoh di anchoredPosition.y = 0 dengan pivot tepat di telapak kaki (0.5f, 0f).
+            // Gerakan nafas hanya mengekspansi dada dan tubuh bagian atas (scaleY & subtle scaleX) ke arah atas.
             if (enableStandeeIdleBobbing)
             {
-                // Pippin (Mage lembut mengambang)
-                if (pippinPortraitRt != null)
-                {
-                    float yPippin = Mathf.Sin(t * 2.2f) * 3.5f;
-                    float sPippin = 1.0f + (Mathf.Sin(t * 2.2f) * 0.015f);
-                    pippinPortraitRt.anchoredPosition = new Vector2(0f, yPippin);
-                    pippinPortraitRt.localScale = new Vector3(1f, sPippin, 1f);
-                    if (pippinShadowRt != null)
-                    {
-                        float shadowScale = 1.0f - (yPippin * 0.012f);
-                        pippinShadowRt.localScale = new Vector3(shadowScale, shadowScale, 1f);
-                    }
-                }
+                // Pippin (Mage lembut: nafas ritmis halus)
+                ApplyGroundedStandeeBreathing(pippinPortraitRt, pippinShadowRt, t, speed: 1.85f, phaseOffset: 0.0f, ampY: 0.022f, ampX: 0.008f);
 
-                // Cedric (Ksatria tegap menapak)
-                if (cedricPortraitRt != null)
-                {
-                    float yCedric = Mathf.Sin(t * 2.0f + 0.85f) * 2.8f;
-                    float sCedric = 1.0f + (Mathf.Sin(t * 2.0f + 0.85f) * 0.012f);
-                    cedricPortraitRt.anchoredPosition = new Vector2(0f, yCedric);
-                    cedricPortraitRt.localScale = new Vector3(1f, sCedric, 1f);
-                    if (cedricShadowRt != null)
-                    {
-                        float shadowScale = 1.0f - (yCedric * 0.012f);
-                        cedricShadowRt.localScale = new Vector3(shadowScale, shadowScale, 1f);
-                    }
-                }
+                // Cedric (Ksatria tegap berbaju zirah: nafas dalam & kokoh)
+                ApplyGroundedStandeeBreathing(cedricPortraitRt, cedricShadowRt, t, speed: 1.65f, phaseOffset: 1.25f, ampY: 0.018f, ampX: 0.006f);
 
-                // Rose (Paladin tangguh berbaju zirah)
-                if (rosePortraitRt != null)
+                // Rose (Paladin tangguh: nafas teratur & mantap)
+                ApplyGroundedStandeeBreathing(rosePortraitRt, roseShadowRt, t, speed: 1.75f, phaseOffset: 2.50f, ampY: 0.020f, ampX: 0.007f);
+
+                // Wind Ranger (Slot 4: hanya bernafas jika terbuka, siluet terkunci tetap statis)
+                var lobby = CitadelLobbyManager.Instance;
+                var windProfile = lobby != null ? lobby.GetHeroProfile(UnitType.WindRanger) : null;
+                bool windUnlocked = windProfile != null && windProfile.isUnlocked;
+                if (windUnlocked)
                 {
-                    float yRose = Mathf.Sin(t * 1.9f + 1.70f) * 2.2f;
-                    float sRose = 1.0f + (Mathf.Sin(t * 1.9f + 1.70f) * 0.010f);
-                    rosePortraitRt.anchoredPosition = new Vector2(0f, yRose);
-                    rosePortraitRt.localScale = new Vector3(1f, sRose, 1f);
-                    if (roseShadowRt != null)
+                    ApplyGroundedStandeeBreathing(windPortraitRt, windShadowRt, t, speed: 1.95f, phaseOffset: 3.80f, ampY: 0.022f, ampX: 0.008f);
+                }
+                else if (windPortraitRt != null)
+                {
+                    windPortraitRt.pivot = new Vector2(0.5f, 0f);
+                    windPortraitRt.anchoredPosition = Vector2.zero;
+                    windPortraitRt.localScale = Vector3.one;
+                    if (windShadowRt != null)
                     {
-                        float shadowScale = 1.0f - (yRose * 0.010f);
-                        roseShadowRt.localScale = new Vector3(shadowScale, shadowScale, 1f);
+                        windShadowRt.anchoredPosition = Vector2.zero;
+                        windShadowRt.localScale = Vector3.one;
                     }
                 }
+            }
+            else
+            {
+                ResetStandeeGroundedState(pippinPortraitRt, pippinShadowRt);
+                ResetStandeeGroundedState(cedricPortraitRt, cedricShadowRt);
+                ResetStandeeGroundedState(rosePortraitRt, roseShadowRt);
+                ResetStandeeGroundedState(windPortraitRt, windShadowRt);
+            }
+        }
+
+        private void ApplyGroundedStandeeBreathing(RectTransform portraitRt, RectTransform shadowRt, float t, float speed, float phaseOffset, float ampY, float ampX)
+        {
+            if (portraitRt == null) return;
+
+            // Kunci telapak kaki 100% menapak di lantai teras tanpa translasi Y (kaki tidak bergerak)
+            if (portraitRt.pivot.y != 0f)
+            {
+                portraitRt.pivot = new Vector2(0.5f, 0f);
+            }
+            portraitRt.anchoredPosition = Vector2.zero;
+
+            // Nafas organik: ekspansi hanya ke atas dari pivot telapak kaki
+            float cycle = Mathf.Sin(t * speed + phaseOffset);
+            float scaleY = 1.0f + (cycle * 0.5f + 0.5f) * ampY; // Mengembang ke atas (0% hingga +ampY)
+            float scaleX = 1.0f + (cycle * 0.5f + 0.5f) * ampX; // Dada melebar tipis ke samping
+
+            portraitRt.localScale = new Vector3(scaleX, scaleY, 1f);
+
+            // Bayangan tanah tetap terkunci kokoh di bawah kaki tanpa melayang
+            if (shadowRt != null)
+            {
+                shadowRt.anchoredPosition = Vector2.zero;
+                shadowRt.localScale = Vector3.one;
+            }
+        }
+
+        private void ResetStandeeGroundedState(RectTransform portraitRt, RectTransform shadowRt)
+        {
+            if (portraitRt != null)
+            {
+                portraitRt.pivot = new Vector2(0.5f, 0f);
+                portraitRt.anchoredPosition = Vector2.zero;
+                portraitRt.localScale = Vector3.one;
+            }
+            if (shadowRt != null)
+            {
+                shadowRt.anchoredPosition = Vector2.zero;
+                shadowRt.localScale = Vector3.one;
             }
         }
 
@@ -483,6 +521,11 @@ namespace FantasyDefense.UI
             if (_goldTickerRoutine != null) { StopCoroutine(_goldTickerRoutine); _goldTickerRoutine = null; }
             if (_energyTickerRoutine != null) { StopCoroutine(_energyTickerRoutine); _energyTickerRoutine = null; }
             if (_gemsTickerRoutine != null) { StopCoroutine(_gemsTickerRoutine); _gemsTickerRoutine = null; }
+
+            ResetStandeeGroundedState(pippinPortraitRt, pippinShadowRt);
+            ResetStandeeGroundedState(cedricPortraitRt, cedricShadowRt);
+            ResetStandeeGroundedState(rosePortraitRt, roseShadowRt);
+            ResetStandeeGroundedState(windPortraitRt, windShadowRt);
 
             CitadelLobbyManager.OnEnergyChanged -= HandleEnergyChanged;
             CitadelLobbyManager.OnGoldChanged -= HandleGoldChanged;
