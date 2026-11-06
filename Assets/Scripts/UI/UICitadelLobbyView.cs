@@ -546,7 +546,7 @@ namespace FantasyDefense.UI
                 var txt = defendCitadelButton.GetComponentInChildren<Text>();
                 if (txt != null)
                 {
-                    txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("LOBBY_DEFEND_BTN", "⚔️ BATTLE  (5 ⚡)", "⚔️ BATTLE  (5 ⚡)");
+                    txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("LOBBY_DEFEND_BTN", "⚔️ BATTLE (5)", "⚔️ BATTLE (5)");
                 }
             }
 

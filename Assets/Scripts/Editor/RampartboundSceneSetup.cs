@@ -765,7 +765,7 @@ namespace Rampartbound.Editor
             tierBarObj.SetActive(false);
 
             // Core Battle Button (Crimson 3D Gold Frame with studs, crossed swords, and diamond accents)
-            var defendBtn = CreateButton(lobbyPanelObj.transform, "DefendCitadelButton", "<b>BATTLE</b>  <color=#FFEE55>(5⚡)</color>", new Color(0.78f, 0.10f, 0.12f), Color.white, 26, defaultFont);
+            var defendBtn = CreateButton(lobbyPanelObj.transform, "DefendCitadelButton", "<b>BATTLE</b>  <color=#FFEE55>(5)</color>", new Color(0.78f, 0.10f, 0.12f), Color.white, 26, defaultFont);
             PositionUI(defendBtn, 0.12f, 0.125f, 0.88f, 0.205f);
 
             var defOutline = defendBtn.AddComponent<Outline>();
