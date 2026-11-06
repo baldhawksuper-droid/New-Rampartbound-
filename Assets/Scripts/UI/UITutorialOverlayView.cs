@@ -231,25 +231,28 @@ namespace FantasyDefense.UI
             if (speakerNameText != null) speakerNameText.text = stepData.GetLocalizedSpeaker();
             if (dialogueBodyText != null) dialogueBodyText.text = stepData.GetLocalizedDialogue();
 
-            // Jika step butuh aksi klik tombol spesifik, hilangkan hint tap-anywhere dan nonaktifkan blocker fullscreen
+            // Posisikan pointer jika ada target UI
+            bool targetFound = PositionSpotlightAndPointer(stepData.targetUiElementName);
+
+            // Jika step butuh aksi klik tombol spesifik tapi objek tidak ditemukan di hierarki aktif,
+            // aktifkan tombol tap-to-continue sebagai fail-safe agar pemain tidak mengalami softlock.
+            bool requireAction = stepData.requireSpecificAction && targetFound;
+
             if (tapHintText != null)
             {
-                tapHintText.gameObject.SetActive(!stepData.requireSpecificAction);
+                tapHintText.gameObject.SetActive(!requireAction);
                 tapHintText.text = FantasyDefense.Localization.CitadelLocalizationManager.Text("Ketuk di mana saja untuk lanjut...", "Tap anywhere to continue...");
             }
 
             if (tapToContinueButton != null)
             {
-                tapToContinueButton.gameObject.SetActive(!stepData.requireSpecificAction);
+                tapToContinueButton.gameObject.SetActive(!requireAction);
             }
 
             if (skipButtonText != null)
             {
                 skipButtonText.text = FantasyDefense.Localization.CitadelLocalizationManager.Text("LEWATI (SKIP) ✕", "SKIP ✕");
             }
-
-            // Posisikan pointer jika ada target UI
-            PositionSpotlightAndPointer(stepData.targetUiElementName);
 
             if (AudioManager.Instance != null)
             {
@@ -261,13 +264,13 @@ namespace FantasyDefense.UI
             }
         }
 
-        private void PositionSpotlightAndPointer(string targetElementName)
+        private bool PositionSpotlightAndPointer(string targetElementName)
         {
             if (string.IsNullOrEmpty(targetElementName))
             {
                 if (spotlightCutout != null) spotlightCutout.gameObject.SetActive(false);
                 if (pointerHand != null) pointerHand.gameObject.SetActive(false);
-                return;
+                return false;
             }
 
             // Cari target GameObject di hierarki aktif
@@ -294,7 +297,7 @@ namespace FantasyDefense.UI
                     }
                 }
 
-                if (targetObj != null)
+                if (targetObj != null && targetObj.activeInHierarchy)
                 {
                     RectTransform targetRect = targetObj.GetComponent<RectTransform>();
                     if (targetRect != null)
@@ -311,7 +314,7 @@ namespace FantasyDefense.UI
                             pointerHand.gameObject.SetActive(true);
                             pointerHand.position = targetRect.position + new Vector3(0, 50f, 0);
                         }
-                        return;
+                        return true;
                     }
                 }
             }
@@ -322,12 +325,18 @@ namespace FantasyDefense.UI
 
             if (spotlightCutout != null) spotlightCutout.gameObject.SetActive(false);
             if (pointerHand != null) pointerHand.gameObject.SetActive(false);
+            return false;
         }
 
         private void OnTapContinue()
         {
             if (currentStepData == null) return;
-            if (currentStepData.requireSpecificAction) return;
+            // Cegah tap-continue HANYA jika aksi spesifik dibutuhkan DAN elemen target memang aktif di layar
+            if (currentStepData.requireSpecificAction)
+            {
+                GameObject targetObj = !string.IsNullOrEmpty(currentStepData.targetUiElementName) ? GameObject.Find(currentStepData.targetUiElementName) : null;
+                if (targetObj != null && targetObj.activeInHierarchy) return;
+            }
             TutorialGuideManager.Instance?.AdvanceStep();
         }
 

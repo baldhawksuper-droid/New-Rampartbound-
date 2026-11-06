@@ -665,6 +665,12 @@ namespace FantasyDefense.UI
                 gameObject.SetActive(true);
             }
             RefreshDisplays();
+
+            // Pemicu panduan onboarding selamat datang saat membuka lobby
+            if (FantasyDefense.Metagame.TutorialGuideManager.Instance != null)
+            {
+                FantasyDefense.Metagame.TutorialGuideManager.Instance.CheckAndStartLobbyGuide();
+            }
         }
 
         public void CloseView()

@@ -291,15 +291,15 @@ namespace FantasyDefense.Metagame
         {
             if (disableTutorial || IsCompleted) return;
 
-            if (currentStep == TutorialStep.WelcomeGreeting)
-            {
-                isTutorialActive = true;
-                TriggerStep(TutorialStep.WelcomeGreeting);
-            }
-            else if (currentStep == TutorialStep.LobbyNavigation)
+            if (currentStep == TutorialStep.LobbyNavigation)
             {
                 isTutorialActive = true;
                 TriggerStep(TutorialStep.LobbyNavigation);
+            }
+            else if (currentStep == TutorialStep.UpgradeHero)
+            {
+                isTutorialActive = true;
+                TriggerStep(TutorialStep.UpgradeHero);
             }
         }
 
