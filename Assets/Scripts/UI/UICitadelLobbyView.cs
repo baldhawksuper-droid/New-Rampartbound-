@@ -199,7 +199,7 @@ namespace FantasyDefense.UI
                 tierSelectorBar.SetActive(showTierSelector);
             }
 
-            // Redesign Dock Navigasi Bawah Gambar 2: Kompak (~0.082f screen), tembus pandang lembut (navy glass alpha 0.78), dan rel emas atas
+            // Redesign Dock Navigasi Bawah Gambar 1: Luas (~0.098f screen), tembus pandang lembut (navy glass), dan rel emas atas
             if (navStageMapButton != null && navStageMapButton.transform.parent != null)
             {
                 var dock = navStageMapButton.transform.parent.gameObject;
@@ -207,7 +207,7 @@ namespace FantasyDefense.UI
                 if (dockRt != null)
                 {
                     dockRt.anchorMin = new Vector2(0f, 0f);
-                    dockRt.anchorMax = new Vector2(1f, 0.082f);
+                    dockRt.anchorMax = new Vector2(1f, 0.098f);
                     dockRt.offsetMin = Vector2.zero;
                     dockRt.offsetMax = Vector2.zero;
                 }
@@ -216,7 +216,7 @@ namespace FantasyDefense.UI
                 var dockImg = dock.GetComponent<Image>();
                 if (dockImg != null)
                 {
-                    dockImg.color = new Color(0.04f, 0.08f, 0.16f, 0.78f);
+                    dockImg.color = new Color(0.04f, 0.08f, 0.16f, 0.88f);
                 }
 
                 // Golden top rail (garis emas halus di sisi atas dock dengan ignoreLayout agar tidak memakan slot di pojok kiri)
@@ -249,7 +249,7 @@ namespace FantasyDefense.UI
                 hlg.childForceExpandWidth = true;
                 hlg.childForceExpandHeight = true;
                 hlg.spacing = 8f;
-                hlg.padding = new RectOffset(8, 8, 4, 4);
+                hlg.padding = new RectOffset(6, 6, 3, 3);
                 if (dockRt != null)
                 {
                     LayoutRebuilder.ForceRebuildLayoutImmediate(dockRt);
@@ -565,7 +565,30 @@ namespace FantasyDefense.UI
                 if (txt != null)
                 {
                     txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("LOBBY_TURRET_BTN", "🏰 ARTILERI BENTENG", "🏰 CITADEL TURRETS");
+                    txt.fontSize = 12;
+                    var lilita = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+                    if (lilita != null) txt.font = lilita;
+                    txt.color = new Color(1f, 0.95f, 0.70f);
+                    txt.alignment = TextAnchor.MiddleCenter;
                 }
+                var dtImg = defenseTurretWorkshopButton.GetComponent<Image>();
+                if (dtImg != null)
+                {
+                    var pillSp = Resources.Load<Sprite>("Sprites/UI/UI_Badge_Hero_Pill")
+#if UNITY_EDITOR
+                        ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Badge_Hero_Pill.png")
+#endif
+                        ;
+                    if (pillSp != null)
+                    {
+                        dtImg.sprite = pillSp;
+                        dtImg.type = Image.Type.Sliced;
+                    }
+                    dtImg.color = new Color(0.12f, 0.16f, 0.25f, 0.94f);
+                }
+                var outline = defenseTurretWorkshopButton.GetComponent<Outline>() ?? defenseTurretWorkshopButton.gameObject.AddComponent<Outline>();
+                outline.effectColor = new Color(0.96f, 0.80f, 0.30f, 0.95f);
+                outline.effectDistance = new Vector2(1.5f, -1.5f);
             }
 
             if (navStageMapButton != null)
@@ -988,13 +1011,14 @@ namespace FantasyDefense.UI
                 {
                     if (isActive)
                     {
-                        iconRt.anchorMin = new Vector2(0.20f, 0.38f);
-                        iconRt.anchorMax = new Vector2(0.80f, 0.94f);
+                        // Pop-out icon berukuran besar & megah memenuhi bagian atas tab card seperti Gambar 1
+                        iconRt.anchorMin = new Vector2(0.06f, 0.28f);
+                        iconRt.anchorMax = new Vector2(0.94f, 0.98f);
                     }
                     else
                     {
-                        iconRt.anchorMin = new Vector2(0.24f, 0.38f);
-                        iconRt.anchorMax = new Vector2(0.76f, 0.88f);
+                        iconRt.anchorMin = new Vector2(0.10f, 0.28f);
+                        iconRt.anchorMax = new Vector2(0.90f, 0.94f);
                     }
                     iconRt.offsetMin = Vector2.zero;
                     iconRt.offsetMax = Vector2.zero;
@@ -1016,7 +1040,7 @@ namespace FantasyDefense.UI
                     iconImg.preserveAspect = true;
                     iconImg.color = Color.white;
                 }
-                iconTr.localScale = isActive ? new Vector3(1.10f, 1.10f, 1f) : Vector3.one;
+                iconTr.localScale = isActive ? new Vector3(1.15f, 1.15f, 1f) : new Vector3(1.04f, 1.04f, 1f);
             }
 
             var txt = btn.GetComponentInChildren<Text>();
@@ -1032,8 +1056,8 @@ namespace FantasyDefense.UI
                 var txtRt = txt.GetComponent<RectTransform>();
                 if (txtRt != null)
                 {
-                    txtRt.anchorMin = new Vector2(0.02f, 0.05f);
-                    txtRt.anchorMax = new Vector2(0.98f, 0.38f);
+                    txtRt.anchorMin = new Vector2(0f, 0.02f);
+                    txtRt.anchorMax = new Vector2(1f, 0.28f);
                     txtRt.offsetMin = Vector2.zero;
                     txtRt.offsetMax = Vector2.zero;
                 }
@@ -1056,6 +1080,7 @@ namespace FantasyDefense.UI
             int displayCp = cp * heroTier;
 
             // Format floating stat pill kanonikal (Lv.X | CP Y,YYY) dengan dot hijau aktif
+            var lilita = Resources.Load<Font>("Fonts/LilitaOne-Regular");
             if (isLocked)
             {
                 infoText.text = "<b><color=#FFAA00>🔒 TERKUNCI</color></b>";
@@ -1064,8 +1089,11 @@ namespace FantasyDefense.UI
             {
                 infoText.text = $"<color=#00FFAA>●</color> Lv.{lvl} | CP {displayCp:N0}";
             }
-            infoText.fontSize = 12;
+            infoText.fontSize = 11;
             infoText.alignment = TextAnchor.MiddleCenter;
+            infoText.horizontalOverflow = HorizontalWrapMode.Overflow;
+            infoText.verticalOverflow = VerticalWrapMode.Overflow;
+            if (lilita != null) infoText.font = lilita;
 
             if (btn != null)
             {
@@ -1074,6 +1102,11 @@ namespace FantasyDefense.UI
                 {
                     namePlate.gameObject.SetActive(!isLocked);
                     namePlate.text = $"<b>{heroName}</b>";
+                    namePlate.fontSize = 12;
+                    namePlate.alignment = TextAnchor.MiddleCenter;
+                    namePlate.horizontalOverflow = HorizontalWrapMode.Overflow;
+                    namePlate.verticalOverflow = VerticalWrapMode.Overflow;
+                    if (lilita != null) namePlate.font = lilita;
                 }
 
                 var img = btn.transform.Find("HeroPortrait")?.GetComponent<Image>();

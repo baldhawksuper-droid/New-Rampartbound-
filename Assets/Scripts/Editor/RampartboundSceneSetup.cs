@@ -701,30 +701,30 @@ namespace Rampartbound.Editor
             cpShadow.effectColor = new Color(0.04f, 0.06f, 0.11f, 0.95f); // #0A101D Drop-shadow tegas
             cpShadow.effectDistance = new Vector2(1.5f, -1.5f);
 
-            // Workshop Artileri Benteng Citadel: Ditempatkan elegan di sayap kiri atas sejajar TEAM CP dengan aksen batu pahat
-            var defenseTurretBtn = CreateButton(lobbyPanelObj.transform, "DefenseTurretWorkshopButton", "🏰 ARTILERI", new Color(0.18f, 0.14f, 0.10f), new Color(1f, 0.92f, 0.45f), 14, defaultFont);
-            PositionUI(defenseTurretBtn, 0.03f, 0.845f, 0.22f, 0.905f);
+            // Workshop Artileri Benteng Citadel: Ditempatkan elegan di sayap kiri atas sejajar TEAM CP dengan aksen batu pahat & bingkai emas
+            var defenseTurretBtn = CreateButton(lobbyPanelObj.transform, "DefenseTurretWorkshopButton", "🏰 ARTILERI BENTENG", new Color(0.12f, 0.16f, 0.25f, 0.94f), new Color(1f, 0.95f, 0.70f), 13, defaultFont);
+            PositionUI(defenseTurretBtn, 0.03f, 0.840f, 0.28f, 0.898f);
             var dtImg = defenseTurretBtn.GetComponent<Image>();
             if (dtImg != null) 
             { 
-                dtImg.sprite = _frameStoneBastion; 
-                dtImg.type = (_frameStoneBastion != null) ? Image.Type.Sliced : Image.Type.Simple;
-                dtImg.color = new Color(0.24f, 0.19f, 0.14f, 0.98f); 
+                dtImg.sprite = _badgeHeroPill ?? _bannerTeamCP; 
+                dtImg.type = Image.Type.Sliced;
+                dtImg.color = new Color(0.12f, 0.16f, 0.25f, 0.94f); 
             }
             var dtOutline = defenseTurretBtn.AddComponent<Outline>();
-            dtOutline.effectColor = new Color(0.95f, 0.78f, 0.28f, 0.95f);
+            dtOutline.effectColor = new Color(0.96f, 0.80f, 0.30f, 0.95f);
             dtOutline.effectDistance = new Vector2(1.5f, -1.5f);
             var dtShadow = defenseTurretBtn.AddComponent<Shadow>();
-            dtShadow.effectColor = new Color(0.05f, 0.04f, 0.02f, 0.85f);
+            dtShadow.effectColor = new Color(0.04f, 0.06f, 0.12f, 0.90f);
             dtShadow.effectDistance = new Vector2(2.0f, -2.0f);
             var dtTxt = defenseTurretBtn.GetComponentInChildren<Text>();
             if (dtTxt != null)
             {
-                dtTxt.color = new Color(1f, 0.94f, 0.50f);
+                dtTxt.color = new Color(1f, 0.95f, 0.70f);
                 dtTxt.fontStyle = FontStyle.Bold;
                 var txtShadow = dtTxt.gameObject.AddComponent<Shadow>();
-                txtShadow.effectColor = new Color(0f, 0f, 0f, 0.90f);
-                txtShadow.effectDistance = new Vector2(1.5f, -1.5f);
+                txtShadow.effectColor = new Color(0f, 0f, 0f, 0.95f);
+                txtShadow.effectDistance = new Vector2(1.2f, -1.2f);
             }
 
             // Hero Courtyard Assembly: Wadah pahlawan di teras batu alami depan kastil (ruang pandang lapang)
@@ -824,7 +824,7 @@ namespace Rampartbound.Editor
 
             // Bottom Navigation Dock (4 Tabs Kanonikal: Citadel, Forge, Heroes, Bag)
             var dockObj = CreatePanel(lobbyPanelObj.transform, "BottomNavigationDock", new Color(0.04f, 0.08f, 0.16f, 0.88f)); // Deep translucent navy glass
-            PositionUI(dockObj, 0f, 0f, 1f, 0.082f); // Sleek compact height
+            PositionUI(dockObj, 0f, 0f, 1f, 0.098f); // Generous spacious height (~125px) for large prominent icons
 
             // Continuous Golden Top Rail
             var topRailObj = new GameObject("GoldenTopRail", typeof(RectTransform), typeof(Image));
@@ -847,7 +847,7 @@ namespace Rampartbound.Editor
             dockHlg.childForceExpandWidth = true;
             dockHlg.childForceExpandHeight = true;
             dockHlg.spacing = 8f;
-            dockHlg.padding = new RectOffset(8, 8, 4, 4);
+            dockHlg.padding = new RectOffset(6, 6, 3, 3);
 
             Sprite iconNavCitadel = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Citadel.png")
                 ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Resources/Sprites/UI/UI_Icon_Nav_Citadel.png");
@@ -886,7 +886,7 @@ namespace Rampartbound.Editor
                 {
                     var podiumObj = new GameObject("ActivePodiumFrame", typeof(RectTransform), typeof(Image));
                     podiumObj.transform.SetParent(btn.transform, false);
-                    PositionUI(podiumObj, 0.04f, 0.04f, 0.96f, 0.96f);
+                    PositionUI(podiumObj, 0.03f, 0.03f, 0.97f, 0.97f);
                     var pImg = podiumObj.GetComponent<Image>();
                     pImg.sprite = _tabActivePodium;
                     pImg.type = Image.Type.Sliced;
@@ -898,14 +898,15 @@ namespace Rampartbound.Editor
                 {
                     var iconObj = new GameObject("TabIcon", typeof(RectTransform), typeof(Image));
                     iconObj.transform.SetParent(btn.transform, false);
-                    PositionUI(iconObj, isActive ? 0.20f : 0.24f, 0.38f, isActive ? 0.80f : 0.76f, isActive ? 0.94f : 0.88f);
+                    // Icon besar & megah memenuhi area tab di atas label teks seperti Gambar 1
+                    PositionUI(iconObj, isActive ? 0.06f : 0.10f, 0.28f, isActive ? 0.94f : 0.90f, isActive ? 0.98f : 0.94f);
                     var icImg = iconObj.GetComponent<Image>();
                     icImg.sprite = iconSp;
                     icImg.type = Image.Type.Simple;
                     icImg.preserveAspect = true;
                     icImg.raycastTarget = false;
                     icImg.color = Color.white;
-                    if (isActive) iconObj.transform.localScale = new Vector3(1.10f, 1.10f, 1f);
+                    iconObj.transform.localScale = isActive ? new Vector3(1.15f, 1.15f, 1f) : new Vector3(1.04f, 1.04f, 1f);
                 }
 
                 var bTxt = btn.GetComponentInChildren<Text>();
@@ -917,8 +918,8 @@ namespace Rampartbound.Editor
                     bTxt.alignment = TextAnchor.MiddleCenter;
                     bTxt.color = isActive ? new Color(1.0f, 0.98f, 0.85f, 1.0f) : new Color(0.86f, 0.90f, 0.96f, 0.95f);
                     var txtRt = bTxt.GetComponent<RectTransform>();
-                    txtRt.anchorMin = new Vector2(0.02f, 0.05f);
-                    txtRt.anchorMax = new Vector2(0.98f, 0.38f);
+                    txtRt.anchorMin = new Vector2(0f, 0.02f);
+                    txtRt.anchorMax = new Vector2(1f, 0.28f);
                     txtRt.offsetMin = Vector2.zero;
                     txtRt.offsetMax = Vector2.zero;
                     var tShadow = bTxt.gameObject.AddComponent<Shadow>();
@@ -3247,6 +3248,8 @@ namespace Rampartbound.Editor
                 nTxt.fontSize = 13;
                 nTxt.fontStyle = FontStyle.Bold;
                 nTxt.alignment = TextAnchor.MiddleCenter;
+                nTxt.horizontalOverflow = HorizontalWrapMode.Overflow;
+                nTxt.verticalOverflow = VerticalWrapMode.Overflow;
                 nTxt.color = new Color(1.0f, 0.96f, 0.82f, 1.0f);
                 var nShadow = nameObj.AddComponent<Shadow>();
                 nShadow.effectColor = new Color(0f, 0f, 0f, 0.95f);
@@ -3268,8 +3271,10 @@ namespace Rampartbound.Editor
                 if (txt != null)
                 {
                     txt.alignment = TextAnchor.MiddleCenter;
-                    txt.fontSize = 13;
+                    txt.fontSize = 12;
                     txt.fontStyle = FontStyle.Bold;
+                    txt.horizontalOverflow = HorizontalWrapMode.Overflow;
+                    txt.verticalOverflow = VerticalWrapMode.Overflow;
                     txt.color = Color.white;
                 }
                 var shadow = txtTrans.gameObject.GetComponent<Shadow>() ?? txtTrans.gameObject.AddComponent<Shadow>();
