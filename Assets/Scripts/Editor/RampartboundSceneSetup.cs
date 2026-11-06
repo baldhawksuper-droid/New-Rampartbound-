@@ -822,20 +822,22 @@ namespace Rampartbound.Editor
             var navEventBtn = CreateButton(quickBarObj.transform, "NavEventArena", "", Color.clear, Color.white, 14, defaultFont);
             var navArtifactBtn = CreateButton(quickBarObj.transform, "NavArtifacts", "", Color.clear, Color.white, 14, defaultFont);
 
-            // Bottom Navigation Dock (4 Tabs Kanonikal Gambar 2: Citadel, Forge, Heroes, Bag)
-            var dockObj = CreatePanel(lobbyPanelObj.transform, "BottomNavigationDock", new Color(0.04f, 0.08f, 0.16f, 0.78f)); // Translucent navy glass
+            // Bottom Navigation Dock (4 Tabs Kanonikal: Citadel, Forge, Heroes, Bag)
+            var dockObj = CreatePanel(lobbyPanelObj.transform, "BottomNavigationDock", new Color(0.04f, 0.08f, 0.16f, 0.88f)); // Deep translucent navy glass
             PositionUI(dockObj, 0f, 0f, 1f, 0.082f); // Sleek compact height
 
             // Continuous Golden Top Rail
             var topRailObj = new GameObject("GoldenTopRail", typeof(RectTransform), typeof(Image));
             topRailObj.transform.SetParent(dockObj.transform, false);
+            var railLe = topRailObj.AddComponent<LayoutElement>();
+            railLe.ignoreLayout = true; // JAMINAN: Mencegah slot kosong di pojok kiri bawah dock
             var railRt = topRailObj.GetComponent<RectTransform>();
             railRt.anchorMin = new Vector2(0f, 1f);
             railRt.anchorMax = new Vector2(1f, 1f);
-            railRt.sizeDelta = new Vector2(0f, 2.5f);
-            railRt.anchoredPosition = new Vector2(0f, -1.25f);
+            railRt.sizeDelta = new Vector2(0f, 2.8f);
+            railRt.anchoredPosition = new Vector2(0f, -1.4f);
             var railImg = topRailObj.GetComponent<Image>();
-            railImg.color = new Color(0.92f, 0.76f, 0.28f, 0.85f);
+            railImg.color = new Color(0.92f, 0.76f, 0.28f, 0.95f);
             railImg.raycastTarget = false;
 
             var dockHlg = dockObj.AddComponent<HorizontalLayoutGroup>();
@@ -844,24 +846,26 @@ namespace Rampartbound.Editor
             dockHlg.childControlHeight = true;
             dockHlg.childForceExpandWidth = true;
             dockHlg.childForceExpandHeight = true;
-            dockHlg.spacing = 6f;
+            dockHlg.spacing = 8f;
             dockHlg.padding = new RectOffset(8, 8, 4, 4);
 
-            Sprite iconNavMap = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Map.png");
             Sprite iconNavCitadel = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Citadel.png")
-                ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Map.png");
-            Sprite iconNavForge = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Forge.png");
+                ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Resources/Sprites/UI/UI_Icon_Nav_Citadel.png");
+            Sprite iconNavForge = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Forge.png")
+                ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Resources/Sprites/UI/UI_Icon_Nav_Forge.png");
             Sprite iconNavHeroes = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Heroes.png")
-                ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Hero.png");
-            Sprite iconNavSummon = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Summon.png");
+                ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Resources/Sprites/UI/UI_Icon_Nav_Heroes.png");
             Sprite iconNavBag = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Bag.png")
-                ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Nav_Store.png");
+                ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Resources/Sprites/UI/UI_Icon_Nav_Bag.png");
 
             var navStageBtn = CreateButton(dockObj.transform, "NavStageMap", "< Citadel >", Color.clear, Color.white, 12, defaultFont);
             var navForgeBtn = CreateButton(dockObj.transform, "NavForge", "Forge", Color.clear, Color.white, 12, defaultFont);
             var navHeroBtn = CreateButton(dockObj.transform, "NavHeroes", "Heroes", Color.clear, Color.white, 12, defaultFont);
-            var navSummonBtn = CreateButton(dockObj.transform, "NavSummon", "Gacha", Color.clear, Color.white, 12, defaultFont);
             var navStoreBtn = CreateButton(dockObj.transform, "NavStore", "Bag", Color.clear, Color.white, 12, defaultFont);
+
+            // Gacha tombol cadangan di luar dock agar dock persis 4 tab kanonikal Gambar 1
+            var navSummonBtn = CreateButton(lobbyPanelObj.transform, "NavSummon", "Gacha", Color.clear, Color.white, 12, defaultFont);
+            navSummonBtn.SetActive(false);
 
             System.Action<GameObject, Sprite, string, bool> setupFantasyNavTab = (btn, iconSp, label, isActive) => {
                 // Standar Ergonomi Sentuh Mobile: Menjamin hit-box tombol minimal 48x48dp (diset min 52x52)
@@ -874,67 +878,57 @@ namespace Rampartbound.Editor
                 var bImg = btn.GetComponent<Image>();
                 if (bImg != null)
                 {
-                    // Selalu transparan agar menyatu halus dengan kaca dock tanpa balok kuning solid
                     bImg.color = Color.clear;
-                    bImg.raycastTarget = true; // Menjamin area hit-box menangkap tap sentuhan jari
+                    bImg.raycastTarget = true;
                 }
 
                 if (_tabActivePodium != null)
                 {
                     var podiumObj = new GameObject("ActivePodiumFrame", typeof(RectTransform), typeof(Image));
                     podiumObj.transform.SetParent(btn.transform, false);
-                    PositionUI(podiumObj, 0.05f, 0.05f, 0.95f, 0.95f);
+                    PositionUI(podiumObj, 0.04f, 0.04f, 0.96f, 0.96f);
                     var pImg = podiumObj.GetComponent<Image>();
                     pImg.sprite = _tabActivePodium;
-                    pImg.type = Image.Type.Simple;
-                    pImg.preserveAspect = true;
+                    pImg.type = Image.Type.Sliced;
                     pImg.raycastTarget = false;
                     podiumObj.SetActive(isActive);
-                }
-
-                var bOutline = btn.AddComponent<Outline>();
-                bOutline.enabled = isActive;
-                if (isActive)
-                {
-                    bOutline.effectColor = new Color(1.0f, 0.85f, 0.35f, 0.85f);
-                    bOutline.effectDistance = new Vector2(1.5f, -1.5f);
                 }
 
                 if (iconSp != null)
                 {
                     var iconObj = new GameObject("TabIcon", typeof(RectTransform), typeof(Image));
                     iconObj.transform.SetParent(btn.transform, false);
-                    PositionUI(iconObj, 0.24f, 0.40f, 0.76f, 0.90f);
+                    PositionUI(iconObj, isActive ? 0.20f : 0.24f, 0.38f, isActive ? 0.80f : 0.76f, isActive ? 0.94f : 0.88f);
                     var icImg = iconObj.GetComponent<Image>();
                     icImg.sprite = iconSp;
                     icImg.type = Image.Type.Simple;
                     icImg.preserveAspect = true;
                     icImg.raycastTarget = false;
-                    icImg.color = isActive ? Color.white : new Color(0.78f, 0.83f, 0.90f, 0.92f);
+                    icImg.color = Color.white;
+                    if (isActive) iconObj.transform.localScale = new Vector3(1.10f, 1.10f, 1f);
                 }
 
                 var bTxt = btn.GetComponentInChildren<Text>();
                 if (bTxt != null)
                 {
                     bTxt.text = $"<b>{label}</b>";
-                    bTxt.fontSize = 12;
+                    bTxt.fontSize = isActive ? 13 : 12;
                     bTxt.font = defaultFont;
                     bTxt.alignment = TextAnchor.MiddleCenter;
-                    bTxt.color = isActive ? new Color(1.0f, 0.95f, 0.60f, 1.0f) : new Color(0.78f, 0.83f, 0.90f, 0.92f);
+                    bTxt.color = isActive ? new Color(1.0f, 0.98f, 0.85f, 1.0f) : new Color(0.86f, 0.90f, 0.96f, 0.95f);
                     var txtRt = bTxt.GetComponent<RectTransform>();
                     txtRt.anchorMin = new Vector2(0.02f, 0.05f);
                     txtRt.anchorMax = new Vector2(0.98f, 0.38f);
                     txtRt.offsetMin = Vector2.zero;
                     txtRt.offsetMax = Vector2.zero;
                     var tShadow = bTxt.gameObject.AddComponent<Shadow>();
-                    tShadow.effectColor = new Color(0f, 0f, 0f, 0.95f);
+                    tShadow.effectColor = new Color(0.10f, 0.06f, 0.02f, 0.95f);
                     tShadow.effectDistance = new Vector2(1.2f, -1.2f);
                 }
             };
             setupFantasyNavTab(navStageBtn, iconNavCitadel, "< Citadel >", true);
             setupFantasyNavTab(navForgeBtn, iconNavForge, "Forge", false);
             setupFantasyNavTab(navHeroBtn, iconNavHeroes, "Heroes", false);
-            setupFantasyNavTab(navSummonBtn, iconNavSummon, "Gacha", false);
             setupFantasyNavTab(navStoreBtn, iconNavBag, "Bag", false);
 
             // Notification Badges (Red Dots) pada tab Forge dan Heroes (Poin Rekomendasi 3)
@@ -3155,7 +3149,11 @@ namespace Rampartbound.Editor
             if (_slotIconRelic == null) _slotIconRelic = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Slot_Icon_Relic.png");
             if (_tabHeroActive == null) _tabHeroActive = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Tab_Hero_Active.png");
             if (_tabHeroInactive == null) _tabHeroInactive = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Tab_Hero_Inactive.png");
-            if (_tabActivePodium == null) _tabActivePodium = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Frame_Active_Tab_Podium.png");
+            if (_tabActivePodium == null)
+            {
+                _tabActivePodium = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Active_Tab_Tile_Gold.png")
+                                ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Frame_Active_Tab_Podium.png");
+            }
             if (_iconCrossedSwords == null) _iconCrossedSwords = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Crossed_Swords.png");
             if (_decorGoldDiamond == null) _decorGoldDiamond = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Decor_Gold_Diamond.png");
             if (_badgeHeroPill == null)
