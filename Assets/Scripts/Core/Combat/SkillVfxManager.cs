@@ -609,7 +609,46 @@ namespace FantasyDefense.Combat
             Sprite slashSprite = Resources.Load<Sprite>("Sprites/VFX/VFX_Slash_Arc");
             if (slashSprite != null) sr.sprite = slashSprite;
 
-            Color flameColor = tier >= UnitTier.Tier3 ? new Color(1f, 0.35f, 0.08f) : new Color(1f, 0.60f, 0.12f);
+            // Rekomendasi 3: Penyelarasan Warna Lintasan & Aura Tebasan Berdasarkan Tier (T1-T5)
+            Color flameColor;
+            Color sparkSecondaryColor = Color.yellow;
+            float scale;
+
+            switch (tier)
+            {
+                case UnitTier.Tier1:
+                    // T1: Warm Golden Ember (Bilah Sabit Emas Hangat Berkilau)
+                    flameColor = new Color(1f, 0.76f, 0.22f);
+                    sparkSecondaryColor = new Color(1f, 0.92f, 0.45f);
+                    scale = 0.62f;
+                    break;
+                case UnitTier.Tier2:
+                    // T2: Blazing Sunfire Orange (Bilah Sabit Oranye Mentari Menyala)
+                    flameColor = new Color(1f, 0.54f, 0.10f);
+                    sparkSecondaryColor = Color.yellow;
+                    scale = 0.72f;
+                    break;
+                case UnitTier.Tier3:
+                    // T3: Crimson Hellfire Blade (Bilah Sabit Merah Api Membara Tajam)
+                    flameColor = new Color(1f, 0.26f, 0.06f);
+                    sparkSecondaryColor = new Color(1f, 0.60f, 0.15f);
+                    scale = 0.84f;
+                    break;
+                case UnitTier.Tier4:
+                    // T4: Abyssal Ruby Flame (Bilah Sabit Merah Delima Pekat Berkilau)
+                    flameColor = new Color(1f, 0.14f, 0.12f);
+                    sparkSecondaryColor = new Color(1f, 0.40f, 0.25f);
+                    scale = 0.92f;
+                    break;
+                case UnitTier.Tier5:
+                default:
+                    // T5: Celestial Solar Flare (Bilah Sabit Agung Surya Kosmik Emas-Putih Suci)
+                    flameColor = new Color(1f, 0.88f, 0.30f);
+                    sparkSecondaryColor = Color.white;
+                    scale = 1.02f;
+                    break;
+            }
+
             sr.color = flameColor;
             sr.sortingLayerName = "Gem";
             sr.sortingOrder = 60;
@@ -618,8 +657,6 @@ namespace FantasyDefense.Combat
             if (dir == Vector3.zero) dir = Vector3.up;
             float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
             slashObj.transform.rotation = Quaternion.Euler(0f, 0f, angle - 90f);
-
-            float scale = tier >= UnitTier.Tier3 ? 0.82f : 0.65f;
             slashObj.transform.localScale = Vector3.one * (scale * 0.7f);
 
             float dist = Vector3.Distance(spawnPos, targetPos);
@@ -638,7 +675,7 @@ namespace FantasyDefense.Combat
                 yield return null;
             }
 
-            SpawnProceduralParticleBurst(targetPos, flameColor, Color.yellow, 7, 2.5f);
+            SpawnProceduralParticleBurst(targetPos, flameColor, sparkSecondaryColor, tier >= UnitTier.Tier4 ? 9 : 7, 2.5f);
             Destroy(slashObj);
         }
 

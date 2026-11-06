@@ -699,6 +699,36 @@ namespace FantasyDefense.Combat
             }
         }
 
+        /// <summary>
+        /// Mengkompensasi elevasi gerak vertikal hero (+Y) agar bayangan kontak tanah tetap menapak di lantai
+        /// dan menyusut secara dinamis (Dynamic Shadow Squash) untuk mempertegas kedalaman ruang 2.5D saat melayang/menyerang.
+        /// </summary>
+        public void SetShadowElevation(float deltaY)
+        {
+            if (groundShadowObj == null || groundShadowSr == null || !groundShadowObj.activeSelf) return;
+
+            float spriteH = (spriteRenderer != null && spriteRenderer.sprite != null)
+                ? spriteRenderer.sprite.rect.height / spriteRenderer.sprite.pixelsPerUnit
+                : 5.12f;
+            float feetLocalY = -(spriteH * 0.5f) * 0.88f;
+
+            float parentScaleX = Mathf.Max(0.001f, transform.localScale.x);
+            float parentScaleY = Mathf.Max(0.001f, transform.localScale.y);
+
+            // Kompensasi posisi lokal Y agar bayangan tidak terangkat ke udara mengikuti lompatan tubuh hero
+            float localDeltaY = deltaY / parentScaleY;
+            groundShadowObj.transform.localPosition = new Vector3(0f, feetLocalY - localDeltaY, 0.08f);
+
+            // Efek proyeksi cahaya 2.5D: saat hero naik lebih tinggi, bayangan mengecil proporsional dan sedikit memudar
+            float heightRatio = Mathf.Clamp01(deltaY / 0.18f);
+            float squashFactor = Mathf.Lerp(1.0f, 0.68f, heightRatio);
+            float alpha = Mathf.Lerp(0.52f, 0.28f, heightRatio);
+
+            groundShadowObj.transform.localScale = new Vector3((0.265f * squashFactor) / parentScaleX,
+                                                             (0.220f * squashFactor) / parentScaleY, 1f);
+            groundShadowSr.color = new Color(0.04f, 0.08f, 0.16f, alpha);
+        }
+
         [Header("Combat Presentation Scaling")]
         [Tooltip("Rasio ukuran unit hero saat mode tempur (berdiri di atas tatakan plinth). Diset 1.05f agar tampak gagah dan berbobot tanpa mengecil.")]
         [SerializeField] protected float combatHeroScaleMultiplier = 1.05f;

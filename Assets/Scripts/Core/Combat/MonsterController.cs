@@ -326,9 +326,25 @@ namespace FantasyDefense.Combat
             Initialize(data, pathWaypoints, 0f);
         }
 
+        protected float hitStopTimer = 0f;
+
+        private IEnumerator TriggerHitStopRoutine(float duration)
+        {
+            hitStopTimer = duration;
+            yield return new WaitForSeconds(duration);
+            hitStopTimer = 0f;
+        }
+
         protected virtual void Update()
         {
             if (isDead || isStunned) return;
+
+            // Micro-hitstop pause (0.05s) saat menerima hantaman tebasan/palu untuk sensasi benturan solid
+            if (hitStopTimer > 0f)
+            {
+                hitStopTimer -= Time.deltaTime;
+                return;
+            }
 
             // Prioritas Tempur Barikade: Monster yang sudah menempel di gerbang fokus mendobrak gerbang
             if (isAttackingBarricade)
@@ -811,8 +827,9 @@ namespace FantasyDefense.Combat
             float finalDamage = defenseDebuff > 0f ? damage * (1f + defenseDebuff) : damage;
 
             currentHealth -= finalDamage;
-            // Rekomendasi 2: Hit Impact Sparks & Flash White pada monster saat menerima damage
+            // Rekomendasi 2: Hit Impact Sparks & Flash White serta Hit-Stop Micro Pause (0.05s) saat menerima damage
             StartCoroutine(FlashDamageColor(isCrit ? new Color(1f, 0.95f, 0.4f) : Color.white));
+            StartCoroutine(TriggerHitStopRoutine(isCrit ? 0.07f : 0.05f));
             if (SkillVfxManager.Instance != null)
             {
                 Color sparkA = isCrit ? new Color(1f, 0.85f, 0.2f) : new Color(1f, 0.45f, 0.2f);

@@ -285,6 +285,10 @@ namespace FantasyDefense.Combat
                                                    baseScale.y * Mathf.Lerp(1.0f, 0.97f, ease),
                                                    baseScale.z);
                 transform.localRotation = Quaternion.Slerp(Quaternion.identity, windupRot, ease);
+
+                // Rekomendasi 1: Dynamic Shadow Squash saat elevasi hero berubah
+                float elev = Mathf.Max(0f, transform.position.y - anchorPos.y);
+                unitController?.SetShadowElevation(elev);
                 yield return null;
             }
 
@@ -326,6 +330,9 @@ namespace FantasyDefense.Combat
                                                    baseScale.y * Mathf.Lerp(0.97f, 1.04f, ease),
                                                    baseScale.z);
                 transform.localRotation = Quaternion.Slerp(windupRot, strikeRot, ease);
+
+                float elev = Mathf.Max(0f, transform.position.y - anchorPos.y);
+                unitController?.SetShadowElevation(elev);
                 yield return null;
             }
 
@@ -357,6 +364,9 @@ namespace FantasyDefense.Combat
                 float t = Mathf.Clamp01(elapsed / tFollow);
                 transform.position = Vector3.Lerp(lungePos, lungePos + dir * 0.02f, t);
                 transform.localScale = Vector3.Lerp(new Vector3(baseScale.x * 0.98f, baseScale.y * 1.04f, baseScale.z), baseScale, t);
+
+                float elev = Mathf.Max(0f, transform.position.y - anchorPos.y);
+                unitController?.SetShadowElevation(elev);
                 yield return null;
             }
 
@@ -376,8 +386,13 @@ namespace FantasyDefense.Combat
                                                    baseScale.y * (1f - bounceSquash),
                                                    baseScale.z);
                 transform.localRotation = Quaternion.Slerp(peakRot, Quaternion.identity, ease);
+
+                float elev = Mathf.Max(0f, transform.position.y - anchorPos.y);
+                unitController?.SetShadowElevation(elev);
                 yield return null;
             }
+
+            unitController?.SetShadowElevation(0f);
 
             if (defaultSprite != null && spriteRenderer != null)
             {

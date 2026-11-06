@@ -59,7 +59,15 @@ namespace FantasyDefense.Combat
             }
             else if (SkillVfxManager.Instance != null)
             {
-                SkillVfxManager.Instance.SpawnMeleeHitSparks(target.transform.position, new Color(1f, 0.55f, 0.1f));
+                Color hitSpark = currentTier switch
+                {
+                    UnitTier.Tier1 => new Color(1f, 0.76f, 0.22f),
+                    UnitTier.Tier2 => new Color(1f, 0.54f, 0.10f),
+                    UnitTier.Tier3 => new Color(1f, 0.26f, 0.06f),
+                    UnitTier.Tier4 => new Color(1f, 0.14f, 0.12f),
+                    _ => new Color(1f, 0.88f, 0.30f)
+                };
+                SkillVfxManager.Instance.SpawnMeleeHitSparks(target.transform.position, hitSpark);
             }
 
             target.TakeDamage(damage, isCrit);
