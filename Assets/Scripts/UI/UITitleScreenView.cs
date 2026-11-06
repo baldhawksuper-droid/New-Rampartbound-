@@ -522,6 +522,7 @@ namespace FantasyDefense.UI
                 try
                 {
                     AudioManager.Instance.PlaySound(SoundType.ButtonClick);
+                    AudioManager.Instance.PlaySound(SoundType.MagicSpark);
                 }
                 catch (Exception) { }
             }
