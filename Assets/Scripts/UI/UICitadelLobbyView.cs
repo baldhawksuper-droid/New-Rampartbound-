@@ -956,7 +956,8 @@ namespace FantasyDefense.UI
                 if (iconImg != null)
                 {
                     iconImg.preserveAspect = true;
-                    iconImg.color = isActive ? Color.white : new Color(0.88f, 0.92f, 0.98f, 0.90f);
+                    // Penyelarasan Rekomendasi 1: Ikon inaktif menggunakan perak kebiruan seragam #C8D4E6
+                    iconImg.color = isActive ? Color.white : new Color(0.78f, 0.83f, 0.90f, 0.92f);
                 }
                 iconTr.localScale = isActive ? new Vector3(1.08f, 1.08f, 1f) : Vector3.one;
             }
@@ -965,9 +966,12 @@ namespace FantasyDefense.UI
             if (txt != null)
             {
                 txt.fontSize = 12;
+                var lilita = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+                if (lilita != null) txt.font = lilita;
+                // Penyelarasan Rekomendasi 1: Label inaktif menggunakan perak kebiruan seragam #C8D4E6
                 txt.color = isActive 
                     ? new Color(1.0f, 0.95f, 0.60f, 1.0f) 
-                    : new Color(0.90f, 0.93f, 0.98f, 0.90f);
+                    : new Color(0.78f, 0.83f, 0.90f, 0.92f);
                 var txtRt = txt.GetComponent<RectTransform>();
                 if (txtRt != null)
                 {
@@ -1457,18 +1461,19 @@ namespace FantasyDefense.UI
             Vector3 targetPos = rt.position;
             Vector3 startPos = targetPos - new Vector3(0f, 15f, 0f);
 
-            float popDur = 0.20f;
+            // Penyelarasan Rekomendasi 3: Pop-in skala 0.8 -> 1.0 berdurasi 0.12s selaras dengan mikro-squash standee
+            float popDur = 0.12f;
             float elapsed = 0f;
             while (elapsed < popDur)
             {
                 if (bubble == null || rt == null) yield break;
                 elapsed += Time.unscaledDeltaTime;
-                float t = elapsed / popDur;
+                float t = Mathf.Clamp01(elapsed / popDur);
                 float s = Mathf.Sin(t * Mathf.PI * 0.5f);
                 try
                 {
                     rt.position = Vector3.Lerp(startPos, targetPos, s);
-                    rt.localScale = Vector3.one * (0.4f + s * 0.6f);
+                    rt.localScale = Vector3.one * Mathf.Lerp(0.80f, 1.00f, s);
                 }
                 catch (Exception)
                 {

@@ -1398,7 +1398,9 @@ namespace FantasyDefense.Combat
                         GameManager.Instance.TryConsumeMove();
                         if (AudioManager.Instance != null)
                         {
-                            AudioManager.Instance.PlaySound(SoundType.TileSlideSwish, 0.85f);
+                            // Penyelarasan Rekomendasi 2: Audio jitter dinamis pada reposisi/slide petak
+                            float pitchJitter = UnityEngine.Random.Range(0.95f, 1.05f);
+                            AudioManager.Instance.PlaySound(SoundType.TileSlideSwish, pitchJitter);
                         }
                         return;
                     }
@@ -1426,6 +1428,12 @@ namespace FantasyDefense.Combat
 
                         OnUnitMoved?.Invoke(this, targetCell);
                         GameManager.Instance.TryConsumeMove();
+
+                        if (AudioManager.Instance != null)
+                        {
+                            float pitchJitter = UnityEngine.Random.Range(0.95f, 1.05f);
+                            AudioManager.Instance.PlaySound(SoundType.TileSlideSwish, pitchJitter);
+                        }
 
                         if (GridMatch3Solver.Instance != null)
                         {
@@ -1489,7 +1497,8 @@ namespace FantasyDefense.Combat
 
             if (AudioManager.Instance != null)
             {
-                AudioManager.Instance.PlaySound(SoundType.TileSlideSwish, 1.05f);
+                float pitchJitter = UnityEngine.Random.Range(0.95f, 1.05f);
+                AudioManager.Instance.PlaySound(SoundType.TileSlideSwish, pitchJitter);
             }
 
             // PENTING: Kunci petak tujuan jari pemain (cellB) sebagai pusat fusi interaksi pemain!

@@ -909,7 +909,7 @@ namespace Rampartbound.Editor
                     icImg.type = Image.Type.Simple;
                     icImg.preserveAspect = true;
                     icImg.raycastTarget = false;
-                    icImg.color = isActive ? Color.white : new Color(0.88f, 0.92f, 0.98f, 0.90f);
+                    icImg.color = isActive ? Color.white : new Color(0.78f, 0.83f, 0.90f, 0.92f);
                 }
 
                 var bTxt = btn.GetComponentInChildren<Text>();
@@ -919,7 +919,7 @@ namespace Rampartbound.Editor
                     bTxt.fontSize = 12;
                     bTxt.font = defaultFont;
                     bTxt.alignment = TextAnchor.MiddleCenter;
-                    bTxt.color = isActive ? new Color(1.0f, 0.95f, 0.60f, 1.0f) : new Color(0.90f, 0.93f, 0.98f, 0.90f);
+                    bTxt.color = isActive ? new Color(1.0f, 0.95f, 0.60f, 1.0f) : new Color(0.78f, 0.83f, 0.90f, 0.92f);
                     var txtRt = bTxt.GetComponent<RectTransform>();
                     txtRt.anchorMin = new Vector2(0.02f, 0.05f);
                     txtRt.anchorMax = new Vector2(0.98f, 0.38f);
