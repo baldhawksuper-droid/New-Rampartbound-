@@ -30,6 +30,14 @@ namespace FantasyDefense.GridSystem
         [Tooltip("Jika aktif, swap yang tidak menghasilkan match akan diputar balik (revert swap)")]
         [SerializeField] private bool requireMatchToSwap = false;
 
+        [Header("Tactile Gem Lift & Drag Parameters")]
+        [Tooltip("Peningkatan skala visual saat gem/unit terangkat (lifted)")]
+        [SerializeField] private float liftScaleMultiplier = 1.18f;
+        [Tooltip("Batas maksimum pergeseran visual gem saat ditarik tangan")]
+        [SerializeField] private float maxDragDistanceMultiplier = 1.35f;
+        [Tooltip("Ambang pembatalan: Jika ditarik melebihi rasio ini, swap dibatalkan dan gem memantul kembali ke petak asal")]
+        [SerializeField] private float cancelDragDistanceMultiplier = 1.55f;
+
         [Header("State Tracking")]
         [SerializeField] private bool isSwapping = false;
         private TileCell startCell = null;
@@ -37,6 +45,15 @@ namespace FantasyDefense.GridSystem
         private Vector2 startScreenPos;
         private bool isPointerDown = false;
         private Camera cachedCamera;
+
+        private UnitController draggedUnit = null;
+        private Vector3 draggedUnitOriginPos = Vector3.zero;
+        private Vector3 draggedUnitOriginScale = Vector3.one;
+        private int draggedUnitOriginalSortingOrder = 0;
+        private SpriteRenderer draggedUnitSpriteRenderer = null;
+        private bool isGemLifted = false;
+        private TileCell currentHighlightedNeighbor = null;
+        private Coroutine snapBackCoroutine = null;
 
         public bool IsSwapping => isSwapping;
 
@@ -72,6 +89,10 @@ namespace FantasyDefense.GridSystem
                 {
                     OnPointerDown(touch.position, touch.fingerId);
                 }
+                else if (touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary)
+                {
+                    OnPointerDrag(touch.position, touch.fingerId);
+                }
                 else if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
                 {
                     OnPointerUp(touch.position, touch.fingerId);
@@ -83,6 +104,10 @@ namespace FantasyDefense.GridSystem
                 if (Input.GetMouseButtonDown(0))
                 {
                     OnPointerDown(Input.mousePosition, -1);
+                }
+                else if (Input.GetMouseButton(0))
+                {
+                    OnPointerDrag(Input.mousePosition, -1);
                 }
                 else if (Input.GetMouseButtonUp(0))
                 {
@@ -180,6 +205,30 @@ namespace FantasyDefense.GridSystem
                 startScreenPos = screenPos;
                 isPointerDown = true;
 
+                if (snapBackCoroutine != null)
+                {
+                    StopCoroutine(snapBackCoroutine);
+                    snapBackCoroutine = null;
+                }
+
+                draggedUnit = cell.CurrentUnit;
+                if (draggedUnit != null)
+                {
+                    draggedUnitOriginPos = cell.transform.position;
+                    draggedUnitOriginScale = draggedUnit.transform.localScale;
+                    draggedUnitSpriteRenderer = draggedUnit.GetComponent<SpriteRenderer>() ?? draggedUnit.GetComponentInChildren<SpriteRenderer>();
+                    if (draggedUnitSpriteRenderer != null)
+                    {
+                        draggedUnitOriginalSortingOrder = draggedUnitSpriteRenderer.sortingOrder;
+                    }
+                    isGemLifted = false;
+                }
+                else
+                {
+                    draggedUnitSpriteRenderer = null;
+                    isGemLifted = false;
+                }
+
                 if (GridMatchHintManager.Instance != null)
                 {
                     GridMatchHintManager.Instance.ResetHintTimer();
@@ -192,14 +241,102 @@ namespace FantasyDefense.GridSystem
             {
                 isPointerDown = false;
                 startCell = null;
+                draggedUnit = null;
+                isGemLifted = false;
                 Debug.Log($"[GridInputHandler] Pointer DOWN pada Screen: {screenPos}, World: {worldPos:F2} -> Tidak mengenai petak mana pun.");
+            }
+        }
+
+        private void OnPointerDrag(Vector2 screenPos, int pointerId)
+        {
+            if (UnitController.IsAnyUnitDragging) return;
+            if (!isPointerDown || startCell == null || draggedUnit == null) return;
+            if (isSwapping) return;
+
+            Vector3 currentWorldPos = cachedCamera.ScreenToWorldPoint(new Vector3(screenPos.x, screenPos.y, -cachedCamera.transform.position.z));
+            currentWorldPos.z = 0f;
+
+            Vector2 currentDelta = (Vector2)currentWorldPos - (Vector2)startWorldPos;
+            float cellSize = GridManager.Instance != null ? GridManager.Instance.CellSize : 1.18f;
+
+            // Efek terangkat (Lift Visual & Elevation) saat sentuhan mulai bergeser sedikit
+            if (!isGemLifted && currentDelta.magnitude >= 0.08f * cellSize)
+            {
+                isGemLifted = true;
+                draggedUnit.transform.localScale = draggedUnitOriginScale * liftScaleMultiplier;
+                if (draggedUnitSpriteRenderer != null)
+                {
+                    draggedUnitSpriteRenderer.sortingOrder = draggedUnitOriginalSortingOrder + 15;
+                }
+                Vector3 liftedP = draggedUnit.transform.position;
+                liftedP.z = -0.4f;
+                draggedUnit.transform.position = liftedP;
+
+                if (AudioManager.Instance != null)
+                {
+                    AudioManager.Instance.PlaySound(SoundType.TileSlideSwish, 0.6f);
+                }
+            }
+
+            if (isGemLifted && draggedUnit != null)
+            {
+                float maxDist = maxDragDistanceMultiplier * cellSize;
+                float cancelDist = cancelDragDistanceMultiplier * cellSize;
+                Vector2 clampedDelta = Vector2.ClampMagnitude(currentDelta, maxDist);
+                Vector3 targetPos = draggedUnitOriginPos + (Vector3)clampedDelta;
+                targetPos.z = -0.4f;
+
+                draggedUnit.transform.position = Vector3.Lerp(draggedUnit.transform.position, targetPos, Time.deltaTime * 35f);
+
+                // Periksa highlight petak tetangga yang sedang diarahkan
+                if (currentDelta.magnitude >= swipeThresholdRatio * cellSize && currentDelta.magnitude <= cancelDist)
+                {
+                    int dx = Mathf.Abs(currentDelta.x) > Mathf.Abs(currentDelta.y) ? (currentDelta.x > 0 ? 1 : -1) : 0;
+                    int dy = Mathf.Abs(currentDelta.x) > Mathf.Abs(currentDelta.y) ? 0 : (currentDelta.y > 0 ? 1 : -1);
+
+                    TileCell neighbor = GridManager.Instance != null ? GridManager.Instance.GetCell(startCell.X + dx, startCell.Y + dy) : null;
+                    if (neighbor != currentHighlightedNeighbor)
+                    {
+                        if (currentHighlightedNeighbor != null)
+                        {
+                            currentHighlightedNeighbor.SetHighlightState(TileHighlightState.None);
+                        }
+                        currentHighlightedNeighbor = neighbor;
+                        if (currentHighlightedNeighbor != null)
+                        {
+                            currentHighlightedNeighbor.SetHighlightState(TileHighlightState.Hover);
+                        }
+                    }
+                }
+                else
+                {
+                    if (currentHighlightedNeighbor != null)
+                    {
+                        currentHighlightedNeighbor.SetHighlightState(TileHighlightState.None);
+                        currentHighlightedNeighbor = null;
+                    }
+                }
             }
         }
 
         private void OnPointerUp(Vector2 screenPos, int pointerId)
         {
+            if (currentHighlightedNeighbor != null)
+            {
+                currentHighlightedNeighbor.SetHighlightState(TileHighlightState.None);
+                currentHighlightedNeighbor = null;
+            }
+
             if (UnitController.IsAnyUnitDragging)
             {
+                if (draggedUnit != null)
+                {
+                    if (draggedUnitSpriteRenderer != null) draggedUnitSpriteRenderer.sortingOrder = draggedUnitOriginalSortingOrder;
+                    draggedUnit.transform.localScale = draggedUnitOriginScale;
+                    draggedUnit.transform.position = draggedUnitOriginPos;
+                    draggedUnit = null;
+                    isGemLifted = false;
+                }
                 isPointerDown = false;
                 startCell = null;
                 return;
@@ -207,6 +344,14 @@ namespace FantasyDefense.GridSystem
 
             if (!isPointerDown || startCell == null)
             {
+                if (draggedUnit != null)
+                {
+                    if (draggedUnitSpriteRenderer != null) draggedUnitSpriteRenderer.sortingOrder = draggedUnitOriginalSortingOrder;
+                    draggedUnit.transform.localScale = draggedUnitOriginScale;
+                    draggedUnit.transform.position = draggedUnitOriginPos;
+                    draggedUnit = null;
+                    isGemLifted = false;
+                }
                 isPointerDown = false;
                 startCell = null;
                 return;
@@ -220,18 +365,48 @@ namespace FantasyDefense.GridSystem
             Vector2 delta = (Vector2)endWorldPos - (Vector2)startWorldPos;
             float cellSize = GridManager.Instance != null ? GridManager.Instance.CellSize : 1.18f;
             float threshold = swipeThresholdRatio * cellSize;
+            float cancelDist = cancelDragDistanceMultiplier * cellSize;
 
-            Debug.Log($"[GridInputHandler] Pointer UP pada Screen: {screenPos}, Delta World: {delta:F2} (Mag: {delta.magnitude:F2}, Threshold: {threshold:F2})");
-
-            // Cek apakah jarak sapuan memenuhi ambang batas (Threshold)
-            if (delta.magnitude < threshold)
+            // Kembalikan sorting order normal
+            if (draggedUnitSpriteRenderer != null)
             {
-                Debug.Log($"[GridInputHandler] Swipe Ditolak: Jarak geser {delta.magnitude:F2} < ambang batas {threshold:F2} (Terdeteksi Tap/Klik biasa).");
+                draggedUnitSpriteRenderer.sortingOrder = draggedUnitOriginalSortingOrder;
+            }
+
+            // ATURAN 1: PENGGESERAN KE ARAH JAUH (DISTANCE CANCELLATION)
+            // Jika tangan menggeser terlalu jauh (> cancelDist) melintasi papan, gerakan dibatalkan dan gem memantul kembali ke petak asal!
+            if (delta.magnitude > cancelDist)
+            {
+                Debug.Log($"[GridInputHandler] Drag Dibatalkan: Jarak geser {delta.magnitude:F2} melebihi batas toleransi {cancelDist:F2}. Gem dikembalikan ke petak asal.");
+                if (draggedUnit != null)
+                {
+                    snapBackCoroutine = StartCoroutine(SnapBackGemRoutine(draggedUnit, draggedUnitOriginPos, draggedUnitOriginScale, 0.14f));
+                    draggedUnit = null;
+                    isGemLifted = false;
+                }
+                if (AudioManager.Instance != null)
+                {
+                    AudioManager.Instance.PlaySound(SoundType.TileReboundThud, 0.85f);
+                }
                 startCell = null;
                 return;
             }
 
-            // Tentukan arah dominan sapuan (Atas, Bawah, Kiri, Kanan)
+            // ATURAN 2: TAP BIASA (DI BAWAH AMBANG BATAS SWIPE)
+            if (delta.magnitude < threshold)
+            {
+                Debug.Log($"[GridInputHandler] Swipe Ditolak: Jarak geser {delta.magnitude:F2} < ambang batas {threshold:F2} (Terdeteksi Tap/Klik biasa).");
+                if (draggedUnit != null)
+                {
+                    snapBackCoroutine = StartCoroutine(SnapBackGemRoutine(draggedUnit, draggedUnitOriginPos, draggedUnitOriginScale, 0.10f));
+                    draggedUnit = null;
+                    isGemLifted = false;
+                }
+                startCell = null;
+                return;
+            }
+
+            // ATURAN 3: SWIPE VALID KE PETAK BERDAMPINGAN (1 LANGKAH ORTOGONAL)
             int dirX = 0;
             int dirY = 0;
             string dirName = "";
@@ -255,8 +430,41 @@ namespace FantasyDefense.GridSystem
             TileCell originCell = startCell;
             startCell = null;
 
+            if (draggedUnit != null)
+            {
+                draggedUnit.transform.localScale = draggedUnitOriginScale;
+                draggedUnit.transform.position = draggedUnitOriginPos;
+                draggedUnit = null;
+                isGemLifted = false;
+            }
+
             // Evaluasi syarat validitas swap & logging alasan jika ditolak
             TryExecuteSwap(originCell, targetX, targetY);
+        }
+
+        private IEnumerator SnapBackGemRoutine(UnitController unit, Vector3 targetPos, Vector3 targetScale, float duration)
+        {
+            if (unit == null) yield break;
+            Vector3 startP = unit.transform.position;
+            Vector3 startS = unit.transform.localScale;
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+                float ease = 1f - Mathf.Pow(1f - t, 3); // Ease-out cubic
+                if (unit != null)
+                {
+                    unit.transform.position = Vector3.Lerp(startP, targetPos, ease);
+                    unit.transform.localScale = Vector3.Lerp(startS, targetScale, ease);
+                }
+                yield return null;
+            }
+            if (unit != null)
+            {
+                unit.transform.position = targetPos;
+                unit.transform.localScale = targetScale;
+            }
         }
 
         private void TryExecuteSwap(TileCell cellA, int targetX, int targetY)

@@ -416,6 +416,9 @@ namespace FantasyDefense.UI
             if (!isPuzzle && GridManager.Instance != null && GridManager.Instance.IsGridFull())
             {
                 StartCoroutine(ShakeButtonRoutine());
+                CitadelToastNotice.Show(CitadelLocalizationManager.Text(
+                    "Papan Penuh! Gabungkan (Merge) unit untuk memberi ruang!",
+                    "Grid Full! Merge units to create space!"));
                 if (SkillVfxManager.Instance != null)
                 {
                     SkillVfxManager.Instance.SpawnFloatingText(
@@ -426,12 +429,20 @@ namespace FantasyDefense.UI
                         true
                     );
                 }
+                if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
+                    FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+                {
+                    FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Light);
+                }
                 return;
             }
 
             if (isPuzzle && HeroSummoner.Instance != null && !HeroSummoner.Instance.HasCatalystCandidate())
             {
                 StartCoroutine(ShakeButtonRoutine());
+                CitadelToastNotice.Show(CitadelLocalizationManager.Text(
+                    "Semua Token Telah Maksimal (Tier 5)!",
+                    "All tokens have reached maximum Tier 5!"));
                 if (SkillVfxManager.Instance != null)
                 {
                     SkillVfxManager.Instance.SpawnFloatingText(
@@ -441,6 +452,11 @@ namespace FantasyDefense.UI
                         1.4f,
                         true
                     );
+                }
+                if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
+                    FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+                {
+                    FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Light);
                 }
                 return;
             }
@@ -518,7 +534,7 @@ namespace FantasyDefense.UI
                 var img = button.GetComponent<Image>();
                 if (img != null)
                 {
-                    img.color = (canAfford && gridHasSpace) ? Color.white : new Color(0.85f, 0.85f, 0.90f, 0.95f);
+                    img.color = (canAfford && gridHasSpace) ? Color.white : new Color(0.60f, 0.60f, 0.65f, 0.85f);
                 }
             }
 

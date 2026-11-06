@@ -788,12 +788,32 @@ namespace FantasyDefense.UI
             {
                 string modeIcon = (stage.battleMode == FantasyDefense.Data.BattleMode.PuzzlePreparation) ? "🧩" : "⚔️";
                 battleModeText.text = $"{modeIcon} <color=#FFD700><b>{stage.GetBattleModeLabel().ToUpper()}</b></color>";
+                var bRt = battleModeText.rectTransform;
+                if (bRt != null)
+                {
+                    bRt.anchorMin = new Vector2(0.05f, 0.68f);
+                    bRt.anchorMax = new Vector2(0.52f, 0.76f);
+                    bRt.offsetMin = Vector2.zero;
+                    bRt.offsetMax = Vector2.zero;
+                }
             }
 
             if (stageDescriptionText != null)
             {
                 string modeTag = battleModeText == null ? $"\n<color=#FFD700><b>Mode:</b> {stage.GetBattleModeLabel()}</color>" : "";
                 stageDescriptionText.text = $"{stage.GetLocalizedDescription()}{modeTag}";
+                var dRt = stageDescriptionText.rectTransform;
+                if (dRt != null)
+                {
+                    dRt.anchorMin = new Vector2(0.05f, 0.49f);
+                    dRt.anchorMax = new Vector2(0.95f, 0.67f);
+                    dRt.offsetMin = Vector2.zero;
+                    dRt.offsetMax = Vector2.zero;
+                }
+                stageDescriptionText.resizeTextForBestFit = true;
+                stageDescriptionText.resizeTextMinSize = 12;
+                stageDescriptionText.resizeTextMaxSize = 17;
+                stageDescriptionText.horizontalOverflow = HorizontalWrapMode.Wrap;
             }
 
             if (recommendedCpText != null)

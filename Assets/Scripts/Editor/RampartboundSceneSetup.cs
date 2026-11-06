@@ -132,9 +132,10 @@ namespace Rampartbound.Editor
             arenaWorldObj.transform.position = Vector3.zero;
 
             // Papan Arena Tempur 5x5 (Battlefield Board Frame)
+            // Kalibrasi Offset Vertikal +0.55f (Anti-Clipping Barricade pada layar 19.5:9 / 20:9)
             var boardObj = new GameObject("BattlefieldBoard");
             boardObj.transform.SetParent(arenaWorldObj.transform);
-            boardObj.transform.position = new Vector3(0f, -0.65f, 0.2f);
+            boardObj.transform.position = new Vector3(0f, -0.10f, 0.2f);
             var boardSr = boardObj.AddComponent<SpriteRenderer>();
             boardSr.sortingLayerName = "Board";
             boardSr.sortingOrder = 0;
@@ -1670,12 +1671,16 @@ namespace Rampartbound.Editor
             warningBanner.SetActive(false);
 
             var modeTxt = CreateText(detailPanel.transform, "BattleModeText", "Mode: Real-Time Deploy", 20, FontStyle.Normal, TextAnchor.MiddleLeft, new Color(1f, 0.85f, 0.3f), defaultFont);
-            PositionUI(modeTxt.gameObject, 0.05f, 0.65f, 0.50f, 0.75f);
+            PositionUI(modeTxt.gameObject, 0.05f, 0.68f, 0.52f, 0.76f);
             var diffTxt = CreateText(detailPanel.transform, "DifficultyStatusText", "Status: Normal", 20, FontStyle.Bold, TextAnchor.MiddleRight, Color.green, defaultFont);
-            PositionUI(diffTxt.gameObject, 0.52f, 0.65f, 0.95f, 0.75f);
+            PositionUI(diffTxt.gameObject, 0.52f, 0.68f, 0.95f, 0.76f);
 
-            var descTxt = CreateText(detailPanel.transform, "StageDescriptionText", "Hadapi gelombang monster Abyssal awal yang mengancam pinggiran benteng.", 19, FontStyle.Normal, TextAnchor.UpperLeft, new Color(0.85f, 0.9f, 0.95f), defaultFont);
-            PositionUI(descTxt.gameObject, 0.05f, 0.50f, 0.95f, 0.72f);
+            var descTxt = CreateText(detailPanel.transform, "StageDescriptionText", "Hadapi gelombang monster Abyssal awal yang mengancam pinggiran benteng.", 18, FontStyle.Normal, TextAnchor.UpperLeft, new Color(0.85f, 0.9f, 0.95f), defaultFont);
+            PositionUI(descTxt.gameObject, 0.05f, 0.49f, 0.95f, 0.67f);
+            descTxt.resizeTextForBestFit = true;
+            descTxt.resizeTextMinSize = 12;
+            descTxt.resizeTextMaxSize = 17;
+            descTxt.horizontalOverflow = HorizontalWrapMode.Wrap;
 
             var recCpTxt = CreateText(detailPanel.transform, "RecommendedCpText", "Rekomendasi CP: 150 (Team CP Kamu: 500)", 20, FontStyle.Normal, TextAnchor.MiddleLeft, Color.white, defaultFont);
             PositionUI(recCpTxt.gameObject, 0.05f, 0.38f, 0.95f, 0.48f);
