@@ -592,7 +592,7 @@ namespace FantasyDefense.Combat
 
         /// <summary>
         /// Cedric: Menghasilkan tebasan sabit api membara (Crescent Flame Slash)
-        /// yang melesat melengkung ke atas menyapu formasi monster musuh.
+        /// yang melesat melengkung membelah udara menuju monster berjarak, meledak menjadi percikan api saat kontak.
         /// </summary>
         public void SpawnUpwardCrescentSlash(Vector3 startPos, Vector3 targetPos, UnitTier tier)
         {
@@ -602,39 +602,92 @@ namespace FantasyDefense.Combat
         private IEnumerator UpwardCrescentSlashRoutine(Vector3 startPos, Vector3 targetPos, UnitTier tier)
         {
             GameObject slashObj = new GameObject("VFX_Cedric_FlameCrescent");
-            Vector3 spawnPos = startPos + new Vector3(0f, 0.40f, 0f);
+            Vector3 spawnPos = startPos + new Vector3(0f, 0.25f, 0f);
             slashObj.transform.position = spawnPos;
 
             SpriteRenderer sr = slashObj.AddComponent<SpriteRenderer>();
             Sprite slashSprite = Resources.Load<Sprite>("Sprites/VFX/VFX_Slash_Arc");
             if (slashSprite != null) sr.sprite = slashSprite;
 
-            Color flameColor = tier >= UnitTier.Tier3 ? new Color(1f, 0.3f, 0.05f) : new Color(1f, 0.55f, 0.1f);
+            Color flameColor = tier >= UnitTier.Tier3 ? new Color(1f, 0.35f, 0.08f) : new Color(1f, 0.60f, 0.12f);
             sr.color = flameColor;
+            sr.sortingLayerName = "Gem";
             sr.sortingOrder = 60;
 
-            Vector3 dir = (targetPos - startPos).normalized;
+            Vector3 dir = (targetPos - spawnPos).normalized;
+            if (dir == Vector3.zero) dir = Vector3.up;
             float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
             slashObj.transform.rotation = Quaternion.Euler(0f, 0f, angle - 90f);
 
-            float scale = tier >= UnitTier.Tier3 ? 0.75f : 0.55f;
-            slashObj.transform.localScale = Vector3.one * (scale * 0.5f);
+            float scale = tier >= UnitTier.Tier3 ? 0.82f : 0.65f;
+            slashObj.transform.localScale = Vector3.one * (scale * 0.7f);
 
-            // Snappy compact duration agar tidak menumpuk saat banyak hero menyerang
-            float duration = 0.12f;
+            float dist = Vector3.Distance(spawnPos, targetPos);
+            float duration = Mathf.Clamp(dist / 13f, 0.14f, 0.28f);
             float elapsed = 0f;
             while (elapsed < duration)
             {
                 elapsed += Time.deltaTime;
-                float t = elapsed / duration;
+                float t = Mathf.Clamp01(elapsed / duration);
                 slashObj.transform.position = Vector3.Lerp(spawnPos, targetPos, t);
-                slashObj.transform.localScale = Vector3.one * Mathf.Lerp(scale * 0.5f, scale * 1.05f, t);
-                sr.color = new Color(flameColor.r, flameColor.g, flameColor.b, (1f - t) * (1f - t));
+                slashObj.transform.localScale = Vector3.one * Mathf.Lerp(scale * 0.7f, scale * 1.05f, t);
+
+                // Pertahankan opasitas penuh di sebagian besar lintasan agar terlihat tegas dan gagah oleh pemain
+                float alpha = t > 0.75f ? Mathf.Lerp(1f, 0f, (t - 0.75f) / 0.25f) : 1f;
+                sr.color = new Color(flameColor.r, flameColor.g, flameColor.b, alpha);
                 yield return null;
             }
 
-            SpawnProceduralParticleBurst(targetPos, flameColor, Color.yellow, 6, 2.2f);
+            SpawnProceduralParticleBurst(targetPos, flameColor, Color.yellow, 7, 2.5f);
             Destroy(slashObj);
+        }
+
+        /// <summary>
+        /// Efek percikan benturan tebasan jarak dekat (Melee Hit Sparks) langsung di tubuh monster target.
+        /// </summary>
+        public void SpawnMeleeHitSparks(Vector3 targetPos, Color hitColor)
+        {
+            SpawnProceduralParticleBurst(targetPos, hitColor, Color.yellow, 6, 2.2f);
+        }
+
+        /// <summary>
+        /// Rose Tanker: Gelombang kejut seismik beruntun merambat di tanah (Traveling Ground Fissure)
+        /// saat palu menghantam tanah menyerang target monster berjarak.
+        /// </summary>
+        public void SpawnTravelingSeismicShockwave(Vector3 startPos, Vector3 targetPos, UnitTier tier)
+        {
+            StartCoroutine(TravelingSeismicShockwaveRoutine(startPos, targetPos, tier));
+        }
+
+        private IEnumerator TravelingSeismicShockwaveRoutine(Vector3 startPos, Vector3 targetPos, UnitTier tier)
+        {
+            Vector3 origin = startPos + new Vector3(0f, -0.15f, 0f);
+            Color roseGold = tier >= UnitTier.Tier4 ? new Color(1f, 0.35f, 0.65f) : new Color(1f, 0.85f, 0.25f);
+
+            // Ground slam pulse di kaki Rose
+            StartCoroutine(SpawnShockwaveRingRoutine(origin, 0.65f, roseGold));
+            SpawnProceduralParticleBurst(origin, roseGold, Color.white, 4, 1.6f);
+
+            float totalDist = Vector3.Distance(origin, targetPos);
+            int steps = Mathf.Clamp(Mathf.RoundToInt(totalDist / 0.7f), 2, 4);
+            float stepDelay = 0.05f;
+
+            for (int i = 1; i <= steps; i++)
+            {
+                yield return new WaitForSeconds(stepDelay);
+                float fraction = (float)i / steps;
+                Vector3 stepPos = Vector3.Lerp(origin, targetPos, fraction);
+                float ringSize = Mathf.Lerp(0.5f, 0.9f, fraction);
+                StartCoroutine(SpawnShockwaveRingRoutine(stepPos, ringSize, roseGold));
+                SpawnProceduralParticleBurst(stepPos, roseGold, Color.yellow, 3, 1.5f);
+            }
+
+            // Hantaman gempa pamungkas di posisi monster target
+            SpawnProceduralParticleBurst(targetPos, roseGold, new Color(1f, 0.25f, 0.45f), 7, 2.4f);
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySound(SoundType.ShieldSlam, 1.15f);
+            }
         }
 
         /// <summary>

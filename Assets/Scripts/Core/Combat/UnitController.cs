@@ -620,111 +620,82 @@ namespace FantasyDefense.Combat
 
         protected void UpdateGroundShadowVisibility(bool show)
         {
-            if (currentTier == UnitTier.Tier0 || isPreparationToken)
+            // 1. Tatakan Plinth: DINONAKTIFKAN secara penuh sesuai arahan baku ("Tanpa tatakan lebih baik")
+            // Seluruh pahlawan berdiri alami menapak tanah dengan bayangan kontak lembut
+            if (groundPlinthObj != null)
             {
-                if (groundPlinthObj != null) groundPlinthObj.SetActive(false);
+                groundPlinthObj.SetActive(false);
+            }
+
+            if (currentTier == UnitTier.Tier0 || isPreparationToken || !show)
+            {
                 if (groundShadowObj != null) groundShadowObj.SetActive(false);
+                if (maxTierBadgeObj != null) maxTierBadgeObj.SetActive(false);
                 return;
             }
 
-            if (show)
+            int sortOrder = Mathf.Max(15, normalSortingOrder - Mathf.RoundToInt(transform.position.y * 3));
+
+            // 2. Soft Contact Ground Shadow (Bayangan kontak oval alami menapak tepat di bawah sol sepatu hero)
+            if (groundShadowObj == null)
             {
-                int sortOrder = Mathf.Max(15, normalSortingOrder - Mathf.RoundToInt(transform.position.y * 3));
-
-                // 1. Tatakan Plinth Semi-3D terintegrasi sesuai Tier/Level Hero (T1 s/d T5)
-                if (groundPlinthObj == null)
-                {
-                    groundPlinthObj = new GameObject("GroundPlinth_Pedestal");
-                    groundPlinthObj.transform.SetParent(transform, false);
-                    groundPlinthObj.transform.localPosition = new Vector3(0f, -0.32f, 0.05f);
-                    groundPlinthSr = groundPlinthObj.AddComponent<SpriteRenderer>();
-                    groundPlinthSr.sortingLayerName = "Gem";
-                    groundPlinthObj.transform.localScale = new Vector3(0.85f, 0.44f, 1f);
-                }
-                else
-                {
-                    if (groundPlinthSr == null) groundPlinthSr = groundPlinthObj.GetComponent<SpriteRenderer>();
-                    groundPlinthObj.transform.localPosition = new Vector3(0f, -0.32f, 0.05f);
-                }
-
-                if (groundPlinthSr != null)
-                {
-                    int tierIndex = Mathf.Clamp((int)currentTier, 1, 5);
-                    Sprite plinthSprite = Resources.Load<Sprite>($"Sprites/Combat/Plinth_Hero_Base_T{tierIndex}");
+                groundShadowObj = new GameObject("GroundShadow_2.5D");
+                groundShadowObj.transform.SetParent(transform, false);
+                groundShadowSr = groundShadowObj.AddComponent<SpriteRenderer>();
+                groundShadowSr.sprite = Resources.Load<Sprite>("Sprites/UI/Shadow_Ground_Oval") ?? Resources.Load<Sprite>("Sprites/UI/UI_Shadow_Oval");
 #if UNITY_EDITOR
-                    if (plinthSprite == null)
-                    {
-                        plinthSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Art/Sprites/Combat/Plinth_Hero_Base_T{tierIndex}.png");
-                    }
+                if (groundShadowSr.sprite == null)
+                {
+                    groundShadowSr.sprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Shadow_Ground_Oval.png")
+                                         ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Shadow_Oval.png");
+                }
 #endif
-                    if (plinthSprite != null)
-                    {
-                        groundPlinthSr.sprite = plinthSprite;
-                    }
-                    groundPlinthSr.sortingOrder = sortOrder - 1;
-                }
-                groundPlinthObj.SetActive(true);
-
-                // 1b. Lencana Bintang Emas Maksimal (Max Tier Badge) di atas tatakan plinth untuk Tier 5
-                if (currentTier == UnitTier.Tier5)
-                {
-                    if (maxTierBadgeObj == null)
-                    {
-                        maxTierBadgeObj = new GameObject("MaxTierBadge_Star");
-                        maxTierBadgeObj.transform.SetParent(transform, false);
-                        // Koordinat presisi (0.32f, -0.22f) menjamin bintang tetap di dalam diameter tatakan plinth (radius 0.42f)
-                        // dan tidak pernah keluar dari petak grid (cellSize 1.18f) pada rasio tablet 4:3 maupun ponsel 20:9
-                        maxTierBadgeObj.transform.localPosition = new Vector3(0.32f, -0.22f, -0.05f);
-                        maxTierBadgeObj.transform.localScale = new Vector3(0.22f, 0.22f, 1f);
-                        maxTierBadgeSr = maxTierBadgeObj.AddComponent<SpriteRenderer>();
-                        maxTierBadgeSr.sprite = Resources.Load<Sprite>("Sprites/UI/UI_Badge_MaxTier_Star");
-                        maxTierBadgeSr.sortingLayerName = "Gem";
-                    }
-                    if (maxTierBadgeSr != null)
-                    {
-                        maxTierBadgeSr.sortingOrder = sortOrder + 2;
-                    }
-                    maxTierBadgeObj.SetActive(true);
-                }
-                else if (maxTierBadgeObj != null)
-                {
-                    maxTierBadgeObj.SetActive(false);
-                }
-
-                // 2. Soft contact shadow di bawah tatakan hero (bayangan lembut menapak di petak)
-                if (groundShadowObj == null)
-                {
-                    groundShadowObj = new GameObject("GroundShadow_2.5D");
-                    groundShadowObj.transform.SetParent(transform, false);
-                    groundShadowObj.transform.localPosition = new Vector3(0f, -0.38f, 0.08f);
-                    groundShadowSr = groundShadowObj.AddComponent<SpriteRenderer>();
-                    groundShadowSr.sprite = Resources.Load<Sprite>("Sprites/UI/Shadow_Ground_Oval") ?? Resources.Load<Sprite>("Sprites/UI/UI_Shadow_Oval");
-#if UNITY_EDITOR
-                    if (groundShadowSr.sprite == null)
-                    {
-                        groundShadowSr.sprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/Shadow_Ground_Oval.png")
-                                             ?? UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Shadow_Oval.png");
-                    }
-#endif
-                    groundShadowSr.sortingLayerName = "Gem";
-                    groundShadowSr.color = new Color(0f, 0f, 0f, 0.38f);
-                    groundShadowObj.transform.localScale = new Vector3(0.98f, 0.46f, 1f);
-                }
-                else
-                {
-                    groundShadowObj.transform.localPosition = new Vector3(0f, -0.38f, 0.08f);
-                }
-
-                if (groundShadowSr != null)
-                {
-                    groundShadowSr.sortingOrder = sortOrder - 2;
-                }
-                groundShadowObj.SetActive(true);
+                groundShadowSr.sortingLayerName = "Gem";
             }
-            else
+
+            if (groundShadowSr != null)
             {
-                if (groundPlinthObj != null) groundPlinthObj.SetActive(false);
-                if (groundShadowObj != null) groundShadowObj.SetActive(false);
+                groundShadowSr.color = new Color(0.04f, 0.08f, 0.16f, 0.52f);
+                groundShadowSr.sortingOrder = sortOrder - 2;
+
+                // Hitung posisi sol telapak kaki hero secara akurat terlepas dari resolusi tekstur (512 vs 1024)
+                float spriteH = (spriteRenderer != null && spriteRenderer.sprite != null)
+                    ? spriteRenderer.sprite.rect.height / spriteRenderer.sprite.pixelsPerUnit
+                    : 5.12f;
+                float feetLocalY = -(spriteH * 0.5f) * 0.88f;
+                groundShadowObj.transform.localPosition = new Vector3(0f, feetLocalY, 0.08f);
+
+                // Kalibrasi skala bayangan dunia seragam (~0.68m x 0.28m) tanpa distorsi resolusi induk
+                float parentScaleX = Mathf.Max(0.001f, transform.localScale.x);
+                float parentScaleY = Mathf.Max(0.001f, transform.localScale.y);
+                groundShadowObj.transform.localScale = new Vector3(0.265f / parentScaleX, 0.220f / parentScaleY, 1f);
+            }
+            groundShadowObj.SetActive(true);
+
+            // 3. Lencana Bintang Emas Maksimal (Max Tier Badge) untuk Tier 5 (Hiasan anggun di atas bahu kanan hero)
+            if (currentTier == UnitTier.Tier5)
+            {
+                if (maxTierBadgeObj == null)
+                {
+                    maxTierBadgeObj = new GameObject("MaxTierBadge_Star");
+                    maxTierBadgeObj.transform.SetParent(transform, false);
+                    maxTierBadgeSr = maxTierBadgeObj.AddComponent<SpriteRenderer>();
+                    maxTierBadgeSr.sprite = Resources.Load<Sprite>("Sprites/UI/UI_Badge_MaxTier_Star");
+                    maxTierBadgeSr.sortingLayerName = "Gem";
+                }
+                if (maxTierBadgeSr != null)
+                {
+                    maxTierBadgeSr.sortingOrder = sortOrder + 2;
+                    float parentScaleX = Mathf.Max(0.001f, transform.localScale.x);
+                    float parentScaleY = Mathf.Max(0.001f, transform.localScale.y);
+                    maxTierBadgeObj.transform.localPosition = new Vector3(0.32f / parentScaleX, 0.38f / parentScaleY, -0.05f);
+                    maxTierBadgeObj.transform.localScale = new Vector3(0.18f / parentScaleX, 0.18f / parentScaleY, 1f);
+                }
+                maxTierBadgeObj.SetActive(true);
+            }
+            else if (maxTierBadgeObj != null)
+            {
+                maxTierBadgeObj.SetActive(false);
             }
         }
 
@@ -768,7 +739,7 @@ namespace FantasyDefense.Combat
                 }
 
                 // Pemuatan dinamis multi-frame combat sequence (Ready, Strike, Follow-through) jika tersedia
-                if (!isPreparationToken && currentTier > UnitTier.Tier0 && visualAnimator != null && !string.IsNullOrEmpty(combatPath))
+                if (currentTier > UnitTier.Tier0 && visualAnimator != null && !string.IsNullOrEmpty(combatPath))
                 {
                     var frameList = new System.Collections.Generic.List<Sprite>();
                     if (targetSprite != null) frameList.Add(targetSprite);

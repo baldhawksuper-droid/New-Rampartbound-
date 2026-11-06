@@ -50,47 +50,60 @@ namespace FantasyDefense.Combat
             attackCounter++;
             float damage = GetAttackDamage();
 
-            if (currentTier == UnitTier.Tier1)
+            System.Action onImpact = () =>
             {
-                // Tier 1: Hammer Guard
-                target.TakeDamage(damage);
-            }
-            else if (currentTier == UnitTier.Tier2)
-            {
-                // Tier 2: Shield Slam setiap 3 kali serangan (Stun 1s + Shield Absorb 25%)
-                if (attackCounter % 3 == 0)
+                if (target == null || target.IsDead) return;
+
+                float dist = Vector3.Distance(transform.position, target.transform.position);
+
+                // Jika target berjarak (> 0.85 unit), luncurkan gelombang seismik merambat di tanah
+                if (dist > 0.85f && SkillVfxManager.Instance != null)
                 {
-                    hasShieldAbsorb = true;
-                    target.TakeDamage(damage * 1.25f);
-                    target.ApplyStun(stunDurationT2);
+                    SkillVfxManager.Instance.SpawnTravelingSeismicShockwave(transform.position, target.transform.position, currentTier);
                 }
-                else
+                else if (SkillVfxManager.Instance != null)
                 {
+                    SkillVfxManager.Instance.SpawnUpwardRadiantShockwave(transform.position, target.transform.position, currentTier);
+                }
+
+                if (currentTier == UnitTier.Tier1)
+                {
+                    // Tier 1: Hammer Guard
                     target.TakeDamage(damage);
                 }
-            }
-            else if (currentTier >= UnitTier.Tier3)
-            {
-                // Tier 3, 4, 5: Earthshaker Impact (AoE Stun & Shockwave Damage)
-                if (Time.time - lastSkillAnnounceTime >= 6.0f)
+                else if (currentTier == UnitTier.Tier2)
                 {
-                    lastSkillAnnounceTime = Time.time;
-                    NotifySkillTriggered("Earthshaker");
+                    // Tier 2: Shield Slam setiap 3 kali serangan (Stun 1s + Shield Absorb 25%)
+                    if (attackCounter % 3 == 0)
+                    {
+                        hasShieldAbsorb = true;
+                        target.TakeDamage(damage * 1.25f);
+                        target.ApplyStun(stunDurationT2);
+                    }
+                    else
+                    {
+                        target.TakeDamage(damage);
+                    }
                 }
-                ExecuteEarthshaker(target, damage);
-            }
-
-            if (SkillVfxManager.Instance != null)
-            {
-                SkillVfxManager.Instance.SpawnUpwardRadiantShockwave(transform.position, target.transform.position, currentTier);
-            }
+                else if (currentTier >= UnitTier.Tier3)
+                {
+                    // Tier 3, 4, 5: Earthshaker Impact (AoE Stun & Shockwave Damage)
+                    if (Time.time - lastSkillAnnounceTime >= 6.0f)
+                    {
+                        lastSkillAnnounceTime = Time.time;
+                        NotifySkillTriggered("Earthshaker");
+                    }
+                    ExecuteEarthshaker(target, damage);
+                }
+            };
 
             if (visualAnimator != null)
             {
-                visualAnimator.PlayAttack(target.transform.position);
+                visualAnimator.PlayAttack(target.transform.position, onImpact);
             }
             else
             {
+                onImpact();
                 StartCoroutine(AnimateAttackPunch());
             }
         }

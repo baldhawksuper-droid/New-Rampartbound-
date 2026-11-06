@@ -223,31 +223,35 @@ namespace FantasyDefense.Combat
             // Archetype-Specific Windup & Lunge Motion Cadence
             Vector3 windupPos;
             Vector3 lungePos;
-            float attackTilt = Mathf.Clamp(-dir.x * 16f, -20f, 20f);
+            float attackTilt = 0f;
 
             if (unitController != null && unitController.UnitType == UnitType.WindRanger)
             {
-                // Archer: Tarik tali busur ke belakang (recoil), tidak menerjang maju seperti pendekar pedang
-                windupPos = anchorPos - dir * 0.06f;
-                lungePos = anchorPos + dir * 0.03f;
+                // Archer (Pemanah): Tetap stabil di petak grid! Tarik tali busur ke belakang (windup), lalu hentakan recoil pelepasan panah
+                windupPos = anchorPos - dir * 0.05f;
+                lungePos = anchorPos - dir * 0.07f; // Recoil kickback ke belakang saat panah terlepas
+                attackTilt = Mathf.Clamp(-dir.x * 8f, -10f, 10f);
             }
             else if (unitController != null && unitController.UnitType == UnitType.RoseTanker)
             {
-                // Paladin: Mengangkat palu perang tinggi ke atas, lalu menghantam tanah (downward slam)
+                // Paladin (Palu Pelindung): Angkat palu perang tinggi ke atas, lalu hantam ke bawah ke tanah (ground slam)
                 windupPos = anchorPos + Vector3.up * 0.08f;
-                lungePos = anchorPos + dir * 0.12f + Vector3.down * 0.03f;
+                lungePos = anchorPos + dir * 0.08f + Vector3.down * 0.04f;
+                attackTilt = Mathf.Clamp(-dir.x * 12f, -15f, 15f);
             }
             else if (unitController != null && unitController.UnitType == UnitType.RabbitMage)
             {
-                // Mage: Melayang anggun saat mengumpulkan tenaga sihir bintang di tongkat kristal
-                windupPos = anchorPos + Vector3.up * 0.06f;
-                lungePos = anchorPos + Vector3.up * 0.02f;
+                // Mage (Penyihir): Melayang anggun di tempat petak (+Y) mengumpulkan tenaga sihir bintang, tanpa lunge fisik
+                windupPos = anchorPos + Vector3.up * 0.08f;
+                lungePos = anchorPos + Vector3.up * 0.12f;
+                attackTilt = Mathf.Clamp(-dir.x * 6f, -8f, 8f);
             }
             else
             {
-                // Melee Spellblade (Cedric & default): Tarikan mundur lalu terjang maju tajam
-                windupPos = anchorPos - dir * 0.07f;
-                lungePos = anchorPos + dir * attackLungeDistance;
+                // Melee Spellblade (Cedric & melee default): Tarikan mundur lalu terjang maju tajam menghunus pedang api
+                windupPos = anchorPos - dir * 0.06f;
+                lungePos = anchorPos + dir * 0.20f;
+                attackTilt = Mathf.Clamp(-dir.x * 16f, -20f, 20f);
             }
 
             Sprite defaultSprite = spriteRenderer != null ? spriteRenderer.sprite : null;
@@ -259,10 +263,10 @@ namespace FantasyDefense.Combat
             // Kalibrasi Timing Animasi Serangan 3-Sprite Kanonikal:
             // Memberi jendela waktu tayang yang tegas dan jelas bagi mata pemain pada setiap frame sprite
             float tWindup = 0.08f;      // Frame 0 (Combat Ready stance)
-            float tLunge = 0.12f;       // Gerakan maju menerjang
+            float tLunge = 0.11f;       // Gerakan maju menerjang / recoil
             float tStrikeHold = 0.18f;  // Freeze-frame pada pose tebasan puncak (Strike)
-            float tFollow = 0.16f;      // Frame 2 (Follow-through / Recovery pose)
-            float tReturn = 0.10f;      // Kembali mulus ke tatakan plinth
+            float tFollow = 0.12f;      // Frame 2 (Follow-through / Recovery pose)
+            float tReturn = 0.10f;      // Kembali mulus ke posisi siaga di petak
 
             // 1. Fase Windup / Tarikan Mundur (Mengumpulkan tenaga tebasan dengan squash sangat halus)
             if (attackFrames != null && attackFrames.Length > 0 && attackFrames[0] != null && spriteRenderer != null)
@@ -311,29 +315,6 @@ namespace FantasyDefense.Combat
                 }
             }
 
-            // Spawn efek visual serangan terintegrasi (tebasan pedang, gelombang kejut, panah angin, atau berkas sihir bintang)
-            if (SkillVfxManager.Instance != null && unitController != null)
-            {
-                if (unitController.UnitType == UnitType.Cedric)
-                {
-                    SkillVfxManager.Instance.SpawnUpwardCrescentSlash(anchorPos, lungePos + dir * 0.15f, unitController.CurrentTier);
-                }
-                else if (unitController.UnitType == UnitType.RoseTanker)
-                {
-                    SkillVfxManager.Instance.SpawnUpwardRadiantShockwave(anchorPos, lungePos, unitController.CurrentTier);
-                }
-                else if (unitController.UnitType == UnitType.WindRanger)
-                {
-                    // Letupan partikel angin hijau di ujung busur saat tali busur dilepaskan
-                    Color windEmerald = unitController.CurrentTier >= UnitTier.Tier4 ? new Color(0.15f, 1.0f, 0.75f) : new Color(0.25f, 0.95f, 0.45f);
-                    SkillVfxManager.Instance.SpawnProceduralParticleBurst(anchorPos + new Vector3(0.12f, 0.28f, 0f), windEmerald, Color.white, 5, 1.8f);
-                }
-                else if (unitController.UnitType == UnitType.RabbitMage)
-                {
-                    // Pippin menembakkan bola sihir kristal (MagicProjectile) dari RabbitMageUnit, tidak perlu beam pendek redundan
-                }
-            }
-
             elapsed = 0f;
             while (elapsed < tLunge)
             {
@@ -349,6 +330,7 @@ namespace FantasyDefense.Combat
             }
 
             // 2b. Freeze-Frame Strike Hold (Tahan frame strike selama 0.18s agar pose serang terlihat jelas dan tajam oleh mata pemain)
+            // onStrikeImpact memicu pelepasan proyektil atau efek tebasan berjarak tepat di puncak pose serangan
             onStrikeImpact?.Invoke();
 
             elapsed = 0f;
@@ -378,7 +360,7 @@ namespace FantasyDefense.Combat
                 yield return null;
             }
 
-            // 4. Fase Elastic Return & Settle (Kembali meluncur mulus ke tatakan plinth dengan pose siaga)
+            // 4. Fase Elastic Return & Settle (Kembali meluncur mulus ke posisi siaga di petak)
             elapsed = 0f;
             Vector3 peakPos = transform.position;
             Quaternion peakRot = transform.localRotation;

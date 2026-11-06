@@ -46,26 +46,45 @@ namespace FantasyDefense.Combat
 
         private float lastSkillAnnounceTime = -999f;
 
+        private void TriggerMeleeStrikeEffectAndDamage(MonsterController target, float damage, bool isCrit)
+        {
+            if (target == null || target.IsDead) return;
+
+            float dist = Vector3.Distance(transform.position, target.transform.position);
+
+            // Jika target berada di luar jarak sentuh fisik (> 0.85 unit), luncurkan proyektil tebasan sabit api (Crescent Blade Wave)
+            if (dist > 0.85f && SkillVfxManager.Instance != null)
+            {
+                SkillVfxManager.Instance.SpawnUpwardCrescentSlash(transform.position, target.transform.position, currentTier);
+            }
+            else if (SkillVfxManager.Instance != null)
+            {
+                SkillVfxManager.Instance.SpawnMeleeHitSparks(target.transform.position, new Color(1f, 0.55f, 0.1f));
+            }
+
+            target.TakeDamage(damage, isCrit);
+        }
+
         protected override void ExecuteAttack(MonsterController target)
         {
             if (target == null || target.IsDead) return;
 
-            if (SkillVfxManager.Instance != null)
-            {
-                SkillVfxManager.Instance.SpawnUpwardCrescentSlash(transform.position, target.transform.position, currentTier);
-            }
-
             if (currentTier == UnitTier.Tier1)
             {
-                // T1: Single Slash
+                // T1: Single Slash terkoordinasi dengan freeze-frame strike
                 float dmg = GetAttackDamage();
-                target.TakeDamage(dmg, false);
+                System.Action onImpact = () =>
+                {
+                    TriggerMeleeStrikeEffectAndDamage(target, dmg, false);
+                };
+
                 if (visualAnimator != null)
                 {
-                    visualAnimator.PlayAttack(target.transform.position);
+                    visualAnimator.PlayAttack(target.transform.position, onImpact);
                 }
                 else
                 {
+                    onImpact();
                     StartCoroutine(AnimateAttackPunch());
                 }
             }
@@ -90,13 +109,18 @@ namespace FantasyDefense.Combat
             // Hit 1
             if (target != null && !target.IsDead)
             {
-                target.TakeDamage(halfDmg, isCrit);
+                System.Action onImpact1 = () =>
+                {
+                    TriggerMeleeStrikeEffectAndDamage(target, halfDmg, isCrit);
+                };
+
                 if (visualAnimator != null)
                 {
-                    visualAnimator.PlayAttack(target.transform.position);
+                    visualAnimator.PlayAttack(target.transform.position, onImpact1);
                 }
                 else
                 {
+                    onImpact1();
                     StartCoroutine(AnimateAttackPunch());
                 }
             }
@@ -106,13 +130,18 @@ namespace FantasyDefense.Combat
             // Hit 2
             if (target != null && !target.IsDead)
             {
-                target.TakeDamage(halfDmg, isCrit);
+                System.Action onImpact2 = () =>
+                {
+                    TriggerMeleeStrikeEffectAndDamage(target, halfDmg, isCrit);
+                };
+
                 if (visualAnimator != null)
                 {
-                    visualAnimator.PlayAttack(target.transform.position);
+                    visualAnimator.PlayAttack(target.transform.position, onImpact2);
                 }
                 else
                 {
+                    onImpact2();
                     StartCoroutine(AnimateAttackPunch());
                 }
             }
@@ -129,50 +158,54 @@ namespace FantasyDefense.Combat
             bool isCrit = Random.value < ((unitData != null ? unitData.criticalChance : 0.05f) + tier2CritBonus);
             float baseDmg = GetAttackDamage();
 
-            // 1. Serang target utama
-            if (primaryTarget != null && !primaryTarget.IsDead)
+            System.Action onImpact = () =>
             {
-                primaryTarget.TakeDamage(baseDmg, isCrit);
-                primaryTarget.ApplyDefenseDebuff(bladeTempestDefShred, bladeTempestDefDuration);
-            }
-
-            // 2. Putaran Badai Pedang (AoE Whirlwind) merobek DEF seluruh monster sekitar
-            Vector3 center = transform.position;
-            var monsters = MonsterController.GetActiveMonstersSnapshot();
-            for (int i = 0; i < monsters.Count; i++)
-            {
-                var monster = monsters[i];
-                if (monster != null && !monster.IsDead && monster != primaryTarget)
+                // 1. Serang target utama
+                if (primaryTarget != null && !primaryTarget.IsDead)
                 {
-                    if (Vector3.Distance(center, monster.transform.position) <= bladeTempestRadius)
+                    TriggerMeleeStrikeEffectAndDamage(primaryTarget, baseDmg, isCrit);
+                    primaryTarget.ApplyDefenseDebuff(bladeTempestDefShred, bladeTempestDefDuration);
+                }
+
+                // 2. Putaran Badai Pedang (AoE Whirlwind) merobek DEF seluruh monster sekitar
+                Vector3 center = transform.position;
+                var monsters = MonsterController.GetActiveMonstersSnapshot();
+                for (int i = 0; i < monsters.Count; i++)
+                {
+                    var monster = monsters[i];
+                    if (monster != null && !monster.IsDead && monster != primaryTarget)
                     {
-                        monster.TakeDamage(baseDmg * 0.75f, isCrit);
-                        monster.ApplyDefenseDebuff(bladeTempestDefShred, bladeTempestDefDuration);
+                        if (Vector3.Distance(center, monster.transform.position) <= bladeTempestRadius)
+                        {
+                            monster.TakeDamage(baseDmg * 0.75f, isCrit);
+                            monster.ApplyDefenseDebuff(bladeTempestDefShred, bladeTempestDefDuration);
+                        }
                     }
                 }
-            }
 
-            // 3. Heroic Surge: Buff +15% Attack Speed untuk seluruh hero di petak terdekat
-            var heroes = GetActiveUnitsSnapshot();
-            for (int i = 0; i < heroes.Count; i++)
-            {
-                var hero = heroes[i];
-                if (hero != null && hero != this)
+                // 3. Heroic Surge: Buff +15% Attack Speed untuk seluruh hero di petak terdekat
+                var heroes = GetActiveUnitsSnapshot();
+                for (int i = 0; i < heroes.Count; i++)
                 {
-                    if (Vector3.Distance(center, hero.transform.position) <= heroicSurgeRadius)
+                    var hero = heroes[i];
+                    if (hero != null && hero != this)
                     {
-                        hero.ApplyAttackSpeedBuff(heroicSurgeBuffPercent, heroicSurgeDuration);
+                        if (Vector3.Distance(center, hero.transform.position) <= heroicSurgeRadius)
+                        {
+                            hero.ApplyAttackSpeedBuff(heroicSurgeBuffPercent, heroicSurgeDuration);
+                        }
                     }
                 }
-            }
+            };
 
             if (visualAnimator != null)
             {
                 visualAnimator.PlaySkillCast("Blade Tempest", new Color(1f, 0.25f, 0.25f));
-                visualAnimator.PlayAttack(primaryTarget != null ? primaryTarget.transform.position : transform.position + Vector3.up);
+                visualAnimator.PlayAttack(primaryTarget != null ? primaryTarget.transform.position : transform.position + Vector3.up, onImpact);
             }
             else
             {
+                onImpact();
                 StartCoroutine(AnimateAttackPunch());
             }
         }
