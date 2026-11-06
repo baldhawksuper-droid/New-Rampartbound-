@@ -111,6 +111,27 @@ namespace FantasyDefense.UI
         {
             EnsureCloseButtonBound();
 
+            var btnGold = Resources.Load<Sprite>("Sprites/UI/Btn_Primary_Gold");
+            var btnStone = Resources.Load<Sprite>("Sprites/UI/Btn_Secondary_Stone");
+            var btnCrimson = Resources.Load<Sprite>("Sprites/UI/UI_Btn_Battle_Crimson");
+
+            void StyleBtn(Button btn, Sprite sp, Color tint)
+            {
+                if (btn == null || sp == null) return;
+                var img = btn.GetComponent<Image>();
+                if (img != null && (img.sprite == null || img.sprite.name.Contains("UISprite") || img.sprite.name.Contains("Background")))
+                {
+                    img.sprite = sp;
+                    img.type = Image.Type.Sliced;
+                    img.color = tint;
+                }
+            }
+
+            StyleBtn(upgradeHeroButton, btnGold, Color.white);
+            StyleBtn(autoEquipButton, btnStone, Color.white);
+            StyleBtn(unequipAllButton, btnStone, Color.white);
+            StyleBtn(deployToFormationButton, btnCrimson ?? btnGold, Color.white);
+
             if (cedricTabButton != null)
                 cedricTabButton.onClick.AddListener(() => SelectHero(UnitType.Cedric));
 
@@ -169,6 +190,19 @@ namespace FantasyDefense.UI
                 closeButton.onClick.RemoveListener(CloseView);
                 closeButton.onClick.AddListener(CloseView);
                 closeButton.transform.SetAsLastSibling();
+
+                var btnClose = Resources.Load<Sprite>("Sprites/UI/Btn_Close_X");
+                if (btnClose != null)
+                {
+                    var img = closeButton.GetComponent<Image>();
+                    if (img != null && (img.sprite == null || img.sprite.name.Contains("UISprite") || img.sprite.name.Contains("Background")))
+                    {
+                        img.sprite = btnClose;
+                        img.type = Image.Type.Simple;
+                        img.preserveAspect = true;
+                        img.color = Color.white;
+                    }
+                }
             }
         }
 

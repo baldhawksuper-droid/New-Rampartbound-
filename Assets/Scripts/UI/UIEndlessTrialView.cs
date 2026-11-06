@@ -75,6 +75,21 @@ namespace FantasyDefense.UI
 
         private void InitializeButtons()
         {
+            var btnClose = Resources.Load<Sprite>("Sprites/UI/Btn_Close_X");
+            void StyleCloseBtn(Button btn)
+            {
+                if (btn == null || btnClose == null) return;
+                var img = btn.GetComponent<Image>();
+                if (img != null && (img.sprite == null || img.sprite.name.Contains("UISprite") || img.sprite.name.Contains("Background")))
+                {
+                    img.sprite = btnClose;
+                    img.type = Image.Type.Simple;
+                    img.preserveAspect = true;
+                    img.color = Color.white;
+                }
+            }
+            StyleCloseBtn(closeButton);
+
             if (startTrialButton != null)
                 startTrialButton.onClick.AddListener(OnStartTrialClicked);
 

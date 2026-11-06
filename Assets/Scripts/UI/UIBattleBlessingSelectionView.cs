@@ -62,9 +62,27 @@ namespace FantasyDefense.UI
             Instance = this;
 
             InitializeButtons();
+            EnsureBlessingCardSprites();
             if (selectionPanel != null)
             {
                 selectionPanel.SetActive(false);
+            }
+        }
+
+        private void EnsureBlessingCardSprites()
+        {
+            var frameOrnate = Resources.Load<Sprite>("Sprites/UI/Frame_OrnateGold_9Slice")
+                           ?? Resources.Load<Sprite>("Sprites/UI/Frame_StoneBastion_9Slice");
+            if (frameOrnate == null) return;
+
+            Image[] frames = { card1FrameImage, card2FrameImage, card3FrameImage };
+            foreach (var img in frames)
+            {
+                if (img != null && (img.sprite == null || img.sprite.name.Contains("UISprite") || img.sprite.name.Contains("Background")))
+                {
+                    img.sprite = frameOrnate;
+                    img.type = Image.Type.Sliced;
+                }
             }
         }
 

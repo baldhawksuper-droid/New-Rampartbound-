@@ -47,7 +47,22 @@ namespace FantasyDefense.UI
                 achievementTabButton.onClick.AddListener(() => SwitchCategory(QuestCategory.Achievement));
 
             if (closeButton != null)
+            {
                 closeButton.onClick.AddListener(CloseQuestView);
+
+                var btnClose = Resources.Load<Sprite>("Sprites/UI/Btn_Close_X");
+                if (btnClose != null)
+                {
+                    var img = closeButton.GetComponent<Image>();
+                    if (img != null && (img.sprite == null || img.sprite.name.Contains("UISprite") || img.sprite.name.Contains("Background")))
+                    {
+                        img.sprite = btnClose;
+                        img.type = Image.Type.Simple;
+                        img.preserveAspect = true;
+                        img.color = Color.white;
+                    }
+                }
+            }
         }
 
         private void OnEnable()

@@ -1178,7 +1178,25 @@ namespace FantasyDefense.UI
                 btnRt.offsetMax = Vector2.zero;
 
                 var btnImg = btnObj.GetComponent<Image>();
-                btnImg.color = (tierNum == currentPreviewTier) ? new Color(0.96f, 0.76f, 0.22f, 1.0f) : new Color(0.10f, 0.15f, 0.24f, 0.88f);
+                var btnStoneSprite = Resources.Load<Sprite>("Sprites/UI/Btn_Secondary_Stone");
+                var btnGoldSprite = Resources.Load<Sprite>("Sprites/UI/Btn_Primary_Gold");
+                bool isCur = (tierNum == currentPreviewTier);
+                if (isCur && btnGoldSprite != null)
+                {
+                    btnImg.sprite = btnGoldSprite;
+                    btnImg.type = Image.Type.Sliced;
+                    btnImg.color = Color.white;
+                }
+                else if (!isCur && btnStoneSprite != null)
+                {
+                    btnImg.sprite = btnStoneSprite;
+                    btnImg.type = Image.Type.Sliced;
+                    btnImg.color = Color.white;
+                }
+                else
+                {
+                    btnImg.color = isCur ? new Color(0.96f, 0.76f, 0.22f, 1.0f) : new Color(0.10f, 0.15f, 0.24f, 0.88f);
+                }
 
                 var textObj = new GameObject("Text", typeof(RectTransform), typeof(Text));
                 textObj.transform.SetParent(btnObj.transform, false);
@@ -1214,9 +1232,26 @@ namespace FantasyDefense.UI
                 var img = btn.GetComponent<Image>();
                 if (img != null)
                 {
-                    img.color = isActive 
-                        ? new Color(0.96f, 0.76f, 0.22f, 1.0f) 
-                        : new Color(0.10f, 0.15f, 0.24f, 0.88f);
+                    var btnStoneSprite = Resources.Load<Sprite>("Sprites/UI/Btn_Secondary_Stone");
+                    var btnGoldSprite = Resources.Load<Sprite>("Sprites/UI/Btn_Primary_Gold");
+                    if (isActive && btnGoldSprite != null)
+                    {
+                        img.sprite = btnGoldSprite;
+                        img.type = Image.Type.Sliced;
+                        img.color = Color.white;
+                    }
+                    else if (!isActive && btnStoneSprite != null)
+                    {
+                        img.sprite = btnStoneSprite;
+                        img.type = Image.Type.Sliced;
+                        img.color = Color.white;
+                    }
+                    else
+                    {
+                        img.color = isActive 
+                            ? new Color(0.96f, 0.76f, 0.22f, 1.0f) 
+                            : new Color(0.10f, 0.15f, 0.24f, 0.88f);
+                    }
                 }
 
                 var txt = btn.GetComponentInChildren<Text>();
@@ -1999,7 +2034,17 @@ namespace FantasyDefense.UI
             closeRt.offsetMin = Vector2.zero;
             closeRt.offsetMax = Vector2.zero;
             var closeImg = closeObj.GetComponent<Image>();
-            closeImg.color = new Color(0.25f, 0.30f, 0.40f, 1f);
+            var btnStoneSprite = Resources.Load<Sprite>("Sprites/UI/Btn_Secondary_Stone");
+            if (btnStoneSprite != null)
+            {
+                closeImg.sprite = btnStoneSprite;
+                closeImg.type = Image.Type.Sliced;
+                closeImg.color = Color.white;
+            }
+            else
+            {
+                closeImg.color = new Color(0.25f, 0.30f, 0.40f, 1f);
+            }
             var closeBtn = closeObj.GetComponent<Button>();
             closeBtn.onClick.AddListener(CloseTurretWorkshopModal);
 
@@ -2090,7 +2135,17 @@ namespace FantasyDefense.UI
             swRt.offsetMin = Vector2.zero;
             swRt.offsetMax = Vector2.zero;
             var swImg = swObj.GetComponent<Image>();
-            swImg.color = new Color(0.18f, 0.35f, 0.55f, 1f);
+            var btnStoneSprite = Resources.Load<Sprite>("Sprites/UI/Btn_Secondary_Stone");
+            if (btnStoneSprite != null)
+            {
+                swImg.sprite = btnStoneSprite;
+                swImg.type = Image.Type.Sliced;
+                swImg.color = Color.white;
+            }
+            else
+            {
+                swImg.color = new Color(0.18f, 0.35f, 0.55f, 1f);
+            }
             switchBtn = swObj.GetComponent<Button>();
 
             var swTxtObj = new GameObject("Txt", typeof(RectTransform), typeof(Text));
@@ -2116,7 +2171,17 @@ namespace FantasyDefense.UI
             upRt.offsetMin = Vector2.zero;
             upRt.offsetMax = Vector2.zero;
             var upImg = upObj.GetComponent<Image>();
-            upImg.color = new Color(0.20f, 0.55f, 0.25f, 1f);
+            var btnGoldSprite = Resources.Load<Sprite>("Sprites/UI/Btn_Primary_Gold");
+            if (btnGoldSprite != null)
+            {
+                upImg.sprite = btnGoldSprite;
+                upImg.type = Image.Type.Sliced;
+                upImg.color = Color.white;
+            }
+            else
+            {
+                upImg.color = new Color(0.20f, 0.55f, 0.25f, 1f);
+            }
             upgradeBtn = upObj.GetComponent<Button>();
 
             var upTxtObj = new GameObject("Txt", typeof(RectTransform), typeof(Text));

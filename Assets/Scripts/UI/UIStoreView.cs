@@ -66,6 +66,27 @@ namespace FantasyDefense.UI
 
         private void InitializeButtons()
         {
+            var btnGold = Resources.Load<Sprite>("Sprites/UI/Btn_Primary_Gold");
+            var btnStone = Resources.Load<Sprite>("Sprites/UI/Btn_Secondary_Stone");
+            void StyleBtn(Button btn, Sprite sp)
+            {
+                if (btn == null || sp == null) return;
+                var img = btn.GetComponent<Image>();
+                if (img != null && (img.sprite == null || img.sprite.name.Contains("UISprite") || img.sprite.name.Contains("Background")))
+                {
+                    img.sprite = sp;
+                    img.type = Image.Type.Sliced;
+                    img.color = Color.white;
+                }
+            }
+            StyleBtn(buyStarterPackButton, btnGold);
+            StyleBtn(buyGems120Button, btnStone);
+            StyleBtn(buyGems650Button, btnStone);
+            StyleBtn(buyGems3500Button, btnGold);
+            StyleBtn(buyGoldBundleButton, btnStone);
+            StyleBtn(buyEnergyFlaskButton, btnStone);
+            StyleBtn(restorePurchasesButton, btnStone);
+
             if (closeButton == null)
             {
                 closeButton = transform.Find("HeaderBanner/CloseButton")?.GetComponent<Button>()
@@ -77,6 +98,19 @@ namespace FantasyDefense.UI
                 closeButton.onClick.RemoveListener(CloseView);
                 closeButton.onClick.AddListener(CloseView);
                 closeButton.transform.SetAsLastSibling();
+
+                var btnClose = Resources.Load<Sprite>("Sprites/UI/Btn_Close_X");
+                if (btnClose != null)
+                {
+                    var img = closeButton.GetComponent<Image>();
+                    if (img != null && (img.sprite == null || img.sprite.name.Contains("UISprite") || img.sprite.name.Contains("Background")))
+                    {
+                        img.sprite = btnClose;
+                        img.type = Image.Type.Simple;
+                        img.preserveAspect = true;
+                        img.color = Color.white;
+                    }
+                }
             }
             if (restorePurchasesButton != null) restorePurchasesButton.onClick.AddListener(OnRestorePurchasesClicked);
 

@@ -470,7 +470,17 @@ namespace FantasyDefense.UI
             bRt.offsetMax = Vector2.zero;
 
             var bImg = btnObj.GetComponent<Image>();
-            bImg.color = new Color(0.20f, 0.26f, 0.38f, 0.95f);
+            var btnGoldSprite = Resources.Load<Sprite>("Sprites/UI/Btn_Primary_Gold");
+            if (btnGoldSprite != null)
+            {
+                bImg.sprite = btnGoldSprite;
+                bImg.type = Image.Type.Sliced;
+                bImg.color = Color.white;
+            }
+            else
+            {
+                bImg.color = new Color(0.20f, 0.26f, 0.38f, 0.95f);
+            }
             widgets.upgradeButton = btnObj.GetComponent<Button>();
             widgets.upgradeButton.onClick.AddListener(() => OnCardUpgradeClicked(type));
 

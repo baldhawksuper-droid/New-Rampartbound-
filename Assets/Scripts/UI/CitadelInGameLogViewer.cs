@@ -593,7 +593,17 @@ namespace FantasyDefense.UI
             floatRect.sizeDelta = new Vector2(180f, 60f);
 
             floatingButtonBg = floatingButtonObj.AddComponent<Image>();
-            floatingButtonBg.color = new Color(0.15f, 0.20f, 0.30f, 0.75f);
+            var btnStoneSprite = Resources.Load<Sprite>("Sprites/UI/Btn_Secondary_Stone");
+            if (btnStoneSprite != null)
+            {
+                floatingButtonBg.sprite = btnStoneSprite;
+                floatingButtonBg.type = Image.Type.Sliced;
+                floatingButtonBg.color = new Color(0.85f, 0.85f, 0.95f, 0.85f);
+            }
+            else
+            {
+                floatingButtonBg.color = new Color(0.15f, 0.20f, 0.30f, 0.75f);
+            }
 
             var floatBtn = floatingButtonObj.AddComponent<Button>();
             floatBtn.onClick.AddListener(ToggleViewer);
@@ -830,7 +840,17 @@ namespace FantasyDefense.UI
             rect.sizeDelta = size;
 
             var bg = btnObj.AddComponent<Image>();
-            bg.color = bgColor;
+            var btnStoneSprite = Resources.Load<Sprite>("Sprites/UI/Btn_Secondary_Stone");
+            if (btnStoneSprite != null)
+            {
+                bg.sprite = btnStoneSprite;
+                bg.type = Image.Type.Sliced;
+                bg.color = bgColor;
+            }
+            else
+            {
+                bg.color = bgColor;
+            }
 
             var btn = btnObj.AddComponent<Button>();
 
@@ -858,7 +878,17 @@ namespace FantasyDefense.UI
             btnObj.transform.SetParent(parent, false);
 
             var bg = btnObj.AddComponent<Image>();
-            bg.color = bgColor;
+            var btnStone = Resources.Load<Sprite>("Sprites/UI/Btn_Secondary_Stone");
+            if (btnStone != null)
+            {
+                bg.sprite = btnStone;
+                bg.type = Image.Type.Sliced;
+                bg.color = bgColor;
+            }
+            else
+            {
+                bg.color = bgColor;
+            }
 
             var btn = btnObj.AddComponent<Button>();
 

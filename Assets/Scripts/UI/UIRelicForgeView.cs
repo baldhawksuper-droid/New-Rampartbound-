@@ -91,6 +91,24 @@ namespace FantasyDefense.UI
 
         private void InitializeButtons()
         {
+            var btnGold = Resources.Load<Sprite>("Sprites/UI/Btn_Primary_Gold");
+            var btnStone = Resources.Load<Sprite>("Sprites/UI/Btn_Secondary_Stone");
+            void StyleBtn(Button btn, Sprite sp)
+            {
+                if (btn == null || sp == null) return;
+                var img = btn.GetComponent<Image>();
+                if (img != null && (img.sprite == null || img.sprite.name.Contains("UISprite") || img.sprite.name.Contains("Background")))
+                {
+                    img.sprite = sp;
+                    img.type = Image.Type.Sliced;
+                    img.color = Color.white;
+                }
+            }
+            StyleBtn(refineTabButton, btnStone);
+            StyleBtn(rarityTabButton, btnStone);
+            StyleBtn(salvageTabButton, btnStone);
+            StyleBtn(actionButton, btnGold);
+
             if (refineTabButton != null)
                 refineTabButton.onClick.AddListener(() => SwitchTab(ForgeTab.Refine));
 
@@ -104,7 +122,22 @@ namespace FantasyDefense.UI
                 actionButton.onClick.AddListener(OnActionButtonClicked);
 
             if (closeButton != null)
+            {
                 closeButton.onClick.AddListener(CloseForge);
+
+                var btnClose = Resources.Load<Sprite>("Sprites/UI/Btn_Close_X");
+                if (btnClose != null)
+                {
+                    var img = closeButton.GetComponent<Image>();
+                    if (img != null && (img.sprite == null || img.sprite.name.Contains("UISprite") || img.sprite.name.Contains("Background")))
+                    {
+                        img.sprite = btnClose;
+                        img.type = Image.Type.Simple;
+                        img.preserveAspect = true;
+                        img.color = Color.white;
+                    }
+                }
+            }
         }
 
         public void OpenView() => OpenForge();

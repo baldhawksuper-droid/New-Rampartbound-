@@ -102,7 +102,17 @@ namespace FantasyDefense.UI
             btnRect.offsetMax = Vector2.zero;
 
             var btnBg = btnObj.AddComponent<Image>();
-            btnBg.color = new Color(0.92f, 0.65f, 0.15f, 1f);
+            var btnGoldSprite = Resources.Load<Sprite>("Sprites/UI/Btn_Primary_Gold");
+            if (btnGoldSprite != null)
+            {
+                btnBg.sprite = btnGoldSprite;
+                btnBg.type = Image.Type.Sliced;
+                btnBg.color = Color.white;
+            }
+            else
+            {
+                btnBg.color = new Color(0.92f, 0.65f, 0.15f, 1f);
+            }
 
             actionButton = btnObj.AddComponent<Button>();
             actionButton.targetGraphic = btnBg;
