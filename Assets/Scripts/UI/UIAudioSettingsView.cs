@@ -49,6 +49,10 @@ namespace FantasyDefense.UI
         [SerializeField] private Button languageToggleButton;
         [SerializeField] private Text languageStatusText;
 
+        [Header("Guest Profile Reset")]
+        [SerializeField] private Button resetGuestDataButton;
+        private float lastResetClickTime = 0f;
+
         private void Awake()
         {
             InitializeActionButtons();
@@ -327,6 +331,46 @@ namespace FantasyDefense.UI
 
             if (languageToggleButton != null)
                 languageToggleButton.onClick.AddListener(OnLanguageToggleClicked);
+
+            if (resetGuestDataButton == null)
+            {
+                var setContent = transform.Find("ContentContainer") ?? transform;
+                var btn = setContent.Find("ResetGuestDataButton")?.GetComponent<Button>() ?? transform.Find("ResetGuestDataButton")?.GetComponent<Button>();
+                if (btn != null) resetGuestDataButton = btn;
+            }
+
+            if (resetGuestDataButton != null)
+            {
+                resetGuestDataButton.onClick.AddListener(OnResetGuestDataClicked);
+            }
+        }
+
+        private void OnResetGuestDataClicked()
+        {
+            if (Time.unscaledTime - lastResetClickTime < 3.5f)
+            {
+                Debug.Log("[UIAudioSettingsView] Konfirmasi reset diterima: Menghapus data akun lokal...");
+                if (SaveManager.Instance != null && SaveManager.Instance.LocalService is LocalSaveService localService)
+                {
+                    localService.DeleteSave();
+                }
+#if UNITY_WEBGL
+                PlayerPrefs.DeleteAll();
+                PlayerPrefs.Save();
+#endif
+                UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+            }
+            else
+            {
+                lastResetClickTime = Time.unscaledTime;
+                if (AudioManager.Instance != null)
+                {
+                    AudioManager.Instance.PlaySound(SoundType.CastleHit, 0.75f);
+                }
+                CitadelToastNotice.Show(FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                    "⚠️ Tekan sekali lagi dalam 3 detik untuk mereset seluruh data tamu!",
+                    "⚠️ Tap once more within 3 seconds to reset all guest data!"));
+            }
         }
 
         public void OpenSettings()
@@ -459,6 +503,18 @@ namespace FantasyDefense.UI
                 accTxt.text = FantasyDefense.Localization.CitadelLocalizationManager.Text(
                     "☁️ STATUS AKUN: MODE TAMU (GUEST) • AUTO-SAVE AKTIF\n<size=15><color=#AAAAAA>Progres tersimpan otomatis di perangkat secara aman. Hapus Cache / Data Aplikasi di Pengaturan Ponsel jika ingin memulai dari awal.</color></size>",
                     "☁️ ACCOUNT STATUS: GUEST MODE • AUTO-SAVE ACTIVE\n<size=15><color=#AAAAAA>Progress is safely auto-saved to device storage. Clear App Data in Phone Settings to reset.</color></size>");
+            }
+
+            // Update Reset Guest Data Button
+            if (resetGuestDataButton != null)
+            {
+                var txt = resetGuestDataButton.GetComponentInChildren<Text>();
+                if (txt != null)
+                {
+                    txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                        "🗑️ RESET DATA TAMU (MULAI DARI AWAL)",
+                        "🗑️ RESET GUEST DATA (RESTART)");
+                }
             }
 
             RefreshLanguageDisplay();

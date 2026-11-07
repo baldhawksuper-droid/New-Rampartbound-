@@ -589,7 +589,7 @@ namespace FantasyDefense.UI
                 var txt = defendCitadelButton.GetComponentInChildren<Text>();
                 if (txt != null)
                 {
-                    txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("LOBBY_DEFEND_BTN", "<b>BATTLE</b>  <color=#00FFFF>⚡5</color>", "<b>BATTLE</b>  <color=#00FFFF>⚡5</color>");
+                    txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("LOBBY_DEFEND_BTN", "<b>BATTLE</b>  <color=#00FFFF>(5)</color>", "<b>BATTLE</b>  <color=#00FFFF>(5)</color>");
                 }
             }
 
@@ -857,7 +857,7 @@ namespace FantasyDefense.UI
             }
             if (teamCpText != null)
             {
-                teamCpText.text = $"⚡ TEAM CP: {lobby.TotalTeamCP:N0}";
+                teamCpText.text = $"TEAM CP: {lobby.TotalTeamCP:N0}";
                 var cpShadow = teamCpText.GetComponent<Shadow>() ?? teamCpText.gameObject.AddComponent<Shadow>();
                 cpShadow.effectColor = new Color(0.04f, 0.06f, 0.11f, 0.95f); // #0A101D Drop-shadow tegas
                 cpShadow.effectDistance = new Vector2(1.5f, -1.5f);
@@ -992,8 +992,17 @@ namespace FantasyDefense.UI
                 var topRail = dockTr.Find("GoldenTopRail");
                 if (topRail != null)
                 {
-                    var le = topRail.GetComponent<LayoutElement>() ?? topRail.gameObject.AddComponent<LayoutElement>();
-                    le.ignoreLayout = true;
+                    // Pindahkan top rail ke sibling luar agar HorizontalLayoutGroup tidak mengalokasikan slot layout
+                    if (dockTr.parent != null)
+                    {
+                        topRail.SetParent(dockTr.parent, true);
+                        topRail.SetAsLastSibling();
+                    }
+                    else
+                    {
+                        var le = topRail.GetComponent<LayoutElement>() ?? topRail.gameObject.AddComponent<LayoutElement>();
+                        le.ignoreLayout = true;
+                    }
                 }
             }
         }

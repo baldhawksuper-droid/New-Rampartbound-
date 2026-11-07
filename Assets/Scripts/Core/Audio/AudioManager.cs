@@ -195,8 +195,12 @@ namespace FantasyDefense.Audio
             if (Save.SaveManager.Instance != null && Save.SaveManager.Instance.CurrentData != null)
             {
                 var data = Save.SaveManager.Instance.CurrentData;
+                masterVolume = data.masterVolume > 0f ? Mathf.Clamp01(data.masterVolume) : 1.0f;
                 bgmVolume = Mathf.Clamp01(data.bgmVolume);
                 sfxVolume = Mathf.Clamp01(data.sfxVolume);
+                isMasterMuted = data.isMasterMuted;
+                isBgmMuted = data.isBgmMuted;
+                isSfxMuted = data.isSfxMuted;
             }
             UpdateVolumes();
         }
@@ -519,6 +523,7 @@ namespace FantasyDefense.Audio
         {
             masterVolume = Mathf.Clamp01(val);
             UpdateVolumes();
+            SyncWithSaveData();
             OnVolumeChanged?.Invoke(masterVolume, bgmVolume, sfxVolume);
         }
 
@@ -542,6 +547,7 @@ namespace FantasyDefense.Audio
         {
             isMasterMuted = !isMasterMuted;
             UpdateVolumes();
+            SyncWithSaveData();
             OnVolumeChanged?.Invoke(masterVolume, bgmVolume, sfxVolume);
         }
 
@@ -549,6 +555,7 @@ namespace FantasyDefense.Audio
         {
             isBgmMuted = !isBgmMuted;
             UpdateVolumes();
+            SyncWithSaveData();
             OnVolumeChanged?.Invoke(masterVolume, bgmVolume, sfxVolume);
         }
 
@@ -556,6 +563,7 @@ namespace FantasyDefense.Audio
         {
             isSfxMuted = !isSfxMuted;
             UpdateVolumes();
+            SyncWithSaveData();
             OnVolumeChanged?.Invoke(masterVolume, bgmVolume, sfxVolume);
         }
 
@@ -579,8 +587,12 @@ namespace FantasyDefense.Audio
         {
             if (Save.SaveManager.Instance != null && Save.SaveManager.Instance.CurrentData != null)
             {
+                Save.SaveManager.Instance.CurrentData.masterVolume = masterVolume;
                 Save.SaveManager.Instance.CurrentData.bgmVolume = bgmVolume;
                 Save.SaveManager.Instance.CurrentData.sfxVolume = sfxVolume;
+                Save.SaveManager.Instance.CurrentData.isMasterMuted = isMasterMuted;
+                Save.SaveManager.Instance.CurrentData.isBgmMuted = isBgmMuted;
+                Save.SaveManager.Instance.CurrentData.isSfxMuted = isSfxMuted;
             }
         }
 

@@ -77,6 +77,9 @@ namespace FantasyDefense.Save
 
                 // Tulis berkas save utama berproteksi checksum
                 File.WriteAllBytes(saveFilePath, rawBytes);
+#if UNITY_WEBGL
+                PlayerPrefs.Save();
+#endif
 
                 Debug.Log($"[LocalSaveService] Data berhasil disimpan secara aman dengan Checksum SHA-256 ke: {saveFilePath}");
                 onComplete?.Invoke(true);
@@ -178,6 +181,10 @@ namespace FantasyDefense.Save
             {
                 if (File.Exists(saveFilePath)) File.Delete(saveFilePath);
                 if (File.Exists(backupFilePath)) File.Delete(backupFilePath);
+#if UNITY_WEBGL
+                PlayerPrefs.DeleteAll();
+                PlayerPrefs.Save();
+#endif
                 Debug.Log("[LocalSaveService] Seluruh berkas penyimpanan lokal telah dibersihkan.");
             }
             catch (Exception ex)

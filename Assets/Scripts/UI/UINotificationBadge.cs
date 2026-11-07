@@ -37,7 +37,7 @@ namespace FantasyDefense.UI
             }
             if (redDotImage == null && redDotObject != null)
             {
-                redDotImage = redDotObject.GetComponent<Image>();
+                redDotImage = redDotObject.GetComponent<Image>() ?? redDotObject.GetComponentInChildren<Image>();
             }
         }
 
@@ -153,7 +153,10 @@ namespace FantasyDefense.UI
 
             while (true)
             {
-                if (redDotObject != null && redDotObject.activeInHierarchy && (redDotImage == null || redDotImage.enabled))
+                var cg = GetComponent<CanvasGroup>();
+                bool isVisible = (cg == null || cg.alpha > 0.05f) && (redDotImage == null || redDotImage.enabled);
+
+                if (redDotObject != null && redDotObject.activeInHierarchy && isVisible)
                 {
                     timer += Time.unscaledDeltaTime * 4.5f;
                     float wave = Mathf.Sin(timer);

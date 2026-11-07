@@ -281,8 +281,12 @@ namespace FantasyDefense.Metagame
         public string authProvider = "Guest";
         public string playerDisplayName = "Komandan Citadel";
         public string playerName => playerDisplayName;
+        public float masterVolume = 1.0f;
         public float bgmVolume = 1.0f;
         public float sfxVolume = 1.0f;
+        public bool isMasterMuted = false;
+        public bool isBgmMuted = false;
+        public bool isSfxMuted = false;
         public long lastDailyQuestResetUtc = 0;
 
         // Endless Abyssal Trial & Forge Crafting Currency
