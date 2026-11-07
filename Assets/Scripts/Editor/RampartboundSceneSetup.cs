@@ -933,9 +933,10 @@ namespace Rampartbound.Editor
             setupFantasyNavTab(navHeroBtn, iconNavHeroes, "Heroes", false);
             setupFantasyNavTab(navStoreBtn, iconNavBag, "Bag", false);
 
-            // Notification Badges (Red Dots) pada tab Forge dan Heroes (Poin Rekomendasi 3)
+            // Notification Badges (Red Dots) pada tab Forge, Heroes, dan Bag (Poin Rekomendasi 3)
             CreateNotificationBadge(navForgeBtn.transform, NotificationBadgeType.DailySummonFree);
-            CreateNotificationBadge(navHeroBtn.transform, NotificationBadgeType.EnergyFull);
+            CreateNotificationBadge(navHeroBtn.transform, NotificationBadgeType.HeroCanUpgrade);
+            CreateNotificationBadge(navStoreBtn.transform, NotificationBadgeType.BagHasUnclaimed);
 
             // Bind serialized properties ke UICitadelLobbyView
             var lobbySO = new SerializedObject(lobbyView);
@@ -3499,25 +3500,77 @@ namespace Rampartbound.Editor
 
         private static GameObject CreateNotificationBadge(Transform parent, NotificationBadgeType badgeType)
         {
-            var badgeObj = new GameObject("NotificationBadge", typeof(RectTransform), typeof(Image), typeof(UINotificationBadge));
-            badgeObj.transform.SetParent(parent, false);
+            Transform targetParent = parent;
+            var tabIcon = parent.Find("TabIcon");
+            if (tabIcon != null)
+            {
+                targetParent = tabIcon;
+            }
+
+            var badgeObj = new GameObject("NotificationBadge", typeof(RectTransform), typeof(CanvasGroup), typeof(UINotificationBadge));
+            badgeObj.transform.SetParent(targetParent, false);
             var rt = badgeObj.GetComponent<RectTransform>();
-            rt.anchorMin = new Vector2(1f, 1f);
-            rt.anchorMax = new Vector2(1f, 1f);
-            rt.pivot = new Vector2(0.5f, 0.5f);
-            rt.anchoredPosition = new Vector2(-6f, -6f);
+            if (targetParent == tabIcon)
+            {
+                rt.anchorMin = new Vector2(0.92f, 0.92f);
+                rt.anchorMax = new Vector2(0.92f, 0.92f);
+                rt.pivot = new Vector2(0.5f, 0.5f);
+                rt.anchoredPosition = Vector2.zero;
+            }
+            else
+            {
+                rt.anchorMin = new Vector2(1f, 1f);
+                rt.anchorMax = new Vector2(1f, 1f);
+                rt.pivot = new Vector2(0.5f, 0.5f);
+                rt.anchoredPosition = new Vector2(-4f, -4f);
+            }
             rt.sizeDelta = new Vector2(16f, 16f);
 
-            var img = badgeObj.GetComponent<Image>();
-            if (_shadowOval != null) img.sprite = _shadowOval;
-            img.color = new Color(0.95f, 0.2f, 0.2f, 1f);
-            img.raycastTarget = false;
+            var cg = badgeObj.GetComponent<CanvasGroup>();
+            cg.alpha = 1f;
+            cg.blocksRaycasts = false;
+
+            // 1. Outer White Rim / Contrast Ring
+            var rimObj = new GameObject("Rim", typeof(RectTransform), typeof(Image));
+            rimObj.transform.SetParent(badgeObj.transform, false);
+            var rimRt = rimObj.GetComponent<RectTransform>();
+            rimRt.anchorMin = Vector2.zero;
+            rimRt.anchorMax = Vector2.one;
+            rimRt.sizeDelta = Vector2.zero;
+            var rimImg = rimObj.GetComponent<Image>();
+            if (_shadowOval != null) rimImg.sprite = _shadowOval;
+            rimImg.color = Color.white;
+            rimImg.raycastTarget = false;
+
+            // 2. Vibrant Ruby Red Core
+            var coreObj = new GameObject("Core", typeof(RectTransform), typeof(Image));
+            coreObj.transform.SetParent(badgeObj.transform, false);
+            var coreRt = coreObj.GetComponent<RectTransform>();
+            coreRt.anchorMin = new Vector2(0.12f, 0.12f);
+            coreRt.anchorMax = new Vector2(0.88f, 0.88f);
+            coreRt.sizeDelta = Vector2.zero;
+            var coreImg = coreObj.GetComponent<Image>();
+            if (_shadowOval != null) coreImg.sprite = _shadowOval;
+            coreImg.color = new Color(0.98f, 0.18f, 0.18f, 1.0f);
+            coreImg.raycastTarget = false;
+
+            // 3. Specular Shiny Highlight
+            var specObj = new GameObject("Highlight", typeof(RectTransform), typeof(Image));
+            specObj.transform.SetParent(badgeObj.transform, false);
+            var specRt = specObj.GetComponent<RectTransform>();
+            specRt.anchorMin = new Vector2(0.25f, 0.55f);
+            specRt.anchorMax = new Vector2(0.55f, 0.85f);
+            specRt.sizeDelta = Vector2.zero;
+            var specImg = specObj.GetComponent<Image>();
+            if (_shadowOval != null) specImg.sprite = _shadowOval;
+            specImg.color = new Color(1f, 1f, 1f, 0.85f);
+            specImg.raycastTarget = false;
 
             var bComp = badgeObj.GetComponent<UINotificationBadge>();
             var bSO = new SerializedObject(bComp);
             bSO.FindProperty("badgeType").enumValueIndex = (int)badgeType;
             bSO.FindProperty("redDotObject").objectReferenceValue = badgeObj;
-            bSO.FindProperty("redDotImage").objectReferenceValue = img;
+            bSO.FindProperty("redDotImage").objectReferenceValue = coreImg;
             bSO.ApplyModifiedProperties();
 
             return badgeObj;

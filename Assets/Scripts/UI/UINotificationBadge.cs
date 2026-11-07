@@ -10,7 +10,9 @@ namespace FantasyDefense.UI
         Custom,
         QuestsUnclaimed,
         DailySummonFree,
-        EnergyFull
+        EnergyFull,
+        HeroCanUpgrade,
+        BagHasUnclaimed
     }
 
     /// <summary>
@@ -62,8 +64,14 @@ namespace FantasyDefense.UI
         public void SetVisible(bool isVisible)
         {
             // Jika redDotObject adalah objek ini sendiri, jangan matikan GameObject karena akan membunuh coroutine!
-            // Cukup sembunyikan/tampilkan komponen Image.
-            if (redDotObject != null && redDotObject != gameObject)
+            // Cukup gunakan CanvasGroup jika tersedia, atau Image.enabled
+            var cg = GetComponent<CanvasGroup>();
+            if (cg != null)
+            {
+                cg.alpha = isVisible ? 1f : 0f;
+                cg.blocksRaycasts = false;
+            }
+            else if (redDotObject != null && redDotObject != gameObject)
             {
                 redDotObject.SetActive(isVisible);
             }
@@ -102,6 +110,36 @@ namespace FantasyDefense.UI
                 case NotificationBadgeType.EnergyFull:
                     var lobby = CitadelLobbyManager.Instance;
                     show = lobby != null && lobby.AccountData != null && lobby.AccountData.currentEnergy >= lobby.AccountData.maxEnergy;
+                    break;
+
+                case NotificationBadgeType.HeroCanUpgrade:
+                    var heroLobby = CitadelLobbyManager.Instance;
+                    if (heroLobby != null && heroLobby.AccountData != null && heroLobby.AccountData.activeRoster != null)
+                    {
+                        foreach (var hero in heroLobby.AccountData.activeRoster)
+                        {
+                            if (hero != null && hero.isUnlocked)
+                            {
+                                if (heroLobby.AccountData.goldCoins >= hero.GetUpgradeGoldCost() ||
+                                    hero.heroShards >= hero.GetShardsRequiredForPromotion())
+                                {
+                                    show = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    break;
+
+                case NotificationBadgeType.BagHasUnclaimed:
+                    var bagLobby = CitadelLobbyManager.Instance;
+                    if (bagLobby != null && bagLobby.AccountData != null)
+                    {
+                        int equipCount = bagLobby.AccountData.equipmentInventory != null ? bagLobby.AccountData.equipmentInventory.Count : 0;
+                        int ownedArt = bagLobby.AccountData.ownedArtifactIds != null ? bagLobby.AccountData.ownedArtifactIds.Count : 0;
+                        int equippedArt = bagLobby.AccountData.equippedArtifactIds != null ? bagLobby.AccountData.equippedArtifactIds.Count : 0;
+                        show = equipCount > 0 || (ownedArt > equippedArt);
+                    }
                     break;
             }
 
