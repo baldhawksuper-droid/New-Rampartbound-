@@ -219,7 +219,13 @@ namespace Rampartbound.Editor
             ProcessBuildReport(report, "Google Play App Bundle (.aab)", aabPath);
         }
 
-        [MenuItem("Rampartbound/Build/Google Play Release Readiness Audit", false, 14)]
+        [MenuItem("Rampartbound/Build/1-Click Build WebGL (GitHub Pages)", false, 14)]
+        public static void BuildWebGL()
+        {
+            BuildScript.BuildWebGL();
+        }
+
+        [MenuItem("Rampartbound/Build/Google Play Release Readiness Audit", false, 15)]
         public static void RunGooglePlayReleaseAudit()
         {
             bool passed = true;

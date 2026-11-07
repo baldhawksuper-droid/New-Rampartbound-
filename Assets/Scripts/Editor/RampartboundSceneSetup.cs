@@ -575,7 +575,7 @@ namespace Rampartbound.Editor
             handShadow.effectColor = new Color(0, 0, 0, 0.75f);
             handShadow.effectDistance = new Vector2(3, -3);
 
-            var versionTxt = CreateText(titlePanelObj.transform, "VersionText", "Versi 1.2.11 (Google Play Edition)", 15, FontStyle.Bold, TextAnchor.MiddleCenter, new Color(0.95f, 0.97f, 1.0f, 0.95f), defaultFont);
+            var versionTxt = CreateText(titlePanelObj.transform, "VersionText", "Versi 1.2.18 (QA Build)", 14, FontStyle.Bold, TextAnchor.MiddleCenter, new Color(0.95f, 0.97f, 1.0f, 0.95f), defaultFont);
             var verRect = versionTxt.GetComponent<RectTransform>();
             verRect.anchorMin = new Vector2(0.05f, 0.012f);
             verRect.anchorMax = new Vector2(0.95f, 0.038f);

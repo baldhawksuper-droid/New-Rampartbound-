@@ -165,6 +165,11 @@ namespace FantasyDefense.Mobile
         {
             if (!isHapticsEnabled) return;
 
+#if UNITY_WEBGL
+            // WebGL browser runtime tidak mendukung getaran perangkat keras / vibrator haptic
+            return;
+#endif
+
 #if UNITY_ANDROID && !UNITY_EDITOR
             if (vibrator != null)
             {

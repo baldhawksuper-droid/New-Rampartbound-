@@ -319,9 +319,9 @@ namespace FantasyDefense.UI
             }
             if (versionText != null)
             {
-                versionText.text = "Versi 1.2.11 (Google Play Edition)";
                 versionText.fontStyle = FontStyle.Bold;
                 versionText.color = new Color(0.95f, 0.97f, 1.0f, 0.95f);
+                versionText.text = GetBuildVersionLabel();
             }
         }
 
@@ -564,6 +564,42 @@ namespace FantasyDefense.UI
 
             btnTransform.localScale = origScale;
             TransitionToLobby();
+        }
+
+        private string GetBuildVersionLabel()
+        {
+            try
+            {
+                var textAsset = Resources.Load<TextAsset>("build_info");
+                if (textAsset != null && !string.IsNullOrEmpty(textAsset.text))
+                {
+                    var data = JsonUtility.FromJson<BuildInfoData>(textAsset.text);
+                    if (data != null && !string.IsNullOrEmpty(data.displayVersion))
+                    {
+                        return data.displayVersion;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"[UITitleScreenView] Build info read fallback: {ex.Message}");
+            }
+
+#if UNITY_WEBGL
+            return $"v{Application.version} (WebGL QA Build)";
+#else
+            return $"v{Application.version} (Google Play Edition)";
+#endif
+        }
+
+        [Serializable]
+        private class BuildInfoData
+        {
+            public string version;
+            public string dateStamp;
+            public string commitHash;
+            public string displayVersion;
+            public string platform;
         }
 
         private void TransitionToLobby()

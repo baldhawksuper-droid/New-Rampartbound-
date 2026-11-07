@@ -1,0 +1,120 @@
+name: Build & Deploy WebGL
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'Assets/**'
+      - 'Packages/**'
+      - 'ProjectSettings/**'
+      - '.github/workflows/webgl.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-webgl:
+    name: Build WebGL
+    runs-on: ubuntu-latest
+    outputs:
+      unity_version: ${{ steps.unity-version.outputs.version }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+          fetch-depth: 0
+
+      - name: Extract Unity Version
+        id: unity-version
+        shell: bash
+        run: |
+          VERSION=$(grep 'm_EditorVersion:' ProjectSettings/ProjectVersion.txt | awk '{print $2}')
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "Detected Unity Version: ${VERSION}"
+
+      - name: Cache Unity Library
+        uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-WebGL-${{ steps.unity-version.outputs.version }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-WebGL-${{ steps.unity-version.outputs.version }}-
+            Library-WebGL-
+
+      # Unity's WebGL builder container is large. Free space on this ephemeral
+      # GitHub-hosted runner before Docker pulls the image.
+      - name: Free runner disk space
+        shell: bash
+        run: |
+          set -euxo pipefail
+          df -h /
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
+            /usr/local/share/powershell /usr/local/share/chromium \
+            /usr/local/.ghcup /usr/lib/jvm
+          docker system prune --all --force --volumes || true
+          df -h /
+
+      - name: Inject Build Stamp
+        shell: bash
+        run: |
+          mkdir -p Assets/Resources
+          COMMIT_HASH=$(git rev-parse --short HEAD || echo "ci")
+          DATE_STAMP=$(date -u +"%Y%m%d-%H%M")
+          VERSION=$(grep 'bundleVersion:' ProjectSettings/ProjectSettings.asset | awk '{print $2}' || echo "1.2.18")
+          DISPLAY_VERSION="v${VERSION} (${DATE_STAMP} · ${COMMIT_HASH})"
+          cat <<EOF > Assets/Resources/build_info.json
+          {
+            "version": "${VERSION}",
+            "dateStamp": "${DATE_STAMP}",
+            "commitHash": "${COMMIT_HASH}",
+            "displayVersion": "${DISPLAY_VERSION}",
+            "platform": "WebGL"
+          }
+          EOF
+          echo "Injected build info: ${DISPLAY_VERSION}"
+
+      - name: Build WebGL with GameCI
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          targetPlatform: WebGL
+          unityVersion: ${{ steps.unity-version.outputs.version }}
+          buildMethod: BuildScript.BuildWebGL
+          buildsPath: Builds
+          allowDirtyBuild: true
+
+      - name: Verify WebGL Build Artifacts
+        shell: bash
+        run: |
+          echo "Checking WebGL output directory..."
+          ls -la Builds/WebGL/Rampartbound
+          test -f Builds/WebGL/Rampartbound/index.html || (echo "ERROR: index.html not found in Builds/WebGL/Rampartbound!" && exit 1)
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: Builds/WebGL/Rampartbound
+
+  deploy-pages:
+    name: Deploy to GitHub Pages
+    needs: build-webgl
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
