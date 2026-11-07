@@ -9,8 +9,10 @@ Dokumen ini merupakan panduan resmi pengujian fungsionalitas dan kualitas (Quali
 Game dapat langsung dimainkan tanpa instalasi melalui browser modern (Chrome, Edge, Firefox, Safari) di desktop maupun mobile:
 
 - **URL Game (GitHub Pages):** [https://baldhawksuper-droid.github.io/New-Rampartbound-/](https://baldhawksuper-droid.github.io/New-Rampartbound-/)
-- **Orientasi:** Portrait (1080x1920). Pada desktop browser, game akan tampil secara *letterbox* vertikal di tengah layar.
-- **Rekomendasi Browser:** Google Chrome / Microsoft Edge versi terbaru dengan akselerasi perangkat keras (Hardware Acceleration) aktif.
+- **Orientasi & Tampilan Perangkat:**
+  - **HP / Tablet (Mobile Browser):** Otomatis mengisi 100% layar vertikal secara imersif tanpa bingkai.
+  - **PC / Laptop (Desktop QA Simulator):** Ditampilkan dalam bingkai chassis simulator perangkat mobile (HP rasio 9:16 atau Tablet rasio 3:4) yang dapat di-toggle lewat bilah kontrol di bawah layar.
+- **Rekomendasi Browser:** Google Chrome / Microsoft Edge / Safari versi terbaru dengan akselerasi perangkat keras (Hardware Acceleration) aktif.
 
 ---
 

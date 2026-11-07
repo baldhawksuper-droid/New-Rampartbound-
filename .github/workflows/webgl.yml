@@ -105,30 +105,7 @@ jobs:
       - name: Optimize WebGL for Responsive Mobile & Desktop QA
         shell: bash
         run: |
-          python3 -c '
-          import os
-          html_path = "Builds/WebGL/Rampartbound/index.html"
-          css_path = "Builds/WebGL/Rampartbound/TemplateData/style.css"
-          if os.path.exists(html_path):
-              with open(html_path, "r", encoding="utf-8") as f:
-                  html = f.read()
-              html = html.replace("// config.autoSyncPersistentDataPath = true;", "config.autoSyncPersistentDataPath = true;")
-              html = html.replace("fullscreenContainer.style.width = \"1080px\";", "// responsive")
-              html = html.replace("fullscreenContainer.style.height = \"1920px\";", "// responsive")
-              with open(html_path, "w", encoding="utf-8") as f:
-                  f.write(html)
-          if os.path.exists(css_path):
-              css_patch = """
-          html, body { overflow: hidden !important; background: radial-gradient(circle at center, #182030 0%, #090c12 100%) !important; display: flex !important; align-items: center !important; justify-content: center !important; }
-          #unity-container.unity-desktop { position: relative !important; left: auto !important; top: auto !important; transform: none !important; width: min(98vw, calc((98vh - 42px) * (1080 / 1920))) !important; height: min(calc(98vw * (1920 / 1080) + 42px), 98vh) !important; }
-          #unity-fullscreen-container { width: 100% !important; height: calc(100% - 38px) !important; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.85) !important; border-radius: 8px 8px 0 0 !important; overflow: hidden !important; }
-          #unity-canvas { width: 100% !important; height: 100% !important; touch-action: none !important; }
-          #unity-footer { width: 100% !important; background: #111824 !important; border-radius: 0 0 8px 8px !important; border-top: 1px solid rgba(255, 215, 0, 0.2) !important; }
-          """
-              with open(css_path, "a", encoding="utf-8") as f:
-                  f.write(css_patch)
-          print("Responsive WebGL layout and IndexedDB auto-sync applied successfully!")
-          '
+          python3 Tools/patch_webgl_mobile.py Builds/WebGL/Rampartbound
 
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
