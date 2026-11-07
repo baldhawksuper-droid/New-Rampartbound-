@@ -105,8 +105,16 @@ jobs:
         run: |
           python3 Tools/patch_webgl_mobile.py Builds/WebGL/Rampartbound
 
+      - name: Upload WebGL Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Rampartbound-WebGL-Build
+          path: Builds/WebGL/Rampartbound
+          if-no-files-found: error
+
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
+        continue-on-error: true
         with:
           path: Builds/WebGL/Rampartbound
 
@@ -114,6 +122,7 @@ jobs:
     name: Deploy to GitHub Pages
     needs: build-webgl
     runs-on: ubuntu-latest
+    continue-on-error: true
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
