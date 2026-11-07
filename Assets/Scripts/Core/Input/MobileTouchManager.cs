@@ -76,23 +76,29 @@ namespace FantasyDefense.Core
                 }
             }
 
-            // Pastikan EventSystem tersedia di Scene
+            // Pastikan EventSystem tersedia di Scene dengan StandaloneInputModule standar (stabil untuk Android Touch)
             var eventSys = UnityEngine.Object.FindAnyObjectByType<EventSystem>();
             if (eventSys == null)
             {
                 GameObject eventSystemObj = new GameObject("EventSystem");
                 eventSys = eventSystemObj.AddComponent<EventSystem>();
+                eventSystemObj.AddComponent<StandaloneInputModule>();
+                Debug.Log("[MobileTouchManager] EventSystem otomatis dibuat di Scene dengan StandaloneInputModule.");
+            }
+            else
+            {
+                // Bersihkan InputSystemUIInputModule jika ada untuk menghindari TypeInitializationException pada Process()
+                var modernMod = eventSys.GetComponent("InputSystemUIInputModule");
+                if (modernMod != null)
+                {
+                    UnityEngine.Object.Destroy(modernMod);
+                    Debug.Log("[MobileTouchManager] Mengganti InputSystemUIInputModule dengan StandaloneInputModule untuk stabilitas uGUI mobile.");
+                }
 
-                var inputModuleType = System.Type.GetType("UnityEngine.InputSystem.UI.InputSystemUIInputModule, Unity.InputSystem");
-                if (inputModuleType != null)
+                if (eventSys.GetComponent<StandaloneInputModule>() == null)
                 {
-                    eventSystemObj.AddComponent(inputModuleType);
+                    eventSys.gameObject.AddComponent<StandaloneInputModule>();
                 }
-                else
-                {
-                    eventSystemObj.AddComponent<StandaloneInputModule>();
-                }
-                Debug.Log("[MobileTouchManager] EventSystem otomatis dibuat di Scene.");
             }
 
             if (eventSys != null)

@@ -95,29 +95,21 @@ namespace Rampartbound.Editor
             var raycaster = mainCam.GetComponent<Physics2DRaycaster>();
             if (raycaster == null) mainCam.gameObject.AddComponent<Physics2DRaycaster>();
 
-            // 3. Pastikan EventSystem untuk UI Input Mobile (Dukungan Penuh Unity 6 & Input System Modern)
+            // 3. Pastikan EventSystem untuk UI Input Mobile (Menggunakan StandaloneInputModule standar yang stabil untuk Android Touch)
             var eventSys = Object.FindAnyObjectByType<EventSystem>();
             if (eventSys == null)
             {
-                var eventSysObj = new GameObject("EventSystem", typeof(EventSystem));
-                var inputModuleType = System.Type.GetType("UnityEngine.InputSystem.UI.InputSystemUIInputModule, Unity.InputSystem");
-                if (inputModuleType != null)
-                {
-                    eventSysObj.AddComponent(inputModuleType);
-                }
-                else
-                {
-                    eventSysObj.AddComponent<StandaloneInputModule>();
-                }
+                var eventSysObj = new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
+                eventSys = eventSysObj.GetComponent<EventSystem>();
             }
             else
             {
-                var inputModuleType = System.Type.GetType("UnityEngine.InputSystem.UI.InputSystemUIInputModule, Unity.InputSystem");
-                if (inputModuleType != null && eventSys.GetComponent(inputModuleType) == null)
+                var modernMod = eventSys.GetComponent("InputSystemUIInputModule");
+                if (modernMod != null) Object.DestroyImmediate(modernMod);
+
+                if (eventSys.GetComponent<StandaloneInputModule>() == null)
                 {
-                    var oldMod = eventSys.GetComponent<StandaloneInputModule>();
-                    if (oldMod != null) Object.DestroyImmediate(oldMod);
-                    eventSys.gameObject.AddComponent(inputModuleType);
+                    eventSys.gameObject.AddComponent<StandaloneInputModule>();
                 }
             }
 
