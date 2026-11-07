@@ -694,7 +694,7 @@ namespace Rampartbound.Editor
 
             // Sub-Header Floating Banner: TEAM CP (matching mockup 1:1)
             var cpBannerObj = CreatePanel(lobbyPanelObj.transform, "TeamCpBanner", Color.white);
-            PositionUI(cpBannerObj, 0.24f, 0.845f, 0.76f, 0.905f);
+            PositionUI(cpBannerObj, 0.27f, 0.845f, 0.73f, 0.905f);
             var cpBannerImg = cpBannerObj.GetComponent<Image>();
             if (_bannerTeamCP != null)
             {
@@ -717,7 +717,7 @@ namespace Rampartbound.Editor
 
             // Workshop Artileri Benteng Citadel: Ditempatkan elegan di sayap kiri atas sejajar TEAM CP dengan aksen batu pahat & bingkai emas
             var defenseTurretBtn = CreateButton(lobbyPanelObj.transform, "DefenseTurretWorkshopButton", "🏰 ARTILERI BENTENG", new Color(0.12f, 0.16f, 0.25f, 0.94f), new Color(1f, 0.95f, 0.70f), 13, defaultFont);
-            PositionUI(defenseTurretBtn, 0.03f, 0.840f, 0.28f, 0.898f);
+            PositionUI(defenseTurretBtn, 0.02f, 0.845f, 0.25f, 0.905f);
             var dtImg = defenseTurretBtn.GetComponent<Image>();
             if (dtImg != null) 
             { 
@@ -747,17 +747,17 @@ namespace Rampartbound.Editor
 
             // Formasi 4 Slot Pahlawan Teras Batu (Pippin, Cedric, Rose, & Hero Terkunci)
             // Pippin (Slot 1, Kiri): Lv.12, CP 1,600
-            var rabbitCard = CreateButton(heroesContainer.transform, "RabbitCard", "<color=#00FFAA>●</color> Lv.12 | CP 1,600", new Color(0f, 0f, 0f, 0f), Color.white, 12, defaultFont);
+            var rabbitCard = CreateButton(heroesContainer.transform, "RabbitCard", "<color=#00FFAA>Lv.12</color> | CP 1,600", new Color(0f, 0f, 0f, 0f), Color.white, 12, defaultFont);
             PositionUI(rabbitCard, 0.02f, 0.04f, 0.25f, 0.72f);
             SetupHeroCardPortrait(rabbitCard, _heroRabbitSprite, "Pippin");
 
             // Cedric (Slot 2, Tengah-Kiri): Cedric, Lv.15, CP 1,850
-            var cedricCard = CreateButton(heroesContainer.transform, "CedricCard", "<color=#00FFAA>●</color> Lv.15 | CP 1,850", new Color(0f, 0f, 0f, 0f), Color.white, 12, defaultFont);
+            var cedricCard = CreateButton(heroesContainer.transform, "CedricCard", "<color=#00FFAA>Lv.15</color> | CP 1,850", new Color(0f, 0f, 0f, 0f), Color.white, 12, defaultFont);
             PositionUI(cedricCard, 0.26f, 0.04f, 0.49f, 0.72f);
             SetupHeroCardPortrait(cedricCard, _heroCedricSprite, "Cedric");
 
             // Rose (Slot 3, Tengah-Kanan): Lv.14, CP 1,400 (Chibi Palu Emas Raksasa)
-            var roseCard = CreateButton(heroesContainer.transform, "RoseCard", "<color=#00FFAA>●</color> Lv.14 | CP 1,400", new Color(0f, 0f, 0f, 0f), Color.white, 12, defaultFont);
+            var roseCard = CreateButton(heroesContainer.transform, "RoseCard", "<color=#00FFAA>Lv.14</color> | CP 1,400", new Color(0f, 0f, 0f, 0f), Color.white, 12, defaultFont);
             PositionUI(roseCard, 0.51f, 0.04f, 0.74f, 0.72f);
             SetupHeroCardPortrait(roseCard, _heroRoseSprite, "Rose");
 
@@ -900,10 +900,11 @@ namespace Rampartbound.Editor
                 {
                     var podiumObj = new GameObject("ActivePodiumFrame", typeof(RectTransform), typeof(Image));
                     podiumObj.transform.SetParent(btn.transform, false);
-                    PositionUI(podiumObj, 0.03f, 0.03f, 0.97f, 0.97f);
+                    PositionUI(podiumObj, 0.08f, 0.06f, 0.92f, 0.94f);
                     var pImg = podiumObj.GetComponent<Image>();
                     pImg.sprite = _tabActivePodium;
                     pImg.type = Image.Type.Sliced;
+                    pImg.color = new Color(1.0f, 0.85f, 0.35f, 0.18f); // Soft ambient glow, bukan balok kuning pekat
                     pImg.raycastTarget = false;
                     podiumObj.SetActive(isActive);
                 }
@@ -961,13 +962,13 @@ namespace Rampartbound.Editor
             lobbySO.FindProperty("teamCpText").objectReferenceValue = cpTxt;
             lobbySO.FindProperty("settingsButton").objectReferenceValue = settingsBtn.GetComponent<Button>();
             lobbySO.FindProperty("rabbitCardButton").objectReferenceValue = rabbitCard.GetComponent<Button>();
-            lobbySO.FindProperty("rabbitInfoText").objectReferenceValue = rabbitCard.GetComponentInChildren<Text>();
+            lobbySO.FindProperty("rabbitInfoText").objectReferenceValue = rabbitCard.transform.Find("Text")?.GetComponent<Text>() ?? rabbitCard.GetComponentInChildren<Text>();
             lobbySO.FindProperty("cedricCardButton").objectReferenceValue = cedricCard.GetComponent<Button>();
-            lobbySO.FindProperty("cedricInfoText").objectReferenceValue = cedricCard.GetComponentInChildren<Text>();
+            lobbySO.FindProperty("cedricInfoText").objectReferenceValue = cedricCard.transform.Find("Text")?.GetComponent<Text>() ?? cedricCard.GetComponentInChildren<Text>();
             lobbySO.FindProperty("roseCardButton").objectReferenceValue = roseCard.GetComponent<Button>();
-            lobbySO.FindProperty("roseInfoText").objectReferenceValue = roseCard.GetComponentInChildren<Text>();
+            lobbySO.FindProperty("roseInfoText").objectReferenceValue = roseCard.transform.Find("Text")?.GetComponent<Text>() ?? roseCard.GetComponentInChildren<Text>();
             lobbySO.FindProperty("windRangerCardButton").objectReferenceValue = windCard.GetComponent<Button>();
-            lobbySO.FindProperty("windRangerInfoText").objectReferenceValue = windCard.GetComponentInChildren<Text>();
+            lobbySO.FindProperty("windRangerInfoText").objectReferenceValue = windCard.transform.Find("Text")?.GetComponent<Text>() ?? windCard.GetComponentInChildren<Text>();
             var tierBarProp = lobbySO.FindProperty("tierSelectorBar");
             if (tierBarProp != null) tierBarProp.objectReferenceValue = tierBarObj;
             lobbySO.FindProperty("defendCitadelButton").objectReferenceValue = defendBtn.GetComponent<Button>();

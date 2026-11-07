@@ -260,6 +260,9 @@ namespace FantasyDefense.Combat
             Quaternion strikeRot = Quaternion.Euler(0f, 0f, attackTilt);
             Quaternion windupRot = Quaternion.Euler(0f, 0f, -attackTilt * 0.35f);
 
+            // Angkat hero secara visual ke layer depan saat menyerang
+            unitController?.SetAttackingState(true);
+
             // Kalibrasi Timing Animasi Serangan 3-Sprite Kanonikal:
             // Memberi jendela waktu tayang yang tegas dan jelas bagi mata pemain pada setiap frame sprite
             float tWindup = 0.08f;      // Frame 0 (Combat Ready stance)
@@ -402,6 +405,8 @@ namespace FantasyDefense.Combat
             transform.position = anchorPos;
             transform.localScale = baseScale;
             transform.localRotation = Quaternion.identity;
+
+            unitController?.SetAttackingState(false);
             StartIdleAnimation();
         }
 

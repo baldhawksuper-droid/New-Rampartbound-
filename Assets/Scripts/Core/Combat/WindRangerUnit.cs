@@ -127,7 +127,7 @@ namespace FantasyDefense.Combat
 
                 var sr = projObj.AddComponent<SpriteRenderer>();
                 sr.sortingLayerName = "Effects";
-                sr.sortingOrder = 50;
+                sr.sortingOrder = 100;
 
                 Sprite arrowSprite = Resources.Load<Sprite>("Sprites/Combat/Projectile_Wind_Arrow");
 #if UNITY_EDITOR

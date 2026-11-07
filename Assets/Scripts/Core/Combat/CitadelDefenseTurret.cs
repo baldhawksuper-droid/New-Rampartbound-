@@ -257,8 +257,8 @@ namespace FantasyDefense.Combat
             projObj.transform.position = spawnPos;
 
             var sr = projObj.AddComponent<SpriteRenderer>();
-            sr.sortingLayerName = "Board";
-            sr.sortingOrder = 24;
+            sr.sortingLayerName = "Effects";
+            sr.sortingOrder = 100;
 
             var proj = projObj.AddComponent<Projectile>();
 

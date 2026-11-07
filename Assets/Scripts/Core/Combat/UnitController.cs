@@ -587,6 +587,17 @@ namespace FantasyDefense.Combat
         [SerializeField] protected float fillRatio = 0.75f;
         public float FillRatio => fillRatio;
 
+        private bool isAttacking = false;
+
+        /// <summary>
+        /// Mengangkat sorting order unit saat sedang mengeksekusi serangan agar tidak tertutup unit/permata di petak lain.
+        /// </summary>
+        public void SetAttackingState(bool attacking)
+        {
+            isAttacking = attacking;
+            UpdateDepthSorting();
+        }
+
         /// <summary>
         /// Menyesuaikan dynamic depth sorting berdasarkan posisi Y agar unit tidak tumpang tindih secara visual.
         /// Menggunakan Sorting Layer standar: Gem (sortingOrder 15+).
@@ -597,6 +608,10 @@ namespace FantasyDefense.Combat
             {
                 spriteRenderer.sortingLayerName = "Gem";
                 int sortOrder = Mathf.Max(15, normalSortingOrder - Mathf.RoundToInt(transform.position.y * 3));
+                if (isAttacking)
+                {
+                    sortOrder += 50; // Terangkat di atas seluruh unit dan permata petak lain saat menyerang
+                }
                 spriteRenderer.sortingOrder = sortOrder;
 
                 if (groundPlinthSr != null)

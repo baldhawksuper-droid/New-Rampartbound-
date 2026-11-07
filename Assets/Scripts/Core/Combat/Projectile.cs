@@ -28,6 +28,27 @@ namespace FantasyDefense.Combat
         private Vector3 startPos;
         private float totalDistance;
 
+        private void Awake()
+        {
+            EnsureEffectsSorting();
+        }
+
+        public void EnsureEffectsSorting()
+        {
+            var sr = GetComponent<SpriteRenderer>();
+            if (sr != null)
+            {
+                sr.sortingLayerName = "Effects";
+                if (sr.sortingOrder < 100) sr.sortingOrder = 100;
+            }
+            var tr = GetComponent<TrailRenderer>();
+            if (tr != null)
+            {
+                tr.sortingLayerName = "Effects";
+                if (tr.sortingOrder < 99) tr.sortingOrder = 99;
+            }
+        }
+
         public void Initialize(
             MonsterController targetMonster,
             float damageAmount,
@@ -52,6 +73,8 @@ namespace FantasyDefense.Combat
             isCannon = cannon;
             isBallista = ballista;
             startPos = transform.position;
+
+            EnsureEffectsSorting();
 
             if (speedOverride > 0f)
             {

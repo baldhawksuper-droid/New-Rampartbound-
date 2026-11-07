@@ -446,7 +446,8 @@ namespace FantasyDefense.Combat
             SpriteRenderer sr = ringObj.AddComponent<SpriteRenderer>();
             sr.sprite = GetOrCreateRingSprite();
             sr.color = color;
-            sr.sortingOrder = 15;
+            sr.sortingLayerName = "Effects";
+            sr.sortingOrder = 100;
 
             float duration = 0.35f;
             float elapsed = 0f;
@@ -564,7 +565,8 @@ namespace FantasyDefense.Combat
             lr.startWidth = lineWidth;
             lr.endWidth = lineWidth * 0.75f;
             lr.positionCount = 2;
-            lr.sortingOrder = 60;
+            lr.sortingLayerName = "Effects";
+            lr.sortingOrder = 100;
 
             Vector3 origin = startPos + new Vector3(0f, 0.35f, 0f);
             lr.SetPosition(0, origin);
@@ -650,8 +652,8 @@ namespace FantasyDefense.Combat
             }
 
             sr.color = flameColor;
-            sr.sortingLayerName = "Gem";
-            sr.sortingOrder = 60;
+            sr.sortingLayerName = "Effects";
+            sr.sortingOrder = 100;
 
             Vector3 dir = (targetPos - spawnPos).normalized;
             if (dir == Vector3.zero) dir = Vector3.up;
@@ -776,7 +778,8 @@ namespace FantasyDefense.Combat
             lr.startWidth = lineWidth;
             lr.endWidth = 0.02f;
             lr.positionCount = 2;
-            lr.sortingOrder = 60;
+            lr.sortingLayerName = "Effects";
+            lr.sortingOrder = 100;
 
             Vector3 origin = startPos + new Vector3(0f, 0.25f, 0f);
             lr.SetPosition(0, origin);
@@ -874,7 +877,8 @@ namespace FantasyDefense.Combat
 
             ParticleSystem ps = psObj.AddComponent<ParticleSystem>();
             ParticleSystemRenderer psRenderer = psObj.GetComponent<ParticleSystemRenderer>();
-            psRenderer.sortingOrder = sortingOrder;
+            psRenderer.sortingLayerName = "Effects";
+            psRenderer.sortingOrder = Mathf.Max(100, sortingOrder);
             if (psRenderer.sharedMaterial == null)
             {
                 Shader shader = Shader.Find("Sprites/Default") ?? Shader.Find("Particles/Standard Unlit");
@@ -944,7 +948,8 @@ namespace FantasyDefense.Combat
         {
             var lineObj = new GameObject("CatalystLightningBeam");
             var lr = lineObj.AddComponent<LineRenderer>();
-            lr.sortingOrder = 35;
+            lr.sortingLayerName = "Effects";
+            lr.sortingOrder = 100;
             lr.material = new Material(Shader.Find("Sprites/Default"));
 
             lr.startColor = new Color(1f, 0.95f, 0.45f, 1f);
@@ -1011,7 +1016,8 @@ namespace FantasyDefense.Combat
             var beamObj = new GameObject("SummonLightPillar");
             beamObj.transform.position = cellPos;
             var lr = beamObj.AddComponent<LineRenderer>();
-            lr.sortingOrder = 25;
+            lr.sortingLayerName = "Effects";
+            lr.sortingOrder = 100;
             lr.material = new Material(Shader.Find("Sprites/Default"));
             lr.startColor = new Color(portalColor.r, portalColor.g, portalColor.b, 0.85f);
             lr.endColor = new Color(1f, 1f, 1f, 0.0f);
@@ -1178,7 +1184,8 @@ namespace FantasyDefense.Combat
             int segments = 18;
             line.positionCount = segments + 1;
             line.useWorldSpace = true;
-            line.sortingOrder = 22;
+            line.sortingLayerName = "Effects";
+            line.sortingOrder = 100;
 
             float dist = Vector2.Distance(startPos, targetPos);
             float arcHeight = Mathf.Clamp(0.8f + dist * 0.18f, 1.0f, 2.5f);
@@ -1202,7 +1209,8 @@ namespace FantasyDefense.Combat
             GameObject reticleObj = new GameObject("VFX_CannonTargetReticle");
             reticleObj.transform.position = targetPos;
             var reticleSr = reticleObj.AddComponent<SpriteRenderer>();
-            reticleSr.sortingOrder = 20;
+            reticleSr.sortingLayerName = "Effects";
+            reticleSr.sortingOrder = 100;
             var reticleTex = GetOrCreateReticleSprite();
             if (reticleTex != null) reticleSr.sprite = reticleTex;
             reticleSr.color = new Color(1f, 0.45f, 0.1f, 0.75f);
@@ -1306,7 +1314,8 @@ namespace FantasyDefense.Combat
                 var sr = chunk.AddComponent<SpriteRenderer>();
                 sr.sprite = boxSprite;
                 sr.color = (i % 3 == 0) ? ironColor : woodColor;
-                sr.sortingOrder = 30;
+                sr.sortingLayerName = "Effects";
+                sr.sortingOrder = 100;
 
                 float w = (i % 3 == 0) ? Random.Range(0.08f, 0.15f) : Random.Range(0.20f, 0.45f);
                 float h = (i % 3 == 0) ? Random.Range(0.08f, 0.15f) : Random.Range(0.08f, 0.18f);
@@ -1396,7 +1405,8 @@ namespace FantasyDefense.Combat
                 var sr = chunk.AddComponent<SpriteRenderer>();
                 sr.sprite = boxSprite;
                 sr.color = (i % 2 == 0) ? obsidianColor : (i % 3 == 0 ? emberColor : magmaRockColor);
-                sr.sortingOrder = 32;
+                sr.sortingLayerName = "Effects";
+                sr.sortingOrder = 100;
 
                 float size = Random.Range(0.12f, 0.28f);
                 chunk.transform.localScale = new Vector3(size, size * Random.Range(0.7f, 1.3f), 1f);

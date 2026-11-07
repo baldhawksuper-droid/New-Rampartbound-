@@ -1027,13 +1027,14 @@ namespace FantasyDefense.UI
                             pImg.sprite = goldTile;
                             pImg.type = Image.Type.Sliced;
                         }
-                        pImg.color = Color.white;
+                        // Pendaran emas lembut (subtle ambient glow) agar tidak menjadi balok kuning pekat
+                        pImg.color = new Color(1.0f, 0.85f, 0.35f, 0.18f);
                     }
                     var pRt = podiumTr.GetComponent<RectTransform>();
                     if (pRt != null)
                     {
-                        pRt.anchorMin = new Vector2(0.04f, 0.04f);
-                        pRt.anchorMax = new Vector2(0.96f, 0.96f);
+                        pRt.anchorMin = new Vector2(0.08f, 0.06f);
+                        pRt.anchorMax = new Vector2(0.92f, 0.94f);
                         pRt.offsetMin = Vector2.zero;
                         pRt.offsetMax = Vector2.zero;
                     }
@@ -1130,7 +1131,7 @@ namespace FantasyDefense.UI
             }
             else
             {
-                infoText.text = $"<color=#00FFAA>●</color> Lv.{lvl} | CP {displayCp:N0}";
+                infoText.text = $"<color=#00FFAA>Lv.{lvl}</color> <color=#FFEE55>CP {displayCp:N0}</color>";
             }
             infoText.fontSize = 11;
             infoText.alignment = TextAnchor.MiddleCenter;

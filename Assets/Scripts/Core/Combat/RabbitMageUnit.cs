@@ -154,7 +154,8 @@ namespace FantasyDefense.Combat
                 projObj.transform.position = originPos;
 
                 var sr = projObj.AddComponent<SpriteRenderer>();
-                sr.sortingOrder = 200; // Prioritas tinggi di atas hero (120) dan monster (25)
+                sr.sortingLayerName = "Effects";
+                sr.sortingOrder = 200; // Prioritas tinggi di atas hero dan tile gems (Effects layer)
 
                 Shader shader = Shader.Find("Universal Render Pipeline/2D/Sprite-Unlit") 
                              ?? Shader.Find("Sprites/Default");
