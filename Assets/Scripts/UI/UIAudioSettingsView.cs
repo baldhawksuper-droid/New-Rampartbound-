@@ -146,6 +146,11 @@ namespace FantasyDefense.UI
                     hImg.preserveAspect = true;
                     hImg.color = Color.white;
                 }
+
+                if (slider.handleRect.GetComponent<UISliderHandleJuice>() == null)
+                {
+                    slider.handleRect.gameObject.AddComponent<UISliderHandleJuice>();
+                }
             }
         }
 
@@ -158,12 +163,28 @@ namespace FantasyDefense.UI
                 bgImg.type = Image.Type.Sliced;
                 bgImg.color = Color.white;
             }
-            if (knob != null && toggle.graphic is Image checkImg)
+
+            var checkTransform = toggle.transform.Find("Background/Checkmark");
+            if (checkTransform != null)
             {
-                checkImg.sprite = knob;
-                checkImg.type = Image.Type.Simple;
-                checkImg.preserveAspect = true;
-                checkImg.color = Color.white;
+                var checkImg = checkTransform.GetComponent<Image>();
+                if (checkImg != null && knob != null)
+                {
+                    checkImg.sprite = knob;
+                    checkImg.type = Image.Type.Simple;
+                    checkImg.preserveAspect = true;
+                    checkImg.color = Color.white;
+                }
+
+                var slidingSwitch = toggle.GetComponent<UISlidingToggleSwitch>();
+                if (slidingSwitch == null)
+                {
+                    slidingSwitch = toggle.gameObject.AddComponent<UISlidingToggleSwitch>();
+                }
+                if (checkImg != null)
+                {
+                    slidingSwitch.SetKnob(checkTransform.GetComponent<RectTransform>(), checkImg);
+                }
             }
         }
 
@@ -579,17 +600,50 @@ namespace FantasyDefense.UI
             }
         }
 
+        private int _testSfxCounter = 0;
+
         private void OnTestSfxClicked()
         {
             if (AudioManager.Instance != null)
             {
-                AudioManager.Instance.PlaySound(SoundType.MergeSuccess);
+                SoundType[] testSounds = new SoundType[]
+                {
+                    SoundType.MergeSuccess,
+                    SoundType.GoldCoinSpend,
+                    SoundType.ArchetypeMaxChime,
+                    SoundType.VictoryFanfare
+                };
+                SoundType selectedSound = testSounds[_testSfxCounter % testSounds.Length];
+                _testSfxCounter++;
+                AudioManager.Instance.PlaySound(selectedSound);
             }
 
             if (DevicePerformanceManager.Instance != null)
             {
                 DevicePerformanceManager.Instance.TriggerHaptic(HapticFeedbackType.Success);
             }
+
+            if (testSfxButton != null)
+            {
+                StartCoroutine(PunchScaleButtonRoutine(testSfxButton.transform));
+            }
+        }
+
+        private System.Collections.IEnumerator PunchScaleButtonRoutine(Transform target)
+        {
+            if (target == null) yield break;
+            Vector3 orig = Vector3.one;
+            float dur = 0.16f;
+            float elapsed = 0f;
+            while (elapsed < dur)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = elapsed / dur;
+                float s = 1f + Mathf.Sin(t * Mathf.PI) * 0.14f;
+                target.localScale = orig * s;
+                yield return null;
+            }
+            target.localScale = orig;
         }
 
         private void HandleVolumeChanged(float master, float bgm, float sfx)

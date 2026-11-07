@@ -3762,6 +3762,7 @@ namespace Rampartbound.Editor
                 hImg.color = new Color(1f, 0.85f, 0.3f);
             }
             slider.handleRect = hRect;
+            handle.AddComponent<FantasyDefense.UI.UISliderHandleJuice>();
 
             return sliderObj;
         }
@@ -3803,6 +3804,9 @@ namespace Rampartbound.Editor
                 cImg.color = new Color(0.3f, 0.9f, 0.4f);
             }
             toggle.graphic = cImg;
+
+            var slidingSwitch = toggleObj.AddComponent<FantasyDefense.UI.UISlidingToggleSwitch>();
+            slidingSwitch.SetKnob(check.GetComponent<RectTransform>(), cImg);
 
             var lbl = CreateText(toggleObj.transform, "Label", label, 20, FontStyle.Normal, TextAnchor.MiddleLeft, Color.white, font);
             PositionUI(lbl.gameObject, 0.25f, 0f, 1f, 1f);
