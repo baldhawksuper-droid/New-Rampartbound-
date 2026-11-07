@@ -88,6 +88,11 @@ namespace FantasyDefense.Metagame
             Instance = this;
         }
 
+        private void Start()
+        {
+            CheckAndResetBannerPity(ACTIVE_BANNER_ID);
+        }
+
         public bool TryFreeDailySummon(out List<GachaResultItem> results)
         {
             results = new List<GachaResultItem>();

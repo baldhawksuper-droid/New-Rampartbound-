@@ -143,6 +143,7 @@ namespace FantasyDefense.UI
             CitadelLobbyManager.OnHeroStarPromoted += HandleHeroStarPromoted;
             CitadelSummonManager.OnGachaPullsCompleted += ShowGachaResults;
             CitadelSummonManager.OnPityCounterChanged += HandlePityCounterChanged;
+            CitadelSummonManager.OnGachaFailed += HandleGachaFailed;
             FantasyDefense.Localization.CitadelLocalizationManager.OnLanguageChanged += HandleLanguageChanged;
 
             UpdateAllDisplays();
@@ -154,7 +155,41 @@ namespace FantasyDefense.UI
             CitadelLobbyManager.OnHeroStarPromoted -= HandleHeroStarPromoted;
             CitadelSummonManager.OnGachaPullsCompleted -= ShowGachaResults;
             CitadelSummonManager.OnPityCounterChanged -= HandlePityCounterChanged;
+            CitadelSummonManager.OnGachaFailed -= HandleGachaFailed;
             FantasyDefense.Localization.CitadelLocalizationManager.OnLanguageChanged -= HandleLanguageChanged;
+        }
+
+        private void HandleGachaFailed(string reason)
+        {
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySound(SoundType.CastleHit, 0.65f);
+            }
+            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+            {
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Warning);
+            }
+
+            if (reason.Contains("Gems tidak cukup") || reason.Contains("Gems"))
+            {
+                string localizedReason = FantasyDefense.Localization.CitadelLocalizationManager.Text(
+                    "💎 Gems Tidak Cukup!\nKumpulkan Gems dari Stage atau Quest untuk memanggil pahlawan.",
+                    "💎 Not Enough Gems!\nEarn Gems from Stages or Quests to summon heroes.");
+
+                string btnShop = FantasyDefense.Localization.CitadelLocalizationManager.Text("BUKA TOKO", "OPEN SHOP");
+                CitadelToastNotice.ShowWithAction(localizedReason, btnShop, () =>
+                {
+                    if (FantasyDefense.Core.GameFlowManager.Instance != null)
+                    {
+                        FantasyDefense.Core.GameFlowManager.Instance.OpenPanel(FantasyDefense.Core.GamePanelType.Store);
+                    }
+                }, 3.5f);
+            }
+            else
+            {
+                CitadelToastNotice.Show($"⚠️ {reason}", 2.8f);
+            }
         }
 
         private void HandleLanguageChanged(FantasyDefense.Localization.AppLanguage lang)
