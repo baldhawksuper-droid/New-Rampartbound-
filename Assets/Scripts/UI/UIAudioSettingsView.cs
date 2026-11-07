@@ -55,6 +55,11 @@ namespace FantasyDefense.UI
             var btnClose = Resources.Load<Sprite>("Sprites/UI/Btn_Close_X");
             var btnGold = Resources.Load<Sprite>("Sprites/UI/Btn_Primary_Gold");
             var btnStone = Resources.Load<Sprite>("Sprites/UI/Btn_Secondary_Stone");
+            var sliderTrack = Resources.Load<Sprite>("Sprites/UI/UI_Slider_Track_Stone");
+            var sliderFill = Resources.Load<Sprite>("Sprites/UI/UI_Slider_Fill_Cyan");
+            var sliderHandle = Resources.Load<Sprite>("Sprites/UI/UI_Slider_Handle_RuneGem");
+            var toggleBase = Resources.Load<Sprite>("Sprites/UI/UI_Toggle_Base_Slot");
+            var toggleKnob = Resources.Load<Sprite>("Sprites/UI/UI_Toggle_Knob_Switch") ?? sliderHandle;
 
             if (closeButton != null && btnClose != null)
             {
@@ -90,6 +95,75 @@ namespace FantasyDefense.UI
                     img.type = Image.Type.Sliced;
                     img.color = Color.white;
                 }
+            }
+
+            // Apply tactile 2.5D styling to volume sliders
+            ApplySliderStyling(masterSlider, sliderTrack, sliderFill, sliderHandle);
+            ApplySliderStyling(bgmSlider, sliderTrack, sliderFill, sliderHandle);
+            ApplySliderStyling(sfxSlider, sliderTrack, sliderFill, sliderHandle);
+
+            // Apply tactile 2.5D styling to toggles
+            ApplyToggleStyling(bgmMuteToggle, toggleBase, toggleKnob);
+            ApplyToggleStyling(sfxMuteToggle, toggleBase, toggleKnob);
+            ApplyToggleStyling(batterySaverToggle, toggleBase, toggleKnob);
+            ApplyToggleStyling(hapticFeedbackToggle, toggleBase, toggleKnob);
+        }
+
+        private void ApplySliderStyling(Slider slider, Sprite track, Sprite fill, Sprite handle)
+        {
+            if (slider == null) return;
+            if (track != null)
+            {
+                var bg = slider.transform.Find("Background");
+                if (bg != null)
+                {
+                    var bgImg = bg.GetComponent<Image>();
+                    if (bgImg != null)
+                    {
+                        bgImg.sprite = track;
+                        bgImg.type = Image.Type.Sliced;
+                        bgImg.color = Color.white;
+                    }
+                }
+            }
+            if (fill != null && slider.fillRect != null)
+            {
+                var fillImg = slider.fillRect.GetComponent<Image>();
+                if (fillImg != null)
+                {
+                    fillImg.sprite = fill;
+                    fillImg.type = Image.Type.Sliced;
+                    fillImg.color = Color.white;
+                }
+            }
+            if (handle != null && slider.handleRect != null)
+            {
+                var hImg = slider.handleRect.GetComponent<Image>();
+                if (hImg != null)
+                {
+                    hImg.sprite = handle;
+                    hImg.type = Image.Type.Simple;
+                    hImg.preserveAspect = true;
+                    hImg.color = Color.white;
+                }
+            }
+        }
+
+        private void ApplyToggleStyling(Toggle toggle, Sprite baseSlot, Sprite knob)
+        {
+            if (toggle == null) return;
+            if (baseSlot != null && toggle.targetGraphic is Image bgImg)
+            {
+                bgImg.sprite = baseSlot;
+                bgImg.type = Image.Type.Sliced;
+                bgImg.color = Color.white;
+            }
+            if (knob != null && toggle.graphic is Image checkImg)
+            {
+                checkImg.sprite = knob;
+                checkImg.type = Image.Type.Simple;
+                checkImg.preserveAspect = true;
+                checkImg.color = Color.white;
             }
         }
 

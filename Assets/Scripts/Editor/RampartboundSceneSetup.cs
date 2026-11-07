@@ -675,8 +675,22 @@ namespace Rampartbound.Editor
 
             Text gemsTxt = null;
 
-            var settingsBtn = CreateButton(lobbyHeaderObj.transform, "SettingsButton", "⚙️", new Color(0.18f, 0.24f, 0.36f), Color.white, 24, defaultFont);
+            var settingsBtn = CreateButton(lobbyHeaderObj.transform, "SettingsButton", "", Color.white, Color.white, 24, defaultFont);
             PositionUI(settingsBtn, 0.88f, 0.15f, 0.97f, 0.85f);
+            var settingsBtnImg = settingsBtn.GetComponent<Image>();
+            if (_iconSettingsGear != null)
+            {
+                settingsBtnImg.sprite = _iconSettingsGear;
+                settingsBtnImg.type = Image.Type.Simple;
+                settingsBtnImg.preserveAspect = true;
+                settingsBtnImg.color = Color.white;
+            }
+            else
+            {
+                var txt = settingsBtn.GetComponentInChildren<Text>();
+                if (txt != null) txt.text = "⚙️";
+                settingsBtnImg.color = new Color(0.18f, 0.24f, 0.36f);
+            }
 
             // Sub-Header Floating Banner: TEAM CP (matching mockup 1:1)
             var cpBannerObj = CreatePanel(lobbyPanelObj.transform, "TeamCpBanner", Color.white);
@@ -3072,6 +3086,7 @@ namespace Rampartbound.Editor
         private static Sprite _btnBattleCrimson;
         private static Sprite _bannerTeamCP;
         private static Sprite _badgeHeroPill;
+        private static Sprite _iconSettingsGear;
         private static Sprite _sliderTrackStone;
         private static Sprite _sliderFillCyan;
         private static Sprite _sliderHandleRuneGem;
@@ -3139,11 +3154,17 @@ namespace Rampartbound.Editor
             if (_btnBattleCrimson == null) _btnBattleCrimson = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Btn_Battle_Crimson.png");
             if (_bannerTeamCP == null) _bannerTeamCP = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Banner_Team_CP.png");
             if (_badgeHeroPill == null) _badgeHeroPill = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Badge_Hero_Pill.png");
+            if (_iconSettingsGear == null) _iconSettingsGear = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Settings_Gear.png");
             if (_sliderTrackStone == null) _sliderTrackStone = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Slider_Track_Stone.png");
             if (_sliderFillCyan == null) _sliderFillCyan = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Slider_Fill_Cyan.png");
             if (_sliderHandleRuneGem == null) _sliderHandleRuneGem = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Slider_Handle_RuneGem.png");
             if (_toggleBaseSlot == null) _toggleBaseSlot = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Toggle_Base_Slot.png");
-            if (_toggleKnobActive == null) _toggleKnobActive = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Toggle_Knob_Active.png");
+            if (_toggleKnobActive == null)
+            {
+                _toggleKnobActive = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Toggle_Knob_Switch.png")
+                                 ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Toggle_Knob_Active.png")
+                                 ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Slider_Handle_RuneGem.png");
+            }
             if (_slotFrameEmpty == null) _slotFrameEmpty = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Slot_Frame_Empty.png");
             if (_slotIconWeapon == null) _slotIconWeapon = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Slot_Icon_Weapon.png");
             if (_slotIconArmor == null) _slotIconArmor = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Slot_Icon_Armor.png");
