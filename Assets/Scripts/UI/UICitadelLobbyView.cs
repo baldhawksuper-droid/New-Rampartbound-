@@ -923,7 +923,7 @@ namespace FantasyDefense.UI
                             shadowRt.sizeDelta = new Vector2(115f, 26f);
                             shadowRt.anchoredPosition = new Vector2(0f, 6f);
                             var sImg = shadowRt.GetComponent<Image>();
-                            if (sImg != null) sImg.color = new Color(0.02f, 0.04f, 0.08f, 0.85f);
+                            if (sImg != null) sImg.color = new Color(0.02f, 0.04f, 0.08f, 0.92f);
                         }
 
                         var badgeRt = standeeButtons[i].transform.Find("BadgePill")?.GetComponent<RectTransform>();
@@ -950,6 +950,33 @@ namespace FantasyDefense.UI
                                 img.sprite = lockedHeroSprite;
                             }
                             img.preserveAspect = true;
+                        }
+
+                        // Golden "+" CTA overlay on locked slot
+                        var existingPlus = standeeButtons[i].transform.Find("LockedSlotPlusCTA");
+                        if (existingPlus == null)
+                        {
+                            var plusObj = new GameObject("LockedSlotPlusCTA", typeof(RectTransform), typeof(Text));
+                            plusObj.transform.SetParent(standeeButtons[i].transform, false);
+                            var plusRt = plusObj.GetComponent<RectTransform>();
+                            plusRt.anchorMin = new Vector2(0.5f, 0.45f);
+                            plusRt.anchorMax = new Vector2(0.5f, 0.45f);
+                            plusRt.pivot = new Vector2(0.5f, 0.5f);
+                            plusRt.sizeDelta = new Vector2(60f, 60f);
+                            plusRt.anchoredPosition = Vector2.zero;
+                            var plusTxt = plusObj.GetComponent<Text>();
+                            plusTxt.text = "+";
+                            plusTxt.fontSize = 48;
+                            plusTxt.fontStyle = FontStyle.Bold;
+                            plusTxt.alignment = TextAnchor.MiddleCenter;
+                            plusTxt.color = new Color(1f, 0.85f, 0.25f, 0.92f);
+                            plusTxt.raycastTarget = false;
+                            var plusOutline = plusObj.AddComponent<Outline>();
+                            plusOutline.effectColor = new Color(0.55f, 0.35f, 0.05f, 0.95f);
+                            plusOutline.effectDistance = new Vector2(2.5f, -2.5f);
+                            var plusShadow = plusObj.AddComponent<Shadow>();
+                            plusShadow.effectColor = new Color(0f, 0f, 0f, 0.85f);
+                            plusShadow.effectDistance = new Vector2(2f, -2f);
                         }
                     }
                 }

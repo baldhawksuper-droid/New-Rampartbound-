@@ -3215,7 +3215,7 @@ namespace Rampartbound.Editor
             {
                 shadowImg.sprite = _shadowOval;
             }
-            shadowImg.color = new Color(0.02f, 0.04f, 0.08f, 0.85f);
+            shadowImg.color = new Color(0.02f, 0.04f, 0.08f, 0.92f);
             shadowImg.raycastTarget = false;
 
             // 2. Hero Standee Portrait (Grounded tegap menapak di atas bayangan tanah & pelat nama)
@@ -3271,15 +3271,18 @@ namespace Rampartbound.Editor
                 nRt.anchoredPosition = Vector2.zero;
                 var nTxt = nameObj.GetComponent<Text>();
                 nTxt.text = $"<b>{heroName}</b>";
-                nTxt.fontSize = 12;
+                nTxt.fontSize = 14;
                 nTxt.fontStyle = FontStyle.Bold;
                 nTxt.alignment = TextAnchor.MiddleCenter;
                 nTxt.horizontalOverflow = HorizontalWrapMode.Overflow;
                 nTxt.verticalOverflow = VerticalWrapMode.Overflow;
                 nTxt.color = new Color(1.0f, 0.96f, 0.82f, 1.0f);
+                var nOutline = nameObj.AddComponent<Outline>();
+                nOutline.effectColor = new Color(0.08f, 0.04f, 0.02f, 0.98f);
+                nOutline.effectDistance = new Vector2(1.8f, -1.8f);
                 var nShadow = nameObj.AddComponent<Shadow>();
-                nShadow.effectColor = new Color(0f, 0f, 0f, 0.95f);
-                nShadow.effectDistance = new Vector2(1.2f, -1.2f);
+                nShadow.effectColor = new Color(0f, 0f, 0f, 0.98f);
+                nShadow.effectDistance = new Vector2(1.5f, -1.5f);
             }
 
             var txtTrans = cardObj.transform.Find("Text");
@@ -3298,15 +3301,18 @@ namespace Rampartbound.Editor
                 if (txt != null)
                 {
                     txt.alignment = TextAnchor.MiddleCenter;
-                    txt.fontSize = 10;
+                    txt.fontSize = 11;
                     txt.fontStyle = FontStyle.Bold;
                     txt.horizontalOverflow = HorizontalWrapMode.Overflow;
                     txt.verticalOverflow = VerticalWrapMode.Overflow;
                     txt.color = Color.white;
                 }
                 var shadow = txtTrans.gameObject.GetComponent<Shadow>() ?? txtTrans.gameObject.AddComponent<Shadow>();
-                shadow.effectColor = new Color(0f, 0f, 0f, 0.90f);
-                shadow.effectDistance = new Vector2(1.0f, -1.0f);
+                shadow.effectColor = new Color(0f, 0f, 0f, 0.95f);
+                shadow.effectDistance = new Vector2(1.2f, -1.2f);
+                var outline = txtTrans.gameObject.GetComponent<Outline>() ?? txtTrans.gameObject.AddComponent<Outline>();
+                outline.effectColor = new Color(0.06f, 0.04f, 0.02f, 0.95f);
+                outline.effectDistance = new Vector2(1.3f, -1.3f);
                 txtTrans.SetAsLastSibling();
             }
         }
