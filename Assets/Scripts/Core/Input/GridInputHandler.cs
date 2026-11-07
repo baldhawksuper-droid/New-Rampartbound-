@@ -21,8 +21,8 @@ namespace FantasyDefense.GridSystem
         public static GridInputHandler Instance { get; private set; }
 
         [Header("Swipe Tuning")]
-        [Tooltip("Ambang batas jarak sapuan jari (dalam rasio cellSize, misal 0.18 * cellSize untuk responsivitas sentuhan mobile)")]
-        [SerializeField] private float swipeThresholdRatio = 0.18f;
+        [Tooltip("Ambang batas jarak sapuan jari (dalam rasio cellSize, dikalibrasi 0.15f untuk ergonomi mobile/tablet)")]
+        [SerializeField] private float swipeThresholdRatio = 0.15f;
 
         [Tooltip("Durasi animasi pertukaran posisi (tween swap) dalam detik")]
         [SerializeField] private float swapDuration = 0.12f;
@@ -43,6 +43,7 @@ namespace FantasyDefense.GridSystem
         private TileCell startCell = null;
         private Vector3 startWorldPos;
         private Vector2 startScreenPos;
+        private float pointerDownTime = 0f;
         private bool isPointerDown = false;
         private Camera cachedCamera;
 
@@ -55,6 +56,10 @@ namespace FantasyDefense.GridSystem
         private TileCell currentHighlightedNeighbor = null;
         private Coroutine snapBackCoroutine = null;
 
+        // Ghost Tile Preview System
+        private GameObject ghostTileObject = null;
+        private SpriteRenderer ghostTileRenderer = null;
+
         public bool IsSwapping => isSwapping;
 
         private void Awake()
@@ -66,6 +71,47 @@ namespace FantasyDefense.GridSystem
             }
             Instance = this;
             cachedCamera = Camera.main;
+        }
+
+        private void OnDestroy()
+        {
+            if (ghostTileObject != null)
+            {
+                Destroy(ghostTileObject);
+                ghostTileObject = null;
+            }
+        }
+
+        private void SpawnGhostTile(UnitController unit, Vector3 originPos)
+        {
+            if (unit == null) return;
+            if (ghostTileObject == null)
+            {
+                ghostTileObject = new GameObject("GhostTile_DragPreview");
+                ghostTileRenderer = ghostTileObject.AddComponent<SpriteRenderer>();
+            }
+
+            ghostTileObject.transform.position = originPos;
+            ghostTileObject.transform.localScale = draggedUnitOriginScale * 0.95f;
+
+            if (draggedUnitSpriteRenderer != null)
+            {
+                ghostTileRenderer.sprite = draggedUnitSpriteRenderer.sprite;
+                ghostTileRenderer.flipX = draggedUnitSpriteRenderer.flipX;
+                ghostTileRenderer.flipY = draggedUnitSpriteRenderer.flipY;
+                ghostTileRenderer.sortingOrder = Mathf.Max(0, draggedUnitOriginalSortingOrder - 1);
+            }
+            // Siluet transparan biru-emas (tactile ghost imprint)
+            ghostTileRenderer.color = new Color(0.80f, 0.92f, 1.0f, 0.42f);
+            ghostTileObject.SetActive(true);
+        }
+
+        private void HideGhostTile()
+        {
+            if (ghostTileObject != null)
+            {
+                ghostTileObject.SetActive(false);
+            }
         }
 
         private void Update()
@@ -202,7 +248,9 @@ namespace FantasyDefense.GridSystem
                 startCell = cell;
                 startWorldPos = worldPos;
                 startScreenPos = screenPos;
+                pointerDownTime = Time.unscaledTime;
                 isPointerDown = true;
+                HideGhostTile();
 
                 if (snapBackCoroutine != null)
                 {
@@ -271,6 +319,9 @@ namespace FantasyDefense.GridSystem
                 liftedP.z = -0.4f;
                 draggedUnit.transform.position = liftedP;
 
+                // Tampilkan siluet ghost tile di petak asal
+                SpawnGhostTile(draggedUnit, draggedUnitOriginPos);
+
                 if (AudioManager.Instance != null)
                 {
                     AudioManager.Instance.PlaySound(SoundType.TileSlideSwish, 0.6f);
@@ -303,7 +354,15 @@ namespace FantasyDefense.GridSystem
                         currentHighlightedNeighbor = neighbor;
                         if (currentHighlightedNeighbor != null)
                         {
-                            currentHighlightedNeighbor.SetHighlightState(TileHighlightState.Hover);
+                            // Highlight taktil: Berikan warna ValidMerge jika unit sejenis/tier sama, atau ValidMove jika petak kosong/swap normal
+                            if (neighbor.CurrentUnit != null && draggedUnit != null && draggedUnit.CanMergeWith(neighbor.CurrentUnit))
+                            {
+                                currentHighlightedNeighbor.SetHighlightState(TileHighlightState.ValidMerge);
+                            }
+                            else
+                            {
+                                currentHighlightedNeighbor.SetHighlightState(TileHighlightState.ValidMove);
+                            }
                         }
                     }
                 }
@@ -320,6 +379,8 @@ namespace FantasyDefense.GridSystem
 
         private void OnPointerUp(Vector2 screenPos, int pointerId)
         {
+            HideGhostTile();
+
             if (currentHighlightedNeighbor != null)
             {
                 currentHighlightedNeighbor.SetHighlightState(TileHighlightState.None);
@@ -373,7 +434,6 @@ namespace FantasyDefense.GridSystem
             }
 
             // ATURAN 1: PENGGESERAN KE ARAH JAUH (DISTANCE CANCELLATION)
-            // Jika tangan menggeser terlalu jauh (> cancelDist) melintasi papan, gerakan dibatalkan dan gem memantul kembali ke petak asal!
             if (delta.magnitude > cancelDist)
             {
                 Debug.Log($"[GridInputHandler] Drag Dibatalkan: Jarak geser {delta.magnitude:F2} melebihi batas toleransi {cancelDist:F2}. Gem dikembalikan ke petak asal.");
@@ -391,10 +451,19 @@ namespace FantasyDefense.GridSystem
                 return;
             }
 
-            // ATURAN 2: TAP BIASA (DI BAWAH AMBANG BATAS SWIPE)
-            if (delta.magnitude < threshold)
+            // Kalibrasi Flick & DPI Layar Sentuh Mobile/Tablet
+            float gestureDuration = Time.unscaledTime - pointerDownTime;
+            float screenDeltaPx = Vector2.Distance(screenPos, startScreenPos);
+            float minScreenSwipePx = Screen.dpi > 0 ? Mathf.Clamp(Screen.dpi * 0.12f, 25f, 65f) : 32f;
+
+            // Deteksi Fast Flick (sapuan cepat jari < 0.28 detik) atau pergeseran terarah melebihi threshold
+            bool isFlick = gestureDuration > 0.02f && gestureDuration <= 0.28f && (delta.magnitude >= threshold * 0.65f || screenDeltaPx >= minScreenSwipePx);
+            bool isNormalSwipe = delta.magnitude >= threshold || (screenDeltaPx >= minScreenSwipePx && delta.magnitude >= threshold * 0.80f);
+
+            // ATURAN 2: TAP BIASA (DI BAWAH AMBANG BATAS SWIPE & BUKAN FLICK)
+            if (!isFlick && !isNormalSwipe)
             {
-                Debug.Log($"[GridInputHandler] Swipe Ditolak: Jarak geser {delta.magnitude:F2} < ambang batas {threshold:F2} (Terdeteksi Tap/Klik biasa).");
+                Debug.Log($"[GridInputHandler] Swipe Ditolak: Jarak {delta.magnitude:F2} < {threshold:F2} (Screen: {screenDeltaPx:F1}px, Durasi: {gestureDuration:F2}s -> Terdeteksi Tap/Klik biasa).");
                 if (draggedUnit != null)
                 {
                     snapBackCoroutine = StartCoroutine(SnapBackGemRoutine(draggedUnit, draggedUnitOriginPos, draggedUnitOriginScale, 0.10f));

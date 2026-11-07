@@ -54,6 +54,15 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       </div>
     </div>
 
+    <!-- Landscape Warning Modal (Auto-triggers on mobile/tablet landscape) -->
+    <div id="landscape-warning-modal">
+      <div class="landscape-box">
+        <div class="rotate-device-icon">📱</div>
+        <h2>PUTAR PERANGKAT ANDA</h2>
+        <p>Rampartbound: Merge Defense dirancang khusus untuk layar vertikal (Portrait). Harap putar perangkat ke posisi tegak untuk pengalaman bermain optimal.</p>
+      </div>
+    </div>
+
     <script>
       let canvas = document.querySelector("#unity-canvas");
       let container = document.querySelector("#unity-container");
@@ -391,6 +400,71 @@ CSS_TEMPLATE = """html, body {
   font-weight: 600;
   display: none;
   z-index: 99;
+}
+
+/* Landscape Warning Overlay for Mobile/Tablet Browser */
+#landscape-warning-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(10, 13, 20, 0.96);
+  z-index: 99999;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+  box-sizing: border-box;
+  backdrop-filter: blur(8px);
+}
+
+.landscape-box {
+  background: #161d2b;
+  border: 1px solid #f59e0b;
+  border-radius: 20px;
+  padding: 28px 24px;
+  max-width: 380px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(245, 158, 11, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.rotate-device-icon {
+  font-size: 48px;
+  animation: rotatePhone 2.2s infinite ease-in-out;
+  margin-bottom: 12px;
+}
+
+@keyframes rotatePhone {
+  0% { transform: rotate(0deg); }
+  30% { transform: rotate(-90deg); }
+  70% { transform: rotate(-90deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.landscape-box h2 {
+  font-size: 18px;
+  font-weight: 800;
+  color: #fbbf24;
+  margin: 0 0 8px 0;
+  letter-spacing: 0.5px;
+}
+
+.landscape-box p {
+  font-size: 13px;
+  color: #cbd5e1;
+  line-height: 1.5;
+  margin: 0;
+}
+
+@media (orientation: landscape) and (max-height: 600px), (orientation: landscape) and (pointer: coarse) {
+  #landscape-warning-modal {
+    display: flex !important;
+  }
 }
 """
 
