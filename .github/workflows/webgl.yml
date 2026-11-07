@@ -1,14 +1,6 @@
 name: Build & Deploy WebGL
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'Assets/**'
-      - 'Packages/**'
-      - 'ProjectSettings/**'
-      - '.github/workflows/webgl.yml'
   workflow_dispatch:
 
 permissions:
