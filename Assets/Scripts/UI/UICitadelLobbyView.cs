@@ -589,7 +589,7 @@ namespace FantasyDefense.UI
                 var txt = defendCitadelButton.GetComponentInChildren<Text>();
                 if (txt != null)
                 {
-                    txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("LOBBY_DEFEND_BTN", "⚔️ BATTLE (5)", "⚔️ BATTLE (5)");
+                    txt.text = FantasyDefense.Localization.CitadelLocalizationManager.Get("LOBBY_DEFEND_BTN", "<b>BATTLE</b>  <color=#00FFFF>⚡5</color>", "<b>BATTLE</b>  <color=#00FFFF>⚡5</color>");
                 }
             }
 
@@ -883,15 +883,16 @@ namespace FantasyDefense.UI
                     if (infoTexts[i] != null)
                     {
                         infoTexts[i].text = $"<b><color=#AAAAAA>SLOT {i + 1}</color></b>\n<color=#FFD700>🔒 Gacha</color>";
-                        infoTexts[i].fontSize = 12;
+                        infoTexts[i].fontSize = 10;
                         infoTexts[i].alignment = TextAnchor.MiddleCenter;
                         var textRt = infoTexts[i].GetComponent<RectTransform>();
                         if (textRt != null)
                         {
-                            textRt.anchorMin = new Vector2(0.02f, 0.00f);
-                            textRt.anchorMax = new Vector2(0.98f, 0.13f);
-                            textRt.offsetMin = Vector2.zero;
-                            textRt.offsetMax = Vector2.zero;
+                            textRt.anchorMin = new Vector2(0.5f, 0.065f);
+                            textRt.anchorMax = new Vector2(0.5f, 0.065f);
+                            textRt.pivot = new Vector2(0.5f, 0.5f);
+                            textRt.sizeDelta = new Vector2(84f, 28f);
+                            textRt.anchoredPosition = new Vector2(14f, 0f);
                         }
                     }
                     if (standeeButtons[i] != null)
@@ -906,32 +907,33 @@ namespace FantasyDefense.UI
                         var portraitRt = standeeButtons[i].transform.Find("HeroPortrait")?.GetComponent<RectTransform>();
                         if (portraitRt != null)
                         {
-                            portraitRt.anchorMin = new Vector2(0.5f, 0.13f);
-                            portraitRt.anchorMax = new Vector2(0.5f, 0.13f);
+                            portraitRt.anchorMin = new Vector2(0.5f, 0.15f);
+                            portraitRt.anchorMax = new Vector2(0.5f, 0.15f);
                             portraitRt.pivot = new Vector2(0.5f, 0f);
                             portraitRt.sizeDelta = new Vector2(165f, 205f);
-                            portraitRt.anchoredPosition = Vector2.zero;
+                            portraitRt.anchoredPosition = new Vector2(0f, 6f);
                         }
 
                         var shadowRt = standeeButtons[i].transform.Find("GroundShadow")?.GetComponent<RectTransform>();
                         if (shadowRt != null)
                         {
-                            shadowRt.anchorMin = new Vector2(0.5f, 0.13f);
-                            shadowRt.anchorMax = new Vector2(0.5f, 0.13f);
+                            shadowRt.anchorMin = new Vector2(0.5f, 0.15f);
+                            shadowRt.anchorMax = new Vector2(0.5f, 0.15f);
                             shadowRt.pivot = new Vector2(0.5f, 0.5f);
-                            shadowRt.sizeDelta = new Vector2(130f, 28f);
-                            shadowRt.anchoredPosition = Vector2.zero;
+                            shadowRt.sizeDelta = new Vector2(115f, 26f);
+                            shadowRt.anchoredPosition = new Vector2(0f, 6f);
                             var sImg = shadowRt.GetComponent<Image>();
-                            if (sImg != null) sImg.color = new Color(0.03f, 0.06f, 0.12f, 0.70f);
+                            if (sImg != null) sImg.color = new Color(0.02f, 0.04f, 0.08f, 0.85f);
                         }
 
                         var badgeRt = standeeButtons[i].transform.Find("BadgePill")?.GetComponent<RectTransform>();
                         if (badgeRt != null)
                         {
-                            badgeRt.anchorMin = new Vector2(0.02f, 0.00f);
-                            badgeRt.anchorMax = new Vector2(0.98f, 0.13f);
-                            badgeRt.offsetMin = Vector2.zero;
-                            badgeRt.offsetMax = Vector2.zero;
+                            badgeRt.anchorMin = new Vector2(0.5f, 0.065f);
+                            badgeRt.anchorMax = new Vector2(0.5f, 0.065f);
+                            badgeRt.pivot = new Vector2(0.5f, 0.5f);
+                            badgeRt.sizeDelta = new Vector2(120f, 32f);
+                            badgeRt.anchoredPosition = Vector2.zero;
                         }
 
                         var img = standeeButtons[i].transform.Find("HeroPortrait")?.GetComponent<Image>();
@@ -1127,17 +1129,27 @@ namespace FantasyDefense.UI
             var lilita = Resources.Load<Font>("Fonts/LilitaOne-Regular");
             if (isLocked)
             {
-                infoText.text = "<b><color=#FFAA00>🔒 TERKUNCI</color></b>";
+                infoText.text = "<b><color=#FFAA00>🔒 Gacha</color></b>";
             }
             else
             {
                 infoText.text = $"<color=#00FFAA>Lv.{lvl}</color> <color=#FFEE55>CP {displayCp:N0}</color>";
             }
-            infoText.fontSize = 11;
+            infoText.fontSize = 10;
             infoText.alignment = TextAnchor.MiddleCenter;
             infoText.horizontalOverflow = HorizontalWrapMode.Overflow;
             infoText.verticalOverflow = VerticalWrapMode.Overflow;
             if (lilita != null) infoText.font = lilita;
+
+            var textRt = infoText.GetComponent<RectTransform>();
+            if (textRt != null)
+            {
+                textRt.anchorMin = new Vector2(0.5f, 0.065f);
+                textRt.anchorMax = new Vector2(0.5f, 0.065f);
+                textRt.pivot = new Vector2(0.5f, 0.5f);
+                textRt.sizeDelta = new Vector2(84f, 28f);
+                textRt.anchoredPosition = new Vector2(14f, 0f);
+            }
 
             if (btn != null)
             {
@@ -1151,6 +1163,47 @@ namespace FantasyDefense.UI
                     namePlate.horizontalOverflow = HorizontalWrapMode.Overflow;
                     namePlate.verticalOverflow = VerticalWrapMode.Overflow;
                     if (lilita != null) namePlate.font = lilita;
+                    var nRt = namePlate.GetComponent<RectTransform>();
+                    if (nRt != null)
+                    {
+                        nRt.anchorMin = new Vector2(0.5f, 0.125f);
+                        nRt.anchorMax = new Vector2(0.5f, 0.125f);
+                        nRt.pivot = new Vector2(0.5f, 0.5f);
+                        nRt.sizeDelta = new Vector2(110f, 20f);
+                        nRt.anchoredPosition = Vector2.zero;
+                    }
+                }
+
+                var badgeRt = btn.transform.Find("BadgePill")?.GetComponent<RectTransform>();
+                if (badgeRt != null)
+                {
+                    badgeRt.anchorMin = new Vector2(0.5f, 0.065f);
+                    badgeRt.anchorMax = new Vector2(0.5f, 0.065f);
+                    badgeRt.pivot = new Vector2(0.5f, 0.5f);
+                    badgeRt.sizeDelta = new Vector2(120f, 32f);
+                    badgeRt.anchoredPosition = Vector2.zero;
+                }
+
+                var shadowRt = btn.transform.Find("GroundShadow")?.GetComponent<RectTransform>();
+                if (shadowRt != null)
+                {
+                    shadowRt.anchorMin = new Vector2(0.5f, 0.15f);
+                    shadowRt.anchorMax = new Vector2(0.5f, 0.15f);
+                    shadowRt.pivot = new Vector2(0.5f, 0.5f);
+                    shadowRt.sizeDelta = new Vector2(115f, 26f);
+                    shadowRt.anchoredPosition = new Vector2(0f, 6f);
+                    var sImg = shadowRt.GetComponent<Image>();
+                    if (sImg != null) sImg.color = new Color(0.02f, 0.04f, 0.08f, 0.85f);
+                }
+
+                var portraitRt = btn.transform.Find("HeroPortrait")?.GetComponent<RectTransform>();
+                if (portraitRt != null)
+                {
+                    portraitRt.anchorMin = new Vector2(0.5f, 0.15f);
+                    portraitRt.anchorMax = new Vector2(0.5f, 0.15f);
+                    portraitRt.pivot = new Vector2(0.5f, 0f);
+                    portraitRt.sizeDelta = new Vector2(165f, 205f);
+                    portraitRt.anchoredPosition = new Vector2(0f, 6f);
                 }
 
                 var img = btn.transform.Find("HeroPortrait")?.GetComponent<Image>();
@@ -1179,39 +1232,8 @@ namespace FantasyDefense.UI
                         }
                     }
                 }
-
-                // Penyelarasan jarak: Rapatkan hero portrait dan ground shadow menapak di atas badge pill
-                var portraitRt = btn.transform.Find("HeroPortrait")?.GetComponent<RectTransform>();
-                if (portraitRt != null)
-                {
-                    portraitRt.anchorMin = new Vector2(0.5f, 0.13f);
-                    portraitRt.anchorMax = new Vector2(0.5f, 0.13f);
-                    portraitRt.pivot = new Vector2(0.5f, 0f);
-                    portraitRt.sizeDelta = new Vector2(165f, 205f);
-                }
-                var shadowRt = btn.transform.Find("GroundShadow")?.GetComponent<RectTransform>();
-                if (shadowRt != null)
-                {
-                    shadowRt.anchorMin = new Vector2(0.5f, 0.13f);
-                    shadowRt.anchorMax = new Vector2(0.5f, 0.13f);
-                    shadowRt.pivot = new Vector2(0.5f, 0.5f);
-                    shadowRt.sizeDelta = new Vector2(130f, 28f);
-                    shadowRt.anchoredPosition = new Vector2(0f, 0f);
-
-                    var shadowImg = shadowRt.GetComponent<Image>();
-                    if (shadowImg != null)
-                    {
-                        shadowImg.color = new Color(0.03f, 0.06f, 0.12f, 0.70f);
-                    }
-                }
-                var badgeRt = btn.transform.Find("BadgePill")?.GetComponent<RectTransform>();
                 if (badgeRt != null)
                 {
-                    badgeRt.anchorMin = new Vector2(0.02f, 0.00f);
-                    badgeRt.anchorMax = new Vector2(0.98f, 0.13f);
-                    badgeRt.offsetMin = Vector2.zero;
-                    badgeRt.offsetMax = Vector2.zero;
-
                     var badgeImg = badgeRt.GetComponent<Image>();
                     if (badgeImg != null && badgeImg.sprite == null)
                     {
@@ -1222,15 +1244,6 @@ namespace FantasyDefense.UI
                 }
                 if (infoText != null)
                 {
-                    var textRt = infoText.GetComponent<RectTransform>();
-                    if (textRt != null)
-                    {
-                        textRt.anchorMin = new Vector2(0.02f, 0.00f);
-                        textRt.anchorMax = new Vector2(0.98f, 0.13f);
-                        textRt.offsetMin = Vector2.zero;
-                        textRt.offsetMax = Vector2.zero;
-                    }
-
                     var textShadow = infoText.GetComponent<Shadow>();
                     if (textShadow == null)
                     {

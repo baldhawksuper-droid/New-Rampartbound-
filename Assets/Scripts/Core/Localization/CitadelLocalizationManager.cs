@@ -31,7 +31,7 @@ namespace FantasyDefense.Localization
         {
             // Lobby & Header
             { "LOBBY_COMMANDER", ("Komandan Benteng", "Citadel Commander") },
-            { "LOBBY_DEFEND_BTN", ("BATTLE  (5 Energy)", "BATTLE  (5 Energy)") },
+            { "LOBBY_DEFEND_BTN", ("<b>BATTLE</b>  <color=#00FFFF>⚡5</color>", "<b>BATTLE</b>  <color=#00FFFF>⚡5</color>") },
             { "LOBBY_ABYSSAL_BTN", ("🌌 UJIAN ABYSSAL (ENDLESS)", "🌌 ABYSSAL TRIAL (ENDLESS)") },
             { "LOBBY_TEAM_CP", ("Team CP", "Team CP") },
 

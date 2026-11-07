@@ -708,14 +708,14 @@ namespace Rampartbound.Editor
             cpShadow.effectDistance = new Vector2(1.5f, -1.5f);
 
             // Workshop Artileri Benteng Citadel: Ditempatkan elegan di sayap kiri atas sejajar TEAM CP dengan aksen batu pahat & bingkai emas
-            var defenseTurretBtn = CreateButton(lobbyPanelObj.transform, "DefenseTurretWorkshopButton", "🏰 ARTILERI BENTENG", new Color(0.12f, 0.16f, 0.25f, 0.94f), new Color(1f, 0.95f, 0.70f), 13, defaultFont);
+            var defenseTurretBtn = CreateButton(lobbyPanelObj.transform, "DefenseTurretWorkshopButton", "🏰 ARTILERI BENTENG", new Color(0.18f, 0.22f, 0.32f, 0.95f), new Color(1f, 0.95f, 0.70f), 13, defaultFont);
             PositionUI(defenseTurretBtn, 0.02f, 0.845f, 0.25f, 0.905f);
             var dtImg = defenseTurretBtn.GetComponent<Image>();
             if (dtImg != null) 
             { 
-                dtImg.sprite = _badgeHeroPill ?? _bannerTeamCP; 
+                dtImg.sprite = _btnSecondaryStone ?? _frameStoneBastion; 
                 dtImg.type = Image.Type.Sliced;
-                dtImg.color = new Color(0.12f, 0.16f, 0.25f, 0.94f); 
+                dtImg.color = Color.white; 
             }
             var dtOutline = defenseTurretBtn.AddComponent<Outline>();
             dtOutline.effectColor = new Color(0.96f, 0.80f, 0.30f, 0.95f);
@@ -771,7 +771,7 @@ namespace Rampartbound.Editor
             tierBarObj.SetActive(false);
 
             // Core Battle Button (Crimson 3D Gold Frame with studs, crossed swords, and diamond accents)
-            var defendBtn = CreateButton(lobbyPanelObj.transform, "DefendCitadelButton", "<b>BATTLE</b>  <color=#FFEE55>(5)</color>", new Color(0.78f, 0.10f, 0.12f), Color.white, 26, defaultFont);
+            var defendBtn = CreateButton(lobbyPanelObj.transform, "DefendCitadelButton", "<b>BATTLE</b>  <color=#00FFFF>⚡5</color>", new Color(0.78f, 0.10f, 0.12f), Color.white, 24, defaultFont);
             PositionUI(defendBtn, 0.12f, 0.125f, 0.88f, 0.205f);
 
             var defOutline = defendBtn.AddComponent<Outline>();
@@ -832,16 +832,10 @@ namespace Rampartbound.Editor
             var dockObj = CreatePanel(lobbyPanelObj.transform, "BottomNavigationDock", new Color(0.04f, 0.08f, 0.16f, 0.88f)); // Deep translucent navy glass
             PositionUI(dockObj, 0f, 0f, 1f, 0.098f); // Generous spacious height (~125px) for large prominent icons
 
-            // Continuous Golden Top Rail
+            // Continuous Golden Top Rail (Ditempatkan di LobbyPanel tepat di bibir atas dock, BUKAN di dalam dock HorizontalLayoutGroup)
             var topRailObj = new GameObject("GoldenTopRail", typeof(RectTransform), typeof(Image));
-            topRailObj.transform.SetParent(dockObj.transform, false);
-            var railLe = topRailObj.AddComponent<LayoutElement>();
-            railLe.ignoreLayout = true; // JAMINAN: Mencegah slot kosong di pojok kiri bawah dock
-            var railRt = topRailObj.GetComponent<RectTransform>();
-            railRt.anchorMin = new Vector2(0f, 1f);
-            railRt.anchorMax = new Vector2(1f, 1f);
-            railRt.sizeDelta = new Vector2(0f, 2.8f);
-            railRt.anchoredPosition = new Vector2(0f, -1.4f);
+            topRailObj.transform.SetParent(lobbyPanelObj.transform, false);
+            PositionUI(topRailObj, 0f, 0.096f, 1f, 0.099f);
             var railImg = topRailObj.GetComponent<Image>();
             railImg.color = new Color(0.92f, 0.76f, 0.28f, 0.95f);
             railImg.raycastTarget = false;
@@ -3180,8 +3174,8 @@ namespace Rampartbound.Editor
             if (_iconAudioMute == null) _iconAudioMute = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Audio_Mute.png");
             if (_badgeHeroPill == null)
             {
-                _badgeHeroPill = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Frame_Hero_Stat_Pill.png")
-                              ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Badge_Hero_Pill.png");
+                _badgeHeroPill = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Badge_Hero_Pill.png")
+                              ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Resources/Sprites/UI/UI_Badge_Hero_Pill.png");
             }
         }
 
@@ -3206,21 +3200,21 @@ namespace Rampartbound.Editor
         {
             if (cardObj == null) return;
 
-            // 1. Oval Ground Shadow (di bawah kaki hero standee tepat di atas pelat nama)
+            // 1. Oval Ground Shadow (di bawah kaki hero standee tepat di atas teras batu)
             var shadowObj = new GameObject("GroundShadow", typeof(RectTransform), typeof(Image));
             shadowObj.transform.SetParent(cardObj.transform, false);
             var shadowRt = shadowObj.GetComponent<RectTransform>();
-            shadowRt.anchorMin = new Vector2(0.5f, 0.13f);
-            shadowRt.anchorMax = new Vector2(0.5f, 0.13f);
+            shadowRt.anchorMin = new Vector2(0.5f, 0.15f);
+            shadowRt.anchorMax = new Vector2(0.5f, 0.15f);
             shadowRt.pivot = new Vector2(0.5f, 0.5f);
-            shadowRt.sizeDelta = new Vector2(130f, 28f);
-            shadowRt.anchoredPosition = Vector2.zero;
+            shadowRt.sizeDelta = new Vector2(115f, 26f);
+            shadowRt.anchoredPosition = new Vector2(0f, 6f);
             var shadowImg = shadowObj.GetComponent<Image>();
             if (_shadowOval != null)
             {
                 shadowImg.sprite = _shadowOval;
             }
-            shadowImg.color = new Color(0.03f, 0.06f, 0.12f, 0.70f);
+            shadowImg.color = new Color(0.02f, 0.04f, 0.08f, 0.85f);
             shadowImg.raycastTarget = false;
 
             // 2. Hero Standee Portrait (Grounded tegap menapak di atas bayangan tanah & pelat nama)
@@ -3229,27 +3223,32 @@ namespace Rampartbound.Editor
                 var portraitObj = new GameObject("HeroPortrait", typeof(RectTransform), typeof(Image));
                 portraitObj.transform.SetParent(cardObj.transform, false);
                 var pRt = portraitObj.GetComponent<RectTransform>();
-                pRt.anchorMin = new Vector2(0.5f, 0.13f);
-                pRt.anchorMax = new Vector2(0.5f, 0.13f);
+                pRt.anchorMin = new Vector2(0.5f, 0.15f);
+                pRt.anchorMax = new Vector2(0.5f, 0.15f);
                 pRt.pivot = new Vector2(0.5f, 0f); // Pivot di telapak kaki hero agar menapak kokoh di teras
                 pRt.sizeDelta = new Vector2(165f, 205f);
-                pRt.anchoredPosition = Vector2.zero;
+                pRt.anchoredPosition = new Vector2(0f, 6f);
                 var img = portraitObj.GetComponent<Image>();
                 img.sprite = heroSprite;
                 img.preserveAspect = true;
                 img.raycastTarget = false;
             }
 
-            // 3. Info Badge Pill (Pill terintegrasi rapi rapat di bawah kaki pahlawan)
+            // 3. Info Badge Pill (Pill terintegrasi rapi rapat di bawah kaki pahlawan tanpa distorsi)
             var badgeObj = new GameObject("BadgePill", typeof(RectTransform), typeof(Image));
             badgeObj.transform.SetParent(cardObj.transform, false);
-            PositionUI(badgeObj, 0.02f, 0.00f, 0.98f, 0.13f);
+            var badgeRt = badgeObj.GetComponent<RectTransform>();
+            badgeRt.anchorMin = new Vector2(0.5f, 0.065f);
+            badgeRt.anchorMax = new Vector2(0.5f, 0.065f);
+            badgeRt.pivot = new Vector2(0.5f, 0.5f);
+            badgeRt.sizeDelta = new Vector2(120f, 32f);
+            badgeRt.anchoredPosition = Vector2.zero;
             var badgeImg = badgeObj.GetComponent<Image>();
             if (_badgeHeroPill != null)
             {
                 badgeImg.sprite = _badgeHeroPill;
                 badgeImg.type = Image.Type.Simple;
-                badgeImg.preserveAspect = false;
+                badgeImg.preserveAspect = true;
                 badgeImg.color = Color.white;
             }
             else
@@ -3263,10 +3262,15 @@ namespace Rampartbound.Editor
             {
                 var nameObj = new GameObject("HeroNamePlate", typeof(RectTransform), typeof(Text));
                 nameObj.transform.SetParent(cardObj.transform, false);
-                PositionUI(nameObj, 0.02f, 0.135f, 0.98f, 0.22f);
+                var nRt = nameObj.GetComponent<RectTransform>();
+                nRt.anchorMin = new Vector2(0.5f, 0.125f);
+                nRt.anchorMax = new Vector2(0.5f, 0.125f);
+                nRt.pivot = new Vector2(0.5f, 0.5f);
+                nRt.sizeDelta = new Vector2(110f, 20f);
+                nRt.anchoredPosition = Vector2.zero;
                 var nTxt = nameObj.GetComponent<Text>();
                 nTxt.text = $"<b>{heroName}</b>";
-                nTxt.fontSize = 13;
+                nTxt.fontSize = 12;
                 nTxt.fontStyle = FontStyle.Bold;
                 nTxt.alignment = TextAnchor.MiddleCenter;
                 nTxt.horizontalOverflow = HorizontalWrapMode.Overflow;
@@ -3283,16 +3287,17 @@ namespace Rampartbound.Editor
                 var rt = txtTrans.GetComponent<RectTransform>();
                 if (rt != null)
                 {
-                    rt.anchorMin = new Vector2(0.02f, 0.00f);
-                    rt.anchorMax = new Vector2(0.98f, 0.13f);
-                    rt.offsetMin = Vector2.zero;
-                    rt.offsetMax = Vector2.zero;
+                    rt.anchorMin = new Vector2(0.5f, 0.065f);
+                    rt.anchorMax = new Vector2(0.5f, 0.065f);
+                    rt.pivot = new Vector2(0.5f, 0.5f);
+                    rt.sizeDelta = new Vector2(84f, 28f);
+                    rt.anchoredPosition = new Vector2(14f, 0f);
                 }
                 var txt = txtTrans.GetComponent<Text>();
                 if (txt != null)
                 {
                     txt.alignment = TextAnchor.MiddleCenter;
-                    txt.fontSize = 12;
+                    txt.fontSize = 10;
                     txt.fontStyle = FontStyle.Bold;
                     txt.horizontalOverflow = HorizontalWrapMode.Overflow;
                     txt.verticalOverflow = VerticalWrapMode.Overflow;
@@ -3300,7 +3305,7 @@ namespace Rampartbound.Editor
                 }
                 var shadow = txtTrans.gameObject.GetComponent<Shadow>() ?? txtTrans.gameObject.AddComponent<Shadow>();
                 shadow.effectColor = new Color(0f, 0f, 0f, 0.90f);
-                shadow.effectDistance = new Vector2(1.5f, -1.5f);
+                shadow.effectDistance = new Vector2(1.0f, -1.0f);
                 txtTrans.SetAsLastSibling();
             }
         }
