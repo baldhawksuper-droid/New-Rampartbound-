@@ -60,9 +60,9 @@ namespace FantasyDefense.UI
 
         private void CacheLocalizedStrings()
         {
-            cachedBoardResolvingText = CitadelLocalizationManager.Text("⚠️ PAPAN SEDANG AKTIF!", "⚠️ BOARD IS RESOLVING!");
-            cachedArenaFullText = CitadelLocalizationManager.Text("⚠️ Arena Penuh! Gabungkan Hero!", "⚠️ Arena Full! Merge Heroes!");
-            cachedTokensMaxText = CitadelLocalizationManager.Text("⭐ Semua Token Telah Tier 5 (MAX)!", "⭐ All Tokens at Max Tier!");
+            cachedBoardResolvingText = CitadelLocalizationManager.Text("✦ PAPAN SEDANG AKTIF!", "✦ BOARD IS RESOLVING!");
+            cachedArenaFullText = CitadelLocalizationManager.Text("✦ Arena Penuh! Gabungkan Hero!", "✦ Arena Full! Merge Heroes!");
+            cachedTokensMaxText = CitadelLocalizationManager.Text("★ Semua Token Telah Tier 5 (MAX)!", "★ All Tokens at Max Tier!");
         }
 
         private void EnsureCubeVisuals()
@@ -432,7 +432,7 @@ namespace FantasyDefense.UI
                 if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
                     FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
                 {
-                    FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Light);
+                    FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Warning);
                 }
                 return;
             }

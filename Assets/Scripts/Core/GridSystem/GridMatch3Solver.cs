@@ -960,14 +960,14 @@ namespace FantasyDefense.GridSystem
                 }
                 else if (matchCount == 4)
                 {
-                    comboText = comboChain > 1 ? $"⚡ 4-MATCH MEGA MERGE x{comboChain}!" : "⚡ 4-MATCH MEGA MERGE!";
+                    comboText = comboChain > 1 ? $"4-MATCH MEGA MERGE x{comboChain}!" : "4-MATCH MEGA MERGE!";
                     txtColor = new Color(0.25f, 0.9f, 1f);
                 }
                 else
                 {
                     if (nextTier == UnitTier.Tier1)
                     {
-                        comboText = comboChain > 1 ? $"⚡ HERO AWAKENED x{comboChain}!" : "HERO AWAKENED!";
+                        comboText = comboChain > 1 ? $"HERO AWAKENED x{comboChain}!" : "HERO AWAKENED!";
                         txtColor = new Color(1f, 0.9f, 0.2f);
                     }
                     else if (nextTier == UnitTier.Tier5)
@@ -982,7 +982,7 @@ namespace FantasyDefense.GridSystem
                     }
                     else
                     {
-                        comboText = comboChain > 1 ? $"⚡ COMBO x{comboChain}!" : "TIER UP MERGE!";
+                        comboText = comboChain > 1 ? $"COMBO x{comboChain}!" : "TIER UP MERGE!";
                         txtColor = comboChain > 1 ? new Color(1f, 0.85f, 0.2f) : Color.white;
                     }
                 }
@@ -1008,7 +1008,7 @@ namespace FantasyDefense.GridSystem
                 FantasyDefense.Core.GameManager.Instance.AddTacticalMoves(bonusMoves);
                 if (SkillVfxManager.Instance != null && promotedUnit != null)
                 {
-                    string bonusText = bonusMoves > 1 ? $"⚡ +{bonusMoves} LANGKAH TAKTIS!" : "⚡ +1 LANGKAH TAKTIS!";
+                    string bonusText = bonusMoves > 1 ? $"+{bonusMoves} LANGKAH TAKTIS!" : "+1 LANGKAH TAKTIS!";
                     SkillVfxManager.Instance.SpawnFloatingText(promotedUnit.transform.position + Vector3.up * 1.15f, bonusText, new Color(1f, 0.95f, 0.2f), 1.6f, true);
                 }
             }

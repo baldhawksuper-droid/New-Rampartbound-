@@ -1967,8 +1967,8 @@ namespace FantasyDefense.UI
             {
                 int currentEnergy = CitadelLobbyManager.Instance.CurrentEnergy;
                 string toastMsg = FantasyDefense.Localization.CitadelLocalizationManager.Text(
-                    $"⚡ Stamina Tidak Cukup!\nMembutuhkan 5 Stamina untuk bertempur. (Tersedia: {currentEnergy})",
-                    $"⚡ Not Enough Energy!\nRequires 5 Stamina to commence defense. (Available: {currentEnergy})"
+                    $"Stamina Tidak Cukup!\nMembutuhkan 5 Stamina untuk bertempur. (Tersedia: {currentEnergy})",
+                    $"Not Enough Energy!\nRequires 5 Stamina to commence defense. (Available: {currentEnergy})"
                 );
                 string btnLabel = FantasyDefense.Localization.CitadelLocalizationManager.Text("💎 BUKA TOKO (REFILL)", "💎 OPEN STORE (REFILL)");
                 CitadelToastNotice.ShowWithAction(toastMsg, btnLabel, () => {
