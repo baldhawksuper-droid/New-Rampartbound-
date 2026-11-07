@@ -53,7 +53,9 @@ jobs:
             /usr/local/share/powershell /usr/local/share/chromium \
             /usr/local/.ghcup /usr/lib/jvm
           docker system prune --all --force --volumes || true
-          # Configure 10GB swap to prevent Linux OOM-killer (exit code 137) during Unity WebGL compilation
+          # Disable existing active swap (which causes "Text file busy"), then create clean 10GB swap
+          sudo swapoff -a || true
+          sudo rm -f /swapfile || true
           sudo fallocate -l 10G /swapfile || sudo dd if=/dev/zero of=/swapfile bs=1M count=10240
           sudo chmod 600 /swapfile
           sudo mkswap /swapfile
