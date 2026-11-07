@@ -161,16 +161,22 @@ namespace FantasyDefense.Combat
                 {
                     float time = (Time.time + seed) * breatheSpeed;
                     float scaleModY = 1.0f + Mathf.Sin(time) * breatheAmplitude;
-                    float scaleModX = 1.0f - Mathf.Sin(time) * (breatheAmplitude * 0.35f);
 
-                    transform.localScale = new Vector3(baseScale.x * scaleModX, baseScale.y * scaleModY, baseScale.z);
+                    // ARAHAN BAKU: "pastikan jika hero bernafas jangan smua nya bobbing tp kaki nya tidsk perlu"
+                    // 1. Kunci scale X tetap solid (1.0f) agar telapak kaki tidak melebar/menyempit di tanah (zero lateral slipping).
+                    // 2. Hitung kompensasi jangkar bawah presisi berdasarkan tinggi aktual sprite:
+                    //    Tinggi sprite separuh (half-height) dikalikan pertambahan skala Y dipindahkan persis ke atas.
+                    //    Hasilnya: Titik terendah telapak kaki hero 100% DIAM menapak (Ground-Locked),
+                    //    dan hanya dada/kepala/bahu yang bergerak naik-turun halus saat bernafas.
+                    float spriteHalfHeight = 0.5f;
+                    if (spriteRenderer != null && spriteRenderer.sprite != null)
+                    {
+                        spriteHalfHeight = (spriteRenderer.sprite.rect.height / spriteRenderer.sprite.pixelsPerUnit) * 0.5f;
+                    }
 
-                    // Kompensasi jangkar kaki:
-                    // Karena pivot sprite berada di tengah, ekspansi tinggi Y akan mendorong kepala ke atas dan kaki ke bawah.
-                    // Untuk mengunci posisi telapak kaki agar 100% diam menapak di atas plinth (grounded),
-                    // kita angkat posisi Y sebesar setengah dari pertambahan tinggi dada.
-                    float footAnchorCompensation = (scaleModY - 1.0f) * (baseScale.y * 0.48f);
-                    transform.localPosition = anchorLocalPos + new Vector3(0f, footAnchorCompensation, 0f);
+                    float footCompensation = (scaleModY - 1.0f) * (baseScale.y * spriteHalfHeight);
+                    transform.localScale = new Vector3(baseScale.x, baseScale.y * scaleModY, baseScale.z);
+                    transform.localPosition = anchorLocalPos + new Vector3(0f, footCompensation, 0f);
                     transform.localRotation = Quaternion.identity;
                 }
                 yield return null;

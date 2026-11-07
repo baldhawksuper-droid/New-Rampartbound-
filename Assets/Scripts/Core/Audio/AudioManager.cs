@@ -112,6 +112,7 @@ namespace FantasyDefense.Audio
         [Range(0f, 1f)] [SerializeField] private float masterVolume = 1.0f;
         [Range(0f, 1f)] [SerializeField] private float bgmVolume = 0.75f;
         [Range(0f, 1f)] [SerializeField] private float sfxVolume = 0.85f;
+        [SerializeField] private bool isMasterMuted = false;
         [SerializeField] private bool isBgmMuted = false;
         [SerializeField] private bool isSfxMuted = false;
 
@@ -121,6 +122,7 @@ namespace FantasyDefense.Audio
         public float MasterVolume => masterVolume;
         public float BgmVolume => bgmVolume;
         public float SfxVolume => sfxVolume;
+        public bool IsMasterMuted => isMasterMuted;
         public bool IsBgmMuted => isBgmMuted;
         public bool IsSfxMuted => isSfxMuted;
         public BgmTrack CurrentBgmTrack => currentBgmTrack;
@@ -244,7 +246,7 @@ namespace FantasyDefense.Audio
 
         public void PlaySound(SoundType type, float pitchOverride = 1.0f)
         {
-            if (isSfxMuted || sfxSources.Count == 0) return;
+            if (isMasterMuted || isSfxMuted || sfxSources.Count == 0) return;
 
             // Anti-clipping & concurrency throttling: cegah tumpukan suara identik dalam hitungan frame (0.032s)
             float now = Time.unscaledTime;
@@ -536,22 +538,40 @@ namespace FantasyDefense.Audio
             OnVolumeChanged?.Invoke(masterVolume, bgmVolume, sfxVolume);
         }
 
+        public void ToggleMuteMaster()
+        {
+            isMasterMuted = !isMasterMuted;
+            UpdateVolumes();
+            OnVolumeChanged?.Invoke(masterVolume, bgmVolume, sfxVolume);
+        }
+
         public void ToggleMuteBgm()
         {
             isBgmMuted = !isBgmMuted;
             UpdateVolumes();
+            OnVolumeChanged?.Invoke(masterVolume, bgmVolume, sfxVolume);
         }
 
         public void ToggleMuteSfx()
         {
             isSfxMuted = !isSfxMuted;
+            UpdateVolumes();
+            OnVolumeChanged?.Invoke(masterVolume, bgmVolume, sfxVolume);
         }
 
         private void UpdateVolumes()
         {
+            float effectiveMaster = isMasterMuted ? 0f : masterVolume;
             if (bgmSource != null)
             {
-                bgmSource.volume = isBgmMuted ? 0f : (bgmVolume * masterVolume);
+                bgmSource.volume = (isBgmMuted || isMasterMuted) ? 0f : (bgmVolume * effectiveMaster);
+            }
+            if (isMasterMuted || isSfxMuted)
+            {
+                foreach (var s in sfxSources)
+                {
+                    if (s != null && s.isPlaying) s.volume = 0f;
+                }
             }
         }
 

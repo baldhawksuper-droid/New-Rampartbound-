@@ -27,8 +27,13 @@ namespace FantasyDefense.UI
         [SerializeField] private Text sfxPercentText;
 
         [Header("Mute Toggles")]
+        [SerializeField] private Toggle masterMuteToggle;
         [SerializeField] private Toggle bgmMuteToggle;
         [SerializeField] private Toggle sfxMuteToggle;
+
+        [Header("Audio Mute Icons")]
+        private Sprite iconSpeaker;
+        private Sprite iconMute;
 
         [Header("Mobile Device Performance Controls")]
         [SerializeField] private Button fps30Button;
@@ -97,14 +102,18 @@ namespace FantasyDefense.UI
                 }
             }
 
+            iconSpeaker = Resources.Load<Sprite>("Sprites/UI/UI_Icon_Audio_Speaker");
+            iconMute = Resources.Load<Sprite>("Sprites/UI/UI_Icon_Audio_Mute");
+
             // Apply tactile 2.5D styling to volume sliders
             ApplySliderStyling(masterSlider, sliderTrack, sliderFill, sliderHandle);
             ApplySliderStyling(bgmSlider, sliderTrack, sliderFill, sliderHandle);
             ApplySliderStyling(sfxSlider, sliderTrack, sliderFill, sliderHandle);
 
-            // Apply tactile 2.5D styling to toggles
-            ApplyToggleStyling(bgmMuteToggle, toggleBase, toggleKnob);
-            ApplyToggleStyling(sfxMuteToggle, toggleBase, toggleKnob);
+            // Apply tactile 2.5D styling to mute buttons & toggles
+            ApplyMuteToggleStyling(masterMuteToggle, masterSlider);
+            ApplyMuteToggleStyling(bgmMuteToggle, bgmSlider);
+            ApplyMuteToggleStyling(sfxMuteToggle, sfxSlider);
             ApplyToggleStyling(batterySaverToggle, toggleBase, toggleKnob);
             ApplyToggleStyling(hapticFeedbackToggle, toggleBase, toggleKnob);
         }
@@ -150,6 +159,72 @@ namespace FantasyDefense.UI
                 if (slider.handleRect.GetComponent<UISliderHandleJuice>() == null)
                 {
                     slider.handleRect.gameObject.AddComponent<UISliderHandleJuice>();
+                }
+            }
+        }
+
+        private void ApplyMuteToggleStyling(Toggle toggle, Slider associatedSlider)
+        {
+            if (toggle == null) return;
+
+            // Bersihkan teks raw "Mute" agar tidak terjadi overlapping visual pada tombol icon
+            var lbl = toggle.GetComponentInChildren<Text>();
+            if (lbl != null) lbl.text = "";
+
+            var checkTransform = toggle.transform.Find("Background/Checkmark") ?? toggle.transform.Find("Checkmark");
+            if (checkTransform != null)
+            {
+                var checkImg = checkTransform.GetComponent<Image>();
+                if (checkImg != null)
+                {
+                    checkImg.type = Image.Type.Simple;
+                    checkImg.preserveAspect = true;
+                    if (iconMute != null && iconSpeaker != null)
+                    {
+                        checkImg.sprite = toggle.isOn ? iconMute : iconSpeaker;
+                    }
+                    checkImg.color = Color.white;
+                }
+            }
+
+            if (associatedSlider != null && associatedSlider.fillRect != null)
+            {
+                var fillImg = associatedSlider.fillRect.GetComponent<Image>();
+                if (fillImg != null)
+                {
+                    fillImg.color = toggle.isOn ? new Color(0.35f, 0.45f, 0.55f, 0.40f) : Color.white;
+                }
+            }
+        }
+
+        private void UpdateMuteVisuals()
+        {
+            UpdateMuteToggleState(masterMuteToggle, masterSlider, AudioManager.Instance != null && AudioManager.Instance.IsMasterMuted);
+            UpdateMuteToggleState(bgmMuteToggle, bgmSlider, AudioManager.Instance != null && (AudioManager.Instance.IsBgmMuted || AudioManager.Instance.IsMasterMuted));
+            UpdateMuteToggleState(sfxMuteToggle, sfxSlider, AudioManager.Instance != null && (AudioManager.Instance.IsSfxMuted || AudioManager.Instance.IsMasterMuted));
+        }
+
+        private void UpdateMuteToggleState(Toggle toggle, Slider slider, bool isMuted)
+        {
+            if (toggle != null)
+            {
+                var checkTransform = toggle.transform.Find("Background/Checkmark") ?? toggle.transform.Find("Checkmark");
+                if (checkTransform != null)
+                {
+                    var checkImg = checkTransform.GetComponent<Image>();
+                    if (checkImg != null && iconMute != null && iconSpeaker != null)
+                    {
+                        checkImg.sprite = isMuted ? iconMute : iconSpeaker;
+                    }
+                }
+            }
+
+            if (slider != null && slider.fillRect != null)
+            {
+                var fillImg = slider.fillRect.GetComponent<Image>();
+                if (fillImg != null)
+                {
+                    fillImg.color = isMuted ? new Color(0.35f, 0.45f, 0.55f, 0.40f) : Color.white;
                 }
             }
         }
@@ -228,6 +303,9 @@ namespace FantasyDefense.UI
 
             if (sfxSlider != null)
                 sfxSlider.onValueChanged.AddListener(OnSfxSliderChanged);
+
+            if (masterMuteToggle != null)
+                masterMuteToggle.onValueChanged.AddListener(OnMasterMuteToggleChanged);
 
             if (bgmMuteToggle != null)
                 bgmMuteToggle.onValueChanged.AddListener(OnBgmMuteToggleChanged);
@@ -433,9 +511,11 @@ namespace FantasyDefense.UI
             if (bgmSlider != null) bgmSlider.value = bgm;
             if (sfxSlider != null) sfxSlider.value = sfx;
 
+            if (masterMuteToggle != null) masterMuteToggle.isOn = AudioManager.Instance.IsMasterMuted;
             if (bgmMuteToggle != null) bgmMuteToggle.isOn = AudioManager.Instance.IsBgmMuted;
             if (sfxMuteToggle != null) sfxMuteToggle.isOn = AudioManager.Instance.IsSfxMuted;
 
+            UpdateMuteVisuals();
             UpdatePercentLabels(master, bgm, sfx);
         }
 
@@ -584,12 +664,22 @@ namespace FantasyDefense.UI
             }
         }
 
+        private void OnMasterMuteToggleChanged(bool isMuted)
+        {
+            if (AudioManager.Instance != null && AudioManager.Instance.IsMasterMuted != isMuted)
+            {
+                AudioManager.Instance.ToggleMuteMaster();
+            }
+            UpdateMuteVisuals();
+        }
+
         private void OnBgmMuteToggleChanged(bool isMuted)
         {
             if (AudioManager.Instance != null && AudioManager.Instance.IsBgmMuted != isMuted)
             {
                 AudioManager.Instance.ToggleMuteBgm();
             }
+            UpdateMuteVisuals();
         }
 
         private void OnSfxMuteToggleChanged(bool isMuted)
@@ -598,6 +688,7 @@ namespace FantasyDefense.UI
             {
                 AudioManager.Instance.ToggleMuteSfx();
             }
+            UpdateMuteVisuals();
         }
 
         private int _testSfxCounter = 0;

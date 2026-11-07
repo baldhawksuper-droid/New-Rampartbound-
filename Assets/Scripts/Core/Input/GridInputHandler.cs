@@ -21,8 +21,8 @@ namespace FantasyDefense.GridSystem
         public static GridInputHandler Instance { get; private set; }
 
         [Header("Swipe Tuning")]
-        [Tooltip("Ambang batas jarak sapuan jari (dalam rasio cellSize, misal 0.3 * cellSize)")]
-        [SerializeField] private float swipeThresholdRatio = 0.3f;
+        [Tooltip("Ambang batas jarak sapuan jari (dalam rasio cellSize, misal 0.18 * cellSize untuk responsivitas sentuhan mobile)")]
+        [SerializeField] private float swipeThresholdRatio = 0.18f;
 
         [Tooltip("Durasi animasi pertukaran posisi (tween swap) dalam detik")]
         [SerializeField] private float swapDuration = 0.12f;
@@ -132,8 +132,8 @@ namespace FantasyDefense.GridSystem
             {
                 if (result.gameObject == null) continue;
 
-                // Hanya blokir jika raycast mengenai elemen Canvas UI (GraphicRaycaster)
-                // JANGAN blokir jika hasil raycast berasal dari Physics2DRaycaster pada objek dunia 2D!
+                // Hanya blokir jika raycast mengenai kontrol interaktif nyata (Tombol, Slider, Toggle, ScrollRect)
+                // atau modal popup aktif. JANGAN blokir jika hanya mengenai panel latar belakang dekoratif canvas!
                 if (result.module is UnityEngine.UI.GraphicRaycaster)
                 {
                     var selectable = result.gameObject.GetComponentInParent<UnityEngine.UI.Selectable>();
@@ -142,11 +142,10 @@ namespace FantasyDefense.GridSystem
                         return true;
                     }
 
-                    var graphic = result.gameObject.GetComponent<UnityEngine.UI.Graphic>();
-                    if (graphic != null && graphic.raycastTarget)
+                    // Blokir jika berada di dalam modal overlay (Settings, Pause, Gacha, Result Dialog)
+                    string objName = result.gameObject.name;
+                    if (objName.Contains("Settings") || objName.Contains("Pause") || objName.Contains("Modal") || objName.Contains("Popup") || objName.Contains("LogConsole"))
                     {
-                        // Abaikan gambar transparan penuh
-                        if (graphic is UnityEngine.UI.Image img && img.color.a <= 0.01f) continue;
                         return true;
                     }
                 }

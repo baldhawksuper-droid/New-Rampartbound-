@@ -2767,23 +2767,25 @@ namespace Rampartbound.Editor
             var setContent = settingsPanel.transform.Find("ContentContainer") ?? settingsPanel.transform;
 
             var mSlider = CreateSlider(setContent, "MasterSlider", 0, 1, 1);
-            PositionUI(mSlider, 0.35f, 0.85f, 0.78f, 0.93f);
+            PositionUI(mSlider, 0.33f, 0.85f, 0.80f, 0.93f);
             var mTxt = CreateText(setContent, "MasterPercentText", "Master: 100%", 20, FontStyle.Normal, TextAnchor.MiddleLeft, Color.white, defaultFont);
-            PositionUI(mTxt.gameObject, 0.05f, 0.85f, 0.33f, 0.93f);
+            PositionUI(mTxt.gameObject, 0.05f, 0.85f, 0.31f, 0.93f);
+            var mMute = CreateMuteToggle(setContent, "MasterMuteToggle", false);
+            PositionUI(mMute, 0.83f, 0.85f, 0.96f, 0.93f);
 
             var bgmSlider = CreateSlider(setContent, "BgmSlider", 0, 1, 1);
-            PositionUI(bgmSlider, 0.35f, 0.74f, 0.78f, 0.82f);
+            PositionUI(bgmSlider, 0.33f, 0.74f, 0.80f, 0.82f);
             var bgmTxt = CreateText(setContent, "BgmPercentText", "BGM: 100%", 20, FontStyle.Normal, TextAnchor.MiddleLeft, Color.white, defaultFont);
-            PositionUI(bgmTxt.gameObject, 0.05f, 0.74f, 0.33f, 0.82f);
-            var bgmMute = CreateToggle(setContent, "BgmMuteToggle", "Mute", false, defaultFont);
-            PositionUI(bgmMute, 0.80f, 0.74f, 0.98f, 0.82f);
+            PositionUI(bgmTxt.gameObject, 0.05f, 0.74f, 0.31f, 0.82f);
+            var bgmMute = CreateMuteToggle(setContent, "BgmMuteToggle", false);
+            PositionUI(bgmMute, 0.83f, 0.74f, 0.96f, 0.82f);
 
             var sfxSlider = CreateSlider(setContent, "SfxSlider", 0, 1, 1);
-            PositionUI(sfxSlider, 0.35f, 0.63f, 0.78f, 0.71f);
+            PositionUI(sfxSlider, 0.33f, 0.63f, 0.80f, 0.71f);
             var sfxTxt = CreateText(setContent, "SfxPercentText", "SFX: 100%", 20, FontStyle.Normal, TextAnchor.MiddleLeft, Color.white, defaultFont);
-            PositionUI(sfxTxt.gameObject, 0.05f, 0.63f, 0.33f, 0.71f);
-            var sfxMute = CreateToggle(setContent, "SfxMuteToggle", "Mute", false, defaultFont);
-            PositionUI(sfxMute, 0.80f, 0.63f, 0.98f, 0.71f);
+            PositionUI(sfxTxt.gameObject, 0.05f, 0.63f, 0.31f, 0.71f);
+            var sfxMute = CreateMuteToggle(setContent, "SfxMuteToggle", false);
+            PositionUI(sfxMute, 0.83f, 0.63f, 0.96f, 0.71f);
 
             var fps30 = CreateButton(setContent, "Fps30Btn", "30 FPS", new Color(0.2f, 0.3f, 0.45f), Color.white, 20, defaultFont);
             if (_btnSecondaryStone != null)
@@ -2851,11 +2853,12 @@ namespace Rampartbound.Editor
             settingsSO.FindProperty("closeButton").objectReferenceValue = FindCloseButton(settingsPanel);
             settingsSO.FindProperty("masterSlider").objectReferenceValue = mSlider.GetComponent<Slider>();
             settingsSO.FindProperty("masterPercentText").objectReferenceValue = mTxt;
+            settingsSO.FindProperty("masterMuteToggle").objectReferenceValue = mMute.GetComponent<Toggle>();
             settingsSO.FindProperty("bgmSlider").objectReferenceValue = bgmSlider.GetComponent<Slider>();
             settingsSO.FindProperty("bgmPercentText").objectReferenceValue = bgmTxt;
+            settingsSO.FindProperty("bgmMuteToggle").objectReferenceValue = bgmMute.GetComponent<Toggle>();
             settingsSO.FindProperty("sfxSlider").objectReferenceValue = sfxSlider.GetComponent<Slider>();
             settingsSO.FindProperty("sfxPercentText").objectReferenceValue = sfxTxt;
-            settingsSO.FindProperty("bgmMuteToggle").objectReferenceValue = bgmMute.GetComponent<Toggle>();
             settingsSO.FindProperty("sfxMuteToggle").objectReferenceValue = sfxMute.GetComponent<Toggle>();
             settingsSO.FindProperty("fps30Button").objectReferenceValue = fps30.GetComponent<Button>();
             settingsSO.FindProperty("fps60Button").objectReferenceValue = fps60.GetComponent<Button>();
@@ -3091,6 +3094,8 @@ namespace Rampartbound.Editor
         private static Sprite _slotIconRelic;
         private static Sprite _tabHeroActive;
         private static Sprite _tabHeroInactive;
+        private static Sprite _iconAudioSpeaker;
+        private static Sprite _iconAudioMute;
         private static Sprite _tabActivePodium;
         private static Sprite _iconCrossedSwords;
         private static Sprite _decorGoldDiamond;
@@ -3171,6 +3176,8 @@ namespace Rampartbound.Editor
             }
             if (_iconCrossedSwords == null) _iconCrossedSwords = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Crossed_Swords.png");
             if (_decorGoldDiamond == null) _decorGoldDiamond = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Decor_Gold_Diamond.png");
+            if (_iconAudioSpeaker == null) _iconAudioSpeaker = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Audio_Speaker.png");
+            if (_iconAudioMute == null) _iconAudioMute = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Icon_Audio_Mute.png");
             if (_badgeHeroPill == null)
             {
                 _badgeHeroPill = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/UI/UI_Frame_Hero_Stat_Pill.png")
@@ -3803,6 +3810,42 @@ namespace Rampartbound.Editor
 
             var lbl = CreateText(toggleObj.transform, "Label", label, 20, FontStyle.Normal, TextAnchor.MiddleLeft, Color.white, font);
             PositionUI(lbl.gameObject, 0.25f, 0f, 1f, 1f);
+
+            return toggleObj;
+        }
+
+        private static GameObject CreateMuteToggle(Transform parent, string name, bool isOn)
+        {
+            LoadUISprites();
+            var toggleObj = new GameObject(name, typeof(RectTransform), typeof(Toggle));
+            toggleObj.transform.SetParent(parent, false);
+            var toggle = toggleObj.GetComponent<Toggle>();
+            toggle.isOn = isOn;
+
+            var bg = new GameObject("Background", typeof(RectTransform), typeof(Image));
+            bg.transform.SetParent(toggleObj.transform, false);
+            PositionUI(bg, 0f, 0f, 1f, 1f);
+            var bgImg = bg.GetComponent<Image>();
+            if (_btnSecondaryStone != null)
+            {
+                bgImg.sprite = _btnSecondaryStone;
+                bgImg.type = Image.Type.Sliced;
+                bgImg.color = Color.white;
+            }
+            else
+            {
+                bgImg.color = new Color(0.18f, 0.22f, 0.32f, 0.85f);
+            }
+
+            var check = new GameObject("Checkmark", typeof(RectTransform), typeof(Image));
+            check.transform.SetParent(bg.transform, false);
+            PositionUI(check, 0.12f, 0.12f, 0.88f, 0.88f);
+            var cImg = check.GetComponent<Image>();
+            cImg.sprite = isOn ? _iconAudioMute : _iconAudioSpeaker;
+            cImg.type = Image.Type.Simple;
+            cImg.preserveAspect = true;
+            cImg.color = Color.white;
+            toggle.graphic = cImg;
 
             return toggleObj;
         }
