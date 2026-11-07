@@ -881,6 +881,11 @@ namespace FantasyDefense.Combat
                 Destroy(bountyHintObj);
             }
 
+            if (statusBadgeObj != null)
+            {
+                Destroy(statusBadgeObj);
+            }
+
             // Segera hapus dari daftar monster aktif agar sinkronisasi jumlah musuh akurat seketika
             ActiveMonsters.Remove(this);
 
@@ -933,6 +938,9 @@ namespace FantasyDefense.Combat
             return baseCol;
         }
 
+        protected GameObject statusBadgeObj;
+        protected TextMesh statusBadgeTxt;
+
         protected void UpdateEffectiveVisualState()
         {
             if (spriteRenderer == null || isDead) return;
@@ -953,6 +961,74 @@ namespace FantasyDefense.Combat
             {
                 spriteRenderer.color = GetEffectiveThemeColor();
             }
+
+            UpdateStatusIndicatorBadge();
+        }
+
+        protected virtual void UpdateStatusIndicatorBadge()
+        {
+            if (isDead)
+            {
+                if (statusBadgeObj != null) statusBadgeObj.SetActive(false);
+                return;
+            }
+
+            bool hasStatus = isStunned || isSlowed || isBurned;
+            if (!hasStatus)
+            {
+                if (statusBadgeObj != null && statusBadgeObj.activeSelf)
+                {
+                    statusBadgeObj.SetActive(false);
+                }
+                return;
+            }
+
+            if (statusBadgeObj == null)
+            {
+                statusBadgeObj = new GameObject("StatusEffectBadge");
+                statusBadgeObj.transform.SetParent(transform, false);
+
+                float invScaleX = 1f / Mathf.Max(0.01f, baseScale.x);
+                float invScaleY = 1f / Mathf.Max(0.01f, baseScale.y);
+                statusBadgeObj.transform.localScale = new Vector3(invScaleX, invScaleY, 1f);
+
+                float headOffset = (spriteRenderer != null && spriteRenderer.sprite != null)
+                    ? (spriteRenderer.sprite.bounds.extents.y * baseScale.y + 0.26f)
+                    : 0.50f;
+                statusBadgeObj.transform.localPosition = new Vector3(0f, headOffset * invScaleY, 0f);
+
+                statusBadgeTxt = statusBadgeObj.AddComponent<TextMesh>();
+                statusBadgeTxt.fontSize = 20;
+                statusBadgeTxt.characterSize = 0.05f;
+                statusBadgeTxt.anchor = TextAnchor.MiddleCenter;
+                statusBadgeTxt.alignment = TextAlignment.Center;
+                statusBadgeTxt.fontStyle = FontStyle.Bold;
+
+                var mr = statusBadgeObj.GetComponent<MeshRenderer>();
+                if (mr != null)
+                {
+                    mr.sortingLayerName = "UI";
+                    mr.sortingOrder = 365;
+                }
+            }
+
+            if (isStunned)
+            {
+                statusBadgeTxt.text = "💫 STUN";
+                statusBadgeTxt.color = new Color(1.0f, 0.88f, 0.25f, 1f);
+            }
+            else if (isSlowed)
+            {
+                statusBadgeTxt.text = "❄️ SLOW";
+                statusBadgeTxt.color = new Color(0.35f, 0.90f, 1.0f, 1f);
+            }
+            else if (isBurned)
+            {
+                statusBadgeTxt.text = "🔥 BURN";
+                statusBadgeTxt.color = new Color(1.0f, 0.45f, 0.15f, 1f);
+            }
+
+            statusBadgeObj.SetActive(true);
         }
 
         public void ApplyStun(float duration)

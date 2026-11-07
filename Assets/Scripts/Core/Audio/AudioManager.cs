@@ -252,11 +252,26 @@ namespace FantasyDefense.Audio
         {
             if (isMasterMuted || isSfxMuted || sfxSources.Count == 0) return;
 
-            // Anti-clipping & concurrency throttling: cegah tumpukan suara identik dalam hitungan frame (0.032s)
+            float speedFactor = Time.timeScale;
+
+            // Anti-clipping & concurrency throttling adaptif terhadap kecepatan game (1x, 2x, 3x)
+            float minInterval = 0.032f;
+            if (speedFactor >= 1.8f)
+            {
+                // Pada mode cepat (2x/3x), proyektil dan benturan frekuensi tinggi datang lebih rapat.
+                // Tingkatkan interval throttling khusus audio impak cepat agar tidak terjadi penumpukan suara (audio mud/clipping).
+                if (type == SoundType.ArrowShot || type == SoundType.MagicSpark || 
+                    type == SoundType.SlimeSquishImpact || type == SoundType.GoblinBucklerClank ||
+                    type == SoundType.Slash || type == SoundType.DualSlash)
+                {
+                    minInterval = speedFactor >= 2.5f ? 0.065f : 0.050f;
+                }
+            }
+
             float now = Time.unscaledTime;
             if (lastPlayTimeBySound.TryGetValue(type, out float lastTime))
             {
-                if (now - lastTime < 0.032f) return;
+                if (now - lastTime < minInterval) return;
             }
             lastPlayTimeBySound[type] = now;
 
@@ -268,7 +283,6 @@ namespace FantasyDefense.Audio
             sfxPlayCounter++;
 
             // Kalibrasi Volume Balancing adaptif terhadap kecepatan game (1x, 2x, 3x)
-            float speedFactor = Time.timeScale;
             float speedVolumeDamping = 1.0f;
             if (speedFactor >= 2.5f)
             {
@@ -292,8 +306,9 @@ namespace FantasyDefense.Audio
             }
             else if (speedFactor >= 2.0f)
             {
-                float rhythmicStep = (sfxPlayCounter % 3 - 1) * 0.04f;
-                pitchJitter = Random.Range(0.92f, 1.10f) + rhythmicStep;
+                // Batasi deviasi nada agar suara impak tetap musikal dan tidak cempreng/distorsi
+                float rhythmicStep = (sfxPlayCounter % 3 - 1) * 0.025f;
+                pitchJitter = Random.Range(0.95f, 1.06f) + rhythmicStep;
             }
             else
             {

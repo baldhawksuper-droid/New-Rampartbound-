@@ -450,6 +450,9 @@ namespace FantasyDefense.Combat
             float castDuration = 0.38f;
             float elapsed = 0f;
 
+            // Kunci sorting layer hero dan child pedestal/shadow di atas unit lain saat cast mantra
+            unitController?.SetAttackingState(true);
+
             // Flash warna aura skill
             if (spriteRenderer != null)
                 spriteRenderer.color = auraColor;
@@ -462,6 +465,10 @@ namespace FantasyDefense.Combat
 
                 transform.position = Vector3.Lerp(anchorPos, hoverPos, hoverProgress);
                 transform.localScale = baseScale * (1f + hoverProgress * 0.28f);
+
+                // Sinkronisasi bayangan tanah: menyusut secara proporsional mengikuti elevasi melayang
+                unitController?.SetShadowElevation(hoverProgress * 0.25f);
+
                 yield return null;
             }
 
@@ -476,6 +483,8 @@ namespace FantasyDefense.Combat
 
             transform.position = anchorPos;
             transform.localScale = baseScale;
+            unitController?.SetShadowElevation(0f);
+            unitController?.SetAttackingState(false);
             StartIdleAnimation();
         }
 
