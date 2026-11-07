@@ -860,6 +860,7 @@ namespace FantasyDefense.GridSystem
             float convergeDur = 0.16f;
             float elapsed = 0f;
             var startPositions = new Dictionary<UnitController, Vector3>();
+            Vector3 promotedBaseScale = promotedUnit.transform.localScale;
             foreach (var absorbed in cluster.absorbedUnits)
             {
                 if (absorbed != null)
@@ -877,6 +878,13 @@ namespace FantasyDefense.GridSystem
                 elapsed += Time.deltaTime;
                 float t = Mathf.Clamp01(elapsed / convergeDur);
                 float easeT = t * t; // Percepatan konvergensi
+
+                // Anticipation pulse pada unit penerima (kompresi taktil 0.92x lalu bersiap memantul)
+                if (promotedUnit != null)
+                {
+                    float compScale = 1.0f - 0.08f * Mathf.Sin(t * Mathf.PI);
+                    promotedUnit.transform.localScale = promotedBaseScale * compScale;
+                }
 
                 foreach (var absorbed in cluster.absorbedUnits)
                 {
@@ -927,6 +935,28 @@ namespace FantasyDefense.GridSystem
             {
                 float pitch = Mathf.Clamp(1.0f + (comboChain - 1) * 0.15f + (matchCount - 3) * 0.1f, 1.0f, 2.3f);
                 AudioManager.Instance.PlaySound(SoundType.MergeSuccess, pitch);
+            }
+
+            // Screen Shake Feedback (Sensasi Hantaman Fusi Taktis)
+            if (FantasyDefense.Core.MobileCameraAdapter.Instance != null)
+            {
+                float shakeDur = (cluster.isIntersection || matchCount >= 5 || nextTier >= UnitTier.Tier4) ? 0.26f : (nextTier == UnitTier.Tier3 || comboChain > 1 ? 0.18f : 0.12f);
+                float shakeMag = (cluster.isIntersection || matchCount >= 5 || nextTier >= UnitTier.Tier4) ? 0.20f : (nextTier == UnitTier.Tier3 || comboChain > 1 ? 0.13f : 0.08f);
+                FantasyDefense.Core.MobileCameraAdapter.Instance.TriggerScreenShake(shakeDur, shakeMag);
+            }
+
+            // Procedural Particle Burst sesuai Tier hasil fusi
+            if (SkillVfxManager.Instance != null && promotedUnit != null)
+            {
+                Color vfxColor = nextTier switch
+                {
+                    UnitTier.Tier5 => new Color(1f, 0.95f, 0.4f, 1f),
+                    UnitTier.Tier4 => new Color(0.85f, 0.35f, 1f, 1f),
+                    UnitTier.Tier3 => new Color(1f, 0.85f, 0.2f, 1f),
+                    UnitTier.Tier2 => new Color(0.35f, 0.85f, 1f, 1f),
+                    _ => new Color(1f, 1f, 1f, 1f)
+                };
+                SkillVfxManager.Instance.SpawnProceduralParticleBurst(promotedUnit.transform.position, vfxColor, Color.white, cluster.isIntersection ? 24 : 16, 2.2f, 540);
             }
 
             // Haptic Feedback Tactile Pulse

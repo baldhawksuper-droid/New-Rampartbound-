@@ -349,16 +349,31 @@ namespace FantasyDefense.Core
                 GridSystem.GridMatch3Solver.Instance.ResetResolvingState();
             }
 
-            // Mainkan audio alert transisi tempur
+            // Mainkan audio alert transisi tempur berbobot
             if (Audio.AudioManager.Instance != null)
             {
-                Audio.AudioManager.Instance.PlaySound(Audio.SoundType.WaveIncoming);
+                Audio.AudioManager.Instance.PlaySound(Audio.SoundType.ModeSwitchWhoosh, 0.90f);
+                Audio.AudioManager.Instance.PlaySound(Audio.SoundType.WaveIncoming, 1.15f);
             }
 
-            // Beritahu HUD / VFX bahwa mode tempur dimulai
+            // Screen Shake dramatis saat transisi mode tempur
+            if (MobileCameraAdapter.Instance != null)
+            {
+                MobileCameraAdapter.Instance.TriggerScreenShake(0.38f, 0.22f, 0.45f);
+            }
+
+            // Haptic feedback getaran perang
+            if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
+            {
+                FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(FantasyDefense.Mobile.HapticFeedbackType.Heavy);
+            }
+
+            // Beritahu HUD / VFX bahwa mode tempur dimulai (tanpa missing Unicode glyph)
             if (Combat.SkillVfxManager.Instance != null)
             {
-                Combat.SkillVfxManager.Instance.SpawnFloatingText(new Vector3(0f, 1.0f, 0f), "⚔️ PERTAHANAN DIMULAI!", new Color(1f, 0.85f, 0.2f), 1.8f, true);
+                Combat.SkillVfxManager.Instance.SpawnFloatingText(new Vector3(0f, 1.0f, 0f), "✦ BATTLE PHASE ACTIVATED! ✦", new Color(1f, 0.88f, 0.2f), 2.0f, true);
+                Combat.SkillVfxManager.Instance.SpawnProceduralParticleBurst(Vector3.up * 0.5f, new Color(1f, 0.80f, 0.2f, 1f), new Color(1f, 0.35f, 0.1f, 1f), 26, 2.6f, 550);
             }
 
             // ATURAN RESMI: Permata mentah (Tier 0) larut halus menjadi lahan kosong,
