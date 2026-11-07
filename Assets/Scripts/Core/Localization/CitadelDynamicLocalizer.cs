@@ -73,8 +73,6 @@ namespace FantasyDefense.Localization
 
             // Sub-Panel Headers & Navigation Tabs
             { "PETA DUNIA & SELEKSI STAGE", "WORLD MAP & STAGE SELECTION" },
-            { "MANAJEMEN & UPGRADE PAHLAWAN", "HERO ROSTER & UPGRADE" },
-            { "BALAI PEMANGGILAN CITADEL", "CITADEL SUMMONING HALL" },
             { "TOKO CITADEL & IN-APP PURCHASE", "CITADEL STORE & IN-APP PURCHASE" },
             { "PANDAI BESI & RELIC FORGE", "RELIC FORGE & BLACKSMITH" },
             { "POHON TALENTA & BERKAH BENTENG", "TALENT TREE & CITADEL BLESSINGS" },
@@ -90,7 +88,6 @@ namespace FantasyDefense.Localization
             { "GACHA", "SUMMON" },
             { "TOKO", "STORE" },
             { "Peta", "Map" },
-            { "Hero", "Heroes" },
             { "Gacha", "Summon" },
             { "Toko", "Store" },
 

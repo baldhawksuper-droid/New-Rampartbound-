@@ -2006,7 +2006,7 @@ namespace FantasyDefense.UI
             victoryStarsText.supportRichText = true;
             victoryStarsText.text = "<color=#3D4A5E><size=36>☆  ☆  ☆</size></color>";
 
-            yield return new WaitForSecondsRealtime(0.35f);
+            yield return new WaitForSecondsRealtime(0.25f);
 
             for (int i = 1; i <= 3; i++)
             {
@@ -2015,7 +2015,7 @@ namespace FantasyDefense.UI
                 {
                     if (j <= i && j <= starCount)
                     {
-                        sb.Append("<color=#FFD700><size=46>★</size></color>  ");
+                        sb.Append("<color=#FFD700><size=48>★</size></color>  ");
                     }
                     else
                     {
@@ -2027,41 +2027,54 @@ namespace FantasyDefense.UI
 
                 if (i <= starCount)
                 {
+                    // Audio: denting metalik kemilau bertahap (Staggered Metallic Chime)
                     if (AudioManager.Instance != null)
                     {
                         if (i == 3)
                         {
                             AudioManager.Instance.PlaySound(SoundType.VictoryFanfare);
+                            AudioManager.Instance.PlaySound(SoundType.ArchetypeMaxChime, 1.25f);
                         }
                         else
                         {
-                            float pitch = (i == 1) ? 1.05f : 1.30f;
+                            float pitch = (i == 1) ? 1.15f : 1.35f;
+                            AudioManager.Instance.PlaySound(SoundType.MagicSpark, pitch);
                             AudioManager.Instance.PlaySound(SoundType.MergeSuccess, pitch);
                         }
                     }
 
-                    if (SkillVfxManager.Instance != null)
+                    // Haptic feedback sesuai intensitas bintang
+                    if (FantasyDefense.Mobile.DevicePerformanceManager.Instance != null &&
+                        FantasyDefense.Mobile.DevicePerformanceManager.Instance.IsHapticsEnabled)
                     {
-                        Color starColor = i == 3 ? new Color(1f, 0.85f, 0.2f) : new Color(0.35f, 0.90f, 1f);
-                        SkillVfxManager.Instance.SpawnProceduralParticleBurst(victoryStarsText.transform.position, starColor, Color.white, 12, 1.8f);
+                        var hapticType = (i == 3) 
+                            ? FantasyDefense.Mobile.HapticFeedbackType.Success 
+                            : FantasyDefense.Mobile.HapticFeedbackType.Light;
+                        FantasyDefense.Mobile.DevicePerformanceManager.Instance.TriggerHaptic(hapticType);
                     }
 
-                    // Punch scale bintang dengan overshoot elastis
-                    float punchDuration = 0.22f;
+                    if (SkillVfxManager.Instance != null)
+                    {
+                        Color starColor = i == 3 ? new Color(1f, 0.88f, 0.2f) : new Color(0.35f, 0.92f, 1f);
+                        SkillVfxManager.Instance.SpawnProceduralParticleBurst(victoryStarsText.transform.position, starColor, Color.white, 16, 2.2f, 560);
+                    }
+
+                    // Punch scale bintang dengan overshoot elastis (1.35x -> 1.0x)
+                    float punchDuration = 0.18f;
                     float elapsed = 0f;
                     Vector3 origScale = Vector3.one;
                     while (elapsed < punchDuration)
                     {
                         elapsed += Time.unscaledDeltaTime;
                         float t = elapsed / punchDuration;
-                        float scale = 1f + Mathf.Sin(t * Mathf.PI) * 0.45f;
+                        float scale = 1f + Mathf.Sin(t * Mathf.PI) * 0.35f;
                         victoryStarsText.transform.localScale = origScale * scale;
                         yield return null;
                     }
                     victoryStarsText.transform.localScale = origScale;
                 }
 
-                yield return new WaitForSecondsRealtime(0.28f);
+                yield return new WaitForSecondsRealtime(0.15f);
             }
         }
 

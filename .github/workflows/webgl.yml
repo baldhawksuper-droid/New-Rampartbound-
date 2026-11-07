@@ -98,6 +98,9 @@ jobs:
       - name: Verify WebGL Build Artifacts
         shell: bash
         run: |
+          echo "Fixing file ownership from Docker root to runner..."
+          sudo chown -R $USER:$USER Builds
+          sudo chmod -R ugo+rw Builds
           echo "Checking WebGL output directory..."
           ls -la Builds/WebGL/Rampartbound
           test -f Builds/WebGL/Rampartbound/index.html || (echo "ERROR: index.html not found in Builds/WebGL/Rampartbound!" && exit 1)

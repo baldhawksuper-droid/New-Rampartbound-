@@ -181,6 +181,26 @@ namespace FantasyDefense.Combat
 
                 // Skala proyektil tajam dan jelas terlihat di layar mobile
                 projObj.transform.localScale = Vector3.one * (currentTier >= UnitTier.Tier3 ? 1.15f : 0.85f);
+
+                // Rekomendasi 1: Luminous Magic Arcane Trail Renderer untuk Cedric / Rabbit Mage
+                var trail = projObj.AddComponent<TrailRenderer>();
+                trail.time = 0.12f;
+                trail.startWidth = currentTier >= UnitTier.Tier3 ? 0.22f : 0.16f;
+                trail.endWidth = 0.02f;
+                Shader trailShader = Shader.Find("Sprites/Default") ?? Shader.Find("Particles/Standard Unlit");
+                if (trailShader != null) trail.material = new Material(trailShader);
+                if (currentTier >= UnitTier.Tier3)
+                {
+                    trail.startColor = new Color(0.90f, 0.45f, 1.0f, 0.85f);
+                    trail.endColor = new Color(0.40f, 0.10f, 0.85f, 0f);
+                }
+                else
+                {
+                    trail.startColor = new Color(0.25f, 0.85f, 1.0f, 0.80f);
+                    trail.endColor = new Color(0.08f, 0.45f, 0.95f, 0f);
+                }
+                trail.sortingLayerName = "Effects";
+                trail.sortingOrder = 190;
             }
 
             var proj = projObj.GetComponent<Projectile>();
