@@ -98,7 +98,6 @@ jobs:
           buildMethod: BuildScript.BuildWebGL
           buildsPath: Builds
           allowDirtyBuild: true
-          dockerMemoryLimit: '6144m'
           dockerShmSize: '2048m'
 
       - name: Diagnostic on Build Failure
