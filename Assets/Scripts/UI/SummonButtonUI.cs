@@ -53,6 +53,21 @@ namespace FantasyDefense.UI
             if (button == null)
                 button = GetComponent<Button>();
 
+            if (costText == null)
+                costText = GetComponentInChildren<Text>();
+
+            if (costText != null)
+            {
+                var lilita = Resources.Load<Font>("Fonts/LilitaOne-Regular");
+                if (lilita != null) costText.font = lilita;
+                costText.fontSize = 15;
+                costText.fontStyle = FontStyle.Bold;
+                costText.color = new Color(1f, 0.96f, 0.85f, 1f); // Warm Ivory
+                var outline = costText.GetComponent<Outline>() ?? costText.gameObject.AddComponent<Outline>();
+                outline.effectColor = new Color(0.05f, 0.03f, 0.01f, 0.95f); // Deep Dark Contrast Outline
+                outline.effectDistance = new Vector2(1.5f, -1.5f);
+            }
+
             button.onClick.AddListener(OnSummonButtonClicked);
             EnsureCubeVisuals();
             CacheLocalizedStrings();
@@ -548,27 +563,29 @@ namespace FantasyDefense.UI
                 bool isPuzzle = FantasyDefense.Core.GameManager.Instance != null &&
                                 FantasyDefense.Core.GameManager.Instance.CurrentBattleMode == BattleMode.PuzzlePreparation;
 
+                string gemUnit = CitadelLocalizationManager.Text("PERMATA", "GEMS");
+
                 if (isPuzzle)
                 {
                     bool hasCandidates = (HeroSummoner.Instance == null || HeroSummoner.Instance.HasCatalystCandidate());
                     if (!hasCandidates)
                     {
-                        costText.text = CitadelLocalizationManager.Text("⭐ TOKEN MAX", "⭐ MAX TIER");
+                        costText.text = CitadelLocalizationManager.Text("⭐ TOKEN MAKSIMAL", "⭐ MAX TIER");
                     }
                     else
                     {
-                        string label = CitadelLocalizationManager.Text("KATALIS SUMMON", "SUMMON CUBE");
-                        costText.text = $"✦ {label} ✦\n({cost} GEMS)";
+                        string label = CitadelLocalizationManager.Text("KATALIS FUSI", "SUMMON CUBE");
+                        costText.text = $"✦ {label} ✦\n({cost} {gemUnit})";
                     }
                 }
                 else if (GridManager.Instance != null && GridManager.Instance.IsGridFull())
                 {
-                    costText.text = CitadelLocalizationManager.Text("GRID PENUH", "GRID FULL");
+                    costText.text = CitadelLocalizationManager.Text("PAPAN PENUH", "GRID FULL");
                 }
                 else
                 {
                     string summonLabel = CitadelLocalizationManager.Text("PANGGIL HERO", "SUMMON HERO");
-                    costText.text = $"✦ {summonLabel} ✦\n({cost} GEMS)";
+                    costText.text = $"✦ {summonLabel} ✦\n({cost} {gemUnit})";
                 }
             }
         }

@@ -25,8 +25,8 @@ namespace FantasyDefense.Core
         [SerializeField] private float horizontalPadding = 0.15f;
 
         [Header("Portrait Viewport Centering (Sprint 43)")]
-        [Tooltip("Offset vertikal kamera agar barikade fisik (y=-3.5) dan waypoint gerbang atas simetris di ponsel portrait")]
-        [SerializeField] private float verticalCenterOffset = -0.45f;
+        [Tooltip("Offset vertikal kamera: naik +0.35f agar board center (0.85f) dan barikade (y=-3.5) simetris di ponsel portrait")]
+        [SerializeField] private float verticalCenterOffset = 0.35f;
 
         private int lastScreenWidth;
         private int lastScreenHeight;

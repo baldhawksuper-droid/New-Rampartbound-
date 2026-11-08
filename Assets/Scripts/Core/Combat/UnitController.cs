@@ -153,12 +153,13 @@ namespace FantasyDefense.Combat
                 rangeLineRenderer = rangeCircleObj.AddComponent<LineRenderer>();
                 rangeLineRenderer.useWorldSpace = false;
                 rangeLineRenderer.loop = true;
-                rangeLineRenderer.startWidth = 0.045f;
-                rangeLineRenderer.endWidth = 0.045f;
+                rangeLineRenderer.startWidth = 0.035f;
+                rangeLineRenderer.endWidth = 0.035f;
 
                 Material lineMat = new Material(Shader.Find("Sprites/Default"));
                 rangeLineRenderer.material = lineMat;
-                Color glowColor = new Color(0.25f, 0.9f, 1.0f, 0.65f);
+                // Pendaran Aura Emas Halus (Soft Golden Fantasy Ring - Task 2)
+                Color glowColor = new Color(1.0f, 0.85f, 0.38f, 0.55f);
                 rangeLineRenderer.startColor = glowColor;
                 rangeLineRenderer.endColor = glowColor;
                 rangeLineRenderer.sortingOrder = 28;

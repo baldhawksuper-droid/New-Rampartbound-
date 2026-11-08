@@ -451,14 +451,14 @@ namespace FantasyDefense.GridSystem
                 return;
             }
 
-            // Kalibrasi Flick & DPI Layar Sentuh Mobile/Tablet
+            // Kalibrasi Flick & DPI Layar Sentuh Mobile/Tablet (Task 5 Pacing Fix)
             float gestureDuration = Time.unscaledTime - pointerDownTime;
             float screenDeltaPx = Vector2.Distance(screenPos, startScreenPos);
-            float minScreenSwipePx = Screen.dpi > 0 ? Mathf.Clamp(Screen.dpi * 0.12f, 25f, 65f) : 32f;
+            float minScreenSwipePx = Screen.dpi > 0 ? Mathf.Clamp(Screen.dpi * 0.10f, 20f, 60f) : 28f;
 
-            // Deteksi Fast Flick (sapuan cepat jari < 0.28 detik) atau pergeseran terarah melebihi threshold
-            bool isFlick = gestureDuration > 0.02f && gestureDuration <= 0.28f && (delta.magnitude >= threshold * 0.65f || screenDeltaPx >= minScreenSwipePx);
-            bool isNormalSwipe = delta.magnitude >= threshold || (screenDeltaPx >= minScreenSwipePx && delta.magnitude >= threshold * 0.80f);
+            // Deteksi Fast Flick (sapuan responsif jari <= 0.35 detik) atau pergeseran terarah melebihi threshold
+            bool isFlick = gestureDuration > 0.001f && gestureDuration <= 0.35f && (delta.magnitude >= threshold * 0.55f || screenDeltaPx >= minScreenSwipePx);
+            bool isNormalSwipe = delta.magnitude >= threshold || (screenDeltaPx >= minScreenSwipePx && delta.magnitude >= threshold * 0.70f);
 
             // ATURAN 2: TAP BIASA (DI BAWAH AMBANG BATAS SWIPE & BUKAN FLICK)
             if (!isFlick && !isNormalSwipe)

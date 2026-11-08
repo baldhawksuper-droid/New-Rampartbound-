@@ -244,36 +244,117 @@ namespace FantasyDefense.GridSystem
             }
         }
 
+        [Header("Tactile Fantasy Rune Bracket Overlay (Task 2)")]
+        private GameObject runeBracketObj;
+        private SpriteRenderer runeBracketSr;
+        private Coroutine pulseGlowRoutine;
+        private static Sprite goldenRuneBracketSprite;
+
+        private void EnsureRuneBracketOverlay()
+        {
+            if (runeBracketObj != null) return;
+
+            Transform child = transform.Find("RuneBracketOverlay");
+            if (child != null)
+            {
+                runeBracketObj = child.gameObject;
+                runeBracketSr = runeBracketObj.GetComponent<SpriteRenderer>();
+            }
+            else
+            {
+                runeBracketObj = new GameObject("RuneBracketOverlay");
+                runeBracketObj.transform.SetParent(transform, false);
+                runeBracketObj.transform.localPosition = new Vector3(0f, 0f, -0.04f);
+
+                runeBracketSr = runeBracketObj.AddComponent<SpriteRenderer>();
+                runeBracketSr.sprite = GetOrCreateRuneBracketSprite();
+                runeBracketSr.sortingLayerName = spriteRenderer != null ? spriteRenderer.sortingLayerName : "Board";
+                runeBracketSr.sortingOrder = spriteRenderer != null ? spriteRenderer.sortingOrder + 2 : 5;
+            }
+            runeBracketObj.SetActive(false);
+        }
+
+        private System.Collections.IEnumerator DoRunePulse(Color baseColor)
+        {
+            float t = 0f;
+            Vector3 baseScale = Vector3.one;
+            while (runeBracketObj != null && runeBracketObj.activeSelf)
+            {
+                t += Time.unscaledDeltaTime * 4.2f;
+                float pulse = Mathf.PingPong(t, 1f);
+                float scale = 1.0f + (pulse * 0.07f);
+                runeBracketObj.transform.localScale = baseScale * scale;
+                if (runeBracketSr != null)
+                {
+                    Color c = baseColor;
+                    c.a = baseColor.a * (0.72f + (pulse * 0.28f));
+                    runeBracketSr.color = c;
+                }
+                yield return null;
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (pulseGlowRoutine != null)
+            {
+                StopCoroutine(pulseGlowRoutine);
+                pulseGlowRoutine = null;
+            }
+            if (runeBracketObj != null)
+            {
+                runeBracketObj.SetActive(false);
+            }
+        }
+
         /// <summary>
-        /// Mengatur umpan balik visual petak dengan warna yang jelas untuk kenyamanan visual layar mobile/tablet.
+        /// Mengatur umpan balik visual petak dengan Tactile Golden Rune Bracket bernafas (Task 2).
+        /// Ubin dasar batu tetap stabil tanpa staining kasar, sementara pendaran rune emas menyorot bidak.
         /// </summary>
         public void SetHighlightState(TileHighlightState state)
         {
             if (spriteRenderer == null) return;
+            EnsureRuneBracketOverlay();
 
-            switch (state)
+            if (state == TileHighlightState.None)
             {
-                case TileHighlightState.None:
-                    if (defaultSprite != null) spriteRenderer.sprite = defaultSprite;
-                    if (currentUnit != null) UpdateRarityVisual();
-                    else spriteRenderer.color = normalColor;
-                    break;
-                case TileHighlightState.Hover:
-                    if (highlightSprite != null) spriteRenderer.sprite = highlightSprite;
-                    spriteRenderer.color = hoverColor;
-                    break;
-                case TileHighlightState.ValidMerge:
-                    if (highlightSprite != null) spriteRenderer.sprite = highlightSprite;
-                    spriteRenderer.color = validMergeColor;
-                    break;
-                case TileHighlightState.ValidMove:
-                    if (highlightSprite != null) spriteRenderer.sprite = highlightSprite;
-                    spriteRenderer.color = validMoveColor;
-                    break;
-                case TileHighlightState.Invalid:
-                    if (highlightSprite != null) spriteRenderer.sprite = highlightSprite;
-                    spriteRenderer.color = invalidColor;
-                    break;
+                if (runeBracketObj != null) runeBracketObj.SetActive(false);
+                if (pulseGlowRoutine != null)
+                {
+                    StopCoroutine(pulseGlowRoutine);
+                    pulseGlowRoutine = null;
+                }
+                if (defaultSprite != null) spriteRenderer.sprite = defaultSprite;
+                if (currentUnit != null) UpdateRarityVisual();
+                else spriteRenderer.color = normalColor;
+            }
+            else
+            {
+                Color targetColor = hoverColor;
+                switch (state)
+                {
+                    case TileHighlightState.Hover:
+                        targetColor = new Color(1.0f, 0.86f, 0.35f, 0.95f); // Warm Golden Amber
+                        break;
+                    case TileHighlightState.ValidMerge:
+                        targetColor = new Color(0.28f, 1.0f, 0.52f, 0.95f); // Luminescent Emerald Green
+                        break;
+                    case TileHighlightState.ValidMove:
+                        targetColor = new Color(0.30f, 0.82f, 1.0f, 0.95f); // Sky Astral Cyan
+                        break;
+                    case TileHighlightState.Invalid:
+                        targetColor = new Color(1.0f, 0.30f, 0.35f, 0.95f); // Ruby Crimson
+                        break;
+                }
+
+                if (runeBracketObj != null)
+                {
+                    runeBracketObj.SetActive(true);
+                    if (runeBracketSr != null) runeBracketSr.color = targetColor;
+
+                    if (pulseGlowRoutine != null) StopCoroutine(pulseGlowRoutine);
+                    pulseGlowRoutine = StartCoroutine(DoRunePulse(targetColor));
+                }
             }
         }
 
@@ -355,6 +436,53 @@ namespace FantasyDefense.GridSystem
             tex.Apply();
             proceduralTileFallbackSprite = Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 100f);
             return proceduralTileFallbackSprite;
+        }
+
+        public static Sprite GetOrCreateRuneBracketSprite()
+        {
+            if (goldenRuneBracketSprite != null) return goldenRuneBracketSprite;
+
+            int size = 128;
+            Texture2D tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+            tex.wrapMode = TextureWrapMode.Clamp;
+            tex.filterMode = FilterMode.Bilinear;
+
+            Color transparent = new Color(0f, 0f, 0f, 0f);
+            Color[] colors = new Color[size * size];
+            for (int i = 0; i < colors.Length; i++) colors[i] = transparent;
+
+            int bracketLen = 32;
+            int thickness = 5;
+            int pad = 6;
+            Color goldPrimary = new Color(1f, 0.88f, 0.40f, 1f);
+            Color goldRim = new Color(0.72f, 0.55f, 0.20f, 0.85f);
+            Color innerGlow = new Color(1f, 0.95f, 0.70f, 0.45f);
+
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    bool inCornerX = (x >= pad && x < pad + bracketLen) || (x < size - pad && x >= size - pad - bracketLen);
+                    bool inCornerY = (y >= pad && y < pad + bracketLen) || (y < size - pad && y >= size - pad - bracketLen);
+                    bool onEdgeX = (x >= pad && x < pad + thickness) || (x < size - pad && x >= size - pad - thickness);
+                    bool onEdgeY = (y >= pad && y < pad + thickness) || (y < size - pad && y >= size - pad - thickness);
+
+                    if ((onEdgeX && inCornerY) || (onEdgeY && inCornerX))
+                    {
+                        bool isBorder = (x == pad || x == size - pad - 1 || y == pad || y == size - pad - 1);
+                        colors[y * size + x] = isBorder ? goldRim : goldPrimary;
+                    }
+                    else if (inCornerX && inCornerY && ((x >= pad + thickness && x < pad + thickness + 4) || (y >= pad + thickness && y < pad + thickness + 4)))
+                    {
+                        colors[y * size + x] = innerGlow;
+                    }
+                }
+            }
+
+            tex.SetPixels(colors);
+            tex.Apply();
+            goldenRuneBracketSprite = Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 100f);
+            return goldenRuneBracketSprite;
         }
         #endregion
     }

@@ -479,7 +479,7 @@ namespace FantasyDefense.UI
         {
             if (waveText != null)
             {
-                waveText.text = $"<b>WAVE {currentWave}/{totalWaves}</b>";
+                waveText.text = CitadelLocalizationManager.Text($"<b>GELOMBANG {currentWave}/{totalWaves}</b>", $"<b>WAVE {currentWave}/{totalWaves}</b>");
             }
             if (waveProgressBarContainer != null)
             {
@@ -502,8 +502,8 @@ namespace FantasyDefense.UI
         {
             if (waveText != null)
             {
-                string completedLabel = CitadelLocalizationManager.Text("CLEARED!", "CLEARED!");
-                waveText.text = $"<b>WAVE {completedWave} {completedLabel}</b>";
+                string completedLabel = CitadelLocalizationManager.Text("SELESAI!", "CLEARED!");
+                waveText.text = CitadelLocalizationManager.Text($"<b>GELOMBANG {completedWave} {completedLabel}</b>", $"<b>WAVE {completedWave} {completedLabel}</b>");
             }
             if (waveProgressBar != null)
             {
@@ -1749,7 +1749,7 @@ namespace FantasyDefense.UI
             {
                 if (speedToggleText != null)
                 {
-                    speedToggleText.text = "<b>▶ 1x SPEED</b>";
+                    speedToggleText.text = CitadelLocalizationManager.Text("<b>▶ 1x CEPAT</b>", "<b>▶ 1x SPEED</b>");
                     speedToggleText.color = new Color(0.85f, 0.95f, 1f, 1f);
                 }
                 if (outline != null)
@@ -1763,7 +1763,7 @@ namespace FantasyDefense.UI
             {
                 if (speedToggleText != null)
                 {
-                    speedToggleText.text = "<b>⏩ 2x TURBO</b>";
+                    speedToggleText.text = CitadelLocalizationManager.Text("<b>⏩ 2x TURBO</b>", "<b>⏩ 2x TURBO</b>");
                     speedToggleText.color = new Color(1f, 0.92f, 0.40f, 1f);
                 }
                 if (outline != null)
@@ -1777,7 +1777,7 @@ namespace FantasyDefense.UI
             {
                 if (speedToggleText != null)
                 {
-                    speedToggleText.text = "<b>⚡ 3x HYPER</b>";
+                    speedToggleText.text = CitadelLocalizationManager.Text("<b>⚡ 3x KILAT</b>", "<b>⚡ 3x HYPER</b>");
                     speedToggleText.color = new Color(1f, 0.50f, 0.35f, 1f);
                 }
                 if (outline != null)

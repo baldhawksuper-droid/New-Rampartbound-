@@ -61,8 +61,9 @@ namespace FantasyDefense.GridSystem
 
             float boardWidth = 6.0f;
             float boardHeight = 6.0f;
-            // Default center papan arena dengan kalibrasi offset +0.55f (Anti-Clipping Barricade)
-            calculatedBoardCenter = new Vector2(0f, -0.10f);
+            // Default center papan arena digeser ke atas (+0.85f) agar baris terbawah grid
+            // tidak menabrak barikade benteng pada layar mobile portrait 19.5:9 / 20:9.
+            calculatedBoardCenter = new Vector2(0f, 0.85f);
 
             // Mengambil ukuran dari SpriteRenderer.bounds papan arena (World Space)
             if (boardRenderer != null)

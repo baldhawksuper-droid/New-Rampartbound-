@@ -124,10 +124,12 @@ namespace Rampartbound.Editor
             arenaWorldObj.transform.position = Vector3.zero;
 
             // Papan Arena Tempur 5x5 (Battlefield Board Frame)
-            // Kalibrasi Offset Vertikal +0.55f (Anti-Clipping Barricade pada layar 19.5:9 / 20:9)
+            // Kalibrasi Offset Vertikal: Board center digeser ke atas (+0.85f) agar baris terbawah grid
+            // tidak menabrak barikade benteng (y=-3.5f) pada layar mobile portrait 19.5:9 / 20:9.
+            // Jarak aman clearance antara baris bawah grid dan puncak barikade: ~0.7 unit dunia.
             var boardObj = new GameObject("BattlefieldBoard");
             boardObj.transform.SetParent(arenaWorldObj.transform);
-            boardObj.transform.position = new Vector3(0f, -0.10f, 0.2f);
+            boardObj.transform.position = new Vector3(0f, 0.85f, 0.2f);
             var boardSr = boardObj.AddComponent<SpriteRenderer>();
             boardSr.sortingLayerName = "Board";
             boardSr.sortingOrder = 0;
