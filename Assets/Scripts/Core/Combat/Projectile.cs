@@ -39,13 +39,13 @@ namespace FantasyDefense.Combat
             if (sr != null)
             {
                 sr.sortingLayerName = "Effects";
-                if (sr.sortingOrder < 100) sr.sortingOrder = 100;
+                if (sr.sortingOrder < 200) sr.sortingOrder = 200;
             }
             var tr = GetComponent<TrailRenderer>();
             if (tr != null)
             {
                 tr.sortingLayerName = "Effects";
-                if (tr.sortingOrder < 99) tr.sortingOrder = 99;
+                if (tr.sortingOrder < 195) tr.sortingOrder = 195;
             }
         }
 
@@ -89,6 +89,15 @@ namespace FantasyDefense.Combat
             {
                 // Kecepatan mortir peluru meriam berbobot
                 flightSpeed = 11.0f;
+            }
+            else if (arrow)
+            {
+                flightSpeed = 8.5f;
+            }
+            else
+            {
+                // Kecepatan proyektil sihir terkalibrasi agar terlihat jelas melesat di layar
+                flightSpeed = 5.5f;
             }
 
             if (target != null)

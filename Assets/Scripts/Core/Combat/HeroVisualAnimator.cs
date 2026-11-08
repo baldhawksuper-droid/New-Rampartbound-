@@ -144,8 +144,16 @@ namespace FantasyDefense.Combat
             Vector3 anchorLocalPos = transform.localPosition;
             while (currentState == AnimationState.Idle)
             {
-                // Pada mode persiapan (Puzzle Preparation) atau saat ditarik, pertahankan ukuran matematis solid tanpa distorsi nafas
-                if (unitController != null && (unitController.IsDragging || unitController.IsPreparationToken))
+                // Pada mode persiapan (Puzzle Preparation) atau saat ditarik/dipilih, cegah penimpaan posisi dan skala
+                if (unitController != null && (unitController.IsDragging || UnitController.CurrentlySelectedUnit == unitController))
+                {
+                    // Saat unit sedang disentuh, dipilih, atau diseret jari, JANGAN menimpa localScale atau localPosition!
+                    // Biarkan sistem input mengontrol elevasi visual (lift scale 1.18x, touch drag offset, dan sorting order)
+                    yield return null;
+                    continue;
+                }
+
+                if (unitController != null && unitController.IsPreparationToken)
                 {
                     if (baseScale.sqrMagnitude > 0.001f)
                     {
@@ -233,30 +241,30 @@ namespace FantasyDefense.Combat
 
             if (unitController != null && unitController.UnitType == UnitType.WindRanger)
             {
-                // Archer (Pemanah): Tetap stabil di petak grid! Tarik tali busur ke belakang (windup), lalu hentakan recoil pelepasan panah
-                windupPos = anchorPos - dir * 0.05f;
-                lungePos = anchorPos - dir * 0.07f; // Recoil kickback ke belakang saat panah terlepas
-                attackTilt = Mathf.Clamp(-dir.x * 8f, -10f, 10f);
+                // Archer (Pemanah): Tarik busur jauh ke belakang saat windup, lalu recoil kickback tegas ke belakang saat panah melesat
+                windupPos = anchorPos - dir * 0.08f;
+                lungePos = anchorPos - dir * 0.14f; // Recoil kickback tegas ke belakang
+                attackTilt = Mathf.Clamp(-dir.x * 10f, -12f, 12f);
             }
             else if (unitController != null && unitController.UnitType == UnitType.RoseTanker)
             {
                 // Paladin (Palu Pelindung): Angkat palu perang tinggi ke atas, lalu hantam ke bawah ke tanah (ground slam)
                 windupPos = anchorPos + Vector3.up * 0.08f;
-                lungePos = anchorPos + dir * 0.08f + Vector3.down * 0.04f;
-                attackTilt = Mathf.Clamp(-dir.x * 12f, -15f, 15f);
+                lungePos = anchorPos + dir * 0.10f + Vector3.down * 0.05f;
+                attackTilt = Mathf.Clamp(-dir.x * 14f, -18f, 18f);
             }
             else if (unitController != null && unitController.UnitType == UnitType.RabbitMage)
             {
-                // Mage (Penyihir): Melayang anggun di tempat petak (+Y) mengumpulkan tenaga sihir bintang, tanpa lunge fisik
-                windupPos = anchorPos + Vector3.up * 0.08f;
-                lungePos = anchorPos + Vector3.up * 0.12f;
-                attackTilt = Mathf.Clamp(-dir.x * 6f, -8f, 8f);
+                // Mage (Penyihir): Tarik tongkat ke belakang saat windup, lalu hentakkan tongkat sihir tajam ke depan (+dir) saat melontarkan bola sihir
+                windupPos = anchorPos - dir * 0.08f + Vector3.up * 0.04f;
+                lungePos = anchorPos + dir * 0.16f + Vector3.up * 0.06f; // Hentakan serang magis tajam ke depan
+                attackTilt = Mathf.Clamp(-dir.x * 12f, -14f, 14f);
             }
             else
             {
                 // Melee Spellblade (Cedric & melee default): Tarikan mundur lalu terjang maju tajam menghunus pedang api
-                windupPos = anchorPos - dir * 0.06f;
-                lungePos = anchorPos + dir * 0.20f;
+                windupPos = anchorPos - dir * 0.07f;
+                lungePos = anchorPos + dir * 0.22f;
                 attackTilt = Mathf.Clamp(-dir.x * 16f, -20f, 20f);
             }
 
@@ -273,7 +281,7 @@ namespace FantasyDefense.Combat
             // Memberi jendela waktu tayang yang tegas dan jelas bagi mata pemain pada setiap frame sprite
             float tWindup = 0.08f;      // Frame 0 (Combat Ready stance)
             float tLunge = 0.11f;       // Gerakan maju menerjang / recoil
-            float tStrikeHold = 0.18f;  // Freeze-frame pada pose tebasan puncak (Strike)
+            float tStrikeHold = 0.22f;  // Freeze-frame pada pose tebasan puncak (Strike) diperpanjang ke 0.22s agar pose serang terbaca jelas
             float tFollow = 0.12f;      // Frame 2 (Follow-through / Recovery pose)
             float tReturn = 0.10f;      // Kembali mulus ke posisi siaga di petak
 
@@ -335,8 +343,8 @@ namespace FantasyDefense.Combat
                 float t = Mathf.Clamp01(elapsed / tLunge);
                 float ease = 1f - Mathf.Pow(1f - t, 3f); // Cubic ease-out
                 transform.position = Vector3.Lerp(windupPos, lungePos, ease);
-                transform.localScale = new Vector3(baseScale.x * Mathf.Lerp(1.03f, 0.98f, ease),
-                                                   baseScale.y * Mathf.Lerp(0.97f, 1.04f, ease),
+                transform.localScale = new Vector3(baseScale.x * Mathf.Lerp(1.03f, 1.10f, ease),
+                                                   baseScale.y * Mathf.Lerp(0.97f, 1.10f, ease),
                                                    baseScale.z);
                 transform.localRotation = Quaternion.Slerp(windupRot, strikeRot, ease);
 
@@ -345,7 +353,7 @@ namespace FantasyDefense.Combat
                 yield return null;
             }
 
-            // 2b. Freeze-Frame Strike Hold (Tahan frame strike selama 0.18s agar pose serang terlihat jelas dan tajam oleh mata pemain)
+            // 2b. Freeze-Frame Strike Hold (Tahan frame strike selama 0.22s agar pose serang terlihat jelas dan tajam oleh mata pemain)
             // onStrikeImpact memicu pelepasan proyektil atau efek tebasan berjarak tepat di puncak pose serangan
             onStrikeImpact?.Invoke();
 
@@ -353,6 +361,8 @@ namespace FantasyDefense.Combat
             while (elapsed < tStrikeHold)
             {
                 elapsed += Time.deltaTime;
+                // Pertahankan skala tegas saat pose strike
+                transform.localScale = baseScale * 1.08f;
                 yield return null;
             }
 

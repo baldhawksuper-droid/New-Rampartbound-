@@ -1101,15 +1101,15 @@ namespace FantasyDefense.Combat
 
             Color primary = isMeteor ? new Color(1f, 0.35f, 0.1f) : new Color(0.25f, 0.85f, 1f);
             Color secondary = isMeteor ? new Color(1f, 0.85f, 0.2f) : new Color(0.8f, 0.45f, 1f);
-            int count = isMeteor ? 26 : (isAoe ? 18 : 10);
-            float speed = isMeteor ? 3.2f : 2.2f;
+            int count = isMeteor ? 28 : (isAoe ? 20 : 16);
+            float speed = isMeteor ? 3.4f : 2.6f;
 
-            SpawnProceduralParticleBurst(impactPos, primary, secondary, count, speed);
+            SpawnProceduralParticleBurst(impactPos, primary, secondary, count, speed, sortingOrder: 210);
 
-            if (enableShockwaves && (isAoe || isMeteor))
+            if (enableShockwaves)
             {
-                float radius = isMeteor ? 1.6f : 1.1f;
-                Color waveColor = isMeteor ? new Color(1f, 0.4f, 0.1f, 0.7f) : new Color(0.2f, 0.8f, 1f, 0.6f);
+                float radius = isMeteor ? 1.6f : (isAoe ? 1.1f : 0.75f);
+                Color waveColor = isMeteor ? new Color(1f, 0.4f, 0.1f, 0.7f) : (isAoe ? new Color(0.2f, 0.8f, 1f, 0.6f) : new Color(0.35f, 0.9f, 1f, 0.65f));
                 StartCoroutine(SpawnShockwaveRingRoutine(impactPos, radius, waveColor));
             }
         }

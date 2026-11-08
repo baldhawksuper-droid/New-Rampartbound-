@@ -136,11 +136,11 @@ namespace FantasyDefense.Combat
             // Posisi ujung kristal tongkat kayu lengkung Pippin (3/4 kanan, koordinat +0.18x, +0.38y)
             Vector3 originPos = transform.position + new Vector3(0.18f, 0.38f, 0f);
 
-            // Efek letupan pendaran sihir astral pada kristal tongkat saat bola sihir terlepas
+            // Efek letupan pendaran sihir astral pada kristal tongkat saat bola sihir terlepas (Cast Muzzle Burst)
             if (SkillVfxManager.Instance != null)
             {
                 Color castColor = currentTier >= UnitTier.Tier3 ? new Color(0.9f, 0.5f, 1f) : new Color(0.35f, 0.85f, 1f);
-                SkillVfxManager.Instance.SpawnProceduralParticleBurst(originPos, castColor, Color.white, 4, 1.2f, sortingOrder: 65);
+                SkillVfxManager.Instance.SpawnProceduralParticleBurst(originPos, castColor, Color.white, 12, 1.8f, sortingOrder: 210);
             }
 
             if (projectilePrefab != null)
@@ -179,14 +179,14 @@ namespace FantasyDefense.Combat
                     sr.color = currentTier >= UnitTier.Tier3 ? new Color(0.95f, 0.45f, 1f) : new Color(0.25f, 0.85f, 1f);
                 }
 
-                // Skala proyektil tajam dan jelas terlihat di layar mobile
-                projObj.transform.localScale = Vector3.one * (currentTier >= UnitTier.Tier3 ? 1.15f : 0.85f);
+                // Skala proyektil diperbesar agar tampak tajam, bervolume, dan jelas melesat di layar mobile
+                projObj.transform.localScale = Vector3.one * (currentTier >= UnitTier.Tier3 ? 1.55f : 1.35f);
 
-                // Rekomendasi 1: Luminous Magic Arcane Trail Renderer untuk Cedric / Rabbit Mage
+                // Rekomendasi 1: Luminous Magic Arcane Trail Renderer untuk Rabbit Mage
                 var trail = projObj.AddComponent<TrailRenderer>();
-                trail.time = 0.12f;
-                trail.startWidth = currentTier >= UnitTier.Tier3 ? 0.22f : 0.16f;
-                trail.endWidth = 0.02f;
+                trail.time = 0.20f;
+                trail.startWidth = currentTier >= UnitTier.Tier3 ? 0.30f : 0.22f;
+                trail.endWidth = 0.04f;
                 Shader trailShader = Shader.Find("Sprites/Default") ?? Shader.Find("Particles/Standard Unlit");
                 if (trailShader != null) trail.material = new Material(trailShader);
                 if (currentTier >= UnitTier.Tier3)
@@ -200,7 +200,7 @@ namespace FantasyDefense.Combat
                     trail.endColor = new Color(0.08f, 0.45f, 0.95f, 0f);
                 }
                 trail.sortingLayerName = "Effects";
-                trail.sortingOrder = 190;
+                trail.sortingOrder = 195;
             }
 
             var proj = projObj.GetComponent<Projectile>();
@@ -224,7 +224,8 @@ namespace FantasyDefense.Combat
                 slow: MeteorSlowPercent,
                 slowTime: MeteorSlowDuration,
                 critical: false,
-                meteor: isMeteor
+                meteor: isMeteor,
+                speedOverride: 5.5f
             );
         }
 

@@ -127,7 +127,7 @@ namespace FantasyDefense.Combat
 
                 var sr = projObj.AddComponent<SpriteRenderer>();
                 sr.sortingLayerName = "Effects";
-                sr.sortingOrder = 100;
+                sr.sortingOrder = 200;
 
                 Sprite arrowSprite = Resources.Load<Sprite>("Sprites/Combat/Projectile_Wind_Arrow");
 #if UNITY_EDITOR
@@ -148,20 +148,26 @@ namespace FantasyDefense.Combat
                 }
 
                 // Skala seragam (UNIFORM SCALE) agar rotasi proyektil matematis tidak mendistorsi/memipihkan bentuk panah
-                float arrowScale = currentTier >= UnitTier.Tier4 ? 0.45f : 0.38f;
+                float arrowScale = currentTier >= UnitTier.Tier4 ? 0.65f : 0.55f;
                 projObj.transform.localScale = new Vector3(arrowScale, arrowScale, 1f);
 
                 // Jejak angin halus (wind ribbon trail) mengikuti lintasan anak panah
                 var trail = projObj.AddComponent<TrailRenderer>();
-                trail.time = 0.08f;
-                trail.startWidth = 0.08f;
-                trail.endWidth = 0.01f;
+                trail.time = 0.16f;
+                trail.startWidth = 0.16f;
+                trail.endWidth = 0.02f;
                 Shader shader = Shader.Find("Sprites/Default") ?? Shader.Find("Particles/Standard Unlit");
                 if (shader != null) trail.material = new Material(shader);
-                trail.startColor = new Color(0.25f, 1.0f, 0.65f, 0.70f);
+                trail.startColor = new Color(0.25f, 1.0f, 0.65f, 0.85f);
                 trail.endColor = new Color(0.10f, 0.90f, 0.40f, 0f);
                 trail.sortingLayerName = "Effects";
-                trail.sortingOrder = 49;
+                trail.sortingOrder = 195;
+
+                // Letupan angin saat anak panah dilepas dari busur (Bow Muzzle Burst)
+                if (SkillVfxManager.Instance != null)
+                {
+                    SkillVfxManager.Instance.SpawnProceduralParticleBurst(projObj.transform.position, new Color(0.25f, 1.0f, 0.65f), Color.white, 8, 1.5f, sortingOrder: 210);
+                }
             }
 
             var proj = projObj.GetComponent<Projectile>();

@@ -310,6 +310,7 @@ namespace FantasyDefense.GridSystem
             if (!isGemLifted && currentDelta.magnitude >= 0.08f * cellSize)
             {
                 isGemLifted = true;
+                draggedUnit.SetExternalDrag(true);
                 draggedUnit.transform.localScale = draggedUnitOriginScale * liftScaleMultiplier;
                 if (draggedUnitSpriteRenderer != null)
                 {
@@ -334,6 +335,8 @@ namespace FantasyDefense.GridSystem
                 float cancelDist = cancelDragDistanceMultiplier * cellSize;
                 Vector2 clampedDelta = Vector2.ClampMagnitude(currentDelta, maxDist);
                 Vector3 targetPos = draggedUnitOriginPos + (Vector3)clampedDelta;
+                // Elevasi vertikal taktil khusus mobile agar gem tidak tertutup jempol pemain dan terlihat melayang
+                targetPos.y += 0.22f * cellSize;
                 targetPos.z = -0.4f;
 
                 draggedUnit.transform.position = Vector3.Lerp(draggedUnit.transform.position, targetPos, Time.deltaTime * 35f);
@@ -391,6 +394,7 @@ namespace FantasyDefense.GridSystem
             {
                 if (draggedUnit != null)
                 {
+                    draggedUnit.SetExternalDrag(false);
                     if (draggedUnitSpriteRenderer != null) draggedUnitSpriteRenderer.sortingOrder = draggedUnitOriginalSortingOrder;
                     draggedUnit.transform.localScale = draggedUnitOriginScale;
                     draggedUnit.transform.position = draggedUnitOriginPos;
@@ -406,6 +410,7 @@ namespace FantasyDefense.GridSystem
             {
                 if (draggedUnit != null)
                 {
+                    draggedUnit.SetExternalDrag(false);
                     if (draggedUnitSpriteRenderer != null) draggedUnitSpriteRenderer.sortingOrder = draggedUnitOriginalSortingOrder;
                     draggedUnit.transform.localScale = draggedUnitOriginScale;
                     draggedUnit.transform.position = draggedUnitOriginPos;
@@ -439,6 +444,7 @@ namespace FantasyDefense.GridSystem
                 Debug.Log($"[GridInputHandler] Drag Dibatalkan: Jarak geser {delta.magnitude:F2} melebihi batas toleransi {cancelDist:F2}. Gem dikembalikan ke petak asal.");
                 if (draggedUnit != null)
                 {
+                    draggedUnit.SetExternalDrag(false);
                     snapBackCoroutine = StartCoroutine(SnapBackGemRoutine(draggedUnit, draggedUnitOriginPos, draggedUnitOriginScale, 0.14f));
                     draggedUnit = null;
                     isGemLifted = false;
@@ -466,6 +472,7 @@ namespace FantasyDefense.GridSystem
                 Debug.Log($"[GridInputHandler] Swipe Ditolak: Jarak {delta.magnitude:F2} < {threshold:F2} (Screen: {screenDeltaPx:F1}px, Durasi: {gestureDuration:F2}s -> Terdeteksi Tap/Klik biasa).");
                 if (draggedUnit != null)
                 {
+                    draggedUnit.SetExternalDrag(false);
                     snapBackCoroutine = StartCoroutine(SnapBackGemRoutine(draggedUnit, draggedUnitOriginPos, draggedUnitOriginScale, 0.10f));
                     draggedUnit = null;
                     isGemLifted = false;
@@ -500,6 +507,7 @@ namespace FantasyDefense.GridSystem
 
             if (draggedUnit != null)
             {
+                draggedUnit.SetExternalDrag(false);
                 draggedUnit.transform.localScale = draggedUnitOriginScale;
                 draggedUnit.transform.position = draggedUnitOriginPos;
                 draggedUnit = null;
@@ -513,6 +521,7 @@ namespace FantasyDefense.GridSystem
         private IEnumerator SnapBackGemRoutine(UnitController unit, Vector3 targetPos, Vector3 targetScale, float duration)
         {
             if (unit == null) yield break;
+            unit.SetExternalDrag(false);
             Vector3 startP = unit.transform.position;
             Vector3 startS = unit.transform.localScale;
             float elapsed = 0f;

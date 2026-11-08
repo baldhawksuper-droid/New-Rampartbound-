@@ -109,6 +109,26 @@ namespace FantasyDefense.Combat
         public bool IsDragging => isDragging;
 
         /// <summary>
+        /// Mengatur status pergeseran eksternal (misal lewat GridInputHandler).
+        /// Mengunci agar LateUpdate tidak menarik posisi kembali ke petak, mengaktifkan elevasi bayangan tanah,
+        /// dan menghentikan penimpaan posisi oleh coroutine idle.
+        /// </summary>
+        public void SetExternalDrag(bool dragging)
+        {
+            isDragging = dragging;
+            if (dragging)
+            {
+                DraggedUnit = this;
+                SetShadowElevation(0.25f);
+            }
+            else
+            {
+                if (DraggedUnit == this) DraggedUnit = null;
+                SetShadowElevation(0f);
+            }
+        }
+
+        /// <summary>
         /// Menampilkan atau menyembunyikan lingkaran jangkauan serang (Attack Range Circle).
         /// Memberikan kejelasan visual (Visual Clarity) mengenai radius serang hero di medan tempur.
         /// </summary>
@@ -1849,9 +1869,9 @@ namespace FantasyDefense.Combat
         protected virtual void LateUpdate()
         {
             // Guardrail Anti-Melayang (Point 2):
-            // Saat unit sedang diam (tidak ditarik jari dan tidak dalam animasi lerp),
+            // Saat unit sedang diam (tidak ditarik jari, tidak dipilih, dan tidak dalam animasi lerp),
             // posisinya mutlak terkunci di titik pusat petaknya.
-            if (!isDragging && snapRoutine == null && currentCell != null)
+            if (!isDragging && snapRoutine == null && currentCell != null && CurrentlySelectedUnit != this)
             {
                 if (visualAnimator == null || visualAnimator.CurrentState == FantasyDefense.Combat.AnimationState.Idle)
                 {
