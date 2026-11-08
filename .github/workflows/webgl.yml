@@ -37,10 +37,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: Library
-          key: Library-WebGL-${{ steps.unity-version.outputs.version }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          key: Library-WebGL-clean-v3-${{ steps.unity-version.outputs.version }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
           restore-keys: |
-            Library-WebGL-${{ steps.unity-version.outputs.version }}-
-            Library-WebGL-
+            Library-WebGL-clean-v3-${{ steps.unity-version.outputs.version }}-
 
       # Unity's WebGL builder container is large. Free space on this ephemeral
       # GitHub-hosted runner before Docker pulls the image.
@@ -53,17 +52,13 @@ jobs:
             /usr/local/share/powershell /usr/local/share/chromium \
             /usr/local/.ghcup /usr/lib/jvm
           docker system prune --all --force --volumes || true
-          # Disable existing active swap (which causes "Text file busy"), then create clean 8GB non-sparse swap via dd
+          # Disable existing active swap (which causes "Text file busy"), then create clean 10GB swap
           sudo swapoff -a || true
           sudo rm -f /swapfile || true
-          sudo dd if=/dev/zero of=/swapfile bs=1M count=8192 status=none
+          sudo fallocate -l 10G /swapfile || sudo dd if=/dev/zero of=/swapfile bs=1M count=10240
           sudo chmod 600 /swapfile
           sudo mkswap /swapfile
           sudo swapon /swapfile
-          # Optimize VM memory & swap subsystem for heavy compilation
-          sudo sysctl -w vm.swappiness=60
-          sudo sysctl -w vm.vfs_cache_pressure=50
-          sudo sysctl -w vm.overcommit_memory=1
           free -h
           df -h /
 
@@ -98,18 +93,6 @@ jobs:
           buildMethod: BuildScript.BuildWebGL
           buildsPath: Builds
           allowDirtyBuild: true
-          dockerShmSize: '2048m'
-
-      - name: Diagnostic on Build Failure
-        if: failure()
-        shell: bash
-        run: |
-          echo "=== KERNEL OOM / KILL LOGS ==="
-          sudo dmesg -T | grep -i -E "oom|killed|out of memory|cgroup" | tail -n 50 || true
-          echo "=== MEMORY STATE ==="
-          free -h
-          echo "=== DISK STATE ==="
-          df -h /
 
       - name: Verify WebGL Build Artifacts
         shell: bash
